@@ -81,6 +81,14 @@
             z-index: 1;
         }
 
+        .logo-section img {
+            width: 150px;
+            height: 180px;
+            margin-bottom: 20px;
+            animation: pulse 2s ease-in-out infinite;
+            object-fit: contain;
+        }
+
         .logo-section i {
             font-size: 80px;
             margin-bottom: 20px;
@@ -89,17 +97,18 @@
 
         @keyframes pulse {
             0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
+            50% { transform: scale(1.05); }
         }
 
         .logo-section h1 {
-            font-size: 32px;
+            font-size: 28px;
             margin-bottom: 10px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            line-height: 1.3;
         }
 
         .logo-section p {
-            font-size: 16px;
+            font-size: 15px;
             opacity: 0.9;
         }
 
@@ -108,34 +117,40 @@
             padding: 60px 40px;
             position: relative;
             overflow: hidden;
+            display: flex;
+            align-items: center;
         }
 
         .form-container {
             position: absolute;
             width: calc(100% - 80px);
+            top: 50%;
+            transform: translateY(-50%);
             transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
 
         .login-form {
             opacity: 1;
-            transform: translateX(0);
+            transform: translate(-50%, -50%);
+            left: 50%;
         }
 
         .signup-form {
             opacity: 0;
-            transform: translateX(100%);
+            transform: translate(50%, -50%);
+            left: 50%;
             pointer-events: none;
         }
 
         .auth-right.show-signup .login-form {
             opacity: 0;
-            transform: translateX(-100%);
+            transform: translate(-150%, -50%);
             pointer-events: none;
         }
 
         .auth-right.show-signup .signup-form {
             opacity: 1;
-            transform: translateX(0);
+            transform: translate(-50%, -50%);
             pointer-events: all;
         }
 
@@ -147,7 +162,7 @@
         }
 
         .input-group {
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             position: relative;
         }
 
@@ -157,7 +172,7 @@
             top: 50%;
             transform: translateY(-50%);
             color: #000075;
-            font-size: 18px;
+            font-size: 16px;
             transition: all 0.3s;
         }
 
@@ -168,10 +183,10 @@
 
         .input-group input {
             width: 100%;
-            padding: 15px 15px 15px 45px;
+            padding: 14px 15px 14px 45px;
             border: 2px solid #e0e0e0;
             border-radius: 10px;
-            font-size: 16px;
+            font-size: 15px;
             transition: all 0.3s;
             background: #f8f9fa;
         }
@@ -185,7 +200,7 @@
 
         .btn {
             width: 100%;
-            padding: 15px;
+            padding: 14px;
             background: linear-gradient(135deg, #000075 0%, #0056b3 100%);
             color: white;
             border: none;
@@ -227,7 +242,7 @@
             text-align: center;
             margin-top: 20px;
             color: #666;
-            font-size: 15px;
+            font-size: 14px;
         }
 
         .switch-text a {
@@ -250,6 +265,7 @@
             margin-bottom: 20px;
             display: none;
             animation: slideDown 0.3s ease-out;
+            font-size: 14px;
         }
 
         .error-message {
@@ -280,23 +296,265 @@
             }
         }
 
-        /* Responsive styles remain the same... */
+        /* Tablet va kichik ekranlar uchun */
+        @media (max-width: 900px) {
+            .auth-container {
+                max-width: 750px;
+            }
+
+            .auth-left {
+                padding: 50px 30px;
+            }
+
+            .auth-right {
+                padding: 50px 30px;
+            }
+
+            .logo-section h1 {
+                font-size: 24px;
+            }
+
+            .logo-section img {
+                width: 130px;
+                height: 160px;
+            }
+        }
+
+        /* Mobil ekranlar uchun */
         @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
             .auth-container {
                 flex-direction: column;
                 max-width: 500px;
+                min-height: auto;
+                border-radius: 20px;
             }
             
             .auth-left {
                 padding: 40px 25px;
+                min-height: auto;
+            }
+
+            .auth-left::before,
+            .auth-left::after {
+                width: 150px;
+                height: 150px;
             }
             
+            .logo-section img {
+                width: 100px;
+                height: 120px;
+            }
+
             .logo-section i {
                 font-size: 60px;
             }
             
             .logo-section h1 {
+                font-size: 20px;
+                margin-bottom: 8px;
+            }
+
+            .logo-section p {
+                font-size: 13px;
+            }
+
+            .auth-right {
+                padding: 40px 25px;
+            }
+
+            .form-container {
+                width: calc(100% - 50px);
+                position: relative;
+                top: 0;
+                left: 0 !important;
+                transform: none !important;
+            }
+
+            .signup-form,
+            .login-form {
+                position: relative;
+                transform: none !important;
+                left: 0 !important;
+            }
+
+            .auth-right.show-signup .signup-form {
+                display: block;
+                opacity: 1;
+            }
+
+            .auth-right.show-signup .login-form {
+                display: none;
+            }
+
+            .login-form {
+                display: block;
+            }
+
+            .signup-form {
+                display: none;
+            }
+
+            h2 {
                 font-size: 24px;
+                margin-bottom: 25px;
+            }
+
+            .input-group {
+                margin-bottom: 18px;
+            }
+
+            .input-group input {
+                padding: 12px 15px 12px 42px;
+                font-size: 14px;
+            }
+
+            .input-group i {
+                font-size: 15px;
+                left: 13px;
+            }
+
+            .btn {
+                padding: 13px;
+                font-size: 15px;
+            }
+
+            .switch-text {
+                font-size: 13px;
+                margin-top: 18px;
+            }
+
+            .error-message,
+            .success-message {
+                padding: 10px 12px;
+                font-size: 13px;
+            }
+        }
+
+        /* Juda kichik mobil ekranlar */
+        @media (max-width: 400px) {
+            body {
+                padding: 5px;
+            }
+
+            .auth-container {
+                border-radius: 15px;
+            }
+
+            .auth-left {
+                padding: 30px 20px;
+            }
+
+            .logo-section img {
+                width: 80px;
+                height: 100px;
+                margin-bottom: 15px;
+            }
+
+            .logo-section h1 {
+                font-size: 18px;
+            }
+
+            .logo-section p {
+                font-size: 12px;
+            }
+
+            .auth-right {
+                padding: 30px 20px;
+            }
+
+            .form-container {
+                width: calc(100% - 40px);
+                position: relative;
+                top: 0;
+                left: 0 !important;
+                transform: none !important;
+            }
+
+            h2 {
+                font-size: 22px;
+                margin-bottom: 20px;
+            }
+
+            .input-group {
+                margin-bottom: 15px;
+            }
+
+            .input-group input {
+                padding: 11px 12px 11px 38px;
+                font-size: 13px;
+                border-radius: 8px;
+            }
+
+            .input-group i {
+                font-size: 14px;
+                left: 12px;
+            }
+
+            .btn {
+                padding: 12px;
+                font-size: 14px;
+                border-radius: 8px;
+            }
+
+            .switch-text {
+                font-size: 12px;
+            }
+        }
+
+        /* Landscape mobil rejim */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .auth-container {
+                flex-direction: row;
+                max-width: 90vw;
+            }
+
+            .auth-left {
+                flex: 0.8;
+                padding: 30px 20px;
+            }
+
+            .logo-section img {
+                width: 70px;
+                height: 90px;
+            }
+
+            .logo-section h1 {
+                font-size: 16px;
+            }
+
+            .logo-section p {
+                font-size: 11px;
+            }
+
+            .auth-right {
+                flex: 1.2;
+                padding: 30px 25px;
+            }
+
+            h2 {
+                font-size: 20px;
+                margin-bottom: 15px;
+            }
+
+            .input-group {
+                margin-bottom: 12px;
+            }
+
+            .input-group input {
+                padding: 10px 12px 10px 38px;
+            }
+
+            .btn {
+                padding: 11px;
+                margin-top: 5px;
+            }
+
+            .switch-text {
+                margin-top: 12px;
             }
         }
     </style>
@@ -305,7 +563,7 @@
     <div class="auth-container">
         <div class="auth-left">
             <div class="logo-section">
-                   <img  src="/static/image/robot.png" width="200px" height="250px"  alt="Robot" />
+                <img src="/static/image/robot.png" alt="MMP Robot" />
                 <h1>Milliy Muhandislik Platformasi</h1>
                 <p>Kelajak muhandislarini tayyorlaymiz</p>
             </div>
@@ -316,23 +574,9 @@
             <div class="form-container login-form">
                 <h2>Kirish</h2>
                 
-                {% if messages %}
-                    {% for message in messages %}
-                        <div class="{% if message.tags == 'error' %}error-message{% else %}success-message{% endif %} show">
-                            <i class="fas fa-{% if message.tags == 'error' %}exclamation-circle{% else %}check-circle{% endif %}"></i> 
-                            {{ message }}
-                        </div>
-                    {% endfor %}
-                {% endif %}
+                <div id="loginMessages"></div>
 
-                {% if error == 'invalid' %}
-                <div class="error-message show">
-                    <i class="fas fa-exclamation-circle"></i> Login yoki parol noto'g'ri!
-                </div>
-                {% endif %}
-
-                <form method="POST" action="{% url 'main:login' %}">
-                    {% csrf_token %}
+                <form method="POST" action="/login/">
                     <input type="hidden" name="action" value="login">
                     
                     <div class="input-group">
@@ -359,22 +603,9 @@
             <div class="form-container signup-form">
                 <h2>Ro'yxatdan o'tish</h2>
 
-                {% if error == 'password_mismatch' %}
-                <div class="error-message show">
-                    <i class="fas fa-exclamation-circle"></i> Parollar mos kelmadi!
-                </div>
-                {% elif error == 'username_exists' %}
-                <div class="error-message show">
-                    <i class="fas fa-exclamation-circle"></i> Bu foydalanuvchi nomi band!
-                </div>
-                {% elif error == 'email_exists' %}
-                <div class="error-message show">
-                    <i class="fas fa-exclamation-circle"></i> Bu email allaqachon ro'yxatdan o'tgan!
-                </div>
-                {% endif %}
+                <div id="signupMessages"></div>
 
-                <form method="POST" action="{% url 'main:login' %}">
-                    {% csrf_token %}
+                <form method="POST" action="/login/">
                     <input type="hidden" name="action" value="signup">
 
                     <div class="input-group">
@@ -418,13 +649,8 @@
             document.getElementById('authRight').classList.remove('show-signup');
         }
 
-        // Agar signup xato bo'lsa, signup formani ko'rsatish
-  
+        // Django messages uchun (agar kerak bo'lsa)
+        // Bu yerda server-side messages ni ko'rsatish uchun kod qo'shishingiz mumkin
     </script>
-    {% if error %}
-<script>
-    switchToSignup();
-</script>
-{% endif %}
 </body>
 </html>
