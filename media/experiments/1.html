@@ -1,0 +1,2424 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radio Controller va Servo Motor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+/* MODAL TUZATISH - Responsive va to'g'ri ko'rinish */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    overflow-y: auto;
+    padding: 20px 0;
+}
+
+.modal-content {
+    background: #000075;
+    color: white;
+    margin: 10vh auto 5vh;
+    padding: 30px;
+    width: 90%;
+    max-width: 800px;
+    border-radius: 20px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+    position: relative;
+    animation: slideDown 0.4s ease;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+/* Scroll bar stilizatsiyasi */
+.modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.close {
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    font-size: 32px;
+    font-weight: bold;
+    cursor: pointer;
+    color: white;
+    transition: all 0.3s;
+    z-index: 2010;
+    line-height: 1;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.close:hover {
+    background: rgba(255, 204, 0, 0.3);
+    color: #ffcc00;
+    transform: rotate(90deg);
+}
+
+.modal-content h2 {
+    font-size: 28px;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+    padding-right: 50px;
+}
+
+.card {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    transition: all 0.3s;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    z-index: 1;
+}
+
+.card:hover {
+    background: rgba(255, 255, 255, 0.18);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.card video {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    background: #000;
+    position: relative;
+    z-index: 2;
+}
+
+.card p {
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 10px 0 0;
+    position: relative;
+    z-index: 2;
+}
+
+.card strong {
+    color: #ffcc00;
+    font-size: 18px;
+}
+
+/* Tab buttons */
+.tab-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 2;
+}
+
+.tab-buttons button {
+    flex: 1;
+    min-width: 150px;
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s;
+    position: relative;
+    z-index: 2;
+}
+
+.tab-buttons button:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+}
+
+.tab-buttons button.active {
+    background: rgba(255, 204, 0, 0.4);
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(255, 204, 0, 0.3);
+}
+
+.tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease;
+    position: relative;
+    z-index: 2;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.tab-content pre {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    border-radius: 12px;
+    overflow-x: auto;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #00ff00;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    z-index: 2;
+}
+
+.tab-content pre::-webkit-scrollbar {
+    height: 8px;
+}
+
+.tab-content pre::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.tab-content pre::-webkit-scrollbar-thumb {
+    background: rgba(0, 255, 0, 0.3);
+    border-radius: 10px;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+/* Flex Layout: 40% Video + 60% Text */
+.flex-container-40-60 {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+}
+
+.flex-video-40 {
+    flex: 0 0 40%;
+}
+
+.flex-video-40 iframe {
+    width: 100%;
+    height: 250px;
+    border-radius: 10px;
+}
+
+.flex-text-60 {
+    flex: 0 0 60%;
+}
+
+.flex-text-60 p {
+    font-size: 16px;
+    line-height: 1.8;
+}
+
+/* Flex Layout: 30% Image + 70% Text */
+.flex-container-30-70 {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+}
+
+.flex-image-30 {
+    flex: 0 0 30%;
+}
+
+.flex-image-30 img {
+    width: 100%;
+    border-radius: 10px;
+}
+
+.flex-text-70 {
+    flex: 0 0 70%;
+}
+
+.flex-text-70 strong {
+    color: #ffcc00;
+    font-size: 18px;
+    display: block;
+    margin-bottom: 10px;
+}
+
+/* 100% Video */
+.video-full video {
+    width: 100%;
+    border-radius: 15px;
+}
+
+/* Dumaloq tugma */
+#infoFloatingBtn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #000075, #0000ff);
+    color: white;
+    border: 4px solid white;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    z-index: 1500;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+#infoFloatingBtn:hover {
+    transform: scale(1.1);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .flex-container-40-60,
+    .flex-container-30-70 {
+        flex-direction: column;
+    }
+    
+    .flex-video-40, .flex-text-60,
+    .flex-image-30, .flex-text-70 {
+        flex: 0 0 100%;
+    }
+}
+/* Tablet responsive */
+@media (max-width: 1024px) {
+    .modal {
+        padding: 15px 0;
+    }
+    
+    .modal-content {
+        width: 95%;
+        padding: 25px;
+        max-height: 75vh;
+        margin: 8vh auto 5vh;
+    }
+    
+    .modal-content h2 {
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+    
+    .card {
+        padding: 15px;
+    }
+    
+    .card p {
+        font-size: 15px;
+    }
+    
+    .tab-buttons button {
+        font-size: 15px;
+        padding: 10px 15px;
+    }
+}
+
+/* Mobile responsive */ 
+@media (max-width: 768px) {
+    .modal {
+        padding: 10px 0;
+    }
+    
+    .modal-content {
+        width: 96%;
+        padding: 20px 15px;
+        margin: 5vh auto 3vh;
+        max-height: 85vh;
+        border-radius: 15px;
+    }
+    
+    .close {
+        right: 10px;
+        top: 10px;
+        font-size: 28px;
+        width: 35px;
+        height: 35px;
+    }
+    
+    .modal-content h2 {
+        font-size: 20px;
+        margin-bottom: 15px;
+        padding-bottom: 12px;
+        padding-right: 45px;
+    }
+    
+    .card {
+        padding: 12px;
+        margin-bottom: 15px;
+        border-radius: 12px;
+    }
+    
+    .card video {
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+    
+    .card p {
+        font-size: 14px;
+        line-height: 1.5;
+    }
+    
+    .card strong {
+        font-size: 16px;
+    }
+    
+    .tab-buttons {
+        gap: 8px;
+        margin-bottom: 15px;
+    }
+    
+    .tab-buttons button {
+        min-width: 120px;
+        font-size: 14px;
+        padding: 10px 12px;
+        border-radius: 8px;
+    }
+    
+    .tab-content pre {
+        padding: 15px;
+        font-size: 12px;
+        line-height: 1.5;
+        border-radius: 10px;
+    }
+}
+
+
+/* Small mobile */
+@media (max-width: 480px) {
+    .modal {
+        padding: 5px 0;
+    }
+    
+    .modal-content {
+        width: 98%;
+        padding: 15px 12px;
+        margin: 3vh auto 2vh;
+        max-height: 90vh;
+        border-radius: 12px;
+    }
+    
+    .close {
+        right: 8px;
+        top: 8px;
+        font-size: 24px;
+        width: 30px;
+        height: 30px;
+    }
+    
+    .modal-content h2 {
+        font-size: 18px;
+        margin-bottom: 12px;
+        padding-bottom: 10px;
+        padding-right: 40px;
+    }
+    
+    .card {
+        padding: 10px;
+        margin-bottom: 12px;
+        border-radius: 10px;
+    }
+    
+    .card p {
+        font-size: 13px;
+    }
+    
+    .card strong {
+        font-size: 15px;
+    }
+    
+    .tab-buttons {
+        flex-direction: column;
+        gap: 6px;
+    }
+    
+    .tab-buttons button {
+        width: 100%;
+        min-width: 100%;
+        font-size: 13px;
+        padding: 10px;
+    }
+    
+    .tab-content pre {
+        padding: 12px;
+        font-size: 11px;
+        line-height: 1.4;
+    }
+}
+
+/* Very small mobile */
+@media (max-width: 360px) {
+    .modal-content {
+        padding: 12px 10px;
+        margin: 2vh auto 1vh;
+    }
+    
+    .modal-content h2 {
+        font-size: 16px;
+    }
+    
+    .card {
+        padding: 8px;
+    }
+    
+    .card p {
+        font-size: 12px;
+    }
+    
+    .tab-buttons button {
+        font-size: 12px;
+        padding: 8px;
+    }
+    
+    .tab-content pre {
+        padding: 10px;
+        font-size: 10px;
+    }
+}
+
+/* Landscape mode fixes */
+@media (max-width: 1024px) and (orientation: landscape) {
+    .modal-content {
+        max-height: 80vh;
+        margin: 5vh auto 3vh;
+    }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .tab-buttons button {
+        min-height: 44px;
+    }
+    
+    .close {
+        min-width: 44px;
+        min-height: 44px;
+    }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    .modal-content {
+        border: 3px solid white;
+    }
+    
+    .card {
+        border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .modal-content,
+    .card,
+    .tab-buttons button,
+    .close {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+/* Print styles */
+@media print {
+    .modal {
+        display: none !important;
+    }
+}
+
+/* Scroll bar stilizatsiyasi */
+.modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.close {
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    font-size: 32px;
+    font-weight: bold;
+    cursor: pointer;
+    color: white;
+    transition: all 0.3s;
+    z-index: 10;
+    line-height: 1;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.close:hover {
+    background: rgba(255, 204, 0, 0.3);
+    color: #ffcc00;
+    transform: rotate(90deg);
+}
+
+.modal-content h2 {
+    font-size: 28px;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+    padding-right: 50px;
+}
+
+.card {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    transition: all 0.3s;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.card:hover {
+    background: rgba(255, 255, 255, 0.18);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.card video {
+    width: 100%;
+    max-width: 70%;
+    height: auto;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    background: #000;
+}
+
+.card p {
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 10px 0 0;
+}
+
+
+.card strong {
+    color: #ffcc00;
+    font-size: 18px;
+}
+
+/* Tab buttons */
+.tab-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.tab-buttons button {
+    flex: 1;
+    min-width: 150px;
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.tab-buttons button:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+}
+
+.tab-buttons button.active {
+    background: rgba(255, 204, 0, 0.4);
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(255, 204, 0, 0.3);
+}
+
+.tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.tab-content pre {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    border-radius: 12px;
+    overflow-x: auto;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #00ff00;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tab-content pre::-webkit-scrollbar {
+    height: 8px;
+}
+
+.tab-content pre::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.tab-content pre::-webkit-scrollbar-thumb {
+    background: rgba(0, 255, 0, 0.3);
+    border-radius: 10px;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Tablet responsive */
+@media (max-width: 1024px) {
+    .modal {
+        padding: 15px 0;
+    }
+    
+    .modal-content {
+        width: 95%;
+        padding: 25px;
+        max-height: 80vh;
+    }
+    
+    .modal-content h2 {
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+    
+    .card {
+        padding: 15px;
+    }
+    
+    .card p {
+        font-size: 15px;
+    }
+    
+    .tab-buttons button {
+        font-size: 15px;
+        padding: 10px 15px;
+    }
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .modal {
+        padding: 10px 0;
+    }
+    
+    .modal-content {
+        width: 96%;
+        padding: 20px 15px;
+        margin: 2vh auto;
+        max-height: 90vh;
+        border-radius: 15px;
+    }
+    
+    .close {
+        right: 10px;
+        top: 10px;
+        font-size: 28px;
+        width: 35px;
+        height: 35px;
+    }
+    
+    .modal-content h2 {
+        font-size: 20px;
+        margin-bottom: 15px;
+        padding-bottom: 12px;
+        padding-right: 45px;
+    }
+    
+    .card {
+        padding: 12px;
+        margin-bottom: 15px;
+        border-radius: 12px;
+    }
+    
+    .card video {
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+    
+    .card p {
+        font-size: 14px;
+        line-height: 1.5;
+    }
+    
+    .card strong {
+        font-size: 16px;
+    }
+    
+    .tab-buttons {
+        gap: 8px;
+        margin-bottom: 15px;
+    }
+    
+    .tab-buttons button {
+        min-width: 120px;
+        font-size: 14px;
+        padding: 10px 12px;
+        border-radius: 8px;
+    }
+    
+    .tab-content pre {
+        padding: 15px;
+        font-size: 12px;
+        line-height: 1.5;
+        border-radius: 10px;
+    }
+}
+
+
+/* Small mobile */
+@media (max-width: 480px) {
+    .modal {
+        padding: 5px 0;
+    }
+    
+    .modal-content {
+        width: 98%;
+        padding: 15px 12px;
+        margin: 1vh auto;
+        max-height: 92vh;
+        border-radius: 12px;
+    }
+    
+    .close {
+        right: 8px;
+        top: 8px;
+        font-size: 24px;
+        width: 30px;
+        height: 30px;
+    }
+    
+    .modal-content h2 {
+        font-size: 18px;
+        margin-bottom: 12px;
+        padding-bottom: 10px;
+        padding-right: 40px;
+    }
+    
+    .card {
+        padding: 10px;
+        margin-bottom: 12px;
+        border-radius: 10px;
+    }
+    
+    .card p {
+        font-size: 13px;
+    }
+    
+    .card strong {
+        font-size: 15px;
+    }
+    
+    .tab-buttons {
+        flex-direction: column;
+        gap: 6px;
+    }
+    
+    .tab-buttons button {
+        width: 100%;
+        min-width: 100%;
+        font-size: 13px;
+        padding: 10px;
+    }
+    
+    .tab-content pre {
+        padding: 12px;
+        font-size: 11px;
+        line-height: 1.4;
+    }
+}
+
+/* Very small mobile */
+@media (max-width: 360px) {
+    .modal-content {
+        padding: 12px 10px;
+    }
+    
+    .modal-content h2 {
+        font-size: 16px;
+    }
+    
+    .card {
+        padding: 8px;
+    }
+    
+    .card p {
+        font-size: 12px;
+    }
+    
+    .tab-buttons button {
+        font-size: 12px;
+        padding: 8px;
+    }
+    
+    .tab-content pre {
+        padding: 10px;
+        font-size: 10px;
+    }
+}
+
+/* Landscape mode fixes */
+@media (max-width: 1024px) and (orientation: landscape) {
+    .modal-content {
+        max-height: 85vh;
+        margin: 2vh auto;
+    }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .tab-buttons button {
+        min-height: 44px;
+    }
+    
+    .close {
+        min-width: 44px;
+        min-height: 44px;
+    }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    .modal-content {
+        border: 3px solid white;
+    }
+    
+    .card {
+        border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .modal-content,
+    .card,
+    .tab-buttons button,
+    .close {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+/* Print styles */
+@media print {
+    .modal {
+        display: none !important;
+    }
+}
+        body {
+            font-family: Arial, sans-serif;
+            background: #e6f3ff;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: auto;
+        }
+
+        /* HEADER */
+        .header {
+            display: flex;
+            align-items: center;
+            background:#000075;
+            color: white;
+            padding: 10px 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            width: 100%;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000075;
+            font-weight: bold;
+        }
+
+        /* MAIN LAYOUT */
+        .main-container {
+            display: flex;
+            margin-top: 20px;
+            gap: 20px;
+        }
+
+        /* LEFT PANEL */
+        .left-panel {
+            width: 250px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            height: fit-content;
+            position: relative;
+            z-index: 1;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 15px;
+        }
+
+        .control-group h3 {
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 8px;
+            font-size: 14px;
+            border-radius: 5px;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn-success { 
+            background: #28a745; 
+            color: white; 
+        }
+        .btn-danger { 
+            background: #dc3545; 
+            color: white; 
+        }
+        .btn-primary { 
+            background: #000075; 
+            color: white; 
+        }
+        .btn-info { 
+            background:#000075 ; 
+            color: white; 
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .title-header {
+            background: #000075;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0 auto 30px;
+            text-align: center;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        /* CIRCUIT DISPLAY */
+        .circuit-display {
+            display: flex;
+            gap: 40px;
+            justify-content: space-between;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        /* TRANSMITTER SECTION */
+        .transmitter-section {
+          flex: none;          /* Ekranga qarab o'zgarmasin */
+    width: 560px; 
+            background: #f8f9fa;
+            border: 3px solid #000075;
+            border-radius: 15px;
+            padding: 20px;
+            position: relative;
+        }
+
+        .section-title {
+            background: #000075;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: bold;
+            position: absolute;
+            top: -12px;
+            left: 20px;
+        }
+
+        .arduino-board {
+            width: 300px;
+            height: 300px;
+         
+            border-radius: 8px;
+            margin-left: 100px;
+            position: relative;
+           
+        }
+        .wire{
+            position: absolute;
+            z-index: 10;
+
+        }
+        .wire-red{
+            background-color: red;
+            top: 335px;
+            left: 580px;
+            height: 270px;
+            width: 3px;
+            transform: rotate(-7deg);
+        }
+        .wire-black{
+            background-color:black;
+            top: 345px;
+            left: 588px;
+            height: 260px;
+            width: 3px;
+            transform: rotate(-11deg);
+        }
+
+         .wire-red1{
+            background-color: red;
+            top: 335px;
+            right: 332px;
+            height: 270px;
+            width: 3px;
+            transform: rotate(-7deg);
+        }
+        .wire-black1{
+            background-color:black;
+            top: 345px;
+            right: 325px;
+            height: 260px;
+            width: 3px;
+            transform: rotate(-11deg);
+        }
+
+        
+        .wire-blue{
+            background-color:blue;
+            top: 335px;
+            right: 330px;
+            height: 102px;
+            width: 3px;
+            transform: rotate(-9deg);
+        }
+         .wire-blue1{
+            background-color:skyblue;
+            top: 345px;
+            right: 325px;
+            height: 92px;
+            width: 3px;
+            transform: rotate(-15deg);
+        }
+          .wire-blue2{
+            background-color:pink;
+            top: 329px;
+            right: 295px;
+            height: 115px;
+            width: 3px;
+            transform: rotate(-32deg);
+        }
+         .wire-blue3{
+            background-color:aqua;
+            top: 345px;
+            right: 305px;
+            height: 92px;
+            width: 3px;
+            transform: rotate(-12deg);
+        }
+        .wire-blue4{
+            background-color:green;
+            top: 345px;
+            right: 315px;
+            height: 95px;
+            width: 3px;
+            transform: rotate(-15deg);
+        }
+         .wire-blue5{
+            background-color:skyblue;
+            top: 345px;
+            left: 587px;
+            height: 94px;
+            width: 3px;
+            transform: rotate(-15deg);
+        }
+          .wire-blue6{
+            background-color:pink;
+            top: 329px;
+            left: 617px;
+            height: 115px;
+            width: 3px;
+            transform: rotate(-32deg);
+        }
+         .wire-blue7{
+            background-color:aqua;
+            top: 345px;
+            left: 608px;
+            height: 92px;
+            width: 3px;
+            transform: rotate(-12deg);
+        }
+        .wire-blue8{
+            background-color:green;
+            top: 345px;
+            left: 598px;
+            height: 95px;
+            width: 3px;
+            transform: rotate(-15deg);
+        }
+         .wire-blue9{
+            background-color:blue;
+            top: 335px;
+            left:585px;
+            height: 102px;
+            width: 3px;
+            transform: rotate(-9deg);
+        }
+         .wire-red4{
+            background-color: red;
+            top: 600px;
+            left: 605px;
+            height: 50px;
+            width: 3px;
+         
+        }
+        .wire-black4{
+            background-color:black;
+              top: 600px;
+            left: 624px;
+            height: 60px;
+            width: 3px;
+            
+        }
+         .wire-red5{
+            background-color: red;
+            top: 600px;
+            right: 305px;
+            height: 50px;
+            width: 3px;
+         
+        }
+        .wire-black5{
+            background-color:black;
+              top: 600px;
+            right: 290px;
+            height: 60px;
+            width: 3px;
+            
+        }
+
+          .wire-red6{
+            background-color: red;
+            top: 650px;
+            left: 505px;
+            height: 85px;
+            width: 3px;
+         
+        }
+        .wire-black6{
+            background-color:black;
+              top: 660px;
+            left: 525px;
+            height: 85px;
+            width: 3px;
+            
+        }
+
+        .wire-red7{
+            background-color: red;
+            top: 650px;
+            left: 508px;
+            height: 3px;
+            width: 100px;
+         
+        }
+        .wire-black7{
+            background-color:black;
+              top: 660px;
+            left: 527px;
+            height: 3px;
+            width: 100px;
+            
+        }
+        .wire-red8{
+            background-color: red;
+            top: 735px;
+            left: 505px;
+            height: 3px;
+            width: 35px;
+         
+        }
+        .wire-black8{
+            background-color:black;
+              top: 742px;
+            left: 525px;
+            height: 3px;
+            width: 15px;
+            
+        }
+
+          .wire-red5{
+            background-color: red;
+            top: 600px;
+            right: 305px;
+            height: 50px;
+            width: 3px;
+         
+        }
+        .wire-black5{
+            background-color:black;
+              top: 600px;
+            right: 290px;
+            height: 60px;
+            width: 3px;
+            
+        }
+
+          .wire-red6{
+            background-color: red;
+            top: 650px;
+            left: 505px;
+            height: 85px;
+            width: 3px;
+         
+        }
+        .wire-black6{
+            background-color:black;
+              top: 660px;
+            left: 525px;
+            height: 85px;
+            width: 3px;
+            
+        }
+
+        .wire-red7{
+            background-color: red;
+            top: 650px;
+            left: 508px;
+            height: 3px;
+            width: 100px;
+         
+        }
+        .wire-black7{
+            background-color:black;
+              top: 660px;
+            left: 527px;
+            height: 3px;
+            width: 100px;
+            
+        }
+        .wire-red8{
+            background-color: red;
+            top: 735px;
+            left: 505px;
+            height: 3px;
+            width: 35px;
+         
+        }
+        .wire-black8{
+            background-color:black;
+              top: 742px;
+            left: 525px;
+            height: 3px;
+            width: 15px;
+            
+        }
+
+        .wire-red9{
+            background-color: red;
+            top: 750px;
+            right: 385px;
+            height: 3px;
+            width: 23px;
+         
+        }
+        .wire-black9{
+            background-color:black;
+              top: 660px;
+            right: 450px;
+            height: 95px;
+            width: 3px;
+            
+        }
+
+          .wire-red10{
+            background-color: red;
+            top: 650px;
+            right: 405px;
+            height: 100px;
+            width: 3px;
+         
+        }
+       
+        .wire-red11{
+            background-color: red;
+            top: 650px;
+            right: 305px;
+            height: 3px;
+            width: 100px;
+         
+        }
+        .wire-black11{
+            background-color:black;
+            top: 660px;
+            right: 290px;
+            height: 3px;
+            width: 160px;
+            
+        }
+      
+        .wire-black12{
+            background-color:black;
+            top: 755px;
+            right: 380px;
+            height: 3px;
+            width:73px;
+            
+        }
+        .wire-brown{
+            background-color:brown;
+            top: 728px;
+            left: 467px;
+            height: 3px;
+            width:73px;
+        }
+        .wire-brown1{
+            background-color:brown;
+            top: 630px;
+            left: 467px;
+            height: 100px;
+            width:3px;
+        }
+          .wire-brown2{
+            background-color:brown;
+            top: 630px;
+            left: 467px;
+            height: 3px;
+            width:185px;
+        }
+          .wire-brown3{
+            background-color:brown;
+            top: 600px;
+            left: 650px;
+            height: 33px;
+            width:3px;
+        }
+         .wire-yellow{
+            background-color:yellow;
+            top: 743px;
+            right: 380px;
+            height: 3px;
+            width:90px;
+        }
+        .wire-yellow1{
+            background-color:yellow;
+            top: 630px;
+            right: 467px;
+            height: 115px;
+            width:3px;
+        }
+          .wire-yellow2{
+            background-color:yellow;
+            top: 630px;
+            right: 272px;
+            height: 3px;
+            width:198px;
+        }
+          .wire-yellow3{
+            background-color:yellow;
+            top: 435px;
+            right: 272px;
+            height: 195px;
+            width:3px;
+        }
+        .arduino-board::before {
+       
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .joystick-module {
+            width: 80px;
+            height: 80px;
+            background: #4a4a4a;
+            border-radius: 50%;
+            margin: 20px auto;
+            position: relative;
+            cursor: grab;
+            border: 4px solid #333;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        .joystick-knob {
+            width: 50px;
+            height: 50px;
+            background: black;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            cursor: grab;
+            transition: all 0.1s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .joystick-knob:active {
+            cursor: grabbing;
+        }
+
+        .nrf24l01 {
+            width: 150px;
+            height: 150px;
+          
+            border-radius: 4px;
+            text-align: center;
+            margin-left: 180px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        /* RECEIVER SECTION */
+        .receiver-section {
+         flex: none;          /* Ekranga qarab o'zgarmasin */
+    width: 565px; 
+            background: #f8f9fa;
+            border: 3px solid #28a745;
+            border-radius: 15px;
+            padding: 20px;
+            position: relative;
+        }
+
+        .receiver-section .section-title {
+            background: #28a745;
+        }
+
+      /* RECEIVER: servo container + arm (replace existing .servo-body & .servo-arm) */
+.servo-container {
+    margin: 30px auto;
+    width: 150px;   /* konteynerni biroz kattalashtirdim */
+    height: 150px;
+    position: relative;
+}
+
+.servo-body {
+    width: 150px;
+    height: 150px;
+    border-radius: 8px;
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    overflow: visible;
+}
+
+/* servo-arm konteyner: markazi chapda pivot bo'ladi */
+.servo-arm {
+    width: 120px;             /* qo'l uzunligi (rasmga moslang) */
+    height: 100px;             /* qo'l balandligi (rasmga moslang) */
+    position: absolute;
+    top: 38%;
+    left: 32%;                /* chapdan ozgina joylash - pivot chap tomonda bo'ladi */
+     transform-origin: center center;  /* Pivot markaz */
+    transform: translate(-50%, -50%) rotate(0deg);  /* translate qo'shildi */
+    transition: transform 0.18s linear;
+    pointer-events: none;     /* qo'lni sudrashda muammo bo'lmasin */
+}
+
+        .servo-center-dot {
+            width: 8px;
+            height: 8px;
+            background: #666;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2;
+        }
+
+        /* STATUS DISPLAYS */
+        .status-display {
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+        }
+
+        .value {
+            color: #00ff00;
+            font-weight: bold;
+        }
+
+        /* SIGNAL STRENGTH */
+        .signal-indicator {
+            display: flex;
+            gap: 3px;
+            align-items: flex-end;
+            margin: 10px 0;
+        }
+
+        .signal-bar {
+            width: 8px;
+            background: #ddd;
+            border-radius: 2px;
+        }
+
+        .signal-bar.active {
+            background: #00ff00;
+        }
+
+        .signal-bar:nth-child(1) { height: 10px; }
+        .signal-bar:nth-child(2) { height: 15px; }
+        .signal-bar:nth-child(3) { height: 20px; }
+        .signal-bar:nth-child(4) { height: 25px; }
+        .signal-bar:nth-child(5) { height: 30px; }
+
+        /* ANIMATIONS */
+        @keyframes dataTransmit {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        .transmitting {
+            animation: dataTransmit 0.5s ease-in-out infinite;
+        }
+
+        /* CONNECTION LINES */
+        .connection-line {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(90deg, #000075, #28a745);
+            z-index: -1;
+            top: 50%;
+            left: 100%;
+            width: 40px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .connected .connection-line {
+            opacity: 1;
+            animation: dataFlow 1s linear infinite;
+        }
+
+        @keyframes dataFlow {
+            0% { transform: translateX(0); opacity: 1; }
+            100% { transform: translateX(20px); opacity: 0; }
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .left-panel {
+                width: 100%;
+            }
+            
+            .circuit-display {
+                flex-direction: column;
+                gap: 20px;
+            }
+        }
+           a{
+            text-decoration: none; 
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="logo">
+                    <a href="/"><img src="/static/image/logo.png" width="80px" height="80px" alt=""></a>
+            <span>Radio Controller va Servo Motor</span>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <div class="main-container">
+        <!-- LEFT PANEL -->
+        <div class="left-panel">
+            <div class="control-group">
+                <h3>Boshqaruv</h3>
+                <button class="btn btn-success" onclick="connectSystem()" id="connectBtn">
+                    Ulanish
+                </button>
+                <button class="btn btn-danger" onclick="disconnectSystem()" id="disconnectBtn">
+                    Uzish
+                </button>
+                <button class="btn btn-primary" onclick="resetServo()">
+                    Servo Reset
+                </button>
+                <button class="btn btn-info" onclick="testSystem()">
+                    Test
+                </button>
+            </div>
+    <div class="control-group">
+    <h3>Ma'lumotlar</h3>
+    <button class="btn btn-primary" id="schemaBtn">💡 Sxema qayerda ishlatiladi</button>
+    <button class="btn btn-primary" id="codeBtn">💻 Kod</button>
+    <button class="btn btn-primary" id="componentsBtn">🔌 Qurilmalar</button>
+</div>
+            <div class="control-group">
+                <h3>Sozlamalar</h3>
+                <button class="btn btn-primary" onclick="showConnectionInfo()">
+                    Ulanish Ma'lumotlari
+                </button>
+                <button class="btn btn-primary" onclick="showTechnicalInfo()">
+                    Texnik Ma'lumotlar
+                </button>
+            </div>
+
+            <div class="control-group">
+                <h3>Tizim Holati</h3>
+                <div class="status-row">
+                    <span>Ulanish:</span>
+                    <div class="status-led" id="connectionLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Joystick:</span>
+                    <div class="status-led" id="joystickLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Servo:</span>
+                    <div class="status-led" id="servoLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Signal:</span>
+                    <div class="signal-indicator" id="signalStrength">
+                        <div class="signal-bar"></div>
+                        <div class="signal-bar"></div>
+                        <div class="signal-bar"></div>
+                        <div class="signal-bar"></div>
+                        <div class="signal-bar"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <div class="modal" id="schemaModal">
+        <div class="modal-content">
+            <span class="close" title="Yopish">&times;</span>
+            <h2>💡 Sxema qayerda ishlatiladi </h2>
+
+            <div class="flex-container-40-60">
+                <div class="flex-video-40">
+                    <!-- 1-video (xohlasangiz almashtiring) -->
+                    <iframe src="https://www.youtube.com/embed/GwYuixn_9Yg?si=Vj4c8dgP21a_CugK" title="DC Motor Control with L298N"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen></iframe>
+                </div>
+                <div class="flex-text-60">
+                    <strong>20 ta Inovatsiyalar siz uchun</strong>
+                   <p>Arduino va servo motor orqali takrorlashingiz mumkin bo'lgan loyihalar</p>
+                </div>
+            </div>
+
+            <div class="flex-container-40-60">
+                <div class="flex-video-40">
+                    <!-- 2-video (ixtiyoriy) -->
+                    <iframe src="https://www.youtube.com/embed/7rcVeFFHcFM?si=K2a9p0cj9WXg5wL2" title="PWM Speed Control"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen></iframe>
+                </div>
+                <div class="flex-text-60">
+                    <strong>🔄 Ishlash prinsipi</strong>
+                    <p>
+                        Bu tizim ko‘p joyda ishlatiladi:
+
+✔ Masofadan boshqariladigan robotlar
+✔ Dronlar
+✔ Avtomatik eshik/valf boshqaruvi
+✔ Masofadan servo aylantirish loyihalari
+
+                    </p>
+                </div>
+            </div>
+              <div class="flex-container-40-60">
+                <div class="flex-video-40">
+                    <!-- 2-video (ixtiyoriy) -->
+                    <iframe src="https://www.youtube.com/embed/Zvl29mFBhls?si=Q9lDODvDK-rK_NHf" title="PWM Speed Control"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen></iframe>
+                </div>
+                <div class="flex-text-60">
+                    <strong>Tizim 2 qismdan iborat bo‘ladi:</strong>
+               <p>
+
+
+A) Joystick/Transmitter (Uzatgich) — Radio signal yuboradi
+B) Receiver (Qabul qiluvchi) — Servo motorni harakatlantiradi</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- ✅ 3) Qurilmalar -->
+    <div class="modal" id="componentsModal">
+        <div class="modal-content">
+            <span class="close" title="Yopish">&times;</span>
+            <h2>🔌 Ishlatilgan Qurilmalar</h2>
+
+
+            <div class="flex-container-30-70">
+                <div class="flex-image-30"><img src="/static/image/arduino1 - Copy.png" alt="Breadboard"></div>
+                <div class="flex-text-70">
+                    <strong>Arduino (UNO/Nano/Mega)</strong>
+                    <p>Arduino — bu microcontroller plata bo‘lib, loyihadagi barcha elektron qurilmalarni boshqaradi. U sensorlardan ma’lumot oladi, qayta ishlaydi va servo motor kabi aktuatorlarga signal yuboradi.</p>
+                </div>
+            </div>
+             <div class="flex-container-30-70">
+                <div class="flex-image-30"><img src="/static/image/radio - Copy.png" alt="Breadboard"></div>
+                <div class="flex-text-70">
+                    <strong>Radio Moduli (nRF24L01 yoki 433 MHz RF modul)</strong>
+                    <p>Radio moduli ikki Arduino orasida simlarsiz (wireless) aloqa o‘rnatish uchun ishlatiladi. U ma’lumot paketlarini yuqori tezlikda uzatadi va qabul qiladi.</p>
+                </div>
+            </div>
+             <div class="flex-container-30-70">
+                <div class="flex-image-30"><img src="/static/image/servo.m - Copy.png" alt="Breadboard"></div>
+                <div class="flex-text-70">
+                    <strong>Servo Motor (SG90 yoki MG996R)</strong>
+                    <p>Servo motor – aniq 0° dan 180° gacha burchakka harakatlana oladigan motor. Ichida potensiometr va mikrokontroller mavjud.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ✅ 4) Qo'shimcha info (ixtiyoriy) + suzuvchi tugma -->
+    <div class="modal" id="infoModal">
+        <div class="modal-content">
+            <span class="close" title="Yopish">&times;</span>
+            <h2>📚 Qo'shimcha Ma'lumot</h2>
+            <div class="video-full">
+                <video controls>
+                    <source src="/media/2.mp4" type="video/mp4">
+                    Brauzeringiz video formatni qo'llab-quvvatlamaydi.
+                </video>
+            </div>
+        </div>
+    </div>
+
+    <button id="infoFloatingBtn"><span>📚</span><span>Ma'lumot</span></button>
+
+    <div class="modal" id="codeModal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>💻 Kod</h2>
+
+        <div class="tab-buttons">
+            <button class="tab-btn active" data-tab="mblock">mBlock Kodi</button>
+            <button class="tab-btn" data-tab="arduino">Arduino Kodi</button>
+        </div>
+
+        <div class="tab-content active" id="mblock">
+            <pre><img src="/static/image/servo.png" alt="mBlock Code" style="width: 80%; height: auto;"></pre>
+        </div>
+
+        <div class="tab-content" id="arduino">
+            <pre>
+                Transmitter kodi
+#include SPI.h>
+#include nRF24L01.h>
+#include RF24.h>
+
+RF24 radio(9,10);
+const byte address[6] = "00001";
+
+void setup() {
+  radio.begin();
+  radio.openWritingPipe(address);
+  radio.setPALevel(RF24_PA_MIN);
+}
+
+void loop() {
+  int xValue = analogRead(A0);
+  radio.write(&xValue, sizeof(xValue));
+}
+Receiver kodi
+#include SPI.h>
+#include nRF24L01.h>
+#include RF24.h>
+#include Servo.h>
+
+RF24 radio(9,10);
+Servo myservo;
+int xValue;
+
+const byte address[6] = "00001";
+
+void setup() {
+  myservo.attach(3);
+  radio.begin();
+  radio.openReadingPipe(0, address);
+  radio.startListening();
+}
+
+void loop() {
+  if (radio.available()) {
+    radio.read(&xValue, sizeof(xValue));
+
+    int angle = map(xValue, 0, 1023, 0, 180);
+    myservo.write(angle);
+  }
+}
+
+            </pre>
+        </div>
+    </div>
+</div>
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+           
+            
+            <div class="circuit-display">
+                <!-- TRANSMITTER SECTION -->
+                <div class="transmitter-section" id="transmitter">
+                    <div class="section-title">UZATUVCHI (Transmitter)</div>
+                    <div class="connection-line"></div>
+                         <div class="nrf24l01 transmitting" id="transmitterNRF">
+                           <img src="/static/image/radio - Copy.png" width="100%" height="100%" alt="">
+                         </div>
+                    <div class="arduino-board">
+                       <img src="/static/image/arduino1 - Copy.png" width="100%" height="100%" alt="">
+
+                    </div>
+    
+                    <div class="joystick-module" id="joystickModule">
+                        <div class="joystick-knob" id="joystickKnob"></div>
+                    </div>
+                    
+               
+                    
+                    <div class="status-display">
+                        <div class="status-row">
+                            <span>X Pozitsiya:</span>
+                            <span class="value" id="xPosition">512</span>
+                        </div>
+                        <div class="status-row">
+                            <span>Y Pozitsiya:</span>
+                            <span class="value" id="yPosition">512</span>
+                        </div>
+                        <div class="status-row">
+                            <span>Servo Burchak:</span>
+                            <span class="value" id="servoAngle">90°</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="wire wire-red"></div>
+                <div class="wire wire-red1"></div>
+                <div class="wire wire-red2"></div>
+                <div class="wire wire-red3"></div>
+                <div class="wire wire-black"></div>
+                <div class="wire wire-black1"></div>
+                <div class="wire wire-black2"></div>
+                <div class="wire wire-black3"></div>
+                <div class="wire wire-blue"></div>
+                <div class="wire wire-blue1"></div>
+                <div class="wire wire-blue2"></div>
+                <div class="wire wire-blue3"></div>
+                <div class="wire wire-blue4"></div>
+                <div class="wire wire-blue5"></div>
+                <div class="wire wire-blue6"></div>
+                <div class="wire wire-blue7"></div>
+                <div class="wire wire-blue8"></div>
+                <div class="wire wire-blue9"></div>
+                 <div class="wire wire-red4"></div>
+                <div class="wire wire-black4"></div>
+                  <div class="wire wire-red5"></div>
+                <div class="wire wire-black5"></div>
+                 <div class="wire wire-red6"></div>
+                <div class="wire wire-black6"></div>
+                    <div class="wire wire-red7"></div>
+                <div class="wire wire-black7"></div>
+                   <div class="wire wire-red8"></div>
+                <div class="wire wire-black8"></div>
+                 <div class="wire wire-red9"></div>
+                <div class="wire wire-black9"></div>
+                 <div class="wire wire-red10"></div>
+                <div class="wire wire-black10"></div>
+                    <div class="wire wire-red11"></div>
+                <div class="wire wire-black11"></div>
+                   <div class="wire wire-red12"></div>
+                <div class="wire wire-black12"></div>
+                <div class=" wire wire-brown"></div>
+                <div class=" wire wire-brown1"></div>
+                <div class=" wire wire-brown2"></div>
+                <div class=" wire wire-brown3"></div>
+                 <div class=" wire wire-yellow"></div>
+                <div class=" wire wire-yellow1"></div>
+                <div class=" wire wire-yellow2"></div>
+                <div class=" wire wire-yellow3"></div>
+                <!-- RECEIVER SECTION -->
+                <div class="receiver-section" id="receiver">
+                    <div class="section-title">QABUL QILUVCHI (Receiver)</div>
+                    
+                    <div class="nrf24l01 transmitting" id="receiverNRF">
+                       <img src="/static/image/radio - Copy.png" width="100%" height="100%" alt="">
+                    </div>
+                    
+                    <div class="arduino-board">
+                        <img src="/static/image/arduino1 - Copy.png" width="100%" height="100%" alt="">
+                    </div>
+                    
+                    <div class="servo-container">
+                        <div class="servo-body">
+                           <img src="/static/image/servo.m - Copy.png" width="100%" height="100%" alt="">
+                        </div>
+                        <div class="servo-arm" id="servoArm">
+                           <img src="/static/image/hep.png" width="100%" height="100%" alt="">
+                        </div>
+                       
+                    </div>
+                    
+                    <div class="status-display">
+                        <div class="status-row">
+                            <span>Qabul qilingan X:</span>
+                            <span class="value" id="receivedX">512</span>
+                        </div>
+                        <div class="status-row">
+                            <span>Qabul qilingan Y:</span>
+                            <span class="value" id="receivedY">512</span>
+                        </div>
+                        <div class="status-row">
+                            <span>Signal kuchi:</span>
+                            <span class="value" id="signalStrengthValue">-45 dBm</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // System variables
+        let isConnected = false;
+        let joystickX = 512;
+        let joystickY = 512;
+        let servoAngle = 90;
+        let isDragging = false;
+
+        // DOM elements
+        const joystickKnob = document.getElementById('joystickKnob');
+        const joystickModule = document.getElementById('joystickModule');
+        const servoArm = document.getElementById('servoArm');
+        const transmitter = document.getElementById('transmitter');
+        const receiver = document.getElementById('receiver');
+
+        // Status elements
+        const elements = {
+            xPosition: document.getElementById('xPosition'),
+            yPosition: document.getElementById('yPosition'),
+            servoAngle: document.getElementById('servoAngle'),
+            receivedX: document.getElementById('receivedX'),
+            receivedY: document.getElementById('receivedY'),
+            signalStrengthValue: document.getElementById('signalStrengthValue'),
+            connectionLed: document.getElementById('connectionLed'),
+            joystickLed: document.getElementById('joystickLed'),
+            servoLed: document.getElementById('servoLed')
+        };
+
+
+        // Joystick control
+        joystickKnob.addEventListener('mousedown', startDrag);
+        document.addEventListener('mousemove', drag);
+        document.addEventListener('mouseup', stopDrag);
+
+        // Touch events for mobile
+        joystickKnob.addEventListener('touchstart', startDrag);
+        document.addEventListener('touchmove', drag);
+        document.addEventListener('touchend', stopDrag);
+
+        function startDrag(e) {
+            if (!isConnected) return;
+            isDragging = true;
+            joystickKnob.style.cursor = 'grabbing';
+            e.preventDefault();
+        }
+
+        function drag(e) {
+            if (!isDragging || !isConnected) return;
+
+            const rect = joystickModule.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+
+            let clientX, clientY;
+            if (e.type.includes('touch')) {
+                clientX = e.touches[0].clientX;
+                clientY = e.touches[0].clientY;
+            } else {
+                clientX = e.clientX;
+                clientY = e.clientY;
+            }
+
+            const deltaX = clientX - centerX;
+            const deltaY = clientY - centerY;
+            const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+            const maxDistance = 25; // Maximum movement radius
+
+            let x = deltaX;
+            let y = deltaY;
+
+            if (distance > maxDistance) {
+                x = (deltaX / distance) * maxDistance;
+                y = (deltaY / distance) * maxDistance;
+            }
+
+            joystickKnob.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
+
+            // Convert to joystick values (0-1023)
+            joystickX = Math.round(512 + (x / maxDistance) * 512);
+            joystickY = Math.round(512 - (y / maxDistance) * 512); // Inverted Y
+
+            // Constrain values
+            joystickX = Math.max(0, Math.min(1023, joystickX));
+            joystickY = Math.max(0, Math.min(1023, joystickY));
+
+            updateServoPosition();
+            updateDisplay();
+        }
+
+        function stopDrag() {
+            if (!isDragging) return;
+            isDragging = false;
+            joystickKnob.style.cursor = 'grab';
+
+            // Return to center
+            setTimeout(() => {
+                joystickKnob.style.transform = 'translate(-50%, -50%)';
+                joystickX = 512;
+                joystickY = 512;
+                updateServoPosition();
+                updateDisplay();
+            }, 100);
+        }
+
+    /* YANGI KOD: */
+function updateServoPosition() {
+    servoAngle = Math.round((joystickX / 1023) * 180);  /* 270 o'rniga 180 */
+    const rotation = servoAngle - 90;
+    servoArm.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;  /* translate qo'shildi */
+}
+
+
+        function updateDisplay() {
+            elements.xPosition.textContent = joystickX;
+            elements.yPosition.textContent = joystickY;
+            elements.servoAngle.textContent = servoAngle + '°';
+            
+            if (isConnected) {
+                // Add small delay to simulate transmission
+                setTimeout(() => {
+                    elements.receivedX.textContent = joystickX;
+                    elements.receivedY.textContent = joystickY;
+                }, 50);
+            }
+        }
+
+        function connectSystem() {
+            isConnected = true;
+            transmitter.classList.add('connected');
+            receiver.classList.add('connected');
+            
+            // Update status LEDs
+            elements.connectionLed.style.background = '#28a745';
+            elements.connectionLed.style.boxShadow = '0 0 10px rgba(40, 167, 69, 0.8)';
+            elements.joystickLed.style.background = '#28a745';
+            elements.joystickLed.style.boxShadow = '0 0 10px rgba(40, 167, 69, 0.8)';
+            elements.servoLed.style.background = '#28a745';
+            elements.servoLed.style.boxShadow = '0 0 10px rgba(40, 167, 69, 0.8)';
+
+            // Update signal strength
+            updateSignalStrength(5);
+            
+            alert('Tizim muvaffaqiyatli ulandi!');
+        }
+
+        function disconnectSystem() {
+            isConnected = false;
+            transmitter.classList.remove('connected');
+            receiver.classList.remove('connected');
+            
+            // Update status LEDs
+            elements.connectionLed.style.background = '#dc3545';
+            elements.connectionLed.style.boxShadow = 'inset 0 0 5px rgba(0,0,0,0.5)';
+            elements.joystickLed.style.background = '#dc3545';
+            elements.joystickLed.style.boxShadow = 'inset 0 0 5px rgba(0,0,0,0.5)';
+            elements.servoLed.style.background = '#dc3545';
+            elements.servoLed.style.boxShadow = 'inset 0 0 5px rgba(0,0,0,0.5)';
+
+            // Update signal strength
+            updateSignalStrength(0);
+            
+            alert('Tizim uzildi!');
+        }
+
+        function updateSignalStrength(level) {
+            const bars = document.querySelectorAll('.signal-bar');
+            bars.forEach((bar, index) => {
+                if (index < level) {
+                    bar.classList.add('active');
+                } else {
+                    bar.classList.remove('active');
+                }
+            });
+
+            const signalValues = ['-90 dBm', '-75 dBm', '-60 dBm', '-50 dBm', '-35 dBm'];
+            if (level > 0) {
+                elements.signalStrengthValue.textContent = signalValues[level - 1] || '-90 dBm';
+            } else {
+                elements.signalStrengthValue.textContent = 'Signal yo\'q';
+            }
+        }
+
+      function resetServo() {
+    servoAngle = 90;
+    servoArm.style.transform = 'translate(-50%, -50%) rotate(0deg)';
+    joystickX = 512;
+    joystickY = 512;
+    joystickKnob.style.transform = 'translate(-50%, -50%)';
+    updateDisplay();
+    alert('Servo motor reset qilindi!');
+}
+
+
+        function testSystem() {
+            if (!isConnected) {
+                alert('Avval tizimni ulang!');
+                return;
+            }
+
+            alert('Test boshlanmoqda...');
+            
+            // Test sequence
+            const testSequence = [
+                { x: 200, angle: 35 },
+                { x: 512, angle: 90 },
+                { x: 800, angle: 140 },
+                { x: 512, angle: 90 }
+            ];
+
+            let step = 0;
+            const testInterval = setInterval(() => {
+                if (step >= testSequence.length) {
+                    clearInterval(testInterval);
+                    alert('Test tugadi!');
+                    return;
+                }
+
+                const test = testSequence[step];
+                joystickX = test.x;
+                servoAngle = test.angle;
+                
+                const rotation = servoAngle - 90;
+                servoArm.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
+                updateDisplay();
+                
+                step++;
+            }, 1000);
+        }
+
+        function showConnectionInfo() {
+            alert(`Ulanish Ma'lumotlari:
+            
+• Uzatuvchi: Arduino + NRF24L01
+• Qabul qiluvchi: Arduino + NRF24L01 + Servo
+• Chastota: 2.4 GHz
+• Masofa: 100 metrgacha
+• Kechikish: ~50ms`);
+        }
+
+        function showTechnicalInfo() {
+            alert(`Texnik Ma'lumotlar:
+
+• Joystick: Analog 0-1023 qiymatlar
+• Servo: 0°-180° burchak
+• Signal: PWM 50Hz
+• Quvvat: 5V DC
+• Toklar: Arduino ~30mA, Servo ~200mA`);
+        }
+// Modalni ochish
+function openModal(id) {
+    document.getElementById(id).style.display = "block";
+}
+
+// Tugmalarni ulash
+document.getElementById("schemaBtn").addEventListener("click", () => openModal("schemaModal"));
+document.getElementById("codeBtn").addEventListener("click", () => openModal("codeModal"));
+document.getElementById("componentsBtn").addEventListener("click", () => openModal("componentsModal"));
+document.getElementById("infoFloatingBtn").addEventListener("click", () => openModal("infoModal"));
+
+// Yopish tugmalari
+document.querySelectorAll(".close").forEach(btn => {
+    btn.addEventListener("click", function() {
+        this.closest(".modal").style.display = "none";
+    });
+});
+
+// Tab switching (Kod uchun)
+document.querySelectorAll(".tab-btn").forEach(button => {
+    button.addEventListener("click", function() {
+        const tab = this.dataset.tab;
+        document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+        this.classList.add("active");
+        document.querySelectorAll(".tab-content").forEach(content => {
+            content.classList.remove("active");
+            if (content.id === tab) content.classList.add("active");
+        });
+    });
+});
+        // Initialize system
+        function initSystem() {
+            updateDisplay();
+            updateSignalStrength(0);
+            
+            // Set initial LED states
+            const leds = [elements.connectionLed, elements.joystickLed, elements.servoLed];
+            leds.forEach(led => {
+                led.style.width = '12px';
+                led.style.height = '12px';
+                led.style.borderRadius = '50%';
+                led.style.background = '#dc3545';
+                led.style.boxShadow = 'inset 0 0 5px rgba(0,0,0,0.5)';
+                led.style.transition = 'all 0.3s ease';
+            });
+        }
+
+        // Start the system
+        initSystem();
+    </script>
+</body>
+</html>

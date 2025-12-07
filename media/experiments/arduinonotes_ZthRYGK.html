@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arduino Musiqa Zummeri - Nota Ohanglari</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #e6f3ff;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: auto;
+        }
+
+        /* HEADER */
+        .header {
+            display: flex;
+            align-items: center;
+            background: #000075;
+            color: white;
+            padding: 10px 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            width: 100%;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+.left-panel{width:280px;max-width:95%;background:#fff;border-radius:14px;padding:16px;box-shadow:0 6px 16px rgba(0,0,0,.08)}
+  .left-panel h3{margin:0 0 12px;font-size:16px;color:#333}
+  .btn{display:block;width:100%;padding:10px 12px;margin:8px 0;border:0;border-radius:10px;cursor:pointer;transition:.25s;text-align:left;font-weight:600}
+  .btn-primary{background:#000075;color:#fff}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 14px rgba(0,0,0,.1)}
+  .flex-container-40-60{display:flex;gap:20px;align-items:flex-start;background:rgba(255,255,255,.1);padding:20px;border-radius:15px;margin-bottom:20px}
+  .flex-text-60{flex:1}
+  .flex-text-60 p{font-size:16px;line-height:1.8}
+  .flex-container-30-70{display:flex;gap:20px;align-items:flex-start;background:rgba(255,255,255,.1);padding:20px;border-radius:15px;margin-bottom:20px}
+  .flex-image-30{flex:0 0 30%}
+  .flex-image-30 img{width:100%;border-radius:10px}
+  .flex-text-70{flex:0 0 70%}
+  .flex-text-70 strong{color:#ffcc00;font-size:18px;display:block;margin-bottom:10px}
+  .modal{display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.8);backdrop-filter:blur(5px);overflow-y:auto}
+  .modal-content{background:#000075;color:#fff;margin:5vh auto;padding:30px;width:90%;max-width:1000px;border-radius:20px;box-shadow:0 15px 40px rgba(0,0,0,.5);position:relative;animation:slideDown .4s ease}
+  @keyframes slideDown{from{transform:translateY(-50px);opacity:0}to{transform:translateY(0);opacity:1}}
+  .close{position:absolute;right:20px;top:15px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:bold;cursor:pointer;color:#fff;transition:.3s;border-radius:50%;background:rgba(255,255,255,.1)}
+  .close:hover{background:rgba(255,204,0,.3);color:#ffcc00;transform:rotate(90deg)}
+  .modal-content h2{font-size:28px;margin-bottom:25px;padding-bottom:15px;border-bottom:2px solid rgba(255,255,255,.3);padding-right:50px}
+  .tab-buttons{display:flex;gap:8px;margin:12px 0 16px}
+  .tab-btn{flex:1;background:rgba(255,255,255,.12);color:#fff;border:0;border-radius:10px 10px 0 0;padding:10px;cursor:pointer;font-weight:600;transition:.2s}
+  .tab-btn:hover{background:rgba(255,255,255,.2)}
+  .tab-btn.active{background:rgba(255,255,255,.28)}
+  .tab-content{display:none}
+  .tab-content.active{display:block}
+  pre{background:rgba(0,0,0,.35);padding:12px;border-radius:10px;overflow:auto;white-space:pre-wrap;word-break:break-word;color:#fff;font-size:13.5px;line-height:1.55}
+  #infoFloatingBtn{position:fixed;bottom:30px;right:30px;width:120px;height:120px;border-radius:50%;background:linear-gradient(135deg,#000075,#0000ff);color:#fff;border:4px solid #fff;cursor:pointer;font-size:16px;font-weight:bold;box-shadow:0 8px 20px rgba(0,0,0,.4);z-index:1500;transition:.3s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px}
+  #infoFloatingBtn:hover{transform:scale(1.1);box-shadow:0 12px 30px rgba(0,0,255,.6)}
+  #infoFloatingBtn span:first-child{font-size:36px}
+  .video-full{width:100%;border-radius:15px;background:#000}
+  .video-full video{width:100%;height:auto;border-radius:15px;max-height:70vh}
+  @media (max-width:1024px){.flex-container-40-60,.flex-container-30-70{flex-direction:column}.flex-image-30,.flex-text-70{flex:0 0 100%}}
+  @media (max-width:768px){.modal-content{width:96%;padding:20px 15px}#infoFloatingBtn{width:90px;height:90px;font-size:14px;bottom:20px;right:20px}#infoFloatingBtn span:first-child{font-size:28px}}
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: #fff;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        /* MAIN LAYOUT */
+        .main-container {
+            display: flex;
+            margin-top: 20px;
+            gap: 20px;
+        }
+
+        /* LEFT PANEL */
+        .left-panel {
+            width: 250px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            height: fit-content;
+            position: relative;
+            z-index: 1;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 15px;
+        }
+
+        .control-group h3 {
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 8px;
+            font-size: 14px;
+            border-radius: 5px;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn-success { 
+            background: #28a745; 
+            color: white; 
+        }
+        .btn-danger { 
+            background: #dc3545; 
+            color: white; 
+        }
+        .btn-primary { 
+            background: #000075; 
+            color: white; 
+        }
+        .btn-info { 
+            background: #000075; 
+            color: white; 
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .title-header {
+            background: #000075;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0 auto 30px;
+            text-align: center;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        /* CIRCUIT COMPONENTS */
+        .circuit-container {
+         
+            justify-content: center;
+            align-items: flex-start;
+ 
+            min-height: 100px;
+            position: relative;
+        }
+
+        .breadboard {
+            
+     
+            position:absolute;
+            top: -70px;
+            left: 350px;
+
+        }
+
+        .breadboard::before {
+            content: '';
+            position: absolute;
+            width: 90%;
+            height: 2px;
+            background: #666;
+            top: 50%;
+            left: 5%;
+            transform: translateY(-50%);
+        }
+
+        .arduino {
+        
+            border-radius: 8px;
+                       position:absolute;
+            top: 160px;
+            left: 290px;
+           
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .buzzer {
+      
+            border-radius: 50%;
+            position: absolute;
+            top: 80px;
+            left:30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        
+        }
+
+        .buzzer::after {
+            content: '';
+            width: 25px;
+            height: 25px;
+            background: #fff;
+            border-radius: 50%;
+        }
+
+        .buzzer.active {
+            animation: buzzing 0.15s infinite alternate;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
+            border-color: #ffd700;
+        }
+
+        @keyframes buzzing {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.08); }
+        }
+
+        /* LEDs */
+        .led {
+                     width: 20px;
+            height: 30px;
+            border-radius: 10px 10px 0 0;
+            position: absolute;
+   
+          
+            transition: all 0.3s ease;
+        }
+
+        .led-1 { top: 165px; left: 120px; background: #ff4444; }
+        .led-2 { top: 165px; left: 152px; background: #ff4444; }
+        .led-3 { top: 165px; left: 185px; background: #ff4444; }
+        .led-4 { top: 165px; left: 215px; background: #ff4444; }
+        .led-5 { top: 165px; left: 248px; background: #ff4444; }
+
+        .led.active {
+            box-shadow: 0 0 20px currentColor;
+            animation: ledGlow 0.5s ease-in-out;
+        }
+
+        @keyframes ledGlow {
+            0% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+
+        /* RESISTORS */
+        .resistor {
+        
+            position: absolute;
+            border-radius: 4px;
+        }
+
+        .resistor-1 { top: 223px; left: 125px; transform: rotate(-25deg); }
+        .resistor-2 {  top: 223px;  left: 150px;transform: rotate(-8deg); }
+        .resistor-3 {  top: 223px;  left: 182px;transform: rotate(-9deg); }
+        .resistor-4 {  top: 222px;  left: 214px;transform: rotate(-10deg); }
+        .resistor-5 {  top: 222px;  left: 246px;transform: rotate(-8deg); }
+
+        /* WIRES */
+        .wire {
+            position: absolute;
+            z-index: 5;
+        }
+
+        .wire-red { width: 3px; height: 50px; left: 170px; top: 8px; transform: rotate(-40deg); background: #ff0000; }
+        .wire-green { background: #00ff00; }
+        .wire-blue { background: #0066ff; }
+        .wire-yellow { background: #ffff00; }
+        .wire-purple { background: #8a2be2; }
+        .wire-orange { background: #ffa500; }
+        .wire-black { width: 3px; height: 50px; background: #000; left: 160px; bottom: 50px; transform: rotate(-40deg);}
+        .wire-black1 { width: 3px; height: 124px; background: #000; left: 80px; bottom: 91px; transform: rotate(-3deg); }
+        .wrie-skyblue{width: 3px; height: 200px; background: skyblue; left: 120px; bottom: 27px; transform: rotate(-41deg);}
+
+        /* Vertical wires on breadboard */
+        .wire-v1 { width: 3px; height: 120px; top: 202px; left: 165px; transform: rotate(-52deg); }
+        .wire-v2 { width: 3px; height: 100px; top: 212px; left: 185px; transform: rotate(-42deg);  }
+        .wire-v3 { width: 3px; height: 100px; top: 212px; left: 215px; transform: rotate(-42deg);}
+        .wire-v4 { width: 3px; height: 95px; top: 210px; left: 236px; transform: rotate(-28deg); }
+        .wire-v5 { width: 3px; height: 92px; top: 212px; left: 261px; transform: rotate(-20deg);}
+
+        /* STATUS DISPLAY */
+        .status-display {
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            margin: 20px 0;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 8px 0;
+            font-size: 13px;
+        }
+
+        .status-led {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #dc3545;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+        }
+
+        .status-led.on {
+            background: #28a745;
+            box-shadow: 0 0 10px rgba(40, 167, 69, 0.8);
+        }
+
+        /* NOTES CONTROL */
+        .notes-control {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+            margin-top: 400px;
+        }
+
+        .note-btn {
+            padding: 15px 10px;
+            background: linear-gradient(145deg, #4a90e2, #357abd);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .note-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+
+        .note-btn.active {
+            background: linear-gradient(145deg, #ffd700, #ffb700);
+            color: #333;
+        }
+
+        /* MODAL STYLES */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            backdrop-filter: blur(3px);
+        }
+
+        .modal-content {
+            background: #000075;
+            color: white;
+            margin: 5% auto;
+            padding: 20px;
+            width: 60%;
+            max-width: 800px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+            animation: slideDown 0.4s ease;
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+            transition: color 0.3s;
+        }
+
+        .close:hover {
+            color: #ffcc00;
+        }
+
+        .modal-content h2 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            border-bottom: 2px solid rgba(255,255,255,0.2);
+            padding-bottom: 8px;
+        }
+
+        pre {
+            background: rgba(0,0,0,0.4);
+            padding: 12px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* RESPONSIVE DESIGN */
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .left-panel {
+                width: 100%;
+            }
+            
+            .circuit-container {
+                flex-direction: column;
+                gap: 30px;
+            }
+            
+            .notes-control {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .modal-content {
+                width: 90%;
+                margin: 10% auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="logo">
+            <img src="/static/image/logo.png" width="80px" height="80px" alt="">
+            <span>Arduino Musiqa Zummeri - Nota Ohanglari</span>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <div class="main-container">
+        <!-- LEFT PANEL -->
+        <div class="left-panel">
+            <div class="control-group">
+                <h3>Boshqaruv</h3>
+                <button class="btn btn-success" onclick="playMelody()" id="startBtn">
+                    Melodiya Ijro
+                </button>
+                <button class="btn btn-danger" onclick="stopMelody()" id="stopBtn">
+                    To'xtatish
+                </button>
+                <button class="btn btn-primary" onclick="playScale()">
+                    Gamma Ijro
+                </button>
+                <button class="btn btn-info" onclick="resetSystem()">
+                    Reset
+                </button>
+            </div>
+
+        <aside class="left-panel">
+  <h3>Ma'lumotlar</h3>
+  <button class="btn btn-primary" id="schemaBtn">💡 Sxema qayerda ishlatiladi</button>
+  <button class="btn btn-primary" id="codeBtn">💻 Kod</button>
+  <button class="btn btn-primary" id="componentsBtn">🔌 Qurilmalar</button>
+</aside>
+
+            <div class="control-group">
+                <h3>Holat</h3>
+                <div class="status-row">
+                    <span>Arduino:</span>
+                    <div class="status-led on" id="arduinoLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Buzzer:</span>
+                    <div class="status-led" id="buzzerLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>LEDs:</span>
+                    <div class="status-led" id="ledsLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Melodiya:</span>
+                    <div class="status-led" id="melodyLed"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+    
+            <div class="circuit-container">
+                <!-- Arduino -->
+                <div class="arduino">
+                    Arduino UNO
+                    <img src="/static/image/arduino1 - Copy.png" width="300px" height="300px" alt="">
+                </div>
+
+                <!-- Breadboard -->
+                <div class="breadboard">
+                    <img src="/static/image/breadboard-removebg-preview.png" width="400px" height="350px" alt="">
+                    <div ></div>
+                        <img class="buzzer" id="buzzer" src="/static/image/buzzer3.png" width="70px" height="70px" alt="">
+                
+                    <div class="led led-1" id="led1">
+                        
+                    </div>
+                    <div class="led led-2" id="led2"></div>
+                    <div class="led led-3" id="led3"></div>
+                    <div class="led led-4" id="led4"></div>
+                    <div class="led led-5" id="led5"></div>
+                    
+                    
+                    <div class="resistor resistor-1">
+                        <img src="/static/image/resistor_2.png" width="50px" height="40px" alt="">
+                    </div>
+                    <div class="resistor resistor-2">
+                        <img src="/static/image/resistor_2.png" width="50px" height="40px" alt="">
+                    </div>
+                    <div class="resistor resistor-3">
+                        <img src="/static/image/resistor_2.png" width="50px" height="40px" alt="">
+                    </div>
+                    <div class="resistor resistor-4">
+                        <img src="/static/image/resistor_2.png" width="50px" height="40px" alt="">
+                    </div>
+                    <div class="resistor resistor-5">
+                        <img src="/static/image/resistor_2.png" width="50px" height="40px" alt="">
+                    </div>
+                    
+                
+              
+                    
+                    <div class="wire wire-red wire-v1"></div>
+                    <div class="wire wire-green wire-v2"></div>
+                    <div class="wire wire-blue wire-v3"></div>
+                    <div class="wire wire-yellow wire-v4"></div>
+                    <div class="wire wire-purple wire-v5"></div>
+                    <div class="wire wire-black"></div>
+                    <div class="wire wire-black1"></div>
+                     <div class="wire wrie-skyblue"></div>
+                </div>
+            </div>
+
+
+            <div class="notes-control">
+                <button class="note-btn" onclick="playNote('do', 523)">DO</button>
+                <button class="note-btn" onclick="playNote('re', 587)">RE</button>
+                <button class="note-btn" onclick="playNote('mi', 659)">MI</button>
+                <button class="note-btn" onclick="playNote('fa', 698)">FA</button>
+                <button class="note-btn" onclick="playNote('sol', 784)">SOL</button>
+                <button class="note-btn" onclick="playNote('lya', 880)">LYA</button>
+                <button class="note-btn" onclick="playNote('si', 987)">SI</button>
+            </div>
+
+            <div class="status-display">
+                <h4>Ijro holati:</h4>
+                <p id="statusText">Tayyor</p>
+                <p id="currentNote">Joriy nota: --</p>
+            </div>
+        </div>
+    </div>
+
+<div class="modal" id="schemaModal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>💡 Sxema qayerda ishlatiladi (RGB LED)</h2>
+    <div class="flex-container-40-60">
+         <div class="flex-video-40">
+                <iframe 
+                    src="https://www.youtube.com/embed/FoXk6OL8GfQ?si=4tf8LG_7QIrpvFCh" 
+                    title="YouTube video player" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+      <div class="flex-text-60">
+        <strong>🔄 Ulanish sxemasi</strong>
+  <p>Push-button / sensor → Arduino raqamli pin (masalan, D2, D3, D4…)
+
+Buzzer → Arduino pin (masalan, D8)
+
+LEDlar → Arduino pinlar (masalan, D9, D10, D11…)
+
+Rezistorlar → LEDlar va sensorlarni tokdan himoya qilish uchun
+
+Izoh: Agar RGB LED ishlatilsa, uch rang pinlari PWM pinlarga ulanadi va analogWrite() orqali boshqariladi.</p>
+      </div>
+    </div>
+    <div class="flex-container-40-60">
+         <div class="flex-video-40">
+                <iframe 
+                    src="https://www.youtube.com/embed/oVk_rtFlNQo?si=idtRFZM_k28r5LKq"" 
+                    title="YouTube video player" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+      <div class="flex-text-60">
+        <strong>Qo‘shimcha imkoniyatlar</strong>
+<p>Ko‘proq tugmalar va ohanglar qo‘shish → butun oktava yaratish
+
+RGB LED bilan rangli vizual effektlar → har bir ohang uchun turli rang
+
+Capacitive touch sensorlar → tugmalarni sensorli qilish
+
+MIDI yoki buzzer orqali musiqa fayllarini ijro etish
+
+IoT integratsiyasi → telefon orqali klaviatura boshqarish</p>
+      </div>
+    </div>
+    <div class="flex-container-40-60">
+         <div class="flex-video-40">
+                <iframe 
+                    src="https://www.youtube.com/embed/BGoQZt4qBNc?si=L24ffvfZUGFniJkp" 
+                    title="YouTube video player" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+      <div class="flex-text-60">
+        <strong>🌟 Afzalliklari</strong>
+<p>Muzikani o‘rganish va amaliy qo‘llash uchun ideal
+
+Sensor va LEDlarni Arduino bilan boshqarishni o‘rgatadi
+
+Mini elektron piano loyihasi sifatida oson va qiziqarli</p>
+   
+    </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="codeModal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>💻 Kod</h2>
+
+    <!-- Tab tugmalar -->
+    <div class="tab-buttons">
+      <button class="tab-btn active" data-tab="mblock">mBlock Kodi</button>
+      <button class="tab-btn" data-tab="arduino">Arduino Kodi</button>
+    </div>
+
+    <!-- mBlock -->
+    <div class="tab-content active" id="mblock">
+      <!-- O‘zingizning rasm yoki gif’ingizni qo‘ying -->
+      <pre>
+<img src="/static/image/piano.jpg" alt="mBlock – Arduino Notes namunalar" style="width:80%;height:auto">
+<!-- Istasangiz bu yerga qisqa izoh: bloklar ketma-ketligi, sahifa linki, va h.k. -->
+      </pre>
+    </div>
+
+    <!-- Arduino -->
+    <div class="tab-content" id="arduino">
+      <!-- Pastdagi kod — umumiy shablon; xohlagan loyihangiz kodingizni shu yerga qo‘yib ketasiz -->
+      <pre>
+/*
+  Arduino Musiqa Zummeri - 7 Nota Ohanglar
+  Buzzer pin 9, LEDs pinlar 4-8
+  Har bir nota uchun alohida LED yonadi
+*/
+
+// Pin belgilanishlari
+const int buzzerPin = 9;
+const int ledPins[5] = {10,9,6,5,2}; // 5 ta LED
+
+// Notalar chastotalari (Hz)
+int notes[] = {523, 587, 659, 698, 784, 880, 987}; // DO, RE, MI, FA, SOL, LYA, SI
+String noteNames[] = {"DO", "RE", "MI", "FA", "SOL", "LYA", "SI"};
+
+void setup() {
+  // Buzzer va LED pinlarini chiqish sifatida belgilash
+  pinMode(buzzerPin, OUTPUT);
+  for (int i = 0; i < 5; i++) {
+    pinMode(ledPins[i], OUTPUT);
+  }
+  
+  Serial.begin(9600);
+  Serial.println("Arduino Musiqa Zummeri tayyor!");
+  Serial.println("7 ta nota: DO, RE, MI, FA, SOL, LYA, SI");
+}
+
+void loop() {
+  // Asosiy melodiya ijro qilish
+  playMelodySequence();
+  
+  delay(3000); // 3 soniya kutish
+  
+  // Gamma ijro qilish
+  playScale();
+  
+  delay(5000); // 5 soniya kutish
+}
+
+// Melodiya ketma-ketligini ijro qilish
+void playMelodySequence() {
+  Serial.println("Melodiya boshlanadi...");
+  
+  // Oddiy melodiya: DO-RE-MI-FA-SOL-FA-MI-RE-DO
+  int melody[] = {0, 1, 2, 3, 4, 3, 2, 1, 0};
+  int melodyLength = 9;
+  
+  for (int i = 0; i < melodyLength; i++) {
+    playNoteWithLED(melody[i], 500); // Har bir nota 0.5 soniya
+    delay(100); // Notalar orasida kichik pauza
+  }
+  
+  Serial.println("Melodiya tugadi!");
+}
+
+// Gamma (barcha notalarni ketma-ket) ijro qilish
+void playScale() {
+  Serial.println("Gamma boshlanadi...");
+  
+  // Yuqoriga
+  for (int i = 0; i < 7; i++) {
+    playNoteWithLED(i, 400);
+    delay(50);
+  }
+  
+  // Pastga
+  for (int i = 6; i >= 0; i--) {
+    playNoteWithLED(i, 400);
+    delay(50);
+  }
+  
+  Serial.println("Gamma tugadi!");
+}
+
+// Nota va LED bilan ijro qilish
+void playNoteWithLED(int noteIndex, int duration) {
+  // LEDlarni o'chirish
+  turnOffAllLEDs();
+  
+  // Tegishli LEDni yoqish (5 ta LED, 7 ta nota uchun)
+  if (noteIndex < 5) {
+    digitalWrite(ledPins[noteIndex], HIGH);
+  }
+  
+  // Notani ijro qilish
+  tone(buzzerPin, notes[noteIndex]);
+  Serial.print("Ijro: ");
+  Serial.println(noteNames[noteIndex]);
+  
+  delay(duration);
+  
+  // Ovoz va LEDni o'chirish
+  noTone(buzzerPin);
+  turnOffAllLEDs();
+}
+
+// Barcha LEDlarni o'chirish
+void turnOffAllLEDs() {
+  for (int i = 0; i < 5; i++) {
+    digitalWrite(ledPins[i], LOW);
+  }
+}
+
+// Alohida nota ijro qilish
+void playNote(int frequency, int duration) {
+  tone(buzzerPin, frequency, duration);
+}
+      </pre>
+    </div>
+  </div>
+</div>
+
+<!-- 3) Qurilmalar -->
+<div class="modal" id="componentsModal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>🔌 Ishlatilgan Qurilmalar</h2>
+
+    <!-- Har bir kartani ozingizga mos rasm/izoh bilan to‘ldirasiz -->
+    <div class="flex-container-30-70">
+      <div class="flex-image-30"><img src="/static/image/arduino1 - Copy.png" alt="Arduino UNO"></div>
+      <div class="flex-text-70">
+        <strong>Arduino UNO</strong>
+        <p>O‘quv loyihalar uchun qulay platforma.</p>
+      </div>
+    </div>
+
+    <div class="flex-container-30-70">
+      <div class="flex-image-30"><img src="/static/image/breadboard-removebg-preview.png" alt="Breadboard"></div>
+      <div class="flex-text-70">
+        <strong>Breadboard + jumper simlar</strong>
+        <p>Tez ulash, lehimlashsiz sinov uchun.</p>
+      </div>
+    </div>
+
+    <div class="flex-container-30-70">
+      <div class="flex-image-30"><img src="/static/image/resistor.png" alt="Sensor to‘plami"></div>
+      <div class="flex-text-70">
+       <strong>220Ω qarshilik (x3)</strong>
+        <p>Har bir ledga alohida himoya qarshiligi.</p></div>
+    </div>
+
+    <div class="flex-container-30-70">
+      <div class="flex-image-30"><img src="/static/image/buzzer.png" alt="USB kabel"></div>
+      <div class="flex-text-70">
+        <strong>Buzzer</strong>
+        <p>Ushbu qurilma yordamida ovoz chiqariladi </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Qo‘shimcha ma'lumot (ixtiyoriy) -->
+<div class="modal" id="infoModal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>📚 Qo‘shimcha Ma'lumot</h2>
+    <div class="video-full">
+      <video controls>
+        <source src="/media/2.mp4" type="video/mp4">
+        Brauzeringiz video formatni qo‘llab-quvvatlamaydi.
+      </video>
+    </div>
+  </div>
+</div>
+
+<button id="infoFloatingBtn"><span>📚</span><span>Ma'lumot</span></button>
+    <!-- CODE MODAL -->
+ 
+
+    <script>
+        let isPlaying = false;
+        let melodyInterval;
+        let currentNoteIndex = 0;
+        
+        // Note frequencies and names
+        const notes = [523, 587, 659, 698, 784, 880, 987];
+        const noteNames = ['DO', 'RE', 'MI', 'FA', 'SOL', 'LYA', 'SI'];
+        
+        // DOM elements
+        const buzzerElement = document.getElementById('buzzer');
+        const buzzerLed = document.getElementById('buzzerLed');
+        const ledsLed = document.getElementById('ledsLed');
+        const melodyLed = document.getElementById('melodyLed');
+        const statusText = document.getElementById('statusText');
+        const currentNoteDisplay = document.getElementById('currentNote');
+        
+        function playNote(noteName, frequency) {
+            if (isPlaying) return;
+            
+            const noteIndex = noteNames.indexOf(noteName.toUpperCase());
+            
+            // Visual effects
+            buzzerElement.classList.add('active');
+            buzzerLed.classList.add('on');
+            ledsLed.classList.add('on');
+            
+            // Light up corresponding LED
+            if (noteIndex < 5) {
+                document.getElementById(`led${noteIndex + 1}`).classList.add('active');
+            }
+            
+            // Update display
+            statusText.textContent = `${noteName} notasi ijro qilinmoqda`;
+            currentNoteDisplay.textContent = `Joriy nota: ${noteName} (${frequency}Hz)`;
+            
+            // Find and highlight button
+            const buttons = document.querySelectorAll('.note-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            buttons[noteIndex].classList.add('active');
+
+
+            // Turn off after 500ms
+            setTimeout(() => {
+                buzzerElement.classList.remove('active');
+                buzzerLed.classList.remove('on');
+                ledsLed.classList.remove('on');
+                document.querySelectorAll('.led').forEach(led => led.classList.remove('active'));
+                buttons.forEach(btn => btn.classList.remove('active'));
+                statusText.textContent = 'Tayyor';
+                currentNoteDisplay.textContent = 'Joriy nota: --';
+            }, 500);
+        }
+function openModal(id) {
+  const modal = document.getElementById(id);
+  if (modal) modal.style.display = 'block';
+}
+
+function closeModal(el) {
+  const modal = el.closest('.modal');
+  if (modal) modal.style.display = 'none';
+}
+
+// Modallarni yopish
+document.addEventListener('click', (e) => {
+  if (e.target.matches('.modal .close')) closeModal(e.target);
+});
+window.addEventListener('click', (e) => {
+  document.querySelectorAll('.modal').forEach(m => {
+    if (e.target === m) m.style.display = 'none';
+  });
+});
+
+// Tugmalar uchun eventlar
+document.getElementById('schemaBtn')?.addEventListener('click', () => openModal('schemaModal'));
+document.getElementById('codeBtn')?.addEventListener('click', () => openModal('codeModal'));
+document.getElementById('componentsBtn')?.addEventListener('click', () => openModal('componentsModal'));
+document.getElementById('infoFloatingBtn')?.addEventListener('click', () => openModal('infoModal'));
+
+// Kod oynasidagi tab tugmalarni almashtirish
+(function() {
+  const codeModal = document.getElementById('codeModal');
+  if (!codeModal) return;
+  codeModal.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tab = btn.dataset.tab;
+      codeModal.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      codeModal.querySelectorAll('.tab-content').forEach(p => p.classList.toggle('active', p.id === tab));
+    });
+  });
+})();
+        function playMelody() {
+            if (isPlaying) return;
+            
+            isPlaying = true;
+            melodyLed.classList.add('on');
+            statusText.textContent = 'Melodiya ijro qilinmoqda...';
+            
+            // Simple melody: DO-RE-MI-FA-SOL-FA-MI-RE-DO
+            const melody = [0, 1, 2, 3, 4, 3, 2, 1, 0];
+            let noteIndex = 0;
+            
+            melodyInterval = setInterval(() => {
+                if (noteIndex < melody.length) {
+                    const note = melody[noteIndex];
+                    playNoteInMelody(noteNames[note], notes[note]);
+                    noteIndex++;
+                } else {
+                    stopMelody();
+                }
+            }, 600);
+        }
+        
+        function playNoteInMelody(noteName, frequency) {
+            const noteIndex = noteNames.indexOf(noteName);
+            
+            // Visual effects
+            buzzerElement.classList.add('active');
+            buzzerLed.classList.add('on');
+            
+            // Light up corresponding LED
+            if (noteIndex < 5) {
+                document.getElementById(`led${noteIndex + 1}`).classList.add('active');
+            }
+            
+            currentNoteDisplay.textContent = `Joriy nota: ${noteName} (${frequency}Hz)`;
+            
+            // Turn off after 400ms
+            setTimeout(() => {
+                buzzerElement.classList.remove('active');
+                buzzerLed.classList.remove('on');
+                document.querySelectorAll('.led').forEach(led => led.classList.remove('active'));
+            }, 400);
+        }
+        
+        function stopMelody() {
+            isPlaying = false;
+            clearInterval(melodyInterval);
+            
+            melodyLed.classList.remove('on');
+            buzzerElement.classList.remove('active');
+            buzzerLed.classList.remove('on');
+            ledsLed.classList.remove('on');
+            
+            document.querySelectorAll('.led').forEach(led => led.classList.remove('active'));
+            document.querySelectorAll('.note-btn').forEach(btn => btn.classList.remove('active'));
+            
+            statusText.textContent = 'Melodiya to\'xtatildi';
+            currentNoteDisplay.textContent = 'Joriy nota: --';
+        }
+        
+        function playScale() {
+            if (isPlaying) return;
+            
+            isPlaying = true;
+            melodyLed.classList.add('on');
+            statusText.textContent = 'Gamma ijro qilinmoqda...';
+            
+            let noteIndex = 0;
+            
+            // Play scale up then down
+            const scaleSequence = [0, 1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1, 0];
+            
+            melodyInterval = setInterval(() => {
+                if (noteIndex < scaleSequence.length) {
+                    const note = scaleSequence[noteIndex];
+                    playNoteInMelody(noteNames[note], notes[note]);
+                    noteIndex++;
+                } else {
+                    setTimeout(() => {
+                        stopMelody();
+                    }, 500);
+                }
+            }, 450);
+        }
+        
+        function resetSystem() {
+            stopMelody();
+            
+            buzzerElement.classList.remove('active');
+            buzzerLed.classList.remove('on');
+            ledsLed.classList.remove('on');
+            melodyLed.classList.remove('on');
+            
+            document.querySelectorAll('.led').forEach(led => led.classList.remove('active'));
+            document.querySelectorAll('.note-btn').forEach(btn => btn.classList.remove('active'));
+            
+            statusText.textContent = 'Tizim qayta o\'rnatildi';
+            currentNoteDisplay.textContent = 'Joriy nota: --';
+        }
+
+        // Modal functions
+        function openModal(id) {
+            document.getElementById(id).style.display = "block";
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = "none";
+        }
+
+        // Event listeners
+        document.getElementById("codeBtn").addEventListener("click", function() {
+            openModal("codeModal");
+        });
+
+        document.getElementById("componentsBtn").addEventListener("click", function() {
+            openModal("componentsModal");
+        });
+
+        document.querySelectorAll(".modal .close").forEach(btn => {
+            btn.addEventListener("click", function() {
+                this.closest(".modal").style.display = "none";
+            });
+        });
+
+        window.addEventListener("click", function(e) {
+            document.querySelectorAll(".modal").forEach(modal => {
+                if (e.target === modal) {
+                    modal.style.display = "none";
+                }
+            });
+        });
+    // Web Audio API sozlash
+let audioCtx = null;
+function playSound(frequency, duration = 500) {
+    if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    const oscillator = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+
+    oscillator.type = "sine"; // yoki "square", "triangle", "sawtooth"
+    oscillator.frequency.setValueAtTime(frequency, audioCtx.currentTime);
+
+    // yumshoq chiqish uchun
+    gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime); 
+    oscillator.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+
+    oscillator.start();
+    oscillator.stop(audioCtx.currentTime + duration / 1000);
+}
+function playNote(noteName, frequency) {
+    if (isPlaying) return;
+
+    const noteIndex = noteNames.indexOf(noteName.toUpperCase());
+
+    buzzerElement.classList.add('active');
+    buzzerLed.classList.add('on');
+    ledsLed.classList.add('on');
+
+    if (noteIndex < 5) {
+        document.getElementById(`led${noteIndex + 1}`).classList.add('active');
+    }
+
+    statusText.textContent = `${noteName} notasi ijro qilinmoqda`;
+    currentNoteDisplay.textContent = `Joriy nota: ${noteName} (${frequency}Hz)`;
+
+    const buttons = document.querySelectorAll('.note-btn');
+    buttons.forEach(btn => btn.classList.remove('active'));
+    buttons[noteIndex].classList.add('active');
+
+    // 🔊 ovozni chalish
+    playSound(frequency, 500);
+
+    setTimeout(() => {
+        buzzerElement.classList.remove('active');
+        buzzerLed.classList.remove('on');
+        ledsLed.classList.remove('on');
+        document.querySelectorAll('.led').forEach(led => led.classList.remove('active'));
+        buttons.forEach(btn => btn.classList.remove('active'));
+        statusText.textContent = 'Tayyor';
+        currentNoteDisplay.textContent = 'Joriy nota: --';
+    }, 500);
+}
+function playNoteInMelody(noteName, frequency) {
+    const noteIndex = noteNames.indexOf(noteName);
+
+    buzzerElement.classList.add('active');
+    buzzerLed.classList.add('on');
+
+    if (noteIndex < 5) {
+        document.getElementById(`led${noteIndex + 1}`).classList.add('active');
+    }
+
+    currentNoteDisplay.textContent = `Joriy nota: ${noteName} (${frequency}Hz)`;
+
+    // 🔊 tovushni chalish
+    playSound(frequency, 400);
+
+    setTimeout(() => {
+        buzzerElement.classList.remove('active');
+        buzzerLed.classList.remove('on');
+        document.querySelectorAll('.led').forEach(led => led.classList.remove('active'));
+    }, 400);
+}
+
+    </script>
+</body>
+</html>

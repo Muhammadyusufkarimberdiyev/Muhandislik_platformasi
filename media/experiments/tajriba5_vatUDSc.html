@@ -1,0 +1,1201 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Charging Indicator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: auto;
+        }
+
+        /* HEADER */
+        .header {
+            display: flex;
+            align-items: center;
+            background: #000075;
+            color: white;
+            padding: 10px 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            width: 100%;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        /* MAIN LAYOUT */
+        .main-container {
+            display: flex;
+            margin-top: 20px;
+            gap: 20px;
+        }
+
+        /* LEFT PANEL */
+        .left-panel {
+            width: 250px;
+            background: white;
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            height: fit-content;
+            position: relative;
+            z-index: 1;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 15px;
+        }
+
+        .control-group h3 {
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 8px;
+            font-size: 14px;
+            border-radius: 8px;
+            transition: all 0.3s;
+            text-align: left;
+            font-weight: 500;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .btn-success { 
+            background: linear-gradient(45deg, #28a745, #20c997); 
+            color: white; 
+        }
+        .btn-danger { 
+            background: linear-gradient(45deg, #dc3545, #fd7e14); 
+            color: white; 
+        }
+        .btn-primary { 
+            background: linear-gradient(45deg, #000075, #4169e1); 
+            color: white; 
+        }
+        .btn-info { 
+            background: linear-gradient(45deg, #17a2b8, #6f42c1); 
+            color: white; 
+        }
+
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 8px 0;
+            font-size: 13px;
+        }
+
+        .status-led {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #dc3545;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+        }
+
+        .status-led.on {
+            background: #28a745;
+            box-shadow: 0 0 15px rgba(40, 167, 69, 0.8);
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .title-header {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 24px;
+            font-weight: bold;
+            margin: 0 auto 40px;
+            text-align: center;
+            display: inline-block;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        /* CIRCUIT CONTAINER */
+        .circuit-container {
+            background: #f8f9fa;
+            padding: 40px;
+            border-radius: 20px;
+            margin: 30px 0;
+            position: relative;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.05);
+        }
+
+        /* CIRCUIT BOARD - RESPONSIVE */
+        .circuit-board {
+            background: #e8f4fd;
+            border: 4px solid #000075;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 600px;
+            aspect-ratio: 6 / 5;
+            position: relative;
+            margin: 0 auto;
+            box-shadow: 0 0 30px rgba(0, 117, 255, 0.3);
+        }
+
+        .circuit-title {
+            position: absolute;
+            top: -2.5%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 1.3% 3.3%;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 1vw;
+        }
+
+        /* DIODE IMAGE - RESPONSIVE */
+        .diode-img {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 148px;
+            object-fit: contain;
+        }
+
+        /* LED INDICATORS - RESPONSIVE */
+        .led-container {
+            position: absolute;
+            top: 27%;
+            left: 52%;
+            transform: translateX(-50%);
+            display: flex;
+            
+            width: 52%;
+        }
+
+        .led-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+         
+            flex: 0.5;
+        }
+
+        .led {
+            width: 5%;
+            height: 10%;
+            border-radius: 15px 15px 5px 5px;
+            position: relative;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            min-width: 30px;
+            min-height: 50px;
+        }
+
+        .led-charging {
+            background: linear-gradient(to bottom, #ff6b6b, #ff4757);
+            animation: chargingPulse 1.5s infinite;
+        }
+
+        .led-full {
+            background: linear-gradient(to bottom, #2ed573, #1dd1a1);
+        }
+
+        .led.off {
+            background: rgb(246, 133, 133);
+            animation: none;
+        }
+
+        .led.on {
+            background: rgb(128, 242, 128);
+            animation: none;
+            right: 5px;
+        }
+
+        .led-label {
+            font-weight: bold;
+            color: #333;
+            font-size: 0.9vw;
+        }
+
+        @keyframes chargingPulse {
+            0%, 100% { 
+                opacity: 0.6;
+                transform: scale(1);
+                box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            }
+            50% { 
+                opacity: 1;
+                transform: scale(1.1);
+                box-shadow: 0 0 25px rgba(255, 107, 107, 0.8);
+            }
+        }
+
+        /* RESISTOR IMAGE - RESPONSIVE */
+        .resistor-img {
+            position: absolute;
+            top: 45%;
+            left: 51%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 100px;
+            object-fit: contain;
+        }
+
+        /* USB CONTAINER - RESPONSIVE */
+        .usb-container {
+            position: absolute;
+            bottom: 5%;
+            left: 13%;
+            width: 8%;
+        }
+
+        .usb-img {
+            width: 50px;
+            height: 100px;
+            object-fit: contain;
+        }
+
+        .usb-label {
+            font-size: 0.75vw;
+            font-weight: bold;
+            color: #333;
+            text-align: center;
+            margin-top: 5px;
+        }
+
+        /* BATTERY CONTAINER - RESPONSIVE */
+        .battery-container {
+            position: absolute;
+            bottom: 3%;
+            right: 13%;
+            width: 17%;
+        }
+
+        .battery {
+            width: 100%;
+            aspect-ratio: 2 / 1;
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            border-radius: 8px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .battery::after {
+            content: '';
+            position: absolute;
+            right: -2%;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 2%;
+            height: 40%;
+            background: #2c3e50;
+            border-radius: 0 3px 3px 0;
+        }
+
+        .battery-level {
+            position: absolute;
+            left: 2%;
+            top: 50%;
+            transform: translateY(-50%);
+            height: 60%;
+            background: linear-gradient(90deg, #e74c3c, #f39c12, #27ae60);
+            border-radius: 3px;
+            transition: all 0.5s ease;
+            width: 8%;
+        }
+
+        .battery-text {
+            position: relative;
+            z-index: 2;
+            font-size: 0.65vw;
+        }
+
+        .battery-label {
+            font-size: 0.75vw;
+            font-weight: bold;
+            color: #333;
+            text-align: center;
+            margin-top: 5px;
+            white-space: nowrap;
+        }
+
+        /* WIRES - ALL IN PERCENTAGE */
+        .wire {
+            position: absolute;
+            z-index: 10;
+        }
+
+        .wire-red {
+            background: red;
+            top: 14%;
+            right: 27%;
+            width: 0.5%;
+            height: 28%;
+        }
+
+        .wire-red2 {
+            background: red;
+            top: 14%;
+            left: 27%;
+            width: 0.5%;
+            height: 28%;
+        }
+
+        .wire-red3 {
+            background: red;
+            top: 14%;
+            right: 27%;
+            width: 15%;
+            height: 0.6%;
+        }
+
+        .wire-red4 {
+            background: red;
+            top: 14%;
+            left: 27%;
+            width: 15%;
+            height: 0.6%;
+        }
+
+        .wire-red5 {
+            background: red;
+            top: 42%;
+            right: 27%;
+            width: 8%;
+            height: 0.6%;
+        }
+
+        .wire-red6 {
+            background: red;
+            top: 42%;
+            left: 27%;
+            width: 11%;
+            height: 0.6%;
+        }
+
+        .wire-red7 {
+            background: red;
+            top: 36%;
+            right: 23%;
+            width: 0.5%;
+            height: 36%;
+            transform: rotate(-50deg);
+            border-radius: 20px;
+        }
+
+        .wire-red8 {
+            background: red;
+            top: 37%;
+            left: 27%;
+            width: 0.5%;
+            height: 36%;
+            transform: rotate(45deg);
+        }
+
+        .wire-red9 {
+            background: red;
+            top: 65%;
+            right: 12%;
+            width: 0.5%;
+            height: 20.5%;
+        }
+
+        .wire-red10 {
+            background: red;
+            bottom: 14%;
+            right: 12%;
+            width: 1.2%;
+            height: 0.6%;
+        }
+
+        .wire-red11 {
+            background: red;
+            top: 37%;
+            right: 34%;
+            width: 0.5%;
+            height: 5%;
+        }
+
+        .wire-red12 {
+            background: red;
+            top: 37%;
+            left: 37%;
+            width: 0.5%;
+            height: 5.4%;
+        }
+
+        .wire-black {
+            background: black;
+            bottom: 14%;
+            right: 30%;
+            width: 19%;
+            height: 0.6%;
+        }
+
+        .wire-black1 {
+            background: black;
+            bottom: 14%;
+            right: 49%;
+            width: 0.5%;
+            height: 22%;
+        }
+
+        .wire-black2 {
+            background: black;
+            bottom: 32%;
+            left: 17%;
+            width: 34%;
+            height: 0.6%;
+        }
+
+        .wire-black3 {
+            background: black;
+            bottom: 55%;
+            right: 48.7%;
+            width: 0.5%;
+            height: 2%;
+        }
+
+        .wire-black4 {
+            background: black;
+            bottom: 57%;
+            right: 49%;
+            width: 10%;
+            height: 0.6%;
+        }
+
+        .wire-black5 {
+            background: black;
+            bottom: 57%;
+            right: 37%;
+            width: 13%;
+            height: 0.6%;
+        }
+
+        .wire-black6 {
+            background: black;
+            bottom: 57%;
+            right: 37%;
+            width: 0.5%;
+            height: 5.8%;
+        }
+
+        .wire-black7 {
+            background: black;
+            bottom: 57%;
+            left: 40.5%;
+            width: 0.5%;
+            height: 5.8%;
+        }
+
+        /* CONTROL PANEL */
+        .control-panel {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        .control-button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            min-width: 120px;
+        }
+
+        .btn-power {
+            background: linear-gradient(45deg, #4169e1, #8a2be2);
+            color: white;
+        }
+
+        .btn-test {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+        }
+
+        .btn-reset {
+            background: linear-gradient(45deg, #dc3545, #fd7e14);
+            color: white;
+        }
+
+        .control-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .control-button:active {
+            transform: translateY(-1px);
+        }
+        @media (min-width: 1700px) and (max-width: 4600px) {
+            .battery{
+                top: 30px;
+            }
+            .usb-container{
+                top: 67.5%;
+            }
+        }   
+        /* RESPONSIVE DESIGN */
+        @media (max-width: 1024px) {
+            .left-panel {
+                width: 100%;
+                margin-bottom: 20px;
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .main-container {
+                flex-direction: column;
+            }
+
+            .diode-img {
+                width: 80px;
+                height: 118px;
+            }
+
+            .usb-img {
+                width: 40px;
+                height: 80px;
+            }
+
+            .resistor-img {
+                width: 80px;
+                height: 80px;
+            }
+
+            .circuit-title {
+                font-size: 1.5vw;
+            }
+
+            .battery-text {
+                font-size: 1vw;
+            }
+
+            .usb-label, .battery-label, .led-label {
+                font-size: 1.2vw;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .circuit-board {
+                aspect-ratio: 6 / 6;
+            }
+
+            .diode-img {
+                width: 60px;
+                height: 88px;
+            }
+
+            .usb-img {
+                width: 30px;
+                height: 60px;
+            }
+
+            .resistor-img {
+                width: 60px;
+                height: 60px;
+            }
+
+            .led {
+                min-width: 20px;
+                min-height: 35px;
+            }
+
+            .circuit-title {
+                font-size: 2vw;
+            }
+
+            .battery-text {
+                font-size: 1.5vw;
+            }
+
+            .usb-label, .battery-label, .led-label {
+                font-size: 1.8vw;
+            }
+
+            .control-button {
+                padding: 10px 15px;
+                font-size: 12px;
+                min-width: 100px;
+            }
+
+            .control-panel {
+                position: relative;
+                margin-top: 30px;
+                transform: none;
+                left: auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .circuit-board {
+                aspect-ratio: 6 / 7;
+            }
+
+            .diode-img {
+                width: 40px;
+                height: 58px;
+                top:3px;
+            }
+
+            .usb-img {
+                width: 20px;
+                height: 40px;
+                top: 80px;
+            }
+
+            .resistor-img {
+                width: 40px;
+                height: 40px;
+                top: 50%;
+            }
+
+            .led {
+                min-width: 15px;
+                min-height: 25px;
+            }
+
+            .circuit-title {
+                font-size: 2.5vw;
+            }
+
+            .battery-text {
+                font-size: 2vw;
+            }
+
+            .usb-label, .battery-label, .led-label {
+                font-size: 2.2vw;
+            }
+
+            .control-panel {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .control-button {
+                width: 100%;
+                max-width: 250px;
+            }
+              .led.on {
+            background: rgb(128, 242, 128);
+            animation: none;
+            right: 2px;
+        }
+        .battery{
+            top: 5px;
+        }
+        .wire-black3{
+            height: 20px;
+            bottom: 48%;
+        }
+        .wire-black2{
+            bottom: 35%;
+        }
+    .wire-red7 {
+            background: red;
+            top: 38.5%;
+            right: 23%;
+            width: 0.5%;
+            height: 30.5%;
+            transform: rotate(-40deg);
+            border-radius: 20px;
+        }
+
+        .wire-red8 {
+            background: red;
+              top: 39.5%;
+            right: 23%;
+            width: 0.5%;
+            height: 28%;
+            transform: rotate(35deg);
+            border-radius: 20px;
+        }
+        }
+
+        /* MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            backdrop-filter: blur(3px);
+        }
+
+        .modal-content {
+            background: #000075;
+            color: white;
+            margin: 5% auto;
+            padding: 20px;
+            width: 50%;
+            max-width: 700px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+            animation: slideDown 0.4s ease;
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+            transition: color 0.3s;
+        }
+
+        .close:hover {
+            color: #ffcc00;
+        }
+
+        .modal-content h2 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            border-bottom: 2px solid rgba(255,255,255,0.2);
+            padding-bottom: 8px;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="logo">
+            <img src="../image/logo.png" width="80px" height="80px" alt="">
+            <span>Oddiy zaryadlash ko'rsatkichi</span>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <div class="main-container">
+        <!-- LEFT PANEL -->
+        <div class="left-panel">
+            <div class="control-group">
+                <h3>Boshqaruv</h3>
+                <button class="btn btn-success" onclick="startCharging()" id="startBtn">
+                    Quvvatlash boshlash
+                </button>
+                <button class="btn btn-danger" onclick="stopCharging()" id="stopBtn">
+                    Quvvatlashni to'xtatish
+                </button>
+                <button class="btn btn-primary" onclick="togglePower()">
+                    Quvvat
+                </button>
+                <button class="btn btn-info" onclick="runTest()">
+                    Test
+                </button>
+            </div>
+
+            <div class="control-group">
+                <h3>Ma'lumotlar</h3>
+                <button class="btn btn-primary" onclick="showInfo('components')">
+                    Qurilmalar
+                </button>
+                <button class="btn btn-primary" onclick="showInfo('working')">
+                    Ishlash prinsipi
+                </button>
+                <button class="btn btn-primary" onclick="showInfo('usage')">
+                    Foydalanish
+                </button>
+            </div>
+
+            <div class="control-group">
+                <h3>Qurilma holati</h3>
+                <div class="status-row">
+                    <span>Quvvat:</span>
+                    <div class="status-led" id="powerLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Diode:</span>
+                    <div class="status-led" id="diodeLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Quvvatlash LED:</span>
+                    <div class="status-led" id="chargingLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>To'liq LED:</span>
+                    <div class="status-led" id="fullLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Batareya:</span>
+                    <div class="status-led" id="batteryLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Batareya darajasi:</span>
+                    <span id="batteryPercent">8%</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+            <div class="circuit-container">
+                <div class="circuit-board">
+                
+                    
+                    <!-- 1N4007 Diode -->
+                    <img src="./1n-removebg-preview.png" class="diode-img" alt="">
+                    
+                    <!-- LED Indicators -->
+                    <div class="led-container">
+                        <div class="led-group">
+                            <div class="led led-charging off" id="chargingLedMain"></div>
+                            <div class="led-label"></div>
+                        </div>
+                        <div class="led-group">
+                            <div class="led led-full on" id="fullLedMain"></div>
+                            <div class="led-label"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Resistor -->
+                    <img src="./resistor_2.png" class="resistor-img" id="resistor" alt="">
+                    
+                    <!-- USB Cable -->
+                    <div class="usb-container">
+                        <img src="./tpp - Copy.png" class="usb-img" alt="">
+                        <div class="usb-label">USB Cable</div>
+                    </div>
+
+                    <!-- Wires -->
+                    <div class="wire wire-red"></div>
+                    <div class="wire wire-red2"></div>
+                    <div class="wire wire-red3"></div>
+                    <div class="wire wire-red4"></div>
+                    <div class="wire wire-red5"></div>
+                    <div class="wire wire-red6"></div>
+                    <div class="wire wire-red7"></div>
+                    <div class="wire wire-red8"></div>
+                    <div class="wire wire-red9"></div>
+                    <div class="wire wire-red10"></div>
+                    <div class="wire wire-red11"></div>
+                    <div class="wire wire-red12"></div>
+                    <div class="wire wire-black"></div>
+                    <div class="wire wire-black1"></div>
+                    <div class="wire wire-black2"></div>
+                    <div class="wire wire-black3"></div>
+                    <div class="wire wire-black4"></div>
+                    <div class="wire wire-black5"></div>
+                    <div class="wire wire-black6"></div>
+                    <div class="wire wire-black7"></div>
+
+                    <!-- Battery -->
+                    <div class="battery-container">
+                        <div class="battery" id="battery">
+                            <div class="battery-level" id="batteryLevel"></div>
+                            <div class="battery-text" id="batteryText">8%</div>
+                        </div>
+                        <div class="battery-label">3.7V Lithium-Ion<br>Rechargeable</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONTROL PANEL -->
+    <div class="control-panel">
+        <button class="control-button btn-power" onclick="togglePower()">
+            Quvvat Yoqish/O'chirish
+        </button>
+        <button class="control-button btn-test" onclick="runTest()">
+            Tizimni sinash
+        </button>
+        <button class="control-button btn-reset" onclick="resetAll()">
+            Qayta o'rnatish
+        </button>
+    </div>
+
+    <script>
+        let powerOn = false;
+        let isCharging = false;
+        let batteryLevel = 8;
+        let isFullyCharged = false;
+        let chargingInterval = null;
+        
+        const elements = {
+            powerLed: document.getElementById('powerLed'),
+            diodeLed: document.getElementById('diodeLed'),
+            chargingLed: document.getElementById('chargingLed'),
+            fullLed: document.getElementById('fullLed'),
+            batteryLed: document.getElementById('batteryLed'),
+            chargingLedMain: document.getElementById('chargingLedMain'),
+            fullLedMain: document.getElementById('fullLedMain'),
+            batteryLevelDiv: document.getElementById('batteryLevel'),
+            batteryText: document.getElementById('batteryText'),
+            batteryPercent: document.getElementById('batteryPercent')
+        };
+
+        function updateBatteryDisplay() {
+            const widthPercent = Math.min(batteryLevel, 100) * 0.9;
+            elements.batteryLevelDiv.style.width = widthPercent + '%';
+            elements.batteryText.textContent = Math.round(batteryLevel) + '%';
+            elements.batteryPercent.textContent = Math.round(batteryLevel) + '%';
+            
+            if (batteryLevel < 20) {
+                elements.batteryLevelDiv.style.background = 'linear-gradient(90deg, #e74c3c, #c0392b)';
+            } else if (batteryLevel < 50) {
+                elements.batteryLevelDiv.style.background = 'linear-gradient(90deg, #f39c12, #e67e22)';
+            } else if (batteryLevel < 80) {
+                elements.batteryLevelDiv.style.background = 'linear-gradient(90deg, #f39c12, #27ae60)';
+            } else {
+                elements.batteryLevelDiv.style.background = 'linear-gradient(90deg, #27ae60, #2ecc71)';
+            }
+        }
+
+        function updateStatus() {
+            elements.powerLed.classList.toggle('on', powerOn);
+            elements.diodeLed.classList.toggle('on', powerOn && isCharging);
+            elements.chargingLed.classList.toggle('on', powerOn && isCharging && !isFullyCharged);
+            elements.fullLed.classList.toggle('on', powerOn && isFullyCharged);
+            elements.batteryLed.classList.toggle('on', powerOn);
+            
+            if (powerOn && isCharging && !isFullyCharged) {
+                elements.chargingLedMain.classList.remove('off');
+                elements.chargingLedMain.classList.add('led-charging');
+            } else {
+                elements.chargingLedMain.classList.add('off');
+                elements.chargingLedMain.classList.remove('led-charging');
+            }
+            
+            if (powerOn && isFullyCharged) {
+                elements.fullLedMain.classList.remove('off');
+                elements.fullLedMain.classList.add('led-full');
+            } else {
+                elements.fullLedMain.classList.add('off');
+                elements.fullLedMain.classList.remove('led-full');
+            }
+        }
+
+        function togglePower() {
+            powerOn = !powerOn;
+            if (!powerOn) {
+                isCharging = false;
+                if (chargingInterval) {
+                    clearInterval(chargingInterval);
+                    chargingInterval = null;
+                }
+            }
+            updateStatus();
+        }
+
+        function startCharging() {
+            if (!powerOn) {
+                alert('Avval quvvatni yoqing!');
+                return;
+            }
+            if (isFullyCharged) {
+                alert('Batareya allaqachon to\'liq quvvatlangan!');
+                return;
+            }
+            if (isCharging) {
+                alert('Batareya allaqachon quvvatlanmoqda!');
+                return;
+            }
+            
+            isCharging = true;
+            updateStatus();
+            
+            chargingInterval = setInterval(() => {
+                if (batteryLevel < 100) {
+                    batteryLevel += 1;
+                    updateBatteryDisplay();
+                    
+                    if (batteryLevel >= 100) {
+                        batteryLevel = 100;
+                        isFullyCharged = true;
+                        isCharging = false;
+                        updateStatus();
+                        updateBatteryDisplay();
+                        clearInterval(chargingInterval);
+                        chargingInterval = null;
+                        alert('Batareya to\'liq quvvatlandi!');
+                    }
+                } else {
+                    clearInterval(chargingInterval);
+                    chargingInterval = null;
+                }
+            }, 1000);
+        }
+
+        function stopCharging() {
+            if (!isCharging) {
+                alert('Quvvatlash jarayoni ishlamayapti!');
+                return;
+            }
+            isCharging = false;
+            if (chargingInterval) {
+                clearInterval(chargingInterval);
+                chargingInterval = null;
+            }
+            updateStatus();
+        }
+
+        function runTest() {
+            if (!powerOn) {
+                alert('Avval quvvatni yoqing!');
+                return;
+            }
+            alert('Test boshlandi...');
+            
+            const originalCharging = isCharging;
+            const originalFull = isFullyCharged;
+            
+            setTimeout(() => {
+                elements.chargingLedMain.classList.remove('off');
+                elements.chargingLedMain.classList.add('led-charging');
+                
+                setTimeout(() => {
+                    elements.chargingLedMain.classList.add('off');
+                    elements.chargingLedMain.classList.remove('led-charging');
+                    elements.fullLedMain.classList.remove('off');
+                    elements.fullLedMain.classList.add('led-full');
+                    
+                    setTimeout(() => {
+                        elements.fullLedMain.classList.add('off');
+                        elements.fullLedMain.classList.remove('led-full');
+                        isCharging = originalCharging;
+                        isFullyCharged = originalFull;
+                        updateStatus();
+                        alert('Test tugadi!');
+                    }, 1000);
+                }, 1000);
+            }, 500);
+        }
+
+        function resetAll() {
+            if (chargingInterval) {
+                clearInterval(chargingInterval);
+                chargingInterval = null;
+            }
+            powerOn = false;
+            isCharging = false;
+            isFullyCharged = false;
+            batteryLevel = 8;
+            updateBatteryDisplay();
+            updateStatus();
+        }
+
+        function showInfo(type) {
+            let message = '';
+            switch(type) {
+                case 'components':
+                    message = `Ishlatilgan qurilmalar:
+                    
+• 1N4007 Diode - Teskari oqimdan himoya
+• 1kΩ Resistor - Oqim cheklash
+• LED (Qizil) - Quvvatlash ko'rsatkichi
+• LED (Yashil) - To'liq quvvat ko'rsatkichi
+• 3.7V Li-ion batareya - Qayta quvvatlanadigan batareya
+• USB kabel - Quvvat manbayi`;
+                    break;
+                case 'working':
+                    message = `Ishlash prinsipi:
+                    
+1. USB orqali quvvat berilganda diode ishga tushadi
+2. Batareya quvvatlanayotganda qizil LED yonadi
+3. Batareya to'liq quvvatlanganida yashil LED yonadi
+4. Resistor LED oqimini cheklaydi
+5. Diode teskari oqimdan himoya qiladi`;
+                    break;
+                case 'usage':
+                    message = `Foydalanish:
+                    
+• Power Bank'larda
+• Telefon quvvatlagichlarda
+• Batareya quvvatlash tizimlarida
+• Elektron qurilmalarda quvvat ko'rsatkichi sifatida
+• DIY loyihalarda`;
+                    break;
+            }
+            alert(message);
+        }
+
+        function initializeSystem() {
+            updateBatteryDisplay();
+            updateStatus();
+        }
+
+        document.addEventListener('DOMContentLoaded', initializeSystem);
+        if (document.readyState !== 'loading') {
+            initializeSystem();
+        }
+    </script>
+</body>
+</html>

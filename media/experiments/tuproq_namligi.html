@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tuproq Namligi Sensori</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:Arial,sans-serif;min-height:100vh;padding:clamp(10px, 2vw, 20px);overflow-x:auto}
+
+    /* HEADER */
+    .header{display:flex;align-items:center;background:#000075;color:#fff;padding:clamp(8px, 1.5vw, 10px) clamp(15px, 3vw, 20px);box-shadow:0 4px 12px rgba(0,0,0,.2);position:sticky;top:0;z-index:1000;width:100%;border-radius:8px}
+    .logo{display:flex;align-items:center;gap:10px;font-size:clamp(14px, 2.5vw, 18px);font-weight:bold}
+    .logo-icon{width:clamp(30px, 5vw, 40px);height:clamp(30px, 5vw, 40px);background:#4CAF50;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:clamp(16px, 3vw, 20px)}
+
+    /* LAYOUT */
+    .main-container{display:flex;margin-top:clamp(15px, 2vw, 20px);gap:clamp(15px, 2vw, 20px)}
+    .left-panel{width:280px;background:#fff;padding:15px;border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,.1);height:fit-content;position:relative}
+    .control-group{margin-bottom:20px;border-bottom:1px solid #ddd;padding-bottom:15px}
+    .control-group h3{margin-bottom:10px;color:#2E7D32;font-size:clamp(14px, 2vw, 16px)}
+    .btn{display:block;width:100%;padding:10px;border:none;cursor:pointer;margin-bottom:8px;font-size:clamp(12px, 1.8vw, 14px);border-radius:8px;transition:all .3s;text-align:left;font-weight:500}
+    .btn:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.15)}
+    .btn-success{background:linear-gradient(135deg,#4CAF50,#66BB6A);color:#fff}
+    .btn-danger{background:linear-gradient(135deg,#F44336,#EF5350);color:#fff}
+    .btn-primary{background:linear-gradient(135deg,#2196F3,#42A5F5);color:#fff}
+    .btn-warning{background:linear-gradient(135deg,#FF9800,#FFB74D);color:#fff}
+
+    .sensor-reading{background:#E8F5E8;padding:12px;border-radius:8px;margin:10px 0;text-align:center}
+    .moisture-level{font-size:clamp(20px, 4vw, 24px);font-weight:bold;color:#2E7D32}
+    .moisture-status{font-size:clamp(12px, 2vw, 14px);margin-top:5px}
+
+    .main-content{flex:1;padding:clamp(15px, 2.5vw, 20px);background:#fff;border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,.1)}
+    .title-header{background:#000075;color:#fff;padding:clamp(12px, 2vw, 15px) clamp(20px, 4vw, 30px);border-radius:25px;font-size:clamp(16px, 2.8vw, 20px);font-weight:bold;margin:0 auto 30px;text-align:center;display:inline-block;box-shadow:0 4px 20px rgba(46,125,50,.3)}
+
+    /* CIRCUIT CANVAS - RESPONSIVE ABSOLUTE PARENT */
+    .circuit-container{
+      position:relative;
+      border-radius:15px;
+      padding:1.5rem;
+      border:3px solid #4CAF50;
+      width:100%;
+      max-width:1100px;
+      margin:0 auto;
+      aspect-ratio: 16 / 9;
+      background:#fefefe;
+      overflow:hidden;
+    }
+  .card {
+    display: flex;
+    gap: 15px;
+    background: #000075;
+    color: white;
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    align-items: center;
+}
+
+.card img {
+    width: 150px;
+    border-radius: 10px;
+}
+
+.card .text h3 {
+    margin-bottom: 8px;
+    color: white;
+}
+    .circuit-title{
+      position:absolute;top:-15px;left:50%;transform:translateX(-50%);
+      background:#FFD54F;color:#333;padding:clamp(8px, 1.5vw, 10px) clamp(20px, 4vw, 30px);border-radius:25px;
+      font-size:clamp(14px, 2.5vw, 18px);font-weight:bold;border:3px solid #FFC107;
+      text-shadow:1px 1px 2px rgba(0,0,0,.1);z-index:10
+    }
+
+    /* RESPONSIVE ABSOLUTE ELEMENTS */
+    .abs{position:absolute;will-change:transform}
+
+    .component{
+      border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:bold;transition:transform .3s ease;
+      font-size:clamp(10px, 1.5vw, 12px);
+    }
+    .component:hover{transform:scale(1.05)}
+    .component img{width:100%;height:100%;object-fit:contain;display:block}
+
+    .relay-module{color:#fff;cursor:pointer}
+    .relay-module.active{background:linear-gradient(145deg,#4CAF50,#388E3C);box-shadow:0 0 20px rgba(76,175,80,.6)}
+
+    .sensor-module{color:#fff;text-align:center}
+
+    .dc-pump{color:#333;cursor:pointer}
+    .water-drops{position:absolute;top:-10%;left:50%;transform:translateX(-50%);width:15%;height:40%;display:none;z-index:10}
+    .water-drop{position:absolute;width:15%;height:20%;background:#2196F3;border-radius:50% 50% 50% 50% / 60% 60% 40% 40%;animation:dropFall .8s linear infinite}
+    .water-drop:nth-child(1){left:15%;animation-delay:0s}
+    .water-drop:nth-child(2){left:45%;animation-delay:.2s}
+    .water-drop:nth-child(3){left:75%;animation-delay:.4s}
+    @keyframes dropFall{
+      0%{top:0;opacity:1;transform:scale(1)}
+      50%{transform:scale(1.2)}
+      100%{top:90%;opacity:.3;transform:scale(.8)}
+    }
+    .dc-pump.active .water-drops{display:block}
+
+    .battery{border-radius:15px;position:absolute;text-align:center;color:#333}
+    .battery::before{
+    position:absolute;left:50%;transform:translateX(-50%);
+      width:clamp(250px, 5vw, 200px);height:clamp(55px, 3vw, 20px);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:clamp(12px, 2vw, 14px)
+    }
+
+    .soil-sensor{color:#fff;border-radius:30px;cursor:pointer;text-align:center;overflow:hidden}
+    .soil-sensor.wet{background:linear-gradient(145deg,#4CAF50,#2E7D32);box-shadow:0 0 20px rgba(76,175,80,.8)}
+    .soil-sensor.dry{background:linear-gradient(145deg,#FF5722,#D84315)}
+
+    /* WIRES - RESPONSIVE */
+    .wire{border-radius:2px;z-index:1}
+    .wire-red{background:linear-gradient(90deg,#F44336,#E57373);box-shadow:0 2px 4px rgba(244,67,54,.3)}
+    .wire-black{background:linear-gradient(90deg,#212121,#424242)}
+    .wire-blue{background:linear-gradient(90deg,#2196F3,#64B5F6);box-shadow:0 2px 4px rgba(33,150,243,.3)}
+    .wire-green{background:linear-gradient(90deg,#4CAF50,#81C784);box-shadow:0 2px 4px rgba(76,175,80,.3)}
+    .wire-yellow{background:linear-gradient(90deg,#FFEB3B,#FFF176);box-shadow:0 2px 4px rgba(255,235,59,.3)}
+
+    /* STATUS DISPLAY */
+    .status-display{position:fixed;top:90px;right:20px;background:rgba(255,255,255,.95);padding:20px;border-radius:15px;min-width:250px;box-shadow:0 8px 25px rgba(0,0,0,.15);z-index:100;border-left:5px solid #4CAF50}
+    .status-row{display:flex;justify-content:space-between;align-items:center;margin:12px 0;font-size:clamp(12px, 2vw, 14px)}
+    .status-led{width:16px;height:16px;border-radius:50%;background:#F44336;transition:all .3s ease;box-shadow:inset 0 2px 4px rgba(0,0,0,.3)}
+    .status-led.on{background:#4CAF50;box-shadow:0 0 15px rgba(76,175,80,.8)}
+    .moisture-bar{width:100%;height:20px;background:#E0E0E0;border-radius:10px;overflow:hidden;margin:10px 0}
+    .moisture-fill{height:100%;background:linear-gradient(90deg,#F44336,#FF9800,#4CAF50);width:0%;transition:width 1s ease;border-radius:10px}
+
+    /* Modal */
+    .modal{display:none;position:fixed;z-index:1000;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,.6);backdrop-filter:blur(3px)}
+    .modal-content{background:#2E7D32;color:#fff;margin:5% auto;padding:25px;width:90%;max-width:800px;border-radius:20px;box-shadow:0 15px 35px rgba(0,0,0,.3);animation:slideDown .4s ease;position:relative}
+    .close{position:absolute;right:20px;top:15px;font-size:28px;font-weight:bold;cursor:pointer;color:#fff;transition:color .3s}
+    .close:hover{color:#FFD54F}
+    .modal-content h2{font-size:clamp(1.3em, 3vw, 1.8em);margin-bottom:20px;border-bottom:3px solid rgba(255,255,255,.3);padding-bottom:10px}
+    .code-block{background:rgba(0,0,0,.4);padding:20px;border-radius:10px;font-family:'Courier New',monospace;white-space:pre-wrap;margin:15px 0;border-left:4px solid #4CAF50;font-size:clamp(11px, 1.8vw, 14px)}
+    @keyframes slideDown{from{transform:translateY(-30px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+    /* Responsive tweaks */
+    @media (max-width:1024px){
+      .main-container{flex-direction:column}
+      .left-panel{width:100%}
+      .status-display{position:relative;margin:20px auto;width:fit-content;top:0;right:0}
+    }
+    @media (max-width:768px){
+      .circuit-container{max-width:100%;padding:1rem}
+      .circuit-title{font-size:clamp(12px, 3vw, 16px);padding:8px 15px}
+    }
+    .left-panel{width:280px;max-width:95%;background:#fff;border-radius:14px;padding:16px;box-shadow:0 6px 16px rgba(0,0,0,.08)}
+  .left-panel h3{margin:0 0 12px;font-size:16px;color:#333}
+  .btn{display:block;width:100%;padding:10px 12px;margin:8px 0;border:0;border-radius:10px;cursor:pointer;transition:.25s;text-align:left;font-weight:600}
+  .btn-primary{background:#000075;color:#fff}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 14px rgba(0,0,0,.1)}
+  .flex-container-40-60{display:flex;gap:20px;align-items:flex-start;background:rgba(255,255,255,.1);padding:20px;border-radius:15px;margin-bottom:20px}
+  .flex-text-60{flex:1}
+  .flex-text-60 p{font-size:16px;line-height:1.8}
+  .flex-container-30-70{display:flex;gap:20px;align-items:flex-start;background:rgba(255,255,255,.1);padding:20px;border-radius:15px;margin-bottom:20px}
+  .flex-image-30{flex:0 0 30%}
+  .flex-image-30 img{width:100%;border-radius:10px}
+  .flex-text-70{flex:0 0 70%}
+  .flex-text-70 strong{color:#ffcc00;font-size:18px;display:block;margin-bottom:10px}
+  .modal{display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.8);backdrop-filter:blur(5px);overflow-y:auto}
+  .modal-content{background:#000075;color:#fff;margin:5vh auto;padding:30px;width:90%;max-width:1000px;border-radius:20px;box-shadow:0 15px 40px rgba(0,0,0,.5);position:relative;animation:slideDown .4s ease}
+  @keyframes slideDown{from{transform:translateY(-50px);opacity:0}to{transform:translateY(0);opacity:1}}
+  .close{position:absolute;right:20px;top:15px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:bold;cursor:pointer;color:#fff;transition:.3s;border-radius:50%;background:rgba(255,255,255,.1)}
+  .close:hover{background:rgba(255,204,0,.3);color:#ffcc00;transform:rotate(90deg)}
+  .modal-content h2{font-size:28px;margin-bottom:25px;padding-bottom:15px;border-bottom:2px solid rgba(255,255,255,.3);padding-right:50px}
+  .tab-buttons{display:flex;gap:8px;margin:12px 0 16px}
+  .tab-btn{flex:1;background:rgba(255,255,255,.12);color:#fff;border:0;border-radius:10px 10px 0 0;padding:10px;cursor:pointer;font-weight:600;transition:.2s}
+  .tab-btn:hover{background:rgba(255,255,255,.2)}
+  .tab-btn.active{background:rgba(255,255,255,.28)}
+  .tab-content{display:none}
+  .tab-content.active{display:block}
+  pre{background:rgba(0,0,0,.35);padding:12px;border-radius:10px;overflow:auto;white-space:pre-wrap;word-break:break-word;color:#fff;font-size:13.5px;line-height:1.55}
+  #infoFloatingBtn{position:fixed;bottom:30px;right:30px;width:120px;height:120px;border-radius:50%;background:linear-gradient(135deg,#000075,#0000ff);color:#fff;border:4px solid #fff;cursor:pointer;font-size:16px;font-weight:bold;box-shadow:0 8px 20px rgba(0,0,0,.4);z-index:1500;transition:.3s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px}
+  #infoFloatingBtn:hover{transform:scale(1.1);box-shadow:0 12px 30px rgba(0,0,255,.6)}
+  #infoFloatingBtn span:first-child{font-size:36px}
+  .video-full{width:100%;border-radius:15px;background:#000}
+  .video-full video{width:100%;height:auto;border-radius:15px;max-height:70vh}
+  @media (max-width:1024px){.flex-container-40-60,.flex-container-30-70{flex-direction:column}.flex-image-30,.flex-text-70{flex:0 0 100%}}
+  @media (max-width:768px){.modal-content{width:96%;padding:20px 15px}#infoFloatingBtn{width:90px;height:90px;font-size:14px;bottom:20px;right:20px}#infoFloatingBtn span:first-child{font-size:28px}}
+  </style>
+</head>
+<body>
+  <!-- HEADER -->
+  <header class="header"> 
+    <div class="logo">
+                 <a href="/"><img src="/static/image/logo.png" width="80px" height="80px" alt=""></a>
+          
+      <span>Tuproq Namligi Sensori Tizimi</span>
+    </div>
+  </header>
+
+  <div class="main-container">
+    <!-- LEFT -->
+    <div class="left-panel">
+      <div class="control-group">
+        <h3>🎛 Boshqaruv</h3>
+        <button class="btn btn-success" onclick="startSystem()" id="startBtn">🟢 Tizimni Yoqish</button>
+        <button class="btn btn-danger" onclick="stopSystem()" id="stopBtn">🔴 Tizimni O'chirish</button>
+        <button class="btn btn-primary" onclick="togglePower()">⚡️ Quvvat</button>
+        <button class="btn btn-warning" onclick="testPump()">🧪 Nasosni Sinash</button>
+      </div>
+
+      <div class="control-group">
+        <h3>📊 Sensor Qiymatlari</h3>
+        <div class="sensor-reading">
+          <div class="moisture-level" id="moistureValue">0%</div>
+          <div class="moisture-status" id="moistureStatus">Quruq tuproq</div>
+          <div class="moisture-bar"><div class="moisture-fill" id="moistureFill"></div></div>
+        </div>
+      </div>
+
+            <div class="control-group">
+                <h3>📚 Ma'lumotlar</h3>
+                <button class="btn btn-primary" id="schemaBtn">
+                    📋 Sxema Haqida
+                </button>
+               
+                <button class="btn btn-primary" id="componentsBtn">
+                    🔌 Qurilmalar
+                </button>
+           
+            </div>
+
+      <div class="control-group">
+        <h3>🔧 Sozlamalar</h3>
+        <button class="btn btn-primary" onclick="simulateRain()">🌧 Yomg'irni Simulyatsiya</button>
+        <button class="btn btn-warning" onclick="simulateDry()">☀️ Quruqlikni Simulyatsiya</button>
+      </div>
+    </div>
+
+    <!-- RIGHT -->
+    <div class="main-content">
+      
+
+      <div class="circuit-container" id="stage">
+      
+        <!-- Components -->
+        <div class="component relay-module abs" id="relay"
+             data-left="-4" data-top="0" data-width="50" data-height="50" onclick="toggleRelay()">
+          <img src="/static/image/single-channel-dc-5v-relay-module-board-optocoupler-low-level-trigger-removebg-preview.png" alt="Relay"/>
+          <div style="font-size:clamp(8px, 1.2vw, 10px)">SRD-5VDC-SL-C</div>
+        </div>
+
+        <div class="component sensor-module abs" id="sensorModule"
+             data-right="5" data-top="-10" data-width="30" data-height="70">
+          <img src="/static/image/sensor_module-removebg-preview.png" alt="Sensor Module"/>
+          <div>Sensor Module</div>
+        </div>
+
+        <div class="component dc-pump abs" id="pump"
+             data-left="0" data-top="52" data-width="30" data-height="30" onclick="togglePump()">
+          <img src="/static/image/dcpump.jpg" alt="DC Pump"/>
+          <div class="water-drops">
+            <div class="water-drop"></div><div class="water-drop"></div><div class="water-drop"></div>
+          </div>
+  
+        </div>
+        
+        <div class="component battery abs" id="battery"
+             data-left="50" data-top="57" data-width="12" data-height="24">
+          <img src="/static/image/litium - Copy.png" alt="3.7v Battery"/>
+        
+        </div>
+
+        <div class="component soil-sensor abs" id="soilSensor"
+             data-left="62" data-top="38" data-width="60" data-height="24" onclick="toggleSoilMoisture()">
+          <div style="font-size:clamp(10px, 1.5vw, 12px);margin-top:4px">Sensor</div>
+          <img src="/static/image/sensor1.jpg" alt="Soil Sensor"/>
+        </div>
+
+        <!-- Wires - PERCENTAGE based -->
+        <div class="wire wire-red abs"   data-left="7.5"  data-top="19"  data-width="5.5"  data-height="0.8"></div>
+        <div class="wire wire-black abs" data-right="7.5" data-top="21" data-width="4"  data-height="0.8"></div>
+     <div class="wire wire-red abs"   data-right="8" data-top="23" data-width="4"  data-height="0.8"></div>
+        <div class="wire wire-black abs" data-left="4"  data-top="24" data-width="10" data-height="0.8"></div>
+        <div class="wire wire-black abs" data-left="4"  data-top="24" data-width="0.6"   data-height="32"></div>
+        <div class="wire wire-black abs" data-left="4"  data-top="55.8" data-width="7"  data-height="0.6"></div>
+        <div class="wire wire-red abs"   data-left="9"  data-top="19"  data-width="0.6"   data-height="36" data-rotate="-10"></div>
+        <div class="wire wire-black abs" data-left="29" data-top="24" data-width="44" data-height="0.6"></div>
+        <div class="wire wire-red abs"   data-left="29" data-top="26.4" data-width="44" data-height="0.6"></div>
+        <div class="wire wire-yellow abs"data-left="29" data-top="21.8" data-width="40" data-height="0.6"></div>
+        <div class="wire wire-yellow abs"data-left="69" data-top="19.8"  data-width="4" data-height="0.6"></div>
+        <div class="wire wire-yellow abs"data-left="69" data-top="19.8"  data-width="0.6"   data-height="3"></div>
+        <div class="wire wire-black abs" data-right="7.5" data-top="21" data-width="0.6"   data-height="20"></div>
+        <div class="wire wire-red abs"   data-right="8" data-top="23" data-width="0.6"   data-height="18"></div>
+        <div class="wire wire-black abs" data-left="45.5" data-top="24" data-width="0.6"   data-height="44"></div>
+        <div class="wire wire-red abs"   data-right="35.5"data-top="26.4" data-width="0.6"   data-height="42"></div>
+        <div class="wire wire-black abs" data-left="45.5" data-bottom="31.8" data-width="5.3" data-height="0.6"></div>
+        <div class="wire wire-red abs"   data-right="35.5"data-bottom="31.4" data-width="3" data-height="0.6"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATUS DISPLAY -->
+ 
+<div class="modal" id="schemaModal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>💡 Sxema qayerda ishlatiladi (RGB LED)</h2>
+    <div class="flex-container-40-60">
+         <div class="flex-video-40">
+                <iframe 
+                    src="https://www.youtube.com/embed/D6-2IlQgq4c?si=6uJAVcumo9-dhsVw" 
+                    title="YouTube video player" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+      <div class="flex-text-60">
+        <strong>🔄 Ishlash prinsipi</strong>
+     <p>Sensor tuproqni tekshiradi va Arduino ga signal yuboradi.
+
+Analog sensor: 0–1023 qiymat beradi (0 = juda nam, 1023 = juda quruq)
+
+Digital sensor: nam/quruq sifatida HIGH/LOW signal beradi
+
+Arduino namlik darajasini tekshiradi:
+
+Agar tuproq quruq bo‘lsa → relay yoqiladi → nasos suv beradi
+
+Agar tuproq yetarlicha nam bo‘lsa → nasos o‘chiriladi
+
+Qo‘shimcha: buzzer yoki LED indikator orqali holat vizual ko‘rsatiladi
+
+Ma’lumot LCD/OLED ekranda ham ko‘rsatilishi mumkin</p>
+      </div>
+    </div>
+    <div class="flex-container-40-60">
+         <div class="flex-video-40">
+                <iframe 
+                    src="https://www.youtube.com/embed/iwkE_HWU-6M?si=3kjB0b4uR9Q0J1UZ" 
+                    title="YouTube video player" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+      <div class="flex-text-60">
+        <strong>Qo‘shimcha funksiyalar</strong>
+   <p>WiFi yoki Bluetooth integratsiyasi → masofadan monitoring
+
+Data logging → SD karta orqali namlik darajasi tarixini saqlash
+
+IoT platformalar bilan integratsiya → Telegram / Blynk orqali ogohlantirish
+
+RGB LED indikator → quruq (qizil), o‘rtacha (sariq), nam (yashil)</p>
+      </div>
+    </div>
+    <div class="flex-container-40-60">
+         <div class="flex-video-40">
+                <iframe 
+                    src="https://www.youtube.com/embed/FDl4SftP8BU?si=9-5xFWD9i-zSb0Va" 
+                    title="YouTube video player" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+      <div class="flex-text-60">
+        <strong>Afzalliklari</strong>
+<p>O‘simliklar uchun optimal sug‘orish
+
+Suv resurslarini tejash
+
+Arduino orqali sensor va relay boshqaruvini o‘rganish
+
+Avtomatik va real vaqt monitoring tizimini yaratish</p>
+   
+    </div>
+    </div>
+  </div>
+</div>
+  <!-- Ishlatilgan qurilmalar (modal) -->
+    <div class="modal" id="componentsModal">
+        <div class="modal-content">
+            <span class="close" title="Yopish">&times;</span>
+            <h2>🔌 Ishlatilgan Qurilmalar</h2>
+
+            <div class="card">
+                <img src="/static/image/single-channel-dc-5v-relay-module-board-optocoupler-low-level-trigger-removebg-preview.png" width="150px" height="150px" alt="Rezistor">
+                 <div class="text">
+                    <h3>5V Yagona Kanal Relay Module</h3>
+                    <p>Bu modul past kuchlanishli boshqaruv signali (masalan, Arduino’dan 5V signal) yordamida yuqori kuchlanishli yuklarni (220V AC lampalar, 12V nasos, motor va hokazo) xavfsiz ulash yoki o‘chirish uchun ishlatiladi.
+                    </p>
+                </div>
+            </div>
+
+            <div class="card">
+                <img src="/static/image/sensor_module-removebg-preview.png" alt="LM393P Komparator">
+                <div class="text">
+                    <h3>3.7V Li-ion qayta zaryadlanadigan batareya</h3>
+                    <p>
+                        Vazifasi: Energiya manbai sifatida ishlaydi, sxemani mustaqil quvvat bilan ta’minlaydi.
+
+                        Izoh: USB orqali zaryadlanadi; sxemadagi LED’lar zaryad holatini bildiradi.
+                    </p>
+                </div>
+            </div>
+<div class="card">
+                <img src="/static/image/sensor1.jpg" alt="LM393P Komparator">
+                <div class="text">
+                    <h3>Tuproq namlik darajasi sensori + LM393</h3>
+                    <p>
+                     Vazifasi: Tuproqdagi namlik darajasini o‘lchaydi va analog/raqamli signal orqali mikrokontrollerga yuboradi.
+
+Xususiyatlari:
+
+Ish kuchlanishi: 3.3–5V
+
+LM393 komparator chipiga ega (raqamli chiqish uchun)
+
+Analog chiqish (A0) – namlik qiymati, Digital chiqish (D0) – trigger darajasida 0 yoki 1 signal
+
+Qo‘llanilishi: Avtomatik sug‘orish tizimlari, o‘simlik monitoringi.
+                    </p>
+                </div>
+            </div>
+            <div class="card">
+                <img src="/static/image/dcpump.jpg" alt="5V Relay modul">
+                <div class="text">
+                    <h3>DC pump motor</h3>
+             <p>Vazifasi: Suvni bir joydan boshqasiga oqizadi, sug‘orish yoki sovutish tizimlarida ishlatiladi.
+
+Xususiyatlari:
+
+Ish kuchlanishi: 3–5V DC
+
+Oqim tezligi: ~80–120 L/soat
+
+Past shovqin, kichik o‘lcham
+
+Qo‘llanilishi: Mini sug‘orish tizimlari, akvariumlar, avtomatik suv purkagichlar.</p>
+                </div>
+            </div>
+       
+
+       
+        </div>
+    </div>
+    </div>
+    </div>
+<div class="modal" id="infoModal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>📚 Qo'shimcha Ma'lumot</h2>
+    <div class="video-full">
+      <video controls>
+        <source src="/media/2.mp4" type="video/mp4">
+        Brauzeringiz video formatni qo'llab-quvvatlamaydi.
+      </video>
+    </div>
+  </div>
+</div>
+
+<button id="infoFloatingBtn"><span>📚</span><span>Ma'lumot</span></button>
+
+
+  <script>
+    let systemActive=false,powerOn=false,moistureLevel=30,relayActive=false,pumpRunning=false,sensorActive=false;
+    const elements={
+      powerLed:document.getElementById('powerLed'),
+      sensorLed:document.getElementById('sensorLed'),
+      relayLed:document.getElementById('relayLed'),
+      pumpLed:document.getElementById('pumpLed'),
+      moistureValue:document.getElementById('moistureValue'),
+      moistureStatus:document.getElementById('moistureStatus'),
+      moistureFill:document.getElementById('moistureFill'),
+      relay:document.getElementById('relay'),
+      pump:document.getElementById('pump'),
+      soilSensor:document.getElementById('soilSensor'),
+      sensorModule:document.getElementById('sensorModule')
+    };
+
+    function updateStatus(){
+      elements.powerLed.classList.toggle('on',powerOn);
+      elements.sensorLed.classList.toggle('on',sensorActive);
+      elements.relayLed.classList.toggle('on',relayActive);
+      elements.pumpLed.classList.toggle('on',pumpRunning);
+
+      elements.moistureValue.textContent=moistureLevel+'%';
+      elements.moistureFill.style.width=moistureLevel+'%';
+
+      if(moistureLevel<30){elements.moistureStatus.textContent="Quruq tuproq - Sug'orish kerak";elements.moistureStatus.style.color='#F44336'}
+      else if(moistureLevel<70){elements.moistureStatus.textContent="O'rtacha namlik";elements.moistureStatus.style.color='#FF9800'}
+      else{elements.moistureStatus.textContent='Yetarli namlik';elements.moistureStatus.style.color='#4CAF50'}
+
+      elements.relay.classList.toggle('active',relayActive);
+      elements.pump.classList.toggle('active',pumpRunning);
+
+      if(moistureLevel<30){elements.soilSensor.classList.add('dry');elements.soilSensor.classList.remove('wet')}
+      else if(moistureLevel>70){elements.soilSensor.classList.add('wet');elements.soilSensor.classList.remove('dry')}
+      else{elements.soilSensor.classList.remove('wet','dry')}
+    }
+
+    function startSystem(){
+      systemActive=true;powerOn=true;sensorActive=true;
+      if(!window.monitoringInterval){window.monitoringInterval=setInterval(checkMoisture,2000)}
+      updateStatus();
+    }
+    function stopSystem(){
+      systemActive=false;relayActive=false;pumpRunning=false;
+      if(window.monitoringInterval){clearInterval(window.monitoringInterval);window.monitoringInterval=null}
+      updateStatus();
+    }
+    function togglePower(){powerOn=!powerOn;if(!powerOn){stopSystem()}updateStatus()}
+
+    function checkMoisture(){
+      if(!systemActive||!powerOn) return;
+      if(moistureLevel>0&&Math.random()>0.7){moistureLevel=Math.max(0,moistureLevel-Math.floor(Math.random()*3+1))}
+      if(moistureLevel<30&&!pumpRunning){activatePump()}
+      else if(moistureLevel>80&&pumpRunning){deactivatePump()}
+      if(pumpRunning){moistureLevel=Math.min(100,moistureLevel+Math.floor(Math.random()*5+2))}
+      updateStatus();
+    }
+    function activatePump(){relayActive=true;pumpRunning=true;updateStatus()}
+    function deactivatePump(){relayActive=false;pumpRunning=false;updateStatus()}
+    function toggleRelay(){relayActive=!relayActive;updateStatus()}
+    function togglePump(){pumpRunning=!pumpRunning;updateStatus()}
+    function toggleSoilMoisture(){moistureLevel = (moistureLevel<50)?85:20;updateStatus()}
+    function simulateRain(){moistureLevel=Math.min(100,moistureLevel+15);updateStatus()}
+    function simulateDry(){moistureLevel=Math.max(0,moistureLevel-15);updateStatus()}
+    function testPump(){activatePump();setTimeout(deactivatePump,1500)}
+    function openModal(id){document.getElementById(id).style.display='block'}
+    function closeModal(el){el.closest('.modal').style.display='none'}
+    window.addEventListener('click',e=>{if(e.target.classList.contains('modal')) e.target.style.display='none'});
+
+  function openModal(id){ const m=document.getElementById(id); if(m) m.style.display='block'; }
+  function closeModal(el){ const m=el.closest('.modal'); if(m) m.style.display='none'; }
+
+  document.addEventListener('click', (e)=>{ if(e.target.matches('.modal .close')) closeModal(e.target); });
+  window.addEventListener('click', (e)=>{ document.querySelectorAll('.modal').forEach(m=>{ if(e.target===m) m.style.display='none'; }); });
+
+  // buttons
+  document.getElementById('schemaBtn')?.addEventListener('click', ()=>openModal('schemaModal'));
+  document.getElementById('codeBtn')?.addEventListener('click',   ()=>openModal('codeModal'));
+  document.getElementById('componentsBtn')?.addEventListener('click', ()=>openModal('componentsModal'));
+  document.getElementById('infoFloatingBtn')?.addEventListener('click', ()=>openModal('infoModal'));
+
+  // tabs
+  (function(){
+    const codeModal=document.getElementById('codeModal');
+    if(!codeModal) return;
+    codeModal.querySelectorAll('.tab-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const t=btn.dataset.tab;
+        codeModal.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        codeModal.querySelectorAll('.tab-content').forEach(p=>p.classList.toggle('active', p.id===t));
+      });
+    });
+  })();
+    // RESPONSIVE POSITIONING SYSTEM
+    function applyResponsivePositions(){
+      const stage=document.getElementById('stage');
+      const items=stage.querySelectorAll('.abs');
+      
+      items.forEach(el=>{
+        const leftPct = el.dataset.left;
+        const topPct  = el.dataset.top;
+        const rightPct= el.dataset.right;
+        const bottomPct=el.dataset.bottom;
+        const wPct    = el.dataset.width;
+        const hPct    = el.dataset.height;
+        const rot     = el.dataset.rotate;
+
+        if(leftPct)  {el.style.left = leftPct+'%'; el.style.right='auto';}
+        if(topPct)   {el.style.top  = topPct+'%'; el.style.bottom='auto';}
+        if(rightPct) {el.style.right= rightPct+'%'; el.style.left='auto';}
+        if(bottomPct){el.style.bottom=bottomPct+'%'; el.style.top='auto';}
+        if(wPct)     {el.style.width = wPct+'%';}
+        if(hPct)     {el.style.height= hPct+'%';}
+        if(rot)      {el.style.transform = `rotate(${rot}deg)`;}
+      });
+    }
+
+    window.addEventListener('load',applyResponsivePositions);
+    window.addEventListener('resize',applyResponsivePositions);
+  </script>
+</body>
+</html>

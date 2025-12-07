@@ -1,0 +1,218 @@
+
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Milliy Muhandislik Platformasi</title>
+  <link rel="stylesheet" href="/static/style.css" />
+    <script src="/static/index.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <style>    
+    section {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 3rem 2rem;
+    }
+    .no-results {
+  text-align: center;
+  color: #000075;
+  font-size: 34px;
+  font-weight: bold;
+  align-items: center;
+  justify-content: center;
+}
+.book-actions{display:flex;gap:.5rem;justify-content:center;margin-top:.75rem}
+.btn{display:inline-block;padding:.55rem .9rem;border-radius:999px;text-decoration:none;font-weight:600}
+.btn-read{background:#000075;color:#fff}
+.btn-read:hover{opacity:.9}
+.download-btn{background:#0b1aa8;color:#fff}
+.download-btn:hover{opacity:.9}
+
+</style>
+ <header>
+  <nav>
+    <a href="/"><img src="/static/image/logo.png" alt="Logo" /></a>
+
+    <!-- SEARCH -->
+    <form class="search-box" action="{% url 'main:bsearch' %}" method="post">
+      {% csrf_token %}
+      <i class="fa fa-search"></i>
+      <input type="text" name="q" placeholder="Qidirish..." value="{{ query|default:'' }}">
+    </form>
+ <div class="menu-toggle" id="menuToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+    <!-- CATEGORY FILTER -->
+   <ul id="navMenu">
+    <li><a href="/">Asosiy sahifa</a></li>
+     
+  <li>
+    <a href="{% url 'main:books' %}" {% if not active_category %}class="active"{% endif %}>Barchasi</a>
+  </li>
+  {% for cat in Bcategory %}
+    <li>
+      <a href="{% url 'main:books' %}?category={{ cat.id }}"
+        {% if active_cat == cat.id %}class="active"{% endif %}> {{ cat.name }}</a>
+    </li>
+  {% endfor %}
+</ul>
+</header>
+
+<section>
+  <div class="books-section">
+    <h1 class="section-title">Kitoblar</h1>
+    <div class="books-grid">
+      {% for book in books %}
+      <div class="book-card">
+        <div class="book-image">
+          <img src="{{ book.image.url }}" width="80%" height="100%" alt="">
+        </div>
+        <div class="book-title">{{ book.name }}</div>
+        <div class="book-pages">
+          {{ book.text }} 
+        </div>
+        {% if book.file %}
+        <div class="book-actions">
+      {% if book.file %}
+        <!-- O‘qish: brauzerda ochadi -->
+        <a class="btn btn-read" href="{{ book.file.url }}" target="_blank" rel="noopener">O‘qish</a>
+        <!-- Yuklab olish -->
+        <a class="btn download-btn" href="{{ book.file.url }}" download>
+          <i class="fas fa-download"></i> Yuklab olish
+        </a>
+      {% else %}
+        <span class="muted">Fayl mavjud emas</span>
+      {% endif %}
+    </div>
+        {% endif %}
+      </div>
+      {% empty %}
+  <p class="no-results">Hech qanday kitob topilmadi.</p>
+{% endfor %}
+
+    </div>
+
+   <!-- PAGINATION -->
+<!-- PAGINATION (books) -->
+{% if page and page.has_other_pages %}
+  <div class="pagination">
+    {% if page.has_previous %}
+      <a class="page-prev"
+         href="?{% if active_category %}category={{ active_category }}&{% endif %}{% if query %}q={{ query }}&{% endif %}page={{ page.previous_page_number }}">⬅</a>
+    {% endif %}
+
+    {% for num in paginator.page_range %}
+      <a class="page-dot{% if page.number == num %} active{% endif %}"
+         href="?{% if active_category %}category={{ active_category }}&{% endif %}{% if query %}q={{ query }}&{% endif %}page={{ num }}">
+      </a>
+    {% endfor %}
+
+    {% if page.has_next %}
+      <a class="page-next"
+         href="?{% if active_category %}category={{ active_category }}&{% endif %}{% if query %}q={{ query }}&{% endif %}page={{ page.next_page_number }}">➡</a>
+    {% endif %}
+  </div>
+{% endif %}
+
+  
+</section>
+ <footer>
+      <div class="footer">
+        <div class="left">
+          <img src="/static/image/muallif.jpg" alt="Muallif logotipi">
+          <p>
+<span style="display: block; text-align: center; font-size: 20px; font-weight: bold;">
+    Muallif : Muhammad Al-Xorazmiy Nomidagi Ixtisoslashtirilgan Maktab Andijon Filiali
+</span>
+
+              <br>Ushbu platforma O'zbekiston Respublikasi Prezidentining <br> 2024-yil 1-apreldagi PF-55-son
+            Farmoniga asosan tashkil etilgan 2025-yilgi Ixtirochilikka qadam tanlovini 1-o'rin <br> sohibi hamda
+            amaliyotgan tadbiq etish uchun Oliy ta'lim <br> va innovatsiyalar vazirligi huzuridagi
+            Ilm-fanni moliyalashtirish va innovatsiyalarni qo'llab-quvvatlash jamg'armasi tomonidan
+            56 mln so'm miqdorida moliyalashtirilgan.
+          </p>
+        </div>
+        <div class="center">
+          <h2>Aloqa uchun</h2>
+          <p>Manzil: Andijon shahar, Qalandarxona mahalla fuqarolar yig'ini,<br> Buxoro ko'chasi, 4 uy</p>
+          <p>Tel: +998 94 212 14 48</p>
+          <p>Gmail: ixm337@piima.uz</p>
+          <ul class="social-icons">
+            <li><a href="https://www.facebook.com/share/1C2cE7VJQR/?mibextid=wwXIfr" target="_blank"><i class="fab fa-facebook-f"></i></a></li>
+            <li><a href="https://www.youtube.com/@Milliy_muhandislik_platformasi" target="_blank"><i class="fab fa-youtube"></i></a></li>
+            <li><a href="https://www.instagram.com/itschool_andijan?igsh=MWdkMzQ4Zmt5MzhxaA==" target="_blank"><i class="fab fa-instagram"></i></a></li>
+            <li><a href="https://t.me/milliy_muhandislik" target="_blank"><i class="fab fa-telegram"></i></a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="bottom">
+        <p>Yaratilgan 2025 MMP | Dizayn va Dasturlash muallifi</p>
+      </div>
+    </footer>
+
+
+
+</body>
+<script src="/static/index.js"></script>
+<script src="/static/main.js"></script>
+<script>
+    // BURGER MENU FUNCTIONALITY
+        // =========================
+        const menuToggle = document.getElementById('menuToggle');
+        const navMenu = document.getElementById('navMenu');
+
+        menuToggle.addEventListener('click', function() {
+            navMenu.classList.toggle('active');
+            this.classList.toggle('active');
+        });
+
+        // Menyu tashqarisiga bosilganda yopish
+        document.addEventListener('click', function(e) {
+            if (!menuToggle.contains(e.target) && !navMenu.contains(e.target)) {
+                navMenu.classList.remove('active');
+                menuToggle.classList.remove('active');
+            }
+        });
+    // Add interactive functionality to pagination dots
+    const dots = document.querySelectorAll('.page-dot');
+    dots.forEach((dot, index) => {
+      dot.addEventListener('click', () => {
+        dots.forEach(d => d.classList.remove('active'));
+        dot.classList.add('active');
+      });
+    });
+
+    // Add smooth scrolling effect for download buttons
+    const downloadBtns = document.querySelectorAll('.download-btn, .tutorial-btn');
+    downloadBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        btn.style.transform = 'scale(0.95)';
+        setTimeout(() => {
+          btn.style.transform = '';
+        }, 150);
+      });
+    });
+
+    // Add parallax effect to tutorial cards
+    window.addEventListener('scroll', () => {
+      const cards = document.querySelectorAll('.tutorial-card');
+      cards.forEach(card => {
+        const rect = card.getBoundingClientRect();
+        const scrolled = window.pageYOffset;
+        const rate = scrolled * -0.5;
+        
+        if (rect.top <= window.innerHeight && rect.bottom >= 0) {
+          card.style.transform = `translateY(${rate * 0.1}px)`;
+        }
+      });
+    });
+  </script>
+
+</html>

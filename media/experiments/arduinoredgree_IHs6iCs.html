@@ -1,0 +1,1818 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arduino LED Quiz Tizimi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+/* MODAL TUZATISH - Responsive va to'g'ri ko'rinish */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    overflow-y: auto;
+    padding: 20px 0;
+}
+
+.modal-content {
+    background: #000075;
+    color: white;
+    margin: 10vh auto 5vh;
+    padding: 30px;
+    width: 90%;
+    max-width: 800px;
+    border-radius: 20px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+    position: relative;
+    animation: slideDown 0.4s ease;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+/* Scroll bar stilizatsiyasi */
+.modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.close {
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    font-size: 32px;
+    font-weight: bold;
+    cursor: pointer;
+    color: white;
+    transition: all 0.3s;
+    z-index: 2010;
+    line-height: 1;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.close:hover {
+    background: rgba(255, 204, 0, 0.3);
+    color: #ffcc00;
+    transform: rotate(90deg);
+}
+
+.modal-content h2 {
+    font-size: 28px;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+    padding-right: 50px;
+}
+
+.card {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    transition: all 0.3s;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    z-index: 1;
+}
+
+.card:hover {
+    background: rgba(255, 255, 255, 0.18);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.card video {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    background: #000;
+    position: relative;
+    z-index: 2;
+}
+
+.card p {
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 10px 0 0;
+    position: relative;
+    z-index: 2;
+}
+
+.card strong {
+    color: #ffcc00;
+    font-size: 18px;
+}
+
+/* Tab buttons */
+.tab-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 2;
+}
+
+.tab-buttons button {
+    flex: 1;
+    min-width: 150px;
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s;
+    position: relative;
+    z-index: 2;
+}
+
+.tab-buttons button:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+}
+
+.tab-buttons button.active {
+    background: rgba(255, 204, 0, 0.4);
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(255, 204, 0, 0.3);
+}
+
+.tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease;
+    position: relative;
+    z-index: 2;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.tab-content pre {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    border-radius: 12px;
+    overflow-x: auto;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #00ff00;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    z-index: 2;
+}
+
+.tab-content pre::-webkit-scrollbar {
+    height: 8px;
+}
+
+.tab-content pre::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.tab-content pre::-webkit-scrollbar-thumb {
+    background: rgba(0, 255, 0, 0.3);
+    border-radius: 10px;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+/* Flex Layout: 40% Video + 60% Text */
+.flex-container-40-60 {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+}
+
+.flex-video-40 {
+    flex: 0 0 40%;
+}
+
+.flex-video-40 iframe {
+    width: 100%;
+    height: 250px;
+    border-radius: 10px;
+}
+
+.flex-text-60 {
+    flex: 0 0 60%;
+}
+
+.flex-text-60 p {
+    font-size: 16px;
+    line-height: 1.8;
+}
+
+/* Flex Layout: 30% Image + 70% Text */
+.flex-container-30-70 {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+}
+
+.flex-image-30 {
+    flex: 0 0 30%;
+}
+
+.flex-image-30 img {
+    width: 100%;
+    border-radius: 10px;
+}
+
+.flex-text-70 {
+    flex: 0 0 70%;
+}
+
+.flex-text-70 strong {
+    color: #ffcc00;
+    font-size: 18px;
+    display: block;
+    margin-bottom: 10px;
+}
+
+/* 100% Video */
+.video-full video {
+    width: 100%;
+    border-radius: 15px;
+}
+
+/* Dumaloq tugma */
+#infoFloatingBtn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #000075, #0000ff);
+    color: white;
+    border: 4px solid white;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    z-index: 1500;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+#infoFloatingBtn:hover {
+    transform: scale(1.1);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .flex-container-40-60,
+    .flex-container-30-70 {
+        flex-direction: column;
+    }
+    
+    .flex-video-40, .flex-text-60,
+    .flex-image-30, .flex-text-70 {
+        flex: 0 0 100%;
+    }
+}
+/* Tablet responsive */
+@media (max-width: 1024px) {
+    .modal {
+        padding: 15px 0;
+    }
+    
+    .modal-content {
+        width: 95%;
+        padding: 25px;
+        max-height: 75vh;
+        margin: 8vh auto 5vh;
+    }
+    
+    .modal-content h2 {
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+    
+    .card {
+        padding: 15px;
+    }
+    
+    .card p {
+        font-size: 15px;
+    }
+    
+    .tab-buttons button {
+        font-size: 15px;
+        padding: 10px 15px;
+    }
+}
+
+/* Mobile responsive */ 
+@media (max-width: 768px) {
+    .modal {
+        padding: 10px 0;
+    }
+    
+    .modal-content {
+        width: 96%;
+        padding: 20px 15px;
+        margin: 5vh auto 3vh;
+        max-height: 85vh;
+        border-radius: 15px;
+    }
+    
+    .close {
+        right: 10px;
+        top: 10px;
+        font-size: 28px;
+        width: 35px;
+        height: 35px;
+    }
+    
+    .modal-content h2 {
+        font-size: 20px;
+        margin-bottom: 15px;
+        padding-bottom: 12px;
+        padding-right: 45px;
+    }
+    
+    .card {
+        padding: 12px;
+        margin-bottom: 15px;
+        border-radius: 12px;
+    }
+    
+    .card video {
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+    
+    .card p {
+        font-size: 14px;
+        line-height: 1.5;
+    }
+    
+    .card strong {
+        font-size: 16px;
+    }
+    
+    .tab-buttons {
+        gap: 8px;
+        margin-bottom: 15px;
+    }
+    
+    .tab-buttons button {
+        min-width: 120px;
+        font-size: 14px;
+        padding: 10px 12px;
+        border-radius: 8px;
+    }
+    
+    .tab-content pre {
+        padding: 15px;
+        font-size: 12px;
+        line-height: 1.5;
+        border-radius: 10px;
+    }
+}
+
+
+/* Small mobile */
+@media (max-width: 480px) {
+    .modal {
+        padding: 5px 0;
+    }
+    
+    .modal-content {
+        width: 98%;
+        padding: 15px 12px;
+        margin: 3vh auto 2vh;
+        max-height: 90vh;
+        border-radius: 12px;
+    }
+    
+    .close {
+        right: 8px;
+        top: 8px;
+        font-size: 24px;
+        width: 30px;
+        height: 30px;
+    }
+    
+    .modal-content h2 {
+        font-size: 18px;
+        margin-bottom: 12px;
+        padding-bottom: 10px;
+        padding-right: 40px;
+    }
+    
+    .card {
+        padding: 10px;
+        margin-bottom: 12px;
+        border-radius: 10px;
+    }
+    
+    .card p {
+        font-size: 13px;
+    }
+    
+    .card strong {
+        font-size: 15px;
+    }
+    
+    .tab-buttons {
+        flex-direction: column;
+        gap: 6px;
+    }
+    
+    .tab-buttons button {
+        width: 100%;
+        min-width: 100%;
+        font-size: 13px;
+        padding: 10px;
+    }
+    
+    .tab-content pre {
+        padding: 12px;
+        font-size: 11px;
+        line-height: 1.4;
+    }
+}
+
+/* Very small mobile */
+@media (max-width: 360px) {
+    .modal-content {
+        padding: 12px 10px;
+        margin: 2vh auto 1vh;
+    }
+    
+    .modal-content h2 {
+        font-size: 16px;
+    }
+    
+    .card {
+        padding: 8px;
+    }
+    
+    .card p {
+        font-size: 12px;
+    }
+    
+    .tab-buttons button {
+        font-size: 12px;
+        padding: 8px;
+    }
+    
+    .tab-content pre {
+        padding: 10px;
+        font-size: 10px;
+    }
+}
+
+/* Landscape mode fixes */
+@media (max-width: 1024px) and (orientation: landscape) {
+    .modal-content {
+        max-height: 80vh;
+        margin: 5vh auto 3vh;
+    }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .tab-buttons button {
+        min-height: 44px;
+    }
+    
+    .close {
+        min-width: 44px;
+        min-height: 44px;
+    }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    .modal-content {
+        border: 3px solid white;
+    }
+    
+    .card {
+        border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .modal-content,
+    .card,
+    .tab-buttons button,
+    .close {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+/* Print styles */
+@media print {
+    .modal {
+        display: none !important;
+    }
+}
+
+/* Scroll bar stilizatsiyasi */
+.modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.close {
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    font-size: 32px;
+    font-weight: bold;
+    cursor: pointer;
+    color: white;
+    transition: all 0.3s;
+    z-index: 10;
+    line-height: 1;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.close:hover {
+    background: rgba(255, 204, 0, 0.3);
+    color: #ffcc00;
+    transform: rotate(90deg);
+}
+
+.modal-content h2 {
+    font-size: 28px;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+    padding-right: 50px;
+}
+
+.card {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    transition: all 0.3s;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.card:hover {
+    background: rgba(255, 255, 255, 0.18);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.card video {
+    width: 100%;
+    max-width: 70%;
+    height: auto;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    background: #000;
+}
+
+.card p {
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 10px 0 0;
+}
+
+
+.card strong {
+    color: #ffcc00;
+    font-size: 18px;
+}
+
+/* Tab buttons */
+.tab-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.tab-buttons button {
+    flex: 1;
+    min-width: 150px;
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.tab-buttons button:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+}
+
+.tab-buttons button.active {
+    background: rgba(255, 204, 0, 0.4);
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(255, 204, 0, 0.3);
+}
+
+.tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.tab-content pre {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    border-radius: 12px;
+    overflow-x: auto;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #00ff00;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tab-content pre::-webkit-scrollbar {
+    height: 8px;
+}
+
+.tab-content pre::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.tab-content pre::-webkit-scrollbar-thumb {
+    background: rgba(0, 255, 0, 0.3);
+    border-radius: 10px;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Tablet responsive */
+@media (max-width: 1024px) {
+    .modal {
+        padding: 15px 0;
+    }
+    
+    .modal-content {
+        width: 95%;
+        padding: 25px;
+        max-height: 80vh;
+    }
+    
+    .modal-content h2 {
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+    
+    .card {
+        padding: 15px;
+    }
+    
+    .card p {
+        font-size: 15px;
+    }
+    
+    .tab-buttons button {
+        font-size: 15px;
+        padding: 10px 15px;
+    }
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .modal {
+        padding: 10px 0;
+    }
+    
+    .modal-content {
+        width: 96%;
+        padding: 20px 15px;
+        margin: 2vh auto;
+        max-height: 90vh;
+        border-radius: 15px;
+    }
+    
+    .close {
+        right: 10px;
+        top: 10px;
+        font-size: 28px;
+        width: 35px;
+        height: 35px;
+    }
+    
+    .modal-content h2 {
+        font-size: 20px;
+        margin-bottom: 15px;
+        padding-bottom: 12px;
+        padding-right: 45px;
+    }
+    
+    .card {
+        padding: 12px;
+        margin-bottom: 15px;
+        border-radius: 12px;
+    }
+    
+    .card video {
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+    
+    .card p {
+        font-size: 14px;
+        line-height: 1.5;
+    }
+    
+    .card strong {
+        font-size: 16px;
+    }
+    
+    .tab-buttons {
+        gap: 8px;
+        margin-bottom: 15px;
+    }
+    
+    .tab-buttons button {
+        min-width: 120px;
+        font-size: 14px;
+        padding: 10px 12px;
+        border-radius: 8px;
+    }
+    
+    .tab-content pre {
+        padding: 15px;
+        font-size: 12px;
+        line-height: 1.5;
+        border-radius: 10px;
+    }
+}
+
+
+/* Small mobile */
+@media (max-width: 480px) {
+    .modal {
+        padding: 5px 0;
+    }
+    
+    .modal-content {
+        width: 98%;
+        padding: 15px 12px;
+        margin: 1vh auto;
+        max-height: 92vh;
+        border-radius: 12px;
+    }
+    
+    .close {
+        right: 8px;
+        top: 8px;
+        font-size: 24px;
+        width: 30px;
+        height: 30px;
+    }
+    
+    .modal-content h2 {
+        font-size: 18px;
+        margin-bottom: 12px;
+        padding-bottom: 10px;
+        padding-right: 40px;
+    }
+    
+    .card {
+        padding: 10px;
+        margin-bottom: 12px;
+        border-radius: 10px;
+    }
+    
+    .card p {
+        font-size: 13px;
+    }
+    
+    .card strong {
+        font-size: 15px;
+    }
+    
+    .tab-buttons {
+        flex-direction: column;
+        gap: 6px;
+    }
+    
+    .tab-buttons button {
+        width: 100%;
+        min-width: 100%;
+        font-size: 13px;
+        padding: 10px;
+    }
+    
+    .tab-content pre {
+        padding: 12px;
+        font-size: 11px;
+        line-height: 1.4;
+    }
+}
+
+/* Very small mobile */
+@media (max-width: 360px) {
+    .modal-content {
+        padding: 12px 10px;
+    }
+    
+    .modal-content h2 {
+        font-size: 16px;
+    }
+    
+    .card {
+        padding: 8px;
+    }
+    
+    .card p {
+        font-size: 12px;
+    }
+    
+    .tab-buttons button {
+        font-size: 12px;
+        padding: 8px;
+    }
+    
+    .tab-content pre {
+        padding: 10px;
+        font-size: 10px;
+    }
+}
+
+/* Landscape mode fixes */
+@media (max-width: 1024px) and (orientation: landscape) {
+    .modal-content {
+        max-height: 85vh;
+        margin: 2vh auto;
+    }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .tab-buttons button {
+        min-height: 44px;
+    }
+    
+    .close {
+        min-width: 44px;
+        min-height: 44px;
+    }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    .modal-content {
+        border: 3px solid white;
+    }
+    
+    .card {
+        border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .modal-content,
+    .card,
+    .tab-buttons button,
+    .close {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+/* Print styles */
+@media print {
+    .modal {
+        display: none !important;
+    }
+}
+        body {
+            font-family: Arial, sans-serif;
+            background: #e6f3ff;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: auto;
+        }
+
+        /* HEADER */
+        .header {
+            display: flex;
+            align-items: center;
+            background: #000075;
+            color: white;
+            padding: 10px 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            width: 100%;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .logo-icon img {
+            border-radius: 50%;
+            border: 2px solid white;
+            width: 40px;
+            height: 40px;
+        }
+
+        /* MAIN LAYOUT */
+        .main-container {
+            display: flex;
+            margin-top: 20px;
+            gap: 20px;
+        }
+
+        /* LEFT PANEL */
+        .left-panel {
+            width: 250px;
+            min-width: 250px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            height: fit-content;
+            position: relative;
+            z-index: 1;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 15px;
+        }
+
+        .control-group h3 {
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 8px;
+            font-size: 14px;
+            border-radius: 5px;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn-success { background: #28a745; color: white; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-primary { background: #000075; color: white; }
+        .btn-info { background: #000075; color: white; }
+
+        /* MAIN CONTENT */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+
+        /* CIRCUIT CONTAINER - FIXED SIZE - QOTIB TURADI */
+        .circuit-container {
+            width: 750px;
+            height: 420px;
+            min-width: 750px;
+            min-height: 420px;
+            max-width: 750px;
+            max-height: 420px;
+            position: relative;
+            border: 2px solid blue;
+            border-radius: 20px;
+            margin: 30px auto;
+            flex-shrink: 0;
+            flex-grow: 0;
+        }
+
+        /* ARDUINO BOARD - FIXED POSITION */
+        .arduino-board {
+            position: absolute;
+            left: 20px;
+            top: 60px;
+            width: 300px;
+            height: 300px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .arduino-board img {
+            width: 300px;
+            height: 300px;
+        }
+
+        /* BREADBOARD - FIXED POSITION */
+        .breadboard {
+            position: absolute;
+            left: 340px;
+            top: 60px;
+            width: 350px;
+            height: 300px;
+            border-radius: 8px;
+        }
+
+        .breadboard img {
+            width: 350px;
+            height: 300px;
+        }
+
+        /* LEDs - FIXED POSITION */
+        .led {
+            width: 20px;
+            height: 30px;
+            border-radius: 10px 10px 0 0;
+            position: absolute;
+            margin: 10px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.3);
+            transition: all 0.5s ease;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .led-red {
+            background: #dc3545;
+            border: 3px solid #a71e2a;
+            left: 500px;
+            top: 130px;
+        }
+
+        .led-green {
+            background: #28a745;
+            border: 3px solid #1e7e34;
+            left: 470px;
+            top: 130px;
+        }
+        
+        .led.on {
+            box-shadow: 0 0 20px currentColor, inset 0 0 10px rgba(255,255,255,0.3);
+            transform: scale(1.1);
+        }
+
+        .led-red.on {
+            color: #ff4757;
+            background: #ff4757;
+        }
+
+        .led-green.on {
+            color: #2ed573;
+            background: #2ed573;
+        }
+
+        .led::before {
+            content: '';
+            position: absolute;
+            top: 20%;
+            left: 20%;
+            width: 60%;
+            height: 60%;
+            background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, transparent 70%);
+            border-radius: 50%;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .led.on::before {
+            opacity: 1;
+        }
+
+        /* LED CONTAINER - FIXED POSITION */
+        .led-container {
+            position: absolute;
+            right: 20px;
+            top: 180px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .led-label {
+            font-size: 12px;
+            font-weight: bold;
+            color: #333;
+            text-align: center;
+        }
+
+        /* WIRES - FIXED POSITIONS */
+        .wire {
+            position: absolute;
+            border-radius: 2px;
+            z-index: 5;
+        }
+
+        .wire-black { width: 265px; height: 3px; top: 80px; left: 180px; background: black; }
+        .wire-black1 { width: 3px; height: 50px; top: 80px; left: 180px; background: black; }
+        .wire-black2 { width: 3px; height: 86px; top: 80px; left: 443px; background: black; }
+        .wire-blue { width: 3px; height: 51px; top: 130px; left: 262px; background: #0066ff; }
+        .wire-blue1 { width: 268px; height: 3px; top: 180px; left: 262px; background: #0066ff; }
+        .wire-yellow { width: 3px; height: 60px; top: 130px; left: 270px; background: #ffff00; }
+        .wire-yellow1 { width: 232px; height: 3px; top: 186px; left: 270px; background: yellow; }
+        .wire-black3 { width: 40px; height: 3px; top: 172px; left: 442px; transform: rotate(0deg); background: black; }
+        .wire-black4 { width: 30px; height: 3px; top: 195px; left: 480px; background: black; }
+
+        /* QUIZ SECTION */
+        .quiz-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 2px solid #dee2e6;
+        }
+
+        .question {
+            font-size: 18px;
+            font-weight: bold;
+            color: #000075;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .answers {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .answer-btn {
+            padding: 15px;
+            border: 2px solid #000075;
+            background: white;
+            color: #000075;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .answer-btn:hover {
+            background: #000075;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .answer-btn.correct {
+            background: #28a745;
+            color: white;
+            border-color: #28a745;
+        }
+
+        .answer-btn.incorrect {
+            background: #dc3545;
+            color: white;
+            border-color: #dc3545;
+        }
+
+        .answer-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        /* SCORE DISPLAY */
+        .score-display {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .score-correct { color: #28a745; }
+        .score-incorrect { color: #dc3545; }
+
+        /* STATUS DISPLAY */
+        .status-display {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            min-width: 220px;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            z-index: 100;
+        }
+
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 8px 0;
+            font-size: 13px;
+        }
+
+        .status-led {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #dc3545;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+        }
+
+        .status-led.on {
+            background: #28a745;
+            box-shadow: 0 0 10px rgba(40, 167, 69, 0.8);
+        }
+
+        @media (max-width: 1024px) {
+            .status-display {
+                position: relative;
+                margin: 20px auto;
+                width: fit-content;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+            .left-panel {
+                width: 100%;
+            }
+            .answers {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="logo">
+                 <a href="/"><img src="/static/image/logo.png" width="80px" height="80px" alt=""></a>
+            <span>Arduino LED Quiz Tizimi</span>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <div class="main-container">
+        <!-- LEFT PANEL -->
+        <div class="left-panel">
+            <div class="control-group">
+                <h3>Boshqaruv</h3>
+                <button class="btn btn-success" onclick="startQuiz()" id="startBtn">Quiz Boshlash</button>
+                <button class="btn btn-danger" onclick="stopQuiz()" id="stopBtn">Quiz To'xtatish</button>
+                <button class="btn btn-primary" onclick="togglePower()">Quvvat On/Off</button>
+                <button class="btn btn-info" onclick="nextQuestion()">Keyingi Savol</button>
+            </div>
+
+            <div class="control-group">
+                <h3>LED Test</h3>
+                <button class="btn btn-success" onclick="testGreenLED()">Yashil LED Test</button>
+                <button class="btn btn-danger" onclick="testRedLED()">Qizil LED Test</button>
+                <button class="btn btn-primary" onclick="turnOffLEDs()">LEDlarni O'chirish</button>
+            </div>
+<div class="control-group">
+    <h3>Ma'lumotlar</h3>
+    <button class="btn btn-primary" id="schemaBtn">💡 Sxema qayerda ishlatiladi</button>
+    <button class="btn btn-primary" id="codeBtn">💻 Kod</button>
+    <button class="btn btn-primary" id="componentsBtn">🔌 Qurilmalar</button>
+</div>
+
+        </div>
+<!-- ✅ 1) Sxema qayerda ishlatiladi (DC Motor / L298N) -->
+    <div class="modal" id="schemaModal">
+        <div class="modal-content">
+            <span class="close" title="Yopish">&times;</span>
+            <h2>💡 Sxema qayerda ishlatiladi </h2>
+
+            <div class="flex-container-40-60">
+                <div class="flex-video-40">
+                    <!-- 1-video (xohlasangiz almashtiring) -->
+                    <iframe src="https://www.youtube.com/embed/e1FVSpkw6q4?si=QS7dWj__KDXIZgEk" title="DC Motor Control with L298N"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen></iframe>
+                </div>
+                <div class="flex-text-60">
+                    <strong>Arduino va ledlardan foydalanishni o'rganish</strong>
+                   <p>Ushbu video orqali Arduino orqali ledlarni boshqarishni to'liq o'rganish mumkin bo'ladi </p>
+                </div>
+            </div>
+
+            <div class="flex-container-40-60">
+                <div class="flex-video-40">
+                    <!-- 2-video (ixtiyoriy) -->
+                    <iframe src="https://www.youtube.com/embed/FKekzzj5844?si=HSwsZ44Tc6aw4ELE" title="PWM Speed Control"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen></iframe>
+                </div>
+                <div class="flex-text-60">
+                    <strong>Tajribaning maqsadi</strong>
+                    <p>Bu tajribaning asosiy maqsadi:
+
+✔ Arduino’dan raqamli chiqish pinlari orqali ikki xil rangdagi LEDni boshqarish
+✔ Breadboardda ulanishlarni to‘g‘ri tashkil qilishni o‘rganish
+✔ Elektr zanjirini to‘g‘ri joylashtirish va signal oqimini tushunish</p>
+                </div>
+            </div>
+              <div class="flex-container-40-60">
+                <div class="flex-video-40">
+                    <!-- 2-video (ixtiyoriy) -->
+                    <iframe src="https://www.youtube.com/embed/l2yrDmrPW70?si=A3qX1kx3PjxtHxHI" title="PWM Speed Control"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen></iframe>
+                </div>
+                <div class="flex-text-60">
+                    <strong>Qo‘shimcha tajriba g‘oyalari Svetafor Tayyorlash</strong>
+               <p>Ushbu tajribada Arduino UNO platasidan foydalanib ikki dona LED lampani raqamli chiqish pinlari orqali boshqarish o‘rgatildi. Breadboard yordamida LEDlar ulanishi tartibli shakllantirildi. Arduino’dan keladigan HIGH va LOW signalga ko‘ra LEDlar navbatma-navbat yonib-o‘chadi. Bu tajriba raqamli chiqishlar, breadboard tuzilishi va LEDlarning anod-katod ulanishini o‘rganish uchun asosiy laboratoriya ishi hisoblanadi.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+  <div class="modal" id="codeModal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>💻 Kod</h2>
+
+        <div class="tab-buttons">
+            <button class="tab-btn active" data-tab="mblock">mBlock Kodi</button>
+            <button class="tab-btn" data-tab="arduino">Arduino Kodi</button>
+        </div>
+
+        <div class="tab-content active" id="mblock">
+            <pre><img src="/static/image/arduinoredgreen.jpg" alt="mBlock Code" style="width: 80%; height: auto;"></pre>
+        </div>
+
+        <div class="tab-content" id="arduino">
+            <pre>
+int redLED = 12;     // Qizil LED
+int greenLED = 11;   // Yashil LED
+
+void setup() {
+  pinMode(redLED, OUTPUT);     // LED pinlarini chiqish sifatida belgilash
+  pinMode(greenLED, OUTPUT);
+}
+
+void loop() {
+  digitalWrite(redLED, HIGH);   // Qizil LED yoqiladi
+  digitalWrite(greenLED, LOW);
+  delay(500);
+
+  digitalWrite(redLED, LOW);    // Yashil LED yoqiladi
+  digitalWrite(greenLED, HIGH);
+  delay(500);
+}
+
+            </pre>
+        </div>
+    </div>
+</div>
+
+
+    <!-- ✅ 3) Qurilmalar -->
+    <div class="modal" id="componentsModal">
+        <div class="modal-content">
+            <span class="close" title="Yopish">&times;</span>
+            <h2>🔌 Ishlatilgan Qurilmalar</h2>
+
+
+            <div class="flex-container-30-70">
+                <div class="flex-image-30"><img src="/static/image/arduino1 - Copy.png" alt="Breadboard"></div>
+                <div class="flex-text-70">
+                    <strong>Arduino UNO</strong>
+                    <p>Arduino mikrokontroller platasidir. U kompyuter orqali berilgan kodni bajaradi va LEDlarni yoqadi/o‘chiradi.
+
+Vazifasi:
+
+Pinlar orqali HIGH/LOW signal yuborish
+
+LEDlarni boshqarish
+
+Breadboardga quvvat yetkazish</p>
+                </div>
+            </div>
+            
+            <div class="flex-container-30-70">
+                <div class="flex-image-30"><img src="/static/image/breadboard-removebg-preview.png alt="Breadboard"></div>
+                <div class="flex-text-70">
+                    <strong>Breadboard (Makronima taxtachasi)</strong>
+                    <p>Elektr zanjirlarni lehimsiz yig‘ish uchun ishlatiladi.
+
+Vazifasi:
+
+LED, resistor va kabellarni ulash
+
+Arduino bilan oson tajriba qilish imkonini berish</p>
+                </div>
+            </div>
+            
+            <div class="flex-container-30-70">
+                <div class="flex-image-30"><img src="/static/image/led.png" alt="Breadboard"></div>
+                <div class="flex-text-70">
+                    <strong>LED lampalar (qizil va yashil)</strong>
+                    <p>LED — Light Emitting Diode — yorituvchi diod. Polaritetga ega: uzun oyoq → musbat (anod), qisqa oyoq → manfiy (katod).
+
+Vazifasi:
+
+Arduino’dan kelgan raqamli signallarni yoritish orqali ko‘rsatish</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ✅ 4) Qo'shimcha info (ixtiyoriy) + suzuvchi tugma -->
+    <div class="modal" id="infoModal">
+        <div class="modal-content">
+            <span class="close" title="Yopish">&times;</span>
+            <h2>📚 Qo'shimcha Ma'lumot</h2>
+            <div class="video-full">
+                <video controls>
+                    <source src="/media/2.mp4" type="video/mp4">
+                    Brauzeringiz video formatni qo'llab-quvvatlamaydi.
+                </video>
+            </div>
+        </div>
+    </div>
+
+    <button id="infoFloatingBtn"><span>📚</span><span>Ma'lumot</span></button>
+
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+            <!-- CIRCUIT CONTAINER - FIXED SIZE -->
+            <div class="circuit-container">
+                <!-- ARDUINO UNO -->
+                <div class="arduino-board" id="arduino">
+                   <img src="/static/image/arduino1 - Copy.png" width="300px" height="300px" alt="">
+                </div>
+
+                <!-- BREADBOARD -->
+                <div class="breadboard">
+                    <div class="breadboard-holes" id="breadboardHoles">
+                       <img src="/static/image/breadboard-removebg-preview.png" width="350px" height="300px" alt="">
+                    </div>
+                </div>
+
+                <!-- WIRES -->
+                <div class="wire wire-black"></div>
+                <div class="wire wire-blue"></div>
+                <div class="wire wire-yellow"></div>
+                <div class="wire wire-black1"></div>
+                <div class="wire wire-black2"></div>
+                <div class="wire wire-blue1"></div>
+                <div class="wire wire-yellow1"></div>
+                <div class="wire wire-black3"></div>
+                <div class="wire wire-black4"></div>
+
+                <!-- LEDs -->
+                <div class="led led-green" id="greenLED"></div>
+                <div class="led led-red" id="redLED"></div>
+
+                <!-- LED CONTAINER -->
+                
+            </div>
+
+            <!-- QUIZ SECTION -->
+            <div class="quiz-section" id="quizSection">
+                <div class="question" id="questionText">Quiz boshlash uchun "Quiz Boshlash" tugmasini bosing</div>
+                <div class="answers" id="answersContainer"></div>
+                <div class="score-display">
+                    <span class="score-correct">To'g'ri: <span id="scoreCorrect">0</span></span>
+                    &nbsp;&nbsp;&nbsp;
+                    <span class="score-incorrect">Noto'g'ri: <span id="scoreIncorrect">0</span></span>
+                </div>
+            </div>
+
+            <!-- STATUS DISPLAY -->
+            <div class="status-display">
+                <h4>Tizim Holati</h4>
+                <div class="status-row">
+                    <span>Arduino:</span>
+                    <div class="status-led" id="arduinoLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Yashil LED:</span>
+                    <div class="status-led" id="greenStatusLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Qizil LED:</span>
+                    <div class="status-led" id="redStatusLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Joriy savol:</span>
+                    <span id="currentQuestion">-</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let powerOn = false;
+        let quizActive = false;
+        let currentQuestionIndex = 0;
+        let correctAnswers = 0;
+        let incorrectAnswers = 0;
+        let answerSelected = false;
+// Modalni ochish
+function openModal(id) {
+    document.getElementById(id).style.display = "block";
+}
+
+// Tugmalarni ulash
+document.getElementById("schemaBtn").addEventListener("click", () => openModal("schemaModal"));
+document.getElementById("codeBtn").addEventListener("click", () => openModal("codeModal"));
+document.getElementById("componentsBtn").addEventListener("click", () => openModal("componentsModal"));
+document.getElementById("infoFloatingBtn").addEventListener("click", () => openModal("infoModal"));
+
+// Yopish tugmalari
+document.querySelectorAll(".close").forEach(btn => {
+    btn.addEventListener("click", function() {
+        this.closest(".modal").style.display = "none";
+    });
+});
+
+// Tab switching (Kod uchun)
+document.querySelectorAll(".tab-btn").forEach(button => {
+    button.addEventListener("click", function() {
+        const tab = this.dataset.tab;
+        document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+        this.classList.add("active");
+        document.querySelectorAll(".tab-content").forEach(content => {
+            content.classList.remove("active");
+            if (content.id === tab) content.classList.add("active");
+        });
+    });
+});
+        const questions = [
+            { question: "Arduino Uno-da nechta digital pin bor?", answers: ["12 ta", "14 ta", "16 ta", "10 ta"], correct: 1 },
+            { question: "LED to'g'ri ulanishi uchun nima kerak?", answers: ["Faqat qarshilik", "Qarshilik va to'g'ri qutblanish", "Faqat to'g'ri qutblanish", "Hech narsa"], correct: 1 },
+            { question: "Arduino-da PWM nima uchun ishlatiladi?", answers: ["Raqamli signal", "Analog signal taqlidi", "Quvvat ta'minoti", "Ma'lumot uzatish"], correct: 1 },
+            { question: "digitalWrite() funksiyasi nima qiladi?", answers: ["Pin qiymatini o'qiydi", "Pin qiymatini yozadi", "Pin rejimini belgilaydi", "Vaqtni kechiktiradi"], correct: 1 },
+            { question: "Arduino-da 5V kuchlanish qaysi pinga beriladi?", answers: ["VIN", "3.3V", "5V", "GND"], correct: 2 },
+            { question: "LED ning uzun oyog'i qaysi qutb?", answers: ["Manfiy (katod)", "Musbat (anod)", "Neytral", "Farqi yo'q"], correct: 1 },
+            { question: "delay() funksiyasi qanday o'lchovda ishlaydi?", answers: ["Sekund", "Millisekundlar", "Mikrosekundlar", "Daqiqalar"], correct: 1 },
+            { question: "Breadboard nima uchun ishlatiladi?", answers: ["Ovqat tayyorlash", "Prototip yasash", "Kod yozish", "Rasm chizish"], correct: 1 }
+        ];
+
+        const el = {
+            powerLed: document.getElementById('powerLed'),
+            quizLed: document.getElementById('quizLed'),
+            arduinoLed: document.getElementById('arduinoLed'),
+            greenStatusLed: document.getElementById('greenStatusLed'),
+            redStatusLed: document.getElementById('redStatusLed'),
+            greenLED: document.getElementById('greenLED'),
+            redLED: document.getElementById('redLED'),
+            questionText: document.getElementById('questionText'),
+            answersContainer: document.getElementById('answersContainer'),
+            correctCount: document.getElementById('correctCount'),
+            incorrectCount: document.getElementById('incorrectCount'),
+            scoreCorrect: document.getElementById('scoreCorrect'),
+            scoreIncorrect: document.getElementById('scoreIncorrect'),
+            currentQuestion: document.getElementById('currentQuestion')
+        };
+
+        function updateStatus() {
+            el.powerLed.classList.toggle('on', powerOn);
+            el.quizLed.classList.toggle('on', quizActive);
+            el.arduinoLed.classList.toggle('on', powerOn);
+            el.greenStatusLed.classList.toggle('on', el.greenLED.classList.contains('on'));
+            el.redStatusLed.classList.toggle('on', el.redLED.classList.contains('on'));
+            el.correctCount.textContent = correctAnswers;
+            el.incorrectCount.textContent = incorrectAnswers;
+            el.scoreCorrect.textContent = correctAnswers;
+            el.scoreIncorrect.textContent = incorrectAnswers;
+            el.currentQuestion.textContent = quizActive ? `${currentQuestionIndex + 1}/${questions.length}` : '-';
+        }
+
+        function togglePower() {
+            powerOn = !powerOn;
+            if (!powerOn) { stopQuiz(); turnOffLEDs(); }
+            updateStatus();
+        }
+
+        function testGreenLED() {
+            if (!powerOn) { alert('Avval quvvatni yoqing!'); return; }
+            turnOffLEDs();
+            el.greenLED.classList.add('on');
+            updateStatus();
+            setTimeout(() => { el.greenLED.classList.remove('on'); updateStatus(); }, 2000);
+        }
+
+        function testRedLED() {
+            if (!powerOn) { alert('Avval quvvatni yoqing!'); return; }
+            turnOffLEDs();
+            el.redLED.classList.add('on');
+            updateStatus();
+            setTimeout(() => { el.redLED.classList.remove('on'); updateStatus(); }, 2000);
+        }
+
+        function turnOffLEDs() {
+            el.greenLED.classList.remove('on');
+            el.redLED.classList.remove('on');
+            updateStatus();
+        }
+
+        function startQuiz() {
+            if (!powerOn) { alert('Avval quvvatni yoqing!'); return; }
+            quizActive = true;
+            currentQuestionIndex = 0;
+            correctAnswers = 0;
+            incorrectAnswers = 0;
+            turnOffLEDs();
+            showQuestion();
+            updateStatus();
+        }
+
+        function stopQuiz() {
+            quizActive = false;
+            answerSelected = false;
+            el.questionText.textContent = "Quiz to'xtatildi. Qayta boshlash uchun 'Quiz Boshlash' tugmasini bosing.";
+            el.answersContainer.innerHTML = '';
+            turnOffLEDs();
+            updateStatus();
+        }
+
+        function showQuestion() {
+            if (currentQuestionIndex >= questions.length) { endQuiz(); return; }
+            const q = questions[currentQuestionIndex];
+            el.questionText.textContent = q.question;
+            el.answersContainer.innerHTML = '';
+            answerSelected = false;
+            q.answers.forEach((ans, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'answer-btn';
+                btn.textContent = ans;
+                btn.onclick = () => selectAnswer(i);
+                el.answersContainer.appendChild(btn);
+            });
+            updateStatus();
+        }
+
+        function selectAnswer(idx) {
+            if (!quizActive || answerSelected) return;
+            answerSelected = true;
+            const q = questions[currentQuestionIndex];
+            const btns = el.answersContainer.querySelectorAll('.answer-btn');
+            btns.forEach((btn, i) => {
+                btn.disabled = true;
+                if (i === q.correct) btn.classList.add('correct');
+                else if (i === idx) btn.classList.add('incorrect');
+            });
+            turnOffLEDs();
+            if (idx === q.correct) { correctAnswers++; el.greenLED.classList.add('on'); }
+            else { incorrectAnswers++; el.redLED.classList.add('on'); }
+            updateStatus();
+            setTimeout(() => { turnOffLEDs(); currentQuestionIndex++; showQuestion(); }, 2500);
+        }
+
+        function nextQuestion() {
+            if (!quizActive || !answerSelected) return;
+            turnOffLEDs();
+            currentQuestionIndex++;
+            showQuestion();
+        }
+
+        function endQuiz() {
+            quizActive = false;
+            const pct = Math.round((correctAnswers / questions.length) * 100);
+            el.questionText.textContent = `Quiz tugadi! Natija: ${correctAnswers}/${questions.length} (${pct}%)`;
+            el.answersContainer.innerHTML = '';
+            flashLED(pct >= 70 ? 'green' : 'red', pct >= 70 ? 5 : 3);
+            updateStatus();
+        }
+
+        function flashLED(color, times) {
+            const led = color === 'green' ? el.greenLED : el.redLED;
+            let count = 0;
+            const interval = setInterval(() => {
+                led.classList.toggle('on');
+                count++;
+                if (count >= times * 2) { clearInterval(interval); led.classList.remove('on'); updateStatus(); }
+            }, 300);
+        }
+
+        updateStatus();
+    </script>
+</body>
+</html>

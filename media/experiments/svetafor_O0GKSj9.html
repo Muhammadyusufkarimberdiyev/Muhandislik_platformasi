@@ -1,0 +1,1350 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Svetafor Tajribasi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: white;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: auto;
+        }
+
+        /* HEADER */
+        .header {
+            display: flex;
+            align-items: center;
+            background: #000075;
+            color: white;
+            padding: 10px 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            width: 100%;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000075;
+            font-size: 20px;
+        }
+
+        /* MAIN LAYOUT */
+        .main-container {
+            display: flex;
+            margin-top: 20px;
+            gap: 20px;
+        }
+
+        /* LEFT PANEL */
+        .left-panel {
+            width: 250px;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            height: fit-content;
+            position: relative;
+            z-index: 1;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 15px;
+        }
+
+        .control-group h3 {
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 8px;
+            font-size: 14px;
+            border-radius: 5px;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn-primary { 
+            background: #000075; 
+            color: white; 
+        }
+
+        .btn-success { 
+            background: #28a745; 
+            color: white; 
+        }
+
+        .btn-danger { 
+            background: #dc3545; 
+            color: white; 
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .title-header {
+            background: #000075;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0 auto 30px;
+            text-align: center;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        /* EXPERIMENT AREA */
+        .experiment-area {
+            
+            justify-content: center;
+            align-items: center;
+            gap: 50px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        /* ARDUINO BOARD */
+        .arduino-board {
+        position: absolute;
+            top: 400px;
+            left: 648px;
+            border-radius: 10px;
+      
+         
+        }
+
+        .arduino-logo {
+            position: absolute;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: black;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .pin-row {
+            position: absolute;
+            display: flex;
+            gap: 8px;
+        }
+
+        .pin-row.digital {
+            top: 40px;
+            right: 20px;
+            flex-direction: column;
+        }
+
+        .pin-row.power {
+            top: 40px;
+            left: 20px;
+            flex-direction: column;
+        }
+
+        .pin {
+            width: 12px;
+            height: 6px;
+            background: #333;
+            border-radius: 2px;
+            position: relative;
+        }
+
+        .pin-label {
+            position: absolute;
+            font-size: 8px;
+            color: white;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        /* BREADBOARD */
+        .breadboard {
+            width: 400px;
+            height: 250px;
+            
+            border-radius: 10px;
+               position: absolute;
+            top: 100px;
+            left: 700px;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .breadboard-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .breadboard-hole {
+            width: 8px;
+            height: 8px;
+           
+            border-radius: 50%;
+        }
+
+        /* LEDs */
+        .led {
+               width: 20px;
+            height: 30px;
+            border-radius: 10px 10px 0 0;
+            position: absolute;
+            top: 175px;
+            right: 220px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .led.red {
+            background: #666;
+            top: 80px;
+            left: 100px;
+        }
+
+        .led.red.active {
+            background: #ff0000;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.8);
+        }
+
+        .led.yellow {
+            background: #666;
+            top: 80px;
+            left: 150px;
+        }
+
+        .led.yellow.active {
+            background: #ffff00;
+            box-shadow: 0 0 20px rgba(255, 255, 0, 0.8);
+        }
+
+        .led.green {
+            background: #666;
+            top: 80px;
+            left: 200px;
+        }
+        .things{
+            position: absolute;
+            top:90px;
+            left: 52px;
+        }
+        .led.green.active {
+            background: #00ff00;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.8);
+        }
+
+        /* RESISTORS */
+        .resistor {
+            width: 40px;
+            height: 8px;
+              border-radius: 4px;
+            position: absolute;
+        }
+
+        .resistor.r1 {
+            top: 130px;
+            left: 125px;
+            transform: rotate(90deg);
+        }
+
+        .resistor.r2 {
+            top: 130px;
+            left: 168px;
+            transform: rotate(90deg);
+        }
+
+        .resistor.r3 {
+            top: 130px;
+            left: 221px;
+            transform: rotate(90deg);
+        }
+
+        /* WIRES */
+        .wire {
+            position: absolute;
+            background: #333;
+            z-index: 10;
+        }
+
+        .wire-red {
+            width: 3px;
+            height: 125px;
+            top: 175px;
+            left: 119px;
+            background: red;
+         
+        }
+
+        .wire-yellow {
+            width: 3px;
+            height: 140px;
+            top: 165px;
+            left: 162px;
+            background: red;
+        }
+
+        .wire-green {
+            width: 2px;
+            height: 137px;
+            top: 165px;
+            left: 210px;
+            background: red;
+            transform: rotate(4deg);
+        }
+
+        .wire-ground {
+            width: 3px;
+            height: 75px;
+            top: 225px;
+            left: 84px;
+            background: black;
+            transform: rotate(13deg);
+        }
+
+        .wire-power {
+            width: 3px;
+            height: 120px;
+            top: 110px;
+            left: 100px;
+            background: black;
+            transform: rotate(-3deg);
+        }
+         .wire-power1 {
+            width: 3px;
+            height: 120px;
+            top: 110px;
+            left: 148px;
+            background: black;
+            transform: rotate(2deg);
+            
+        }
+         .wire-power2 {
+          width: 3px;
+            height: 120px;
+            top: 110px;
+            left: 190px;
+            background: black;
+            transform: rotate(12deg);
+        }
+        /* STATUS DISPLAY */
+        .status-display {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            min-width: 200px;
+        }
+
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        .status-led {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #333;
+        }
+
+        .status-led.active {
+            background: #00ff00;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.8);
+        }
+        .tab-buttons {
+  display: flex;
+  margin-bottom: 15px;
+  gap: 10px;
+}
+.tab-btn {
+  flex: 1;
+  background: rgba(255,255,255,0.1);
+  color: white;
+  padding: 10px;
+  border: none;
+  cursor: pointer;
+  border-radius: 6px;
+  font-weight: bold;
+}
+.tab-btn.active {
+  background: rgba(255,255,255,0.3);
+}
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+.flex-container-30-70 {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 20px;
+  border-radius: 15px;
+  margin-bottom: 20px;
+}
+.flex-image-30 {
+  flex: 0 0 30%;
+}
+.flex-image-30 img {
+  width: 100%;
+  border-radius: 10px;
+}
+.flex-text-70 {
+  flex: 0 0 70%;
+}
+.flex-text-70 strong {
+  color: #ffcc00;
+  font-size: 18px;
+  display: block;
+  margin-bottom: 10px;
+}
+pre {
+  background: rgba(0, 0, 0, 0.4);
+  color: #00ff99;
+  padding: 15px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 15px;
+}
+        /* MODAL STYLES */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            backdrop-filter: blur(3px);
+        }
+
+        .modal-content {
+            background: #000075;
+            color: white;
+            margin: 5% auto;
+            padding: 20px;
+            width: 80%;
+            max-width: 800px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+            animation: slideDown 0.4s ease;
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+        }
+.flex-container-40-60 {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+}
+.flex-video-40 {
+    flex: 0 0 40%;
+}
+.flex-video-40 iframe {
+    width: 100%;
+    height: 250px;
+    border-radius: 10px;
+}
+.flex-text-60 {
+    flex: 0 0 60%;
+}
+.flex-text-60 p {
+    font-size: 16px;
+    line-height: 1.8;
+}
+/* Modal umumiy stil */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
+    overflow-y: auto;
+}
+.modal-content {
+    background: #000075;
+    color: white;
+    margin: 5vh auto;
+    padding: 30px;
+    width: 90%;
+    max-width: 1000px;
+    border-radius: 20px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+    position: relative;
+    animation: slideDown 0.4s ease;
+}
+.close {
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    font-size: 32px;
+    font-weight: bold;
+    cursor: pointer;
+    color: white;
+    transition: all 0.3s;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+}
+.close:hover {
+    background: rgba(255, 204, 0, 0.3);
+    color: #ffcc00;
+    transform: rotate(90deg);
+}
+.modal-content h2 {
+    font-size: 28px;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+    padding-right: 50px;
+}
+@keyframes slideDown {
+    from { transform: translateY(-50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+@media (max-width: 768px) {
+    .flex-container-40-60 {
+        flex-direction: column;
+    }
+    .flex-video-40, .flex-text-60 {
+        flex: 0 0 100%;
+    }
+    .modal-content {
+        width: 96%;
+        padding: 20px 15px;
+    }
+}
+        .close:hover {
+            color: #ffcc00;
+        }
+
+        .modal-content h2 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            border-bottom: 2px solid rgba(255,255,255,0.2);
+            padding-bottom: 8px;
+        }
+
+        .card {
+            background: rgba(255,255,255,0.08);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .tab-buttons {
+            display: flex;
+            margin-bottom: 15px;
+        }
+
+        .tab-buttons button {
+            flex: 1;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .tab-buttons button.active {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        pre {
+            background: rgba(0,0,0,0.4);
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 0.9rem;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* RESPONSIVE DESIGN */
+        @media (max-width: 1024px) {
+            .experiment-area {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .status-display {
+                position: relative;
+                margin: 20px auto;
+                width: fit-content;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .left-panel {
+                width: 100%;
+            }
+            
+            .arduino-board {
+                width: 250px;
+                height: 150px;
+            }
+
+            .breadboard {
+                width: 300px;
+                height: 200px;
+            }
+            
+            .modal-content {
+                width: 95%;
+                margin: 10% auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="logo">
+             <a href="/"><img src="/static/image/logo.png" width="80px" height="80px" alt=""></a>
+            <span>Svetafor Tajribasi</span>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <div class="main-container">
+        <!-- LEFT PANEL -->
+        <div class="left-panel">
+            <div class="control-group">
+                <h3>Boshqaruv</h3>
+                <button class="btn btn-success" onclick="startExperiment()" id="startBtn">
+                    🟢 Boshlash
+                </button>
+                <button class="btn btn-danger" onclick="stopExperiment()" id="stopBtn">
+                    🔴 To'xtatish
+                </button>
+            </div>
+
+            <div class="control-group">
+                <h3>LED Boshqaruv</h3>
+                <button class="btn btn-primary" onclick="toggleLED('red')">
+                    🔴 Qizil LED
+                </button>
+                <button class="btn btn-primary" onclick="toggleLED('yellow')">
+                    🟡 Sariq LED
+                </button>
+                <button class="btn btn-primary" onclick="toggleLED('green')">
+                    🟢 Yashil LED
+                </button>
+            </div>
+
+             <div class="control-group">
+                <h3>📊 Ma'lumotlar</h3>
+                <button class="btn btn-primary" id="schemaBtn">
+                    💡 Sxema
+                </button>
+                <button class="btn btn-primary" id="codeBtn">
+                    💻 Kod
+                </button>
+                <button class="btn btn-primary" id="componentsBtn">
+                    🔌 Qurilmalar
+                </button>
+
+            </div>
+
+            <div class="control-group">
+                <h3>Holat</h3>
+                <div class="status-row">
+                    <span>Qizil LED:</span>
+                    <div class="status-led" id="redStatus"></div>
+                </div>
+                <div class="status-row">
+                    <span>Sariq LED:</span>
+                    <div class="status-led" id="yellowStatus"></div>
+                </div>
+                <div class="status-row">
+                    <span>Yashil LED:</span>
+                    <div class="status-led" id="greenStatus"></div>
+                </div>
+            </div>
+        </div>
+<!-- MODAL 1: Sxema qayerda ishlatiladi (Svetafor Tajribasi) -->
+<div class="modal" id="schemaModal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>🚦 Sxema qayerda ishlatiladi</h2>
+
+        <div class="flex-container-40-60">
+            <div class="flex-video-40">
+                <iframe 
+                    src="https://www.youtube.com/embed/l2yrDmrPW70?si=ship-dSgI1bXfPla" 
+                    title="Svetafor tajribasi 1" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+            <div class="flex-text-60">
+                <strong>LED Svetafor Tajribasi</strong>
+                <p>
+                    Ushbu tajribada Arduino yordamida uchta LED (qizil, sariq, yashil) navbat bilan yoqiladi va o‘chiriladi.
+                    Bu jarayon svetaforlarning real ishlash prinsipiga o‘xshaydi.
+                </p>
+                <p>
+                    Har bir LED 220Ω rezistor orqali Arduino pinlariga ulangan bo‘lib, <b>digitalWrite()</b> funksiyasi orqali boshqariladi.
+                    Kodda kechikish (<b>delay()</b>) yordamida vaqt oralig‘i belgilanadi.
+                </p>
+            </div>
+        </div>
+
+        <br>
+
+        <div class="flex-container-40-60">
+            <div class="flex-video-40">
+                <iframe 
+                    src="https://www.youtube.com/embed/HN-xurZ1kww?si=ffj9n_NCF-vIHlUk" 
+                    title="Svetafor tajribasi 2"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+            <div class="flex-text-60">
+                <strong>Svetafor Ishlash Prinsipi</strong>
+                <p>
+                    Tajriba davomida Arduino har bir LEDni ketma-ket yoqib, svetaforning harakatni boshqarish ketma-ketligini modellashtiradi.
+                    Avval qizil LED yonadi, so‘ng sariq, keyin yashil — bu haqiqiy yo‘l harakati svetaforidagi siklga mos.
+                </p>
+            </div>
+        </div>
+
+        <br>
+
+        <div class="flex-container-40-60">
+            <div class="flex-video-40">
+                <iframe 
+                    src="https://www.youtube.com/embed/semY5oEMxXg?si=dsfs32PUlUvve-3x" 
+                    title="Svetafor tajribasi 3" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+            <div class="flex-text-60">
+                <strong>Amaliy Natija</strong>
+                <p>
+                    Ushbu sxema yordamida o‘quvchilar real hayotdagi svetafor tizimini o‘rganadilar.
+                    Shuningdek, bu tajriba orqali <b>elektr zanjir</b> va <b>dasturlash asoslari</b>ni o‘zlashtirish mumkin.
+                </p>
+                <p>
+                    Arduino C++ kod yordamida LEDlar ketma-ket yoqilib-o‘chadi va realistik svetafor siklini yaratadi.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal" id="infoModal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>📚 Qo'shimcha Ma'lumot</h2>
+        
+        <div class="video-full">
+            <video controls>
+                <source src="/media/2.mp4" type="video/mp4">
+                Brauzeringiz video formatni qo'llab-quvvatlamaydi.
+            </video>
+        </div>
+    </div>
+</div>
+<div class="modal" id="codeModal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>💻 Arduino Kod — Svetafor Tajribasi</h2>
+
+    <div class="tab-buttons">
+      <button class="tab-btn active" data-tab="arduino">Arduino Kodi</button>
+      <button class="tab-btn" data-tab="explanation">Mblock Kodi</button>
+    </div>
+
+    <!-- Arduino Code -->
+    <div class="tab-content active" id="arduino">
+      <pre>
+// LED Svetafor Tajribasi
+// Uchta LED (qizil, sariq, yashil) ketma-ket yonadi va o'chadi
+
+int redLED = 8;      // Qizil LED 8-pinga ulangan
+int yellowLED = 9;   // Sariq LED 9-pinga ulangan
+int greenLED = 10;   // Yashil LED 10-pinga ulangan
+
+void setup() {
+  pinMode(redLED, OUTPUT);
+  pinMode(yellowLED, OUTPUT);
+  pinMode(greenLED, OUTPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  // Qizil LED
+  digitalWrite(redLED, HIGH);
+  Serial.println("Qizil LED yondi");
+  delay(1000);
+  digitalWrite(redLED, LOW);
+
+  // Sariq LED
+  digitalWrite(yellowLED, HIGH);
+  Serial.println("Sariq LED yondi");
+  delay(1000);
+  digitalWrite(yellowLED, LOW);
+
+  // Yashil LED
+  digitalWrite(greenLED, HIGH);
+  Serial.println("Yashil LED yondi");
+  delay(1000);
+  digitalWrite(greenLED, LOW);
+}
+      </pre>
+    </div>
+
+    <!-- Kod tushuntirish -->
+    <div class="tab-content" id="explanation">
+                 <pre><img src="/static/image/arduino trafficlight.png" alt="mBlock Code" style="width: 80%; height: auto;"></pre>
+           
+    </div>
+  </div>
+</div>
+
+<!-- MODAL 3: Qurilmalar -->
+<div class="modal" id="componentsModal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>🔌 Ishlatilgan Qurilmalar</h2>
+
+    <div class="flex-container-30-70">
+      <div class="flex-image-30">
+        <img src="/static/image/arduino1 - Copy.png" alt="Arduino UNO">
+      </div>
+      <div class="flex-text-70">
+        <strong>Arduino UNO</strong>
+        <p>
+          Tajribaning bosh miyasidir. Har bir LEDni ketma-ket yoqish va o‘chirishni boshqaradi.
+        </p>
+      </div>
+    </div>
+
+    
+    <div class="flex-container-30-70">
+      <div class="flex-image-30">
+        <img src="/static/image/resistor.png" alt="Rezistor">
+      </div>
+      <div class="flex-text-70">
+        <strong>Rezistor (220Ω)</strong>
+        <p>
+          LEDni ortiqcha tokdan himoya qiladi. Har bir LED bilan ketma-ket ulanadi.
+        </p>
+      </div>
+    </div>
+
+    <div class="flex-container-30-70">
+      <div class="flex-image-30">
+        <img src="/static/image/breadboard-removebg-preview.png" alt="Breadboard">
+      </div>
+      <div class="flex-text-70">
+        <strong>Breadboard</strong>
+        <p>
+          Barcha komponentlarni lehimlamasdan o‘rnatish uchun ishlatiladi.
+        </p>
+      </div>
+    </div>
+
+  
+  </div>
+</div>
+
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+   
+            <div class="experiment-area">
+                
+                <!-- BREADBOARD WITH COMPONENTS -->
+                <div class="breadboard">
+                    <img src="/static/image/breadboard-removebg-preview.png" width="400px" height="400px" alt="">
+                    <!-- LEDs -->
+                     <div class="things">
+                           <div class="led red" id="redLED"></div>
+                    <div class="led yellow" id="yellowLED"></div>
+                    <div class="led green" id="greenLED"></div>
+                    
+                    <!-- Resistors -->
+                    <div class="resistor r1"><img src="/static/image/resistor.png" width="40px" height="60px" alt=""></div>
+                    <div class="resistor r2"><img src="/static/image/resistor.png" width="40px" height="60px" alt=""></div>
+                    <div class="resistor r3"><img src="/static/image/resistor.png" width="40px" height="60px" alt=""></div>
+                    
+                    <!-- Wires -->
+                    <div class="wire wire-red"></div>
+                    <div class="wire wire-yellow"></div>
+                    <div class="wire wire-green"></div>
+                    <div class="wire wire-ground"></div>
+                    <div class="wire wire-power"></div>
+                    <div class="wire wire-power1"></div>
+                    <div class="wire wire-power2"></div>
+                     </div>
+                 
+                </div>
+                <!-- ARDUINO BOARD -->
+                <div class="arduino-board">
+                 
+                    
+                    <img src="/static/image/arduino1 - Copy.png" width="400px" height="400px" alt="">
+                       
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- STATUS DISPLAY (MOBILE) -->
+    <div class="status-display">
+        <h4>LED Holati</h4>
+        <div class="status-row">
+            <span>Qizil:</span>
+            <div class="status-led" id="redStatusMobile"></div>
+        </div>
+        <div class="status-row">
+            <span>Sariq:</span>
+            <div class="status-led" id="yellowStatusMobile"></div>
+        </div>
+        <div class="status-row">
+            <span>Yashil:</span>
+            <div class="status-led" id="greenStatusMobile"></div>
+        </div>
+    </div>
+
+    <!-- MODALS -->
+    <!-- Schema Modal -->
+    <div class="modal" id="schemaModal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>LED Yashnash Sxemasi Haqida</h2>
+            
+            <div class="card">
+                <h3>📋 Sxema Tavsifi</h3>
+                <p>Bu tajriba uchta LED (qizil, sariq, yashil) va ularning navbat bilan yonish-o'chishini ko'rsatadi. Har bir LED 220Ω rezistor orqali Arduino pinlariga ulangan.</p>
+            </div>
+
+            <div class="card">
+                <h3>🔌 Ulanish Sxemasi</h3>
+                <ul>
+                    <li><strong>Qizil LED:</strong> Pin 8 → Rezistor → LED → GND</li>
+                    <li><strong>Sariq LED:</strong> Pin 9 → Rezistor → LED → GND</li>
+                    <li><strong>Yashil LED:</strong> Pin 10 → Rezistor → LED → GND</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h3>⚡ Qanday Ishlaydi</h3>
+                <p>Arduino har bir LED ni navbat bilan yoqadi va o'chiradi. Dastur 500ms (0.5 soniya) oraliqda har bir LED ni yoqib, keyin o'chiradi.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Code Modal -->
+    <div class="modal" id="codeModal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Arduino Kodi</h2>
+
+            <div class="tab-buttons">
+                <button class="tab-btn active" data-tab="arduino">Arduino C++</button>
+                <button class="tab-btn" data-tab="explanation">Kod Tushuntirish</button>
+            </div>
+
+            <div class="tab-content active" id="arduino">
+                <pre>
+// LED Yashnash Tajribasi
+// Uchta LED navbat bilan yonadi va o'chadi
+
+// LED pinlarini belgilash
+int redLED = 8;     // Qizil LED 8-pinga ulangan
+int yellowLED = 9;  // Sariq LED 9-pinga ulangan  
+int greenLED = 10;  // Yashil LED 10-pinga ulangan
+
+void setup() {
+  // LED pinlarini chiqish rejimida sozlash
+  pinMode(redLED, OUTPUT);
+  pinMode(yellowLED, OUTPUT);
+  pinMode(greenLED, OUTPUT);
+  
+  // Serial moniterni boshlash
+  Serial.begin(9600);
+  Serial.println("LED Yashnash Tajribasi Boshlandi!");
+}
+
+void loop() {
+  // Qizil LED ni yoqish
+  digitalWrite(redLED, HIGH);
+  Serial.println("Qizil LED yondi");
+  delay(500);  // 0.5 soniya kutish
+  
+  digitalWrite(redLED, LOW);
+  Serial.println("Qizil LED o'chdi");
+  delay(100);
+  
+  // Sariq LED ni yoqish
+  digitalWrite(yellowLED, HIGH);
+  Serial.println("Sariq LED yondi");
+  delay(500);
+  
+  digitalWrite(yellowLED, LOW);
+  Serial.println("Sariq LED o'chdi");
+  delay(100);
+  
+  // Yashil LED ni yoqish
+  digitalWrite(greenLED, HIGH);
+  Serial.println("Yashil LED yondi");
+  delay(500);
+  
+  digitalWrite(greenLED, LOW);
+  Serial.println("Yashil LED o'chdi");
+  delay(100);
+  
+  // Barcha LEDlarni bir vaqtda yoqish
+  digitalWrite(redLED, HIGH);
+  digitalWrite(yellowLED, HIGH);
+  digitalWrite(greenLED, HIGH);
+  Serial.println("Barcha LEDlar yondi");
+  delay(1000);  // 1 soniya
+  
+  // Barcha LEDlarni o'chirish
+  digitalWrite(redLED, LOW);
+  digitalWrite(yellowLED, LOW);
+  digitalWrite(greenLED, LOW);  
+  Serial.println("Barcha LEDlar o'chdi");
+  delay(500);
+}
+                </pre>
+            </div>
+
+            <div class="tab-content" id="explanation">
+                <div class="card">
+                    <h3>🔧 Kod Tushuntirishlari</h3>
+                    <p><strong>pinMode():</strong> Pin rejimini belgilaydi (INPUT/OUTPUT)</p>
+                    <p><strong>digitalWrite():</strong> Pinga HIGH (5V) yoki LOW (0V) signal beradi</p>
+                    <p><strong>delay():</strong> Kodning bajarilishini millisekund birligida to'xtatadi</p>
+                    <p><strong>Serial.println():</strong> Serial monitorda xabar chop etadi</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Components Modal -->
+    <div class="modal" id="componentsModal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Kerakli Komponentlar</h2>
+
+            <div class="card">
+                <h3>🔧 Arduino UNO</h3>
+                <p>Asosiy mikrokontroller plata. LEDlarni boshqarish uchun ishlatiladi.</p>
+            </div>
+
+            <div class="card">
+                <h3>💡 LEDlar</h3>
+                <ul>
+                    <li><strong>Qizil LED (1x):</strong> 1.8-2.2V, ~20mA</li>
+                    <li><strong>Sariq LED (1x):</strong> 2.0-2.2V, ~20mA</li>
+                    <li><strong>Yashil LED (1x):</strong> 2.0-3.4V, ~20mA</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h3>⚡ Rezistorlar</h3>
+                <p><strong>220Ω rezistor (3x):</strong> LEDni ortiqcha tokdan himoyalash uchun</p>
+                <p>Rang kodi: Qizil-Qizil-Jigarrang-Oltin</p>
+            </div>
+
+            <div class="card">
+                <h3>🔌 Boshqa Komponentlar</h3>
+                <ul>
+                    <li><strong>Breadboard:</strong> Komponentlarni ulash uchun</li>
+                    <li><strong>Jumper simlari:</strong> Ulanishlar uchun</li>
+                    <li><strong>USB kabel:</strong> Arduino ni kompyuterga ulash</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let experimentRunning = false;
+        let ledStates = { red: false, yellow: false, green: false };
+        let animationInterval;
+
+        // DOM Elements
+        const redLED = document.getElementById('redLED');
+        const yellowLED = document.getElementById('yellowLED');
+        const greenLED = document.getElementById('greenLED');
+        const redStatus = document.getElementById('redStatus');
+        const yellowStatus = document.getElementById('yellowStatus');
+        const greenStatus = document.getElementById('greenStatus');
+        const redStatusMobile = document.getElementById('redStatusMobile');
+        const yellowStatusMobile = document.getElementById('yellowStatusMobile');
+        const greenStatusMobile = document.getElementById('greenStatusMobile');
+document.querySelectorAll(".tab-btn").forEach(button => {
+  button.addEventListener("click", function() {
+    const tab = this.dataset.tab;
+    const parent = this.closest(".modal-content");
+    parent.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+    this.classList.add("active");
+    parent.querySelectorAll(".tab-content").forEach(c => {
+      c.classList.remove("active");
+      if (c.id === tab) c.classList.add("active");
+    });
+  });
+});
+
+document.getElementById("codeBtn").addEventListener("click", () => {
+  document.getElementById("codeModal").style.display = "block";
+});
+document.getElementById("componentsBtn").addEventListener("click", () => {
+  document.getElementById("componentsModal").style.display = "block";
+});
+document.querySelectorAll(".close").forEach(btn => {
+  btn.addEventListener("click", function() {
+    this.closest(".modal").style.display = "none";
+  });
+});
+window.addEventListener("click", e => {
+  document.querySelectorAll(".modal").forEach(m => {
+    if (e.target === m) m.style.display = "none";
+  });
+});
+        // Update LED states
+        function updateLEDStates() {
+            // Red LED
+            redLED.classList.toggle('active', ledStates.red);
+            redStatus.classList.toggle('active', ledStates.red);
+            redStatusMobile.classList.toggle('active', ledStates.red);
+
+            // Yellow LED  
+            yellowLED.classList.toggle('active', ledStates.yellow);
+            yellowStatus.classList.toggle('active', ledStates.yellow);
+            yellowStatusMobile.classList.toggle('active', ledStates.yellow);
+
+            // Green LED
+            greenLED.classList.toggle('active', ledStates.green);
+            greenStatus.classList.toggle('active', ledStates.green);
+            greenStatusMobile.classList.toggle('active', ledStates.green);
+        }
+
+        // Start experiment animation
+        function startExperiment() {
+            if (experimentRunning) return;
+            
+            experimentRunning = true;
+            document.getElementById('startBtn').textContent = '🟡 Ishlayapti...';
+            
+            let step = 0;
+            animationInterval = setInterval(() => {
+                // Reset all LEDs
+                ledStates = { red: false, yellow: false, green: false };
+                
+                switch(step % 8) {
+                    case 0:
+                        ledStates.red = true;
+                        break;
+                    case 1:
+                        break; // All off
+                    case 2:
+                        ledStates.yellow = true;
+                        break;
+                    case 3:
+                        break; // All off
+                    case 4:
+                        ledStates.green = true;
+                        break;
+                    case 5:
+                        break; // All off
+                    case 6:
+                        ledStates = { red: true, yellow: true, green: true };
+                        break;
+                    case 7:
+                        break; // All off
+                }
+                
+                updateLEDStates();
+                step++;
+            }, 500);
+        }
+
+        // Stop experiment
+        function stopExperiment() {
+            if (!experimentRunning) return;
+            
+            experimentRunning = false;
+            clearInterval(animationInterval);
+            
+            // Turn off all LEDs
+            ledStates = { red: false, yellow: false, green: false };
+            updateLEDStates();
+            
+            document.getElementById('startBtn').textContent = '🟢 Boshlash';
+        }
+
+        // Toggle individual LED
+        function toggleLED(color) {
+            if (experimentRunning) {
+                stopExperiment();
+            }
+            
+            ledStates[color] = !ledStates[color];
+            updateLEDStates();
+        }
+
+        // Modal functions
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = "block";
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = "none";
+        }
+
+        // Event listeners
+        document.getElementById("schemaBtn").addEventListener("click", () => openModal("schemaModal"));
+        document.getElementById("codeBtn").addEventListener("click", () => openModal("codeModal"));
+        document.getElementById("componentsBtn").addEventListener("click", () => openModal("componentsModal"));
+
+        // Close buttons for modals
+        document.querySelectorAll(".modal .close").forEach(btn => {
+            btn.addEventListener("click", function() {
+                this.closest(".modal").style.display = "none";
+            });
+        });
+
+        // Click outside modal to close
+        window.addEventListener("click", function(e) {
+            document.querySelectorAll(".modal").forEach(modal => {
+                if (e.target === modal) {
+                    modal.style.display = "none";
+                }
+            });
+        });
+
+        // Tab functionality
+        document.querySelectorAll(".tab-btn").forEach(button => {
+            button.addEventListener("click", function() {
+                const tab = this.dataset.tab;
+                const modal = this.closest('.modal');
+
+                // Update buttons
+                modal.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+                this.classList.add("active");
+
+                // Update content
+                modal.querySelectorAll(".tab-content").forEach(content => {
+                    content.classList.remove("active");
+                    if (content.id === tab) {
+                        content.classList.add("active");
+                    }
+                });
+            });
+        });
+document.getElementById("schemaBtn").addEventListener("click", () => {
+    document.getElementById("schemaModal").style.display = "block";
+});
+document.querySelectorAll(".close").forEach(btn => {
+    btn.addEventListener("click", function() {
+        this.closest(".modal").style.display = "none";
+    });
+});
+window.addEventListener("click", function(e) {
+    const modal = document.getElementById("schemaModal");
+    if (e.target === modal) {
+        modal.style.display = "none";
+    }
+});
+        // Initialize   
+        updateLEDStates();
+    </script>
+</body>
+</html>

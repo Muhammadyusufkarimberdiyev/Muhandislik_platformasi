@@ -1,0 +1,991 @@
+
+
+
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Lock Tajribasi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #e6f3ff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            background:#000075;
+            color: white;
+            padding: 10px 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            width: 100%;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .main-container {
+            display: flex;
+            margin-top: 20px;
+            gap: 20px;
+        }
+
+        .left-panel {
+            width: 250px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            height: fit-content;
+            z-index: 1;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 15px;
+        }
+
+        .control-group h3 {
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 8px;
+            font-size: 14px;
+            border-radius: 5px;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn-success { background: #28a745; color: white; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-primary { background: #000075; color: white; }
+        .btn-info { background:#000075; color: white; }
+
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        /* RESPONSIVE CONTAINER - proporsional kichrayish uchun */
+        .circuit-display {
+            background: #f8f9fa;
+            border: 3px solid #000075;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+            position: relative;
+            width: 100%;
+            max-width: 1200px;
+            margin: 20px auto;
+        }
+
+        /* Aspect ratio container */
+        .circuit-wrapper {
+            position: relative;
+            width: 100%;
+            padding-bottom: 50%; /* 2:1 aspect ratio */
+            overflow: visible;
+        }
+
+        .circuit-content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .circuit-title {
+            background: #000075;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 3px 10px rgba(0, 0, 117, 0.3);
+            z-index: 10;
+        }
+
+        /* Barcha komponentlar % da - original pozitsiyalarda */
+        .component {
+            position: absolute;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .component img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .component:hover {
+            transform: scale(1.05);
+        }
+
+        /* NodeMCU - 450/1200 = 37.5%, 105/600 = 17.5% */
+        .nodemcu {
+            width: 20.83%;
+            height: 40%;
+            top: 17.5%;
+            left: 37.5%;
+        }
+
+        .nodemcu.active {
+            box-shadow: 0 0 20px #2c5aa0;
+        }
+
+        /* Buzzer - 516/1200 = 43%, 130/600 = 21.67% */
+        .buzzer {
+            width: 5.83%;
+            height: 10%;
+            border-radius: 50%;
+            top: 21.67%;
+            left: 43%;
+        }
+
+        .buzzer.active {
+            animation: buzzerRing 0.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes buzzerRing {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.1); box-shadow: 0 0 20px #ef4444; }
+        }
+
+        /* Relay Module */
+        .relay-module {
+            width: 16.67%;
+            height: 25%;
+            top: 24.17%;
+            right: 28.17%;
+        }
+
+        .relay-module.active {
+            box-shadow: 0 0 20px #10b981;
+        }
+
+        /* Solenoid Lock */
+        .solenoid-lock {
+            width: 12.5%;
+            height: 23.33%;
+            bottom: 25.5%;
+            right: 26%;
+            border-radius: 12px;
+        }
+
+        .solenoid-lock.active {
+            box-shadow: 0 0 20px #22c55e;
+        }
+
+        /* Power Supply */
+        .power-supply {
+            width: 12.5%;
+            height: 21.67%;
+            top: 23.17%;
+            right: 13.5%;
+        }
+
+        .power-supply.active {
+            box-shadow: 0 0 20px #f59e0b;
+        }
+
+        /* WIRES - original pozitsiyalarda */
+        .wire {
+            position: absolute;
+            border-radius: 2px;
+            z-index: 1;
+        }
+
+        .wire-red { background: #ef4444; height: 0.5%; }
+        .wire-black { background: #1f2937; height: 0.5%; }
+        .wire-blue { background: #3b82f6; height: 0.5%; }
+        .wire-yellow { background: #eab308; height: 0.5%; }
+
+        .wire1 { width: 3.17%; height: 0.5%; top: 50%; left: 54.17%;}
+        .wire2 { width: 0.25%; height: 5%; top: 45.33%; left: 54.17%; }
+        .wire14 { width: 2.92%; height: 0.5%; top: 38.33%; left: 57.08%;}
+        .wire15 { width: 0.25%; height: 12.17%; top: 38.33%; left: 57.08%; }
+        .wire3 { width: 10.83%; height: 0.5%; top: 28.33%; left: 46.25%; }
+        .wire7 { height: 0.5%; top: 28.33%; left: 46.25%; }
+        .wire12 { width: 0.25%; height: 9.17%; top: 28.33%; left: 56.83%; }
+        .wire13 { width: 2.5%; height: 0.5%; top: 37%; left: 56.83%; }
+        .wire6 {width: 0.25%; height: 1.17%; top: 28.33%; left: 46.08%; }
+        .wire4 { width: 7.72%; height: 0.5%; top: 36.67%; right: 24.58%; }
+        .wire5 { width: 0.25%; height: 15.83%; top: 31.67%; right: 25.58%;  }
+        .wire8 { width: 1.25%; height: 0.5%; top: 31.67%; right: 24.58%;  }
+        .wire9 { width: 12.5%; height: 0.5%; top: 47%; right: 25.58%;  }
+        .wire10 { width: 0.25%; height: 9.17%; top: 47%; right: 37.92%;  }
+        .wire11 { width: 3.58%; height: 0.5%; top: 55.83%; right: 34.58%;  }
+        .wire16 { width: 4.5%; height: 0.5%; top: 51.67%; left: 53.25%;}
+        .wire17 { width: 0.25%; height: 6.67%; top: 45.33%; left: 53.25%; }
+        .wire18 { width: 2.5%; height: 0.5%; top: 39.33%; left: 57.5%;}
+        .wire19 { width: 0.25%; height: 12.83%; top: 39.33%; left: 57.5%; }    
+        .wire20 { width: 7.28%; height: 0.5%; top: 39.17%; right: 25%;  }
+        .wire21 { width: 12.5%; height: 0.5%; top: 48.33%; right: 25.17%;  }
+        .wire22 { width: 0.25%; height: 7.5%; top: 48.33%; right: 37.5%;  }
+        .wire23 { width: 3.17%; height: 0.5%; top: 55.33%; right: 34.58%;  }
+        .wire24 { width: 0.25%; height: 9.67%; top: 39.17%; right: 25%;  }
+
+        /* KEYPAD */
+        .keypad-area {
+            position: absolute;
+            bottom: 36.67%;
+            left: 1.67%;
+            background: #1f2937;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+            width: 15%;
+        }
+
+        .keypad-display {
+            background: #000;
+            color: #00ff00;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            margin-bottom: 15px;
+            min-height: 30px;
+        }
+
+        .keypad-grid {
+            display: grid;  
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .key {
+            background: #374151;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.2s ease;
+        }
+
+        .key:hover {
+            background: #4b5563;
+            transform: scale(1.05);
+        }
+
+        /* STATUS DISPLAY */
+        .status-display {
+            position: absolute;
+            top: 5%;
+            right: 3%;
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 12px;
+            border-radius: 12px;
+            min-width: 15%;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 5px 0;
+            font-size: 11px;
+        }
+
+        .status-led {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #dc3545;
+            transition: all 0.3s ease;
+        }
+
+        .status-led.on {
+            background: #28a745;
+            box-shadow: 0 0 10px rgba(40, 167, 69, 0.8);
+        }
+
+        @media (max-width: 1024px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .left-panel {
+                width: 100%;
+            }
+
+            .circuit-wrapper {
+                padding-bottom: 80%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .circuit-wrapper {
+                padding-bottom: 100%;
+            }
+
+            .keypad-grid {
+                gap: 4px;
+            }
+
+            .key {
+                padding: 8px;
+                font-size: 12px;
+            }
+        }
+ @media (max-width: 480px) {
+         .keypad-area {
+            position: absolute;
+            bottom: 0;
+            left: -25%;
+            background: #1f2937;
+  
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+            width: 55%;
+            
+        }
+        .buzzer{
+            top: 27%;
+        }
+        .wire17{
+            top: 41.5%;
+            height: 10.5%;
+        }
+        .wire6{
+            top: 28.5%;
+            height: 5%;
+        }
+        .solenoid-lock{
+            top: 49%;
+        }
+        .wire2{
+          top: 41.5%;
+            height: 9%;  
+        }
+    }
+  .card {
+    display: flex;
+    gap: 15px;
+    background: #000075;
+    color: white;
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    align-items: center;
+}
+
+.card img {
+    width: 150px;
+    border-radius: 10px;
+}
+
+.card .text h3 {
+    margin-bottom: 8px;
+    color: white;
+}
+
+    .left-panel{width:280px;max-width:95%;background:#fff;border-radius:14px;padding:16px;box-shadow:0 6px 16px rgba(0,0,0,.08)}
+  .left-panel h3{margin:0 0 12px;font-size:16px;color:#333}
+  .btn{display:block;width:100%;padding:10px 12px;margin:8px 0;border:0;border-radius:10px;cursor:pointer;transition:.25s;text-align:left;font-weight:600}
+  .btn-primary{background:#000075;color:#fff}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 14px rgba(0,0,0,.1)}
+  .flex-container-40-60{display:flex;gap:20px;align-items:flex-start;background:rgba(255,255,255,.1);padding:20px;border-radius:15px;margin-bottom:20px}
+  .flex-text-60{flex:1}
+  .flex-text-60 p{font-size:16px;line-height:1.8}
+  .flex-container-30-70{display:flex;gap:20px;align-items:flex-start;background:rgba(255,255,255,.1);padding:20px;border-radius:15px;margin-bottom:20px}
+  .flex-image-30{flex:0 0 30%}
+  .flex-image-30 img{width:100%;border-radius:10px}
+  .flex-text-70{flex:0 0 70%}
+  .flex-text-70 strong{color:#ffcc00;font-size:18px;display:block;margin-bottom:10px}
+  .modal{display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.8);backdrop-filter:blur(5px);overflow-y:auto}
+  .modal-content{background:#000075;color:#fff;margin:5vh auto;padding:30px;width:90%;max-width:1000px;border-radius:20px;box-shadow:0 15px 40px rgba(0,0,0,.5);position:relative;animation:slideDown .4s ease}
+  @keyframes slideDown{from{transform:translateY(-50px);opacity:0}to{transform:translateY(0);opacity:1}}
+  .close{position:absolute;right:20px;top:15px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:bold;cursor:pointer;color:#fff;transition:.3s;border-radius:50%;background:rgba(255,255,255,.1)}
+  .close:hover{background:rgba(255,204,0,.3);color:#ffcc00;transform:rotate(90deg)}
+  .modal-content h2{font-size:28px;margin-bottom:25px;padding-bottom:15px;border-bottom:2px solid rgba(255,255,255,.3);padding-right:50px}
+  .tab-buttons{display:flex;gap:8px;margin:12px 0 16px}
+  .tab-btn{flex:1;background:rgba(255,255,255,.12);color:#fff;border:0;border-radius:10px 10px 0 0;padding:10px;cursor:pointer;font-weight:600;transition:.2s}
+  .tab-btn:hover{background:rgba(255,255,255,.2)}
+  .tab-btn.active{background:rgba(255,255,255,.28)}
+  .tab-content{display:none}
+  .tab-content.active{display:block}
+  pre{background:rgba(0,0,0,.35);padding:12px;border-radius:10px;overflow:auto;white-space:pre-wrap;word-break:break-word;color:#fff;font-size:13.5px;line-height:1.55}
+  #infoFloatingBtn{position:fixed;bottom:30px;right:30px;width:120px;height:120px;border-radius:50%;background:linear-gradient(135deg,#000075,#0000ff);color:#fff;border:4px solid #fff;cursor:pointer;font-size:16px;font-weight:bold;box-shadow:0 8px 20px rgba(0,0,0,.4);z-index:1500;transition:.3s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px}
+  #infoFloatingBtn:hover{transform:scale(1.1);box-shadow:0 12px 30px rgba(0,0,255,.6)}
+  #infoFloatingBtn span:first-child{font-size:36px}
+  .video-full{width:100%;border-radius:15px;background:#000}
+  .video-full video{width:100%;height:auto;border-radius:15px;max-height:70vh}
+  @media (max-width:1024px){.flex-container-40-60,.flex-container-30-70{flex-direction:column}.flex-image-30,.flex-text-70{flex:0 0 100%}}
+  @media (max-width:768px){.modal-content{width:96%;padding:20px 15px}#infoFloatingBtn{width:90px;height:90px;font-size:14px;bottom:20px;right:20px}#infoFloatingBtn span:first-child{font-size:28px}}
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+                       <a href="/"><img src="/static/image/logo.png" width="80px" height="80px" alt=""></a>
+          
+            <span>Smart Lock Tajribasi</span>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <div class="left-panel">
+            <div class="control-group">
+                <h3>Boshqaruv</h3>
+                <button class="btn btn-success" onclick="powerOn()" id="powerBtn">
+                    🔌 Quvvatni Yoqish
+                </button>
+                <button class="btn btn-danger" onclick="powerOff()">
+                    ⏹️ Quvvatni O'chirish
+                </button>
+                <button class="btn btn-primary" onclick="testSystem()">
+                    🧪 Tizimni Sinash
+                </button>
+                <button class="btn btn-info" onclick="resetSystem()">
+                    🔄 Qayta O'rnatish
+                </button>
+            </div>
+
+            <div class="control-group">
+                <h3>📚 Ma'lumotlar</h3>
+                <button class="btn btn-primary" id="schemaBtn">
+                    📋 Sxema Haqida
+                </button>
+               
+                <button class="btn btn-primary" id="componentsBtn">
+                    🔌 Qurilmalar
+                </button>
+           
+            </div>
+            <div class="control-group">
+                <h3>Qulf Boshqaruvi</h3>
+                <button class="btn btn-success" onclick="unlockDoor()">
+                    🔓 Qulfni Ochish
+                </button>
+                <button class="btn btn-danger" onclick="lockDoor()">
+                    🔒 Qulfni Yopish
+                </button>
+                <button class="btn btn-primary" onclick="emergencyOverride()">
+                    🚨 Favqulodda Ochish
+                </button>
+            </div>
+
+            <div class="control-group">
+                <h3>Qurilma holati</h3>
+                <div class="status-row">
+                    <span>Quvvat:</span>
+                    <div class="status-led" id="powerLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>NodeMCU:</span>
+                    <div class="status-led" id="mcuLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Relay:</span>
+                    <div class="status-led" id="relayLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Qulf:</span>
+                    <div class="status-led" id="lockLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Buzzer:</span>
+                    <div class="status-led" id="buzzerLed"></div>
+                </div>
+            </div>
+        </div>
+<div class="modal" id="schemaModal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>💡 Sxema qayerda ishlatiladi (RGB LED)</h2>
+    <div class="flex-container-40-60">
+         <div class="flex-video-40">
+                <iframe 
+                          src="https://www.youtube.com/embed/ABXBtdnCO1Q?si=E8CTQzCzbSy1k3iO" 
+                    
+                    title="YouTube video player" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+      <div class="flex-text-60">
+        <strong>🔄 Ishlash prinsipi</strong>
+<p>Foydalanuvchi parol kiritadi yoki RFID kartani skanerlash orqali tizimga kiradi.
+
+Arduino parolni tekshiradi:
+
+Agar parol yoki RFID to‘g‘ri bo‘lsa → servo motor yoki solenoid ishlaydi → eshik ochiladi
+
+Agar noto‘g‘ri bo‘lsa → buzzer signal beradi va LED qizil yonadi
+
+Agar Bluetooth ulansa, foydalanuvchi mobil ilovadan ham eshikni ochishi yoki yopishi mumkin.
+
+Qo‘shimcha: Arduino vaqtinchalik qayta yopish funksiyasini ham bajarishi mumkin.</p>
+      </div>
+    </div>
+    <div class="flex-container-40-60">
+         <div class="flex-video-40">
+                <iframe 
+          src="https://www.youtube.com/embed/gpB4600keWA?si=7Ggw9kBaAsSwwEZ5" 
+                    title="YouTube video player" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+      <div class="flex-text-60">
+        <strong>Qo‘shimcha funksiyalar</strong>
+  <p>Bluetooth + App control: mobil ilovadan ochish
+
+RFID modul: karta orqali autentifikatsiya
+
+OLED/LCD ekran: parol, status ko‘rsatish
+
+WiFi / IoT: eshikni internet orqali boshqarish va log saqlash
+
+Alarm tizimi: kuch bilan ochishga urinishda signal berish</p>
+      </div>
+    </div>
+    <div class="flex-container-40-60">
+         <div class="flex-video-40">
+                <iframe 
+                    src="https://www.youtube.com/embed/qGNfQC7qzmI?si=eE0h2DhuBkYkbg1R" 
+                    title="YouTube video player" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+      <div class="flex-text-60">
+        <strong>Afzalliklari</strong>
+    <p>Xavfsiz va qulay eshik boshqaruvi
+
+Arduino orqali oson dasturlash va sozlash
+
+IoT va smart home tizimlariga integratsiya qilinadi
+
+Mobil yoki karta orqali masofadan boshqarish imkoniyati</p>
+   
+    </div>
+    </div>
+  </div>
+</div>
+  <!-- Ishlatilgan qurilmalar (modal) -->
+    <div class="modal" id="componentsModal">
+        <div class="modal-content">
+            <span class="close" title="Yopish">&times;</span>
+            <h2>🔌 Ishlatilgan Qurilmalar</h2>
+
+            <div class="card">
+                <img src="/static/image/Single-Relay-Board-640x640-removebg-preview.png" width="150px" height="150px" alt="Rezistor">
+                <div class="text">
+                    <h3>5V Yagona Kanal Relay Module</h3>
+                    <p>Bu modul past kuchlanishli boshqaruv signali (masalan, Arduino’dan 5V signal) yordamida yuqori kuchlanishli yuklarni (220V AC lampalar, 12V nasos, motor va hokazo) xavfsiz ulash yoki o‘chirish uchun ishlatiladi.
+                    </p>
+                </div>
+            </div>
+
+            <div class="card">
+                <img src="/static/image/battery - touch.png" alt="LM393P Komparator">
+                <div class="text">
+                    <h3>9V DC Batareya</h3>
+                    <p>
+                       Vazifasi: Qurilmani (NodeMCU, relay, sensorlar) barqaror 9 volt kuchlanish bilan ta’minlaydi.
+
+Xususiyatlari: 9V chiqish, 1A–2A oqim sig‘imi, polaritetga e’tibor berish kerak.
+
+Qo‘llanilishi: Elektron loyihalarda asosiy quvvat manbai sifatida ishlatiladi.
+                    </p>
+                </div>
+            </div>
+
+            <div class="card">
+                <img src="/static/image/ESP8266-NodeMCU_018abef1-dfa7-4405-9d8e-209a0458ad67_grande-removebg-preview.png" alt="5V Relay modul">
+                <div class="text">
+                    <h3>NodeMCU ESP8266</h3>
+                    <p>
+                    Nom: NodeMCU ESP8266 Wi-Fi Module
+
+Vazifasi: IoT (Internet of Things) loyihalarda markaziy boshqaruvchi sifatida ishlaydi — Wi-Fi orqali ma’lumot uzatadi va oladi.    
+                    </p>
+                </div>
+            </div>
+            <div class="card">
+                <img src="/static/image/buzzer3.png" alt="5V Relay modul">
+                <div class="text">
+                    <h3>Buzzer</h3>
+                    <p>
+                     Vazifasi: Elektr signalga javoban tovush chiqaradi — ogohlantirish yoki signal maqsadida.
+
+Xususiyatlari:
+
+Ish kuchlanishi: 3–5V
+
+Aktiv buzzer — signal berilganda o‘zi tovush chiqaradi
+
+Passiv buzzer — PWM signal orqali boshqariladi
+
+Qo‘llanilishi: Xavfsizlik tizimlari, signalizatsiya, ogohlantirish qurilmalari.
+                    </p>
+                </div>
+            </div>
+
+
+            <div class="card">
+                <img src="/static/image/lock-style-solenoid-12vdc-the-pi-hut-ada1512-28610304344259_1000x-removebg-preview.png" alt="5V Relay modul">
+                <div class="text">
+                    <h3>Magnit qulf</h3>
+                    <p>
+                      Vazifasi: Elektr toki berilganda magnit orqali qulf mexanizmini ochadi; tok uzilganda avtomatik tarzda yopiladi.
+
+Xususiyatlari:
+
+Ish kuchlanishi: 12V DC
+
+Oqim: 300–500mA
+
+Mustahkam metall korpus
+
+Qo‘llanilishi: Eshik, shkaf, saqlash joylarini elektron tarzda qulflash tizimlarida.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<div class="modal" id="infoModal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>📚 Qo'shimcha Ma'lumot</h2>
+    <div class="video-full">
+      <video controls>
+        <source src="/media/2.mp4" type="video/mp4">
+        Brauzeringiz video formatni qo'llab-quvvatlamaydi.
+      </video>
+    </div>
+  </div>
+</div>
+
+<button id="infoFloatingBtn"><span>📚</span><span>Ma'lumot</span></button>
+        <div class="main-content">
+            <div class="circuit-display">
+        
+                <div class="circuit-wrapper">
+                    <div class="circuit-content">
+                        <!-- POWER SUPPLY -->
+                        <div class="component power-supply" id="powerSupply">
+                           <img src="/static/image/battery1.png" alt="">
+                        </div>
+
+                        <!-- NODEMCU -->
+                        <div class="component nodemcu" id="nodeMCU">
+                            <img src="/static/image/ESP8266-NodeMCU_018abef1-dfa7-4405-9d8e-209a0458ad67_grande-removebg-preview.png" alt="">
+                        </div>
+ 
+                        <!-- BUZZER -->
+                        <div class="component buzzer" id="buzzer">
+                            <img src="/static/image/buzzer3.png" alt="">
+                        </div>
+
+                        <!-- RELAY MODULE -->
+                        <div class="component relay-module" id="relayModule">
+                            <img src="/static/image/Single-Relay-Board-640x640-removebg-preview.png" alt="">
+                        </div>
+
+                        <!-- SOLENOID LOCK -->
+                        <div class="component solenoid-lock locked" id="solenoidLock">  
+                           <img src="/static/image/lock-style-solenoid-12vdc-the-pi-hut-ada1512-28610304344259_1000x-removebg-preview.png" alt="">
+                        </div>
+
+                        <!-- WIRES -->
+                        <div class="wire wire-red wire1"></div>
+                        <div class="wire wire-red wire2"></div>
+                        <div class="wire wire-blue wire3"></div>
+                        <div class="wire wire-black wire4"></div>
+                        <div class="wire wire-red wire5"></div>
+                        <div class="wire wire-blue wire6"></div>
+                        <div class="wire wire-blue wire7"></div>
+                        <div class="wire wire-red wire8"></div>
+                        <div class="wire wire-red wire9"></div>
+                        <div class="wire wire-red wire10"></div>
+                        <div class="wire wire-red wire11"></div>
+                        <div class="wire wire-blue wire12"></div>
+                        <div class="wire wire-blue wire13"></div>
+                        <div class="wire wire-red wire14"></div>
+                        <div class="wire wire-red wire15"></div>
+                        <div class="wire wire-blue wire20"></div>
+                        <div class="wire wire-blue wire21"></div>
+                        <div class="wire wire-blue wire22"></div>
+                        <div class="wire wire-blue wire23"></div>
+                        <div class="wire wire-blue wire24"></div>
+                        <div class="wire wire-black wire16"></div>
+                        <div class="wire wire-black wire17"></div>
+                        <div class="wire wire-black wire18"></div>
+                        <div class="wire wire-black wire19"></div>
+
+                        <!-- KEYPAD -->
+                        <div class="keypad-area">
+                            <div class="keypad-display" id="keypadDisplay">Enter Code</div>
+                            <div class="keypad-grid">
+                                <button class="key" onclick="keyPress('1')">1</button>
+                                <button class="key" onclick="keyPress('2')">2</button>
+                                <button class="key" onclick="keyPress('3')">3</button>
+                                <button class="key" onclick="keyPress('4')">4</button>
+                                <button class="key" onclick="keyPress('5')">5</button>
+                                <button class="key" onclick="keyPress('6')">6</button>
+                                <button class="key" onclick="keyPress('7')">7</button>
+                                <button class="key" onclick="keyPress('8')">8</button>
+                                <button class="key" onclick="keyPress('9')">9</button>
+                                <button class="key" onclick="clearCode()">C</button>
+                                <button class="key" onclick="keyPress('0')">0</button>
+                                <button class="key" onclick="submitCode()">✓</button>
+                            </div>
+                        </div>
+
+                        <!-- STATUS -->
+                   
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let systemPowered = false;
+        let lockState = 'locked';
+        let enteredCode = '';
+        const correctCode = '1234';
+function openModal(id){ const m=document.getElementById(id); if(m) m.style.display='block'; }
+  function closeModal(el){ const m=el.closest('.modal'); if(m) m.style.display='none'; }
+
+  document.addEventListener('click', (e)=>{ if(e.target.matches('.modal .close')) closeModal(e.target); });
+  window.addEventListener('click', (e)=>{ document.querySelectorAll('.modal').forEach(m=>{ if(e.target===m) m.style.display='none'; }); });
+
+  // buttons
+  document.getElementById('schemaBtn')?.addEventListener('click', ()=>openModal('schemaModal'));
+  document.getElementById('codeBtn')?.addEventListener('click',   ()=>openModal('codeModal'));
+  document.getElementById('componentsBtn')?.addEventListener('click', ()=>openModal('componentsModal'));
+  document.getElementById('infoFloatingBtn')?.addEventListener('click', ()=>openModal('infoModal'));
+
+  // tabs
+  (function(){
+    const codeModal=document.getElementById('codeModal');
+    if(!codeModal) return;
+    codeModal.querySelectorAll('.tab-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const t=btn.dataset.tab;
+        codeModal.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        codeModal.querySelectorAll('.tab-content').forEach(p=>p.classList.toggle('active', p.id===t));
+      });
+    });
+  })();
+        const elements = {
+            powerSupply: document.getElementById('powerSupply'),
+            nodeMCU: document.getElementById('nodeMCU'),
+            buzzer: document.getElementById('buzzer'),
+            relayModule: document.getElementById('relayModule'),
+            solenoidLock: document.getElementById('solenoidLock'),
+            keypadDisplay: document.getElementById('keypadDisplay'),
+            powerLed: document.getElementById('powerLed'),
+            mcuLed: document.getElementById('mcuLed'),
+            relayLed: document.getElementById('relayLed'),
+            lockLed: document.getElementById('lockLed'),
+            buzzerLed: document.getElementById('buzzerLed'),
+            powerLed2: document.getElementById('powerLed2'),
+            mcuLed2: document.getElementById('mcuLed2'),
+            relayLed2: document.getElementById('relayLed2'),
+            lockLed2: document.getElementById('lockLed2')
+        };
+
+        function updateStatus() {
+            elements.powerLed.classList.toggle('on', systemPowered);
+            elements.mcuLed.classList.toggle('on', systemPowered);
+            elements.relayLed.classList.toggle('on', lockState === 'unlocked');
+            elements.lockLed.classList.toggle('on', lockState === 'unlocked');
+            
+            elements.powerLed2.classList.toggle('on', systemPowered);
+            elements.mcuLed2.classList.toggle('on', systemPowered);
+            elements.relayLed2.classList.toggle('on', lockState === 'unlocked');
+            elements.lockLed2.classList.toggle('on', lockState === 'unlocked');
+        }
+
+        function powerOn() {
+            systemPowered = true;
+            elements.powerSupply.classList.add('active');
+            setTimeout(() => elements.nodeMCU.classList.add('active'), 300);
+            setTimeout(() => {
+                elements.relayModule.classList.add('active');
+                elements.keypadDisplay.textContent = 'Ready';
+            }, 600);
+            updateStatus();
+        }
+
+  function openModal(id){ const m=document.getElementById(id); if(m) m.style.display='block'; }
+  function closeModal(el){ const m=el.closest('.modal'); if(m) m.style.display='none'; }
+
+  document.addEventListener('click', (e)=>{ if(e.target.matches('.modal .close')) closeModal(e.target); });
+  window.addEventListener('click', (e)=>{ document.querySelectorAll('.modal').forEach(m=>{ if(e.target===m) m.style.display='none'; }); });
+
+  // buttons
+  document.getElementById('schemaBtn')?.addEventListener('click', ()=>openModal('schemaModal'));
+  document.getElementById('codeBtn')?.addEventListener('click',   ()=>openModal('codeModal'));
+  document.getElementById('componentsBtn')?.addEventListener('click', ()=>openModal('componentsModal'));
+  document.getElementById('infoFloatingBtn')?.addEventListener('click', ()=>openModal('infoModal'));
+
+  // tabs
+  (function(){
+    const codeModal=document.getElementById('codeModal');
+    if(!codeModal) return;
+    codeModal.querySelectorAll('.tab-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const t=btn.dataset.tab;
+        codeModal.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        codeModal.querySelectorAll('.tab-content').forEach(p=>p.classList.toggle('active', p.id===t));
+      });
+    });
+  })();
+        function powerOff() {
+            systemPowered = false;
+            lockState = 'locked';
+            enteredCode = '';
+            document.querySelectorAll('.component').forEach(comp => comp.classList.remove('active'));
+            elements.solenoidLock.classList.add('locked');
+            elements.keypadDisplay.textContent = 'System Off';
+            updateStatus();
+        }
+
+        function keyPress(key) {
+            if (!systemPowered) return;
+            enteredCode += key;
+            elements.keypadDisplay.textContent = '*'.repeat(enteredCode.length);
+            if (enteredCode.length >= 4) {
+                setTimeout(submitCode, 500);
+            }
+        }
+
+        function clearCode() {
+            if (!systemPowered) return;
+            enteredCode = '';
+            elements.keypadDisplay.textContent = 'Enter Code';
+        }
+
+        function submitCode() {
+            if (!systemPowered) return;
+            if (enteredCode === correctCode) {
+                unlockDoor();
+                elements.keypadDisplay.textContent = 'Access Granted';
+                setTimeout(() => {
+                    if (systemPowered) elements.keypadDisplay.textContent = 'Ready';
+                }, 2000);
+            } else {
+                elements.keypadDisplay.textContent = 'Access Denied';
+                setTimeout(() => {
+                    if (systemPowered) elements.keypadDisplay.textContent = 'Enter Code';
+                }, 2000);
+            }
+            enteredCode = '';
+        }
+
+        function unlockDoor() {
+            if (!systemPowered) return;
+            lockState = 'unlocked';
+            elements.relayModule.classList.add('active');
+            elements.solenoidLock.classList.remove('locked');
+            elements.solenoidLock.classList.add('active');
+            updateStatus();
+            setTimeout(() => {
+                if (lockState === 'unlocked') lockDoor();
+            }, 5000);
+        }
+
+        function lockDoor() {
+            lockState = 'locked';
+            elements.relayModule.classList.remove('active');
+            elements.solenoidLock.classList.add('locked');
+            elements.solenoidLock.classList.remove('active');
+            updateStatus();
+        }
+
+        function testSystem() {
+            if (!systemPowered) {
+                alert('Avval quvvatni yoqing!');
+                return;
+            }
+            elements.buzzer.classList.add('active');
+            setTimeout(() => {
+                elements.buzzer.classList.remove('active');
+                unlockDoor();
+            }, 1000);
+            setTimeout(() => lockDoor(), 3000);
+        }
+
+        function resetSystem() {
+            enteredCode = '';
+            if (systemPowered) {
+                elements.keypadDisplay.textContent = 'Ready';
+                lockDoor();
+            }
+        }
+
+        function emergencyOverride() {
+            if (!systemPowered) return;
+            elements.keypadDisplay.textContent = 'Emergency Override';
+            unlockDoor();
+        }
+
+        updateStatus();
+        elements.keypadDisplay.textContent = 'System Off';
+    </script>
+</body>
+</html>

@@ -1,0 +1,2485 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Power Bank Zaryadka Simulyatori</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: auto;
+        }
+
+/* MODAL TUZATISH - Responsive va to'g'ri ko'rinish */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    overflow-y: auto;
+    padding: 20px 0;
+}
+
+.modal-content {
+    background: #000075;
+    color: white;
+    margin: 10vh auto 5vh;
+    padding: 30px;
+    width: 90%;
+    max-width: 800px;
+    border-radius: 20px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+    position: relative;
+    animation: slideDown 0.4s ease;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+/* Scroll bar stilizatsiyasi */
+.modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.close {
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    font-size: 32px;
+    font-weight: bold;
+    cursor: pointer;
+    color: white;
+    transition: all 0.3s;
+    z-index: 2010;
+    line-height: 1;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.close:hover {
+    background: rgba(255, 204, 0, 0.3);
+    color: #ffcc00;
+    transform: rotate(90deg);
+}
+
+.modal-content h2 {
+    font-size: 28px;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+    padding-right: 50px;
+}
+
+.card {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    transition: all 0.3s;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    z-index: 1;
+}
+
+.card:hover {
+    background: rgba(255, 255, 255, 0.18);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.card video {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    background: #000;
+    position: relative;
+    z-index: 2;
+}
+
+.card p {
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 10px 0 0;
+    position: relative;
+    z-index: 2;
+}
+
+.card strong {
+    color: #ffcc00;
+    font-size: 18px;
+}
+
+/* Tab buttons */
+.tab-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 2;
+}
+
+.tab-buttons button {
+    flex: 1;
+    min-width: 150px;
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s;
+    position: relative;
+    z-index: 2;
+}
+
+.tab-buttons button:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+}
+
+.tab-buttons button.active {
+    background: rgba(255, 204, 0, 0.4);
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(255, 204, 0, 0.3);
+}
+
+.tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease;
+    position: relative;
+    z-index: 2;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.tab-content pre {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    border-radius: 12px;
+    overflow-x: auto;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #00ff00;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    z-index: 2;
+}
+
+.tab-content pre::-webkit-scrollbar {
+    height: 8px;
+}
+
+.tab-content pre::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.tab-content pre::-webkit-scrollbar-thumb {
+    background: rgba(0, 255, 0, 0.3);
+    border-radius: 10px;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+/* Flex Layout: 40% Video + 60% Text */
+.flex-container-40-60 {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+}
+
+.flex-video-40 {
+    flex: 0 0 40%;
+}
+
+.flex-video-40 iframe {
+    width: 100%;
+    height: 250px;
+    border-radius: 10px;
+}
+
+.flex-text-60 {
+    flex: 0 0 60%;
+}
+
+.flex-text-60 p {
+    font-size: 16px;
+    line-height: 1.8;
+}
+
+/* Flex Layout: 30% Image + 70% Text */
+.flex-container-30-70 {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+}
+
+.flex-image-30 {
+    flex: 0 0 30%;
+}
+
+.flex-image-30 img {
+    width: 100%;
+    border-radius: 10px;
+}
+
+.flex-text-70 {
+    flex: 0 0 70%;
+}
+
+.flex-text-70 strong {
+    color: #ffcc00;
+    font-size: 18px;
+    display: block;
+    margin-bottom: 10px;
+}
+
+/* 100% Video */
+.video-full video {
+    width: 100%;
+    border-radius: 15px;
+}
+
+/* Dumaloq tugma */
+#infoFloatingBtn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #000075, #0000ff);
+    color: white;
+    border: 4px solid white;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    z-index: 1500;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+#infoFloatingBtn:hover {
+    transform: scale(1.1);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .flex-container-40-60,
+    .flex-container-30-70 {
+        flex-direction: column;
+    }
+    
+    .flex-video-40, .flex-text-60,
+    .flex-image-30, .flex-text-70 {
+        flex: 0 0 100%;
+    }
+}
+/* Tablet responsive */
+@media (max-width: 1024px) {
+    .modal {
+        padding: 15px 0;
+    }
+    
+    .modal-content {
+        width: 95%;
+        padding: 25px;
+        max-height: 75vh;
+        margin: 8vh auto 5vh;
+    }
+    
+    .modal-content h2 {
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+    
+    .card {
+        padding: 15px;
+    }
+    
+    .card p {
+        font-size: 15px;
+    }
+    
+    .tab-buttons button {
+        font-size: 15px;
+        padding: 10px 15px;
+    }
+}
+
+/* Mobile responsive */ 
+@media (max-width: 768px) {
+    .modal {
+        padding: 10px 0;
+    }
+    
+    .modal-content {
+        width: 96%;
+        padding: 20px 15px;
+        margin: 5vh auto 3vh;
+        max-height: 85vh;
+        border-radius: 15px;
+    }
+    
+    .close {
+        right: 10px;
+        top: 10px;
+        font-size: 28px;
+        width: 35px;
+        height: 35px;
+    }
+    
+    .modal-content h2 {
+        font-size: 20px;
+        margin-bottom: 15px;
+        padding-bottom: 12px;
+        padding-right: 45px;
+    }
+    
+    .card {
+        padding: 12px;
+        margin-bottom: 15px;
+        border-radius: 12px;
+    }
+    
+    .card video {
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+    
+    .card p {
+        font-size: 14px;
+        line-height: 1.5;
+    }
+    
+    .card strong {
+        font-size: 16px;
+    }
+    
+    .tab-buttons {
+        gap: 8px;
+        margin-bottom: 15px;
+    }
+    
+    .tab-buttons button {
+        min-width: 120px;
+        font-size: 14px;
+        padding: 10px 12px;
+        border-radius: 8px;
+    }
+    
+    .tab-content pre {
+        padding: 15px;
+        font-size: 12px;
+        line-height: 1.5;
+        border-radius: 10px;
+    }
+}
+
+
+/* Small mobile */
+@media (max-width: 480px) {
+    .modal {
+        padding: 5px 0;
+    }
+    
+    .modal-content {
+        width: 98%;
+        padding: 15px 12px;
+        margin: 3vh auto 2vh;
+        max-height: 90vh;
+        border-radius: 12px;
+    }
+    
+    .close {
+        right: 8px;
+        top: 8px;
+        font-size: 24px;
+        width: 30px;
+        height: 30px;
+    }
+    
+    .modal-content h2 {
+        font-size: 18px;
+        margin-bottom: 12px;
+        padding-bottom: 10px;
+        padding-right: 40px;
+    }
+    
+    .card {
+        padding: 10px;
+        margin-bottom: 12px;
+        border-radius: 10px;
+    }
+    
+    .card p {
+        font-size: 13px;
+    }
+    
+    .card strong {
+        font-size: 15px;
+    }
+    
+    .tab-buttons {
+        flex-direction: column;
+        gap: 6px;
+    }
+    
+    .tab-buttons button {
+        width: 100%;
+        min-width: 100%;
+        font-size: 13px;
+        padding: 10px;
+    }
+    
+    .tab-content pre {
+        padding: 12px;
+        font-size: 11px;
+        line-height: 1.4;
+    }
+}
+
+/* Very small mobile */
+@media (max-width: 360px) {
+    .modal-content {
+        padding: 12px 10px;
+        margin: 2vh auto 1vh;
+    }
+    
+    .modal-content h2 {
+        font-size: 16px;
+    }
+    
+    .card {
+        padding: 8px;
+    }
+    
+    .card p {
+        font-size: 12px;
+    }
+    
+    .tab-buttons button {
+        font-size: 12px;
+        padding: 8px;
+    }
+    
+    .tab-content pre {
+        padding: 10px;
+        font-size: 10px;
+    }
+}
+
+/* Landscape mode fixes */
+@media (max-width: 1024px) and (orientation: landscape) {
+    .modal-content {
+        max-height: 80vh;
+        margin: 5vh auto 3vh;
+    }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .tab-buttons button {
+        min-height: 44px;
+    }
+    
+    .close {
+        min-width: 44px;
+        min-height: 44px;
+    }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    .modal-content {
+        border: 3px solid white;
+    }
+    
+    .card {
+        border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .modal-content,
+    .card,
+    .tab-buttons button,
+    .close {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+/* Print styles */
+@media print {
+    .modal {
+        display: none !important;
+    }
+}
+
+/* Scroll bar stilizatsiyasi */
+.modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.close {
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    font-size: 32px;
+    font-weight: bold;
+    cursor: pointer;
+    color: white;
+    transition: all 0.3s;
+    z-index: 10;
+    line-height: 1;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.close:hover {
+    background: rgba(255, 204, 0, 0.3);
+    color: #ffcc00;
+    transform: rotate(90deg);
+}
+
+.modal-content h2 {
+    font-size: 28px;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+    padding-right: 50px;
+}
+
+.card {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    transition: all 0.3s;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.card:hover {
+    background: rgba(255, 255, 255, 0.18);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.card video {
+    width: 100%;
+    max-width: 70%;
+    height: auto;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    background: #000;
+}
+
+.card p {
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 10px 0 0;
+}
+
+
+.card strong {
+    color: #ffcc00;
+    font-size: 18px;
+}
+
+/* Tab buttons */
+.tab-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.tab-buttons button {
+    flex: 1;
+    min-width: 150px;
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.tab-buttons button:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+}
+
+.tab-buttons button.active {
+    background: rgba(255, 204, 0, 0.4);
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(255, 204, 0, 0.3);
+}
+
+.tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.tab-content pre {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    border-radius: 12px;
+    overflow-x: auto;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #00ff00;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tab-content pre::-webkit-scrollbar {
+    height: 8px;
+}
+
+.tab-content pre::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.tab-content pre::-webkit-scrollbar-thumb {
+    background: rgba(0, 255, 0, 0.3);
+    border-radius: 10px;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Tablet responsive */
+@media (max-width: 1024px) {
+    .modal {
+        padding: 15px 0;
+    }
+    
+    .modal-content {
+        width: 95%;
+        padding: 25px;
+        max-height: 80vh;
+    }
+    
+    .modal-content h2 {
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+    
+    .card {
+        padding: 15px;
+    }
+    
+    .card p {
+        font-size: 15px;
+    }
+    
+    .tab-buttons button {
+        font-size: 15px;
+        padding: 10px 15px;
+    }
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .modal {
+        padding: 10px 0;
+    }
+    
+    .modal-content {
+        width: 96%;
+        padding: 20px 15px;
+        margin: 2vh auto;
+        max-height: 90vh;
+        border-radius: 15px;
+    }
+    
+    .close {
+        right: 10px;
+        top: 10px;
+        font-size: 28px;
+        width: 35px;
+        height: 35px;
+    }
+    
+    .modal-content h2 {
+        font-size: 20px;
+        margin-bottom: 15px;
+        padding-bottom: 12px;
+        padding-right: 45px;
+    }
+    
+    .card {
+        padding: 12px;
+        margin-bottom: 15px;
+        border-radius: 12px;
+    }
+    
+    .card video {
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+    
+    .card p {
+        font-size: 14px;
+        line-height: 1.5;
+    }
+    
+    .card strong {
+        font-size: 16px;
+    }
+    
+    .tab-buttons {
+        gap: 8px;
+        margin-bottom: 15px;
+    }
+    
+    .tab-buttons button {
+        min-width: 120px;
+        font-size: 14px;
+        padding: 10px 12px;
+        border-radius: 8px;
+    }
+    
+    .tab-content pre {
+        padding: 15px;
+        font-size: 12px;
+        line-height: 1.5;
+        border-radius: 10px;
+    }
+}
+
+
+/* Small mobile */
+@media (max-width: 480px) {
+    .modal {
+        padding: 5px 0;
+    }
+    
+    .modal-content {
+        width: 98%;
+        padding: 15px 12px;
+        margin: 1vh auto;
+        max-height: 92vh;
+        border-radius: 12px;
+    }
+    
+    .close {
+        right: 8px;
+        top: 8px;
+        font-size: 24px;
+        width: 30px;
+        height: 30px;
+    }
+    
+    .modal-content h2 {
+        font-size: 18px;
+        margin-bottom: 12px;
+        padding-bottom: 10px;
+        padding-right: 40px;
+    }
+    
+    .card {
+        padding: 10px;
+        margin-bottom: 12px;
+        border-radius: 10px;
+    }
+    
+    .card p {
+        font-size: 13px;
+    }
+    
+    .card strong {
+        font-size: 15px;
+    }
+    
+    .tab-buttons {
+        flex-direction: column;
+        gap: 6px;
+    }
+    
+    .tab-buttons button {
+        width: 100%;
+        min-width: 100%;
+        font-size: 13px;
+        padding: 10px;
+    }
+    
+    .tab-content pre {
+        padding: 12px;
+        font-size: 11px;
+        line-height: 1.4;
+    }
+}
+
+/* Very small mobile */
+@media (max-width: 360px) {
+    .modal-content {
+        padding: 12px 10px;
+    }
+    
+    .modal-content h2 {
+        font-size: 16px;
+    }
+    
+    .card {
+        padding: 8px;
+    }
+    
+    .card p {
+        font-size: 12px;
+    }
+    
+    .tab-buttons button {
+        font-size: 12px;
+        padding: 8px;
+    }
+    
+    .tab-content pre {
+        padding: 10px;
+        font-size: 10px;
+    }
+}
+
+/* Landscape mode fixes */
+@media (max-width: 1024px) and (orientation: landscape) {
+    .modal-content {
+        max-height: 85vh;
+        margin: 2vh auto;
+    }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .tab-buttons button {
+        min-height: 44px;
+    }
+    
+    .close {
+        min-width: 44px;
+        min-height: 44px;
+    }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    .modal-content {
+        border: 3px solid white;
+    }
+    
+    .card {
+        border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .modal-content,
+    .card,
+    .tab-buttons button,
+    .close {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+/* Print styles */
+@media print {
+    .modal {
+        display: none !important;
+    }
+}
+        /* HEADER */
+        .header {
+            display: flex;
+            align-items: center;
+            background: #000075;
+            color: white;
+            padding: 10px 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            width: 100%;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000075;
+            font-size: 20px;
+        }
+
+        /* MAIN LAYOUT */
+        .main-container {
+            display: flex;
+            gap: 20px;
+        }
+
+        /* LEFT PANEL */
+        .left-panel {
+            width: 250px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            height: fit-content;
+            backdrop-filter: blur(10px);
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 15px;
+        }
+
+        .control-group h3 {
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 8px;
+            font-size: 14px;
+            border-radius: 8px;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .btn-success { background: #28a745; color: white; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-primary { background: #000075; color: white; }
+        .btn-info { background: #17a2b8; color: white; }
+
+        /* MAIN CONTENT */
+        .main-content {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+        }
+
+        .title-header {
+            background: linear-gradient(45deg, #000075, #4169e1);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 40px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+
+        /* CIRCUIT CONTAINER */
+        .circuit-container {
+            display: flex;
+       
+            align-items: center;
+            gap: 40px;
+          
+            min-height: 500px;
+        }
+
+        /* POWER BANK MODULE */
+        .powerbank-module {
+            background: linear-gradient(145deg, #f0f8ff, #e6f3ff);
+            border: 4px solid #000075;
+            border-radius: 15px;
+            width: 400px;
+            height: 500px;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .module-label {
+            background: #000075;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .usb-ports {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            margin-bottom: -80px;
+        }
+
+        .usb-port {
+            width: 25px;
+            height: 15px;
+            background: #333;
+            border-radius: 3px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .usb-port.active {
+            background: #00ff00;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.6);
+        }
+
+        .battery-indicator {
+            
+            width: 150px;
+            height: 40px;
+            background: #000;
+            border-radius: 5px;
+            position: relative;
+            margin-top: 60px;
+            overflow: hidden;
+        }
+
+        .battery-level {
+            height: 100%;
+            background: linear-gradient(90deg, #ff4757, #ffa502, #2ed573);
+            width: 0%;
+            transition: all 0.5s ease;
+            border-radius: 5px;
+            
+        }
+
+        .battery-percentage {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .lithium-batteries {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 80px;
+            margin-left: 80px;
+        }
+
+        .battery-cell {
+            width: 60px;
+            height: 80px;
+            background: linear-gradient(145deg, #4169e1, #000075);
+            border-radius: 8px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+            text-align: center;
+            line-height: 1.2;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .battery-cell.charging {
+            animation: batteryPulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes batteryPulse {
+            0%, 100% { 
+                transform: scale(1);
+                box-shadow: 0 0 10px rgba(65, 105, 225, 0.3);
+            }
+            50% { 
+                transform: scale(1.05);
+                box-shadow: 0 0 20px rgba(65, 105, 225, 0.8);
+            }
+        }
+
+        /* PHONE DEVICE */
+        .phone-device {
+            width: 180px;
+            height: 320px;
+            background: linear-gradient(145deg, #2c3e50, #34495e);
+            border-radius: 25px;
+            position: relative;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .phone-screen {
+            flex: 1;
+            background: #000;
+            margin: 15px;
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .phone-content {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .charging-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+            opacity: 0;
+            transition: all 0.5s;
+        }
+
+        .charging-icon.active {
+            opacity: 1;
+            animation: chargeAnimation 2s ease-in-out infinite;
+        }
+
+        @keyframes chargeAnimation {
+            0%, 100% { transform: scale(1); color: #ffff00; }
+            50% { transform: scale(1.2); color: #00ff00; }
+        }
+
+        .phone-battery {
+            width: 60px;
+            height: 30px;
+            border: 2px solid white;
+            border-radius: 5px;
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        .phone-battery::after {
+            content: '';
+            position: absolute;
+            right: -8px;
+            top: 8px;
+            width: 4px;
+            height: 12px;
+            background: white;
+            border-radius: 0 2px 2px 0;
+        }
+
+        .phone-battery-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff4757, #2ed573);
+            width: 20%;
+            transition: all 0.8s ease;
+            border-radius: 3px;
+        }
+
+        .charge-status {
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        /* USB CABLE */
+        .usb-cable {
+            position: relative;
+            width: 450px;
+            height: 4px;
+            background: #333;
+            margin: 0 20px;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .cable-current {
+            position: absolute;
+            width: 20px;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, #00ff00, transparent);
+            left: -20px;
+            animation: none;
+        }
+
+        .cable-current.flowing {
+            animation: currentFlow 1.5s linear infinite;
+        }
+
+        @keyframes currentFlow {
+            0% { left: -20px; }
+            100% { left: 100%; }
+        }
+
+        /* STATUS DISPLAY */
+        .status-display {
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            backdrop-filter: blur(10px);
+        }
+
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+
+        .status-led {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #dc3545;
+            transition: all 0.3s ease;
+        }
+
+        .status-led.on {
+            background: #28a745;
+            box-shadow: 0 0 10px rgba(40, 167, 69, 0.8);
+        }
+
+        /* CONTROL BUTTONS */
+        .control-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .control-btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .control-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .btn-charge {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+        }
+
+        .btn-stop {
+            background: linear-gradient(45deg, #dc3545, #c82333);
+            color: white;
+        }
+
+        .btn-reset {
+            background: linear-gradient(45deg, #000075, #4169e1);
+            color: white;
+        }
+
+        /* NOTIFICATION */
+        .notification {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            z-index: 10000;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success { background: #28a745; }
+        .notification.error { background: #dc3545; }
+        .notification.warning { background: #ffc107; color: #000; }
+        .notification.info { background: #17a2b8; }
+
+        /* RESPONSIVE DESIGN */
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .left-panel {
+                width: 100%;
+            }
+            
+            .circuit-container {
+                flex-direction: column;
+                gap: 30px;
+            }
+            
+            .usb-cable {
+                transform: rotate(90deg);
+                margin: 30px 0;
+            }
+        }
+         @media (max-width: 400px) {
+            .wire{
+                display: none;
+            }
+         }
+        .wire{
+            position: absolute;
+            z-index: 10;
+        }
+        .wire-red{
+            width: 3px;
+            height: 50px;
+            background: red;
+            top: 110px;
+            right: 110px;
+        }
+         .wire-red1{
+            width: 160px;
+            height: 3px;
+            background: red;
+            top: 157px;
+            right: 110px;
+        }
+        .wire-red2{
+            width: 3px;
+            height: 30px;
+            background: red;
+            top: 157px;
+            left: 120px;
+        }
+         .wire-red3{
+            width: 3px;
+            height: 30px;
+            background: red;
+            top: 157px;
+            left: 172px;
+        }
+         .wire-red4{
+            width: 3px;
+            height: 30px;
+            background: red;
+            top: 157px;
+            left: 222px;
+        }
+         .wire-red5{
+            width: 3px;
+            height: 30px;
+            background: red;
+            top: 157px;
+            left: 272px;
+        }
+         .wire-black{
+            width: 3px;
+            height: 35px;
+            background: black;
+            top: 112px;
+            left: 147px;
+        }
+          .wire-black1{
+            width: 100px;
+            height: 3px;
+            background: black;
+            top: 147px;
+            left: 50px;
+        }
+         .wire-black2{
+            width: 3px;
+            height: 255px;
+            background: black;
+            top: 150px;
+            left: 50px;
+        }
+          .wire-black3{
+            width: 228px;
+            height: 3px;
+            background: black;
+            bottom:  85px;
+            left: 50px;
+        }
+         .wire-black4{
+            width: 3px;
+            height: 30px;
+            background: black;
+            bottom: 85px;
+            right: 113px;
+        }
+         .wire-black5{
+            width: 3px;
+            height: 30px;
+            background: black;
+            bottom: 85px;
+            right: 165px;
+        }
+         .wire-black6{
+            width: 3px;
+            height: 30px;
+            background: black;
+            bottom: 85px;
+            right: 217px;
+        }
+       
+        .wire-black8{
+            width: 3px;
+            height: 202px;
+            background: black;
+            bottom: 350px;
+            left: 938px;
+        }
+         .wire-black9{
+            width: 148px;
+            height: 3px;
+            background: black;
+            bottom: 350px;
+            left:938px;
+        }
+        .wire-black10{
+            width: 3px;
+            height: 343px;
+            background: black;
+            top: 10px;
+            left: 490px;
+        }
+             .wire-black11{
+            width: 205px;
+            height: 3px;
+            background: black;
+            top: 10px;
+            left: 285px;
+        }
+              .wire-black12{
+            width: 3px;
+            height: 20px;
+            background: black;
+            top: 10px;
+            left: 285px;
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="logo">
+                  <a href="/"><img src="/static/image/logo.png" width="80px" height="80px" alt=""></a>
+            <span>Power Bank Zaryadka Simulyatori</span>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <div class="main-container">
+        <!-- LEFT PANEL -->
+        <div class="left-panel">
+            <div class="control-group">
+                <h3>Boshqaruv</h3>
+                <button class="btn btn-success" onclick="startCharging()">
+                    🔌 Zaryadlashni Boshlash
+                </button>
+                <button class="btn btn-danger" onclick="stopCharging()">
+                    ⏹️ Zaryadlashni To'xtatish
+                </button>
+                <button class="btn btn-primary" onclick="togglePowerBank()">
+                    ⚡ Power Bank Yoqish/O'chirish
+                </button>
+                <button class="btn btn-info" onclick="runTest()">
+                    🔍 Tizimni Sinash
+                </button>
+            </div>
+        <div class="control-group">
+    <h3>Ma'lumotlar</h3>
+    <button class="btn btn-primary" id="schemaBtn">💡 Sxema qayerda ishlatiladi</button>
+    <button class="btn btn-primary" id="codeBtn">💻 Kod</button>
+    <button class="btn btn-primary" id="componentsBtn">🔌 Qurilmalar</button>
+</div>
+
+            <div class="control-group">
+                <h3>Holat Ko'rsatkichi</h3>
+                <div class="status-row">
+                    <span>Power Bank:</span>
+                    <div class="status-led" id="powerbankLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>USB Ulanish:</span>
+                    <div class="status-led" id="usbLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Zaryadlash:</span>
+                    <div class="status-led" id="chargeLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Telefon:</span>
+                    <div class="status-led" id="phoneLed"></div>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <h3>Texnik Ma'lumotlar</h3>
+                <div class="status-row">
+                    <span>Kuchlanish:</span>
+                    <span id="voltageDisplay">5.0V</span>
+                </div>
+                <div class="status-row">
+                    <span>Tok:</span>
+                    <span id="currentDisplay">0.0A</span>
+                </div>
+                <div class="status-row">
+                    <span>Quvvat:</span>
+                    <span id="powerDisplay">0W</span>
+                </div>
+            </div>
+        </div>
+<!-- ✅ 1) Sxema qayerda ishlatiladi (DC Motor / L298N) -->
+    <div class="modal" id="schemaModal">
+        <div class="modal-content">
+            <span class="close" title="Yopish">&times;</span>
+            <h2>💡 Sxema qayerda ishlatiladi </h2>
+
+            <div class="flex-container-40-60">
+                <div class="flex-video-40">
+                    <!-- 1-video (xohlasangiz almashtiring) -->
+                    <iframe src="https://www.youtube.com/embed/48h0sXGWnAI?si=yfIY9dHEOHEBnrba" title="DC Motor Control with L298N"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen></iframe>
+                </div>
+                <div class="flex-text-60">
+                    <strong>20 ta Inovatsiyalar siz uchun</strong>
+                   <p>Bu quvvat banki o'z-o'zidan uchta ishni qila olishidir. Men PVX quvurini olamiz,  avval uning o'rindig'ini yasaymiz Keyin quvvat bankini yasash uchun kuchli lityum IM batareyalaridan foydalandim, har bir batareya 3,7 volt va 5000 mA/soat quvvatga ega. Quvvat bankini yanada kuchliroq qilish uchun men bu yerda to'rtta lityum batareyadan foydalandim, bu uni 20 000 mA/soat quvvatga ega quvvat bankiga aylantirdi. Keyin men bu batareyani zaryadlash va tushirish uchun bitta mobil zaryadlash yoki quvvat banki modulini o'rnatdim. Shuningdek, menda iPhone uchun simsiz zaryadlash ham bor. Bu shuni anglatadiki, biz telefonimizni simsiz ravishda hech qanday simlarsiz zaryadlashimiz mumkin. Va bu quvvat bankining yana bir afzalligi shundaki, elektr uzilishi holatida men unga favqulodda chiroq o'rnatdim, biz bu chiroqni yoqamiz va ishimizni bajaramiz.</p>
+                </div>
+            </div>
+
+            <div class="flex-container-40-60">
+                <div class="flex-video-40">
+                    <!-- 2-video (ixtiyoriy) -->
+                    <iframe src="https://www.youtube.com/embed/bUVG9XqYVCQ?si=U3bNj5ncJ7gXnMIv" title="PWM Speed Control"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen></iframe>
+                </div>
+                <div class="flex-text-60">
+                    <strong>Quyosh panelik powerbank</strong>
+                    <p>
+                        Ushbu tajribada 4 ta Li-ion 18650 batareyani BMS moduli orqali paralel ulab, USB chiqishidan telefonni zaryadlashni ko‘rsatish maqsad qilingan.
+
+Sxema telefonni xavfsiz zaryadlash uchun avtomatik:
+
+quvvat taqsimoti,
+
+ortiqcha zaryaddan himoya,
+
+ortiqcha tokdan himoya,
+
+zaryad darajasini ko‘rsatish
+
+funksiyalarni bajaruvchi powerbank platasi yordamida ishlaydi.
+                    </p>
+                </div>
+            </div>
+              <div class="flex-container-40-60">
+                <div class="flex-video-40">
+                    <!-- 2-video (ixtiyoriy) -->
+                    <iframe src="https://www.youtube.com/embed/kVpH-pK5V1A?si=6mUO7fAKwmTWtiK1" title="PWM Speed Control"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen></iframe>
+                </div>
+                <div class="flex-text-60">
+                    <strong>Natija</strong>
+               <p>Ushbu sxema yordamida:
+
+4 ta 18650 akkumulyator
+
+BMS powerbank moduli
+
+USB chiqish
+
+yordamida real ishlaydigan kuchli powerbank yig‘iladi.
+
+Quvvat sig‘imi: ~8000–12000 mAh (batareyaga qarab)</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!-- ✅ Powerbank Tajribasi: Ishlatilgan Qurilmalar Modali -->
+<div class="modal" id="componentsModal">
+  <div class="modal-content">
+    <span class="close" title="Yopish">&times;</span>
+    <h2>🔌 Ishlatilgan Qurilmalar</h2>
+
+    <!-- Powerbank PCB Module -->
+    <div class="flex-container-30-70">
+      <div class="flex-image-30">
+       <img src="/static/image/powerbank2-removebg-preview.png" width="110px" height="80px" alt="Powerbank Module">
+      </div>
+      <div class="flex-text-70">
+        <strong>Powerbank Zaryadlash va Himoya Moduli (BMS)</strong>
+        <p>
+          3.7V Li-ion batareyalardan xavfsiz foydalanish uchun mo‘ljallangan modul.
+          U zaryadlashni boshqaradi, ortiqcha tokdan himoya qiladi va USB orqali
+          telefonni zaryadlash uchun 5V kuchlanish hosil qiladi.
+        </p>
+      </div>
+    </div>
+
+    <!-- 18650 Batteries -->
+    <div class="flex-container-30-70">
+      <div class="flex-image-30">
+       <img src="/static/image/litium.png" width="130px" height="100px" alt="18650 Batteries">
+      </div>
+      <div class="flex-text-70">
+        <strong>4 ta 18650 Li-ion Batareya</strong>
+        <p>
+          Quvvat manbai bo‘lib xizmat qiladi. Batareyalar paralel ulangan bo‘lib,
+          umumiy sig‘imni oshiradi va Powerbankning uzoq ishlashini ta'minlaydi.
+        </p>
+      </div>
+    </div>
+
+    <!-- USB Cable -->
+    <div class="flex-container-30-70">
+      <div class="flex-image-30">
+        <img src="tpt.png" width="90px" height="120px" alt="USB Cable">
+      </div>
+      <div class="flex-text-70">
+        <strong>USB Kabel</strong>
+        <p>
+          Powerbank modulidan telefon yoki boshqa qurilmaga quvvat uzatish uchun 
+          ishlatiladi. USB port orqali 5V chiqish beradi.
+        </p>
+      </div>
+    </div>
+
+
+
+  </div>
+</div>
+
+    <!-- ✅ 4) Qo'shimcha info (ixtiyoriy) + suzuvchi tugma -->
+    <div class="modal" id="infoModal">
+        <div class="modal-content">
+            <span class="close" title="Yopish">&times;</span>
+            <h2>📚 Qo'shimcha Ma'lumot</h2>
+            <div class="video-full">
+                <video controls>
+                    <source src="/media/2.mp4" type="video/mp4">
+                    Brauzeringiz video formatni qo'llab-quvvatlamaydi.
+                </video>
+            </div>
+        </div>
+    </div>
+
+    <button id="infoFloatingBtn"><span>📚</span><span>Ma'lumot</span></button>
+
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+           
+            <img src="/static/image/tpp.png" width="30px" height="70px" style="margin-left: 243px;" alt="">
+            <div class="circuit-container">
+                <!-- POWER BANK MODULE -->
+                <div class="powerbank-module" onclick="togglePowerBank()">
+                
+                   <img src="/static/image/powerbank2-removebg-preview.png" style="margin: -100px;" width="350px" height="350px" alt="">
+                    <div class="wire wire-red"></div>
+                    <div class="wire wire-red1"></div>
+                    <div class="wire wire-red2"></div>
+                    <div class="wire wire-red3"></div>
+                    <div class=" wire wire-red4"></div>
+                    <div class=" wire wire-red5"></div>
+                    <div class="wire wire-black"></div>
+                    <div class="wire wire-black1"></div>
+                    <div class="wire wire-black2"></div>
+                    <div class="wire wire-black3"></div>
+                    <div class="wire wire-black4"></div>
+                    <div class="wire wire-black5"></div>
+                    <div class="wire wire-black6"></div>
+                    <div class="wire wire-black7"></div>
+                    <div class="lithium-batteries">
+                       <img src="/static/image/litium.png" width="200px" height="200px" alt="">
+                    </div>
+            
+                      <div class="battery-indicator" >
+                        <div class="battery-level" id="batteryLevel"></div>
+                        <div class="battery-percentage" id="batteryPercentage">85%</div>
+                    </div>
+                </div>
+
+                <!-- USB CABLE -->
+                <div class="usb-cable">
+                    <div class="cable-current" id="cableCurrent"></div>
+                </div>
+                  <div class="wire wire-black8"></div>
+                    <div class="wire wire-black9"></div>
+                    <div class="wire wire-black10"></div>
+                    <div class="wire wire-black11"></div>
+                    <div class="wire wire-black12"></div>
+
+               <img src="/static/image/tpt.png" width="30px "height="50px" style="position: absolute; top: 504px; left: 1072px;" alt="">
+                <!-- PHONE DEVICE -->
+                <div class="phone-device" onclick="connectPhone()">
+                    <div class="phone-screen">
+                        <div class="phone-content">
+                            <div class="charging-icon" id="chargingIcon">⚡</div>
+                            
+                            <div class="phone-battery">
+                                <div class="phone-battery-fill" id="phoneBatteryFill"></div>
+                            </div>
+                            
+                            <div class="charge-status" id="chargeStatus">
+                                Zaryadlanish kutilmoqda...
+                            </div>
+                            
+                            <div style="margin-top: 15px; font-size: 12px;" id="phoneInfo">
+                                📱 Smartphone<br>
+                                🔋 <span id="phoneBatteryText">25%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CONTROL BUTTONS -->
+            <div class="control-buttons">
+                <button class="control-btn btn-charge" onclick="startCharging()">
+                    🔌 Zaryadlashni Boshlash
+                </button>
+                <button class="control-btn btn-stop" onclick="stopCharging()">
+                    ⏹️ To'xtatish
+                </button>
+                <button class="control-btn btn-reset" onclick="resetSimulation()">
+                    🔄 Qayta O'rnatish
+                </button>
+            </div>
+
+            <!-- STATUS DISPLAY -->
+            <div class="status-display">
+                <div class="status-row">
+                    <span>Power Bank Batareya Darajasi:</span>
+                    <span id="powerbankBatteryText">85%</span>
+                </div>
+                <div class="status-row">
+                    <span>Telefon Batareya Darajasi:</span>
+                    <span id="phoneBatteryStatusText">25%</span>
+                </div>
+                <div class="status-row">
+                    <span>Zaryadlash Tezligi:</span>
+                    <span id="chargingSpeed">0%/min</span>
+                </div>
+                <div class="status-row">
+                    <span>Qolgan Vaqt:</span>
+                    <span id="remainingTime">--:--</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // System State Variables
+let powerbankOn = false;
+let usbConnected = false;
+let phoneConnected = false;
+let charging = false;
+let powerbankBattery = 85;
+let phoneBattery = 25;
+let chargingInterval = null;
+let batteryTemperature = 25;
+let isOverheating = false;
+// Modalni ochish
+function openModal(id) {
+    document.getElementById(id).style.display = "block";
+}
+
+// Tugmalarni ulash
+document.getElementById("schemaBtn").addEventListener("click", () => openModal("schemaModal"));
+document.getElementById("codeBtn").addEventListener("click", () => openModal("codeModal"));
+document.getElementById("componentsBtn").addEventListener("click", () => openModal("componentsModal"));
+document.getElementById("infoFloatingBtn").addEventListener("click", () => openModal("infoModal"));
+
+// Yopish tugmalari
+document.querySelectorAll(".close").forEach(btn => {
+    btn.addEventListener("click", function() {
+        this.closest(".modal").style.display = "none";
+    });
+});
+
+// Tab switching (Kod uchun)
+document.querySelectorAll(".tab-btn").forEach(button => {
+    button.addEventListener("click", function() {
+        const tab = this.dataset.tab;
+        document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+        this.classList.add("active");
+        document.querySelectorAll(".tab-content").forEach(content => {
+            content.classList.remove("active");
+            if (content.id === tab) content.classList.add("active");
+        });
+    });
+});
+// DOM Elements
+const elements = {
+    powerbankLed: document.getElementById('powerbankLed'),
+    usbLed: document.getElementById('usbLed'),
+    chargeLed: document.getElementById('chargeLed'),
+    phoneLed: document.getElementById('phoneLed'),
+    batteryLevel: document.getElementById('batteryLevel'),
+    batteryPercentage: document.getElementById('batteryPercentage'),
+    phoneBatteryFill: document.getElementById('phoneBatteryFill'),
+    chargingIcon: document.getElementById('chargingIcon'),
+    chargeStatus: document.getElementById('chargeStatus'),
+    cableCurrent: document.getElementById('cableCurrent'),
+    voltageDisplay: document.getElementById('voltageDisplay'),
+    currentDisplay: document.getElementById('currentDisplay'),
+    powerDisplay: document.getElementById('powerDisplay'),
+    phoneBatteryText: document.getElementById('phoneBatteryText'),
+    powerbankBatteryText: document.getElementById('powerbankBatteryText'),
+    phoneBatteryStatusText: document.getElementById('phoneBatteryStatusText'),
+    chargingSpeed: document.getElementById('chargingSpeed'),
+    remainingTime: document.getElementById('remainingTime')
+};
+
+// Update Status LEDs and Displays
+function updateStatus() {
+    if (elements.powerbankLed) elements.powerbankLed.classList.toggle('on', powerbankOn);
+    if (elements.usbLed) elements.usbLed.classList.toggle('on', usbConnected);
+    if (elements.chargeLed) elements.chargeLed.classList.toggle('on', charging);
+    if (elements.phoneLed) elements.phoneLed.classList.toggle('on', phoneConnected);
+
+    // Update battery displays
+    if (elements.batteryLevel) elements.batteryLevel.style.width = powerbankBattery + '%';
+    if (elements.batteryPercentage) elements.batteryPercentage.textContent = powerbankBattery + '%';
+    if (elements.phoneBatteryFill) elements.phoneBatteryFill.style.width = phoneBattery + '%';
+    if (elements.phoneBatteryText) elements.phoneBatteryText.textContent = phoneBattery + '%';
+    if (elements.powerbankBatteryText) elements.powerbankBatteryText.textContent = powerbankBattery + '%';
+    if (elements.phoneBatteryStatusText) elements.phoneBatteryStatusText.textContent = phoneBattery + '%';
+
+    // Update technical data
+    if (charging) {
+        if (elements.voltageDisplay) elements.voltageDisplay.textContent = '5.0V';
+        if (elements.currentDisplay) elements.currentDisplay.textContent = '2.1A';
+        if (elements.powerDisplay) elements.powerDisplay.textContent = '10.5W';
+        if (elements.chargingSpeed) elements.chargingSpeed.textContent = '1%/min';
+        
+        const remainingTime = Math.ceil((100 - phoneBattery) / 1);
+        if (elements.remainingTime) {
+            elements.remainingTime.textContent = Math.floor(remainingTime / 60) + ':' + 
+                String(remainingTime % 60).padStart(2, '0');
+        }
+    } else {
+        if (elements.currentDisplay) elements.currentDisplay.textContent = '0.0A';
+        if (elements.powerDisplay) elements.powerDisplay.textContent = '0W';
+        if (elements.chargingSpeed) elements.chargingSpeed.textContent = '0%/min';
+        if (elements.remainingTime) elements.remainingTime.textContent = '--:--';
+    }
+
+    updateBatteryColors();
+}
+
+// Battery level color update based on percentage
+function updateBatteryColors() {
+    const powerbankLevel = elements.batteryLevel;
+    const phoneLevel = elements.phoneBatteryFill;
+    
+    if (powerbankLevel) {
+        if (powerbankBattery > 50) {
+            powerbankLevel.style.background = 'linear-gradient(90deg, #2ed573, #2ed573)';
+        } else if (powerbankBattery > 20) {
+            powerbankLevel.style.background = 'linear-gradient(90deg, #ffa502, #ffa502)';
+        } else {
+            powerbankLevel.style.background = 'linear-gradient(90deg, #ff4757, #ff4757)';
+        }
+    }
+    
+    if (phoneLevel) {
+        if (phoneBattery > 50) {
+            phoneLevel.style.background = 'linear-gradient(90deg, #2ed573, #2ed573)';
+        } else if (phoneBattery > 20) {
+            phoneLevel.style.background = 'linear-gradient(90deg, #ffa502, #ffa502)';
+        } else {
+            phoneLevel.style.background = 'linear-gradient(90deg, #ff4757, #ff4757)';
+        }
+    }
+}
+
+// Toggle Power Bank
+function togglePowerBank() {
+    powerbankOn = !powerbankOn;
+    
+    if (powerbankOn) {
+        showNotification('Power Bank yoqildi!', 'success');
+        document.querySelectorAll('.battery-cell').forEach(cell => {
+            cell.style.background = 'linear-gradient(145deg, #4169e1, #000075)';
+        });
+        // USB portlarni ham faollashtirish
+        connectUSB();
+    } else {
+        showNotification('Power Bank o\'chirildi!', 'error');
+        stopCharging();
+        usbConnected = false;
+        phoneConnected = false;
+        document.querySelectorAll('.battery-cell').forEach(cell => {
+            cell.style.background = 'linear-gradient(145deg, #666, #444)';
+        });
+        document.querySelectorAll('.usb-port').forEach(port => {
+            port.classList.remove('active');
+        });
+    }
+    
+    updateStatus();
+}
+
+// Connect USB - to'g'irlandi
+function connectUSB() {
+    if (!powerbankOn) {
+        showNotification('Avval Power Bank\'ni yoqing!', 'warning');
+        return;
+    }
+
+    usbConnected = true;
+    
+    // USB portlarni faollashtirish
+    document.querySelectorAll('.usb-port').forEach(port => {
+        port.classList.add('active');
+    });
+    
+    showNotification('USB ulandi!', 'success');
+    
+    // Avtomatik telefon ulanishi
+    setTimeout(() => {
+        connectPhone();
+    }, 500);
+    
+    updateStatus();
+}
+
+// Connect Phone - to'g'irlandi
+function connectPhone() {
+    if (!usbConnected) {
+        showNotification('Avval USB kabelni ulang!', 'warning');
+        return;
+    }
+
+    phoneConnected = true;
+    
+    showNotification('Telefon ulandi!', 'success');
+    if (elements.chargeStatus) elements.chargeStatus.textContent = 'Telefon ulandi - Zaryadlash tayyor';
+    
+    updateStatus();
+}
+
+// Start Charging - to'g'irlandi
+function startCharging() {
+    if (!powerbankOn) {
+        showNotification('Power Bank yoqilmagan!', 'error');
+        return;
+    }
+    
+    if (!usbConnected) {
+        showNotification('USB kabel ulanmagan!', 'error');
+        return;
+    }
+    
+    if (!phoneConnected) {
+        showNotification('Telefon ulanmagan!', 'error');
+        return;
+    }
+
+    if (phoneBattery >= 100) {
+        showNotification('Telefon batareyasi to\'la zaryadlangan!', 'info');
+        return;
+    }
+
+    if (powerbankBattery <= 10) {
+        showNotification('Power Bank batareyasi kam!', 'error');
+        return;
+    }
+
+    charging = true;
+    if (elements.chargingIcon) elements.chargingIcon.classList.add('active');
+    if (elements.cableCurrent) elements.cableCurrent.classList.add('flowing');
+    if (elements.chargeStatus) elements.chargeStatus.textContent = 'Zaryadlanmoqda...';
+    
+    // Batareya hujayralarini jonlantirish
+    document.querySelectorAll('.battery-cell').forEach(cell => {
+        cell.classList.add('charging');
+    });
+
+    showNotification('Zaryadlash boshlandi!', 'success');
+
+    // Start charging animation with proper interval
+    if (chargingInterval) {
+        clearInterval(chargingInterval);
+    }
+    
+    chargingInterval = setInterval(() => {
+        if (charging && phoneBattery < 100 && powerbankBattery > 10) {
+            // Telefon batareyasini oshirish
+            phoneBattery += 1;
+            // Power bank batareyasini kamaytirish
+            powerbankBattery -= 0.3;
+            
+            // Chegaralarni tekshirish
+            if (powerbankBattery < 0) powerbankBattery = 0;
+            if (phoneBattery > 100) phoneBattery = 100;
+            
+            // Displaylarni yangilash
+            updateStatus();
+            
+            // Zaryadlash tugaganda
+            if (phoneBattery >= 100) {
+                showNotification('Telefon to\'la zaryadlandi!', 'success');
+                stopCharging();
+            } else if (powerbankBattery <= 10) {
+                showNotification('Power Bank batareyasi tugadi!', 'error');
+                stopCharging();
+            }
+        } else {
+            stopCharging();
+        }
+    }, 1000); // 1 soniyada 1% zaryadlash
+
+    updateStatus();
+}
+
+// Stop Charging
+function stopCharging() {
+    charging = false;
+    if (elements.chargingIcon) elements.chargingIcon.classList.remove('active');
+    if (elements.cableCurrent) elements.cableCurrent.classList.remove('flowing');
+    if (elements.chargeStatus) elements.chargeStatus.textContent = 'Zaryadlash to\'xtatildi';
+    
+    document.querySelectorAll('.battery-cell').forEach(cell => {
+        cell.classList.remove('charging');
+    });
+
+    if (chargingInterval) {
+        clearInterval(chargingInterval);
+        chargingInterval = null;
+    }
+
+    updateStatus();
+}
+
+// Run Test
+function runTest() {
+    showNotification('Test boshlandi...', 'info');
+    
+    // Reset everything first
+    resetSimulation();
+    
+    setTimeout(() => {
+        if (!powerbankOn) togglePowerBank();
+        
+        setTimeout(() => {
+            showNotification('Test muvaffaqiyatli yakunlandi!', 'success');
+        }, 2000);
+    }, 1000);
+}
+
+// Reset Simulation - to'g'irlandi
+function resetSimulation() {
+    // Stop charging first
+    stopCharging();
+    
+    // Reset all states
+    powerbankOn = false;
+    usbConnected = false;
+    phoneConnected = false;
+    powerbankBattery = 85;
+    phoneBattery = 25;
+    batteryTemperature = 25;
+    isOverheating = false;
+
+    // Clear intervals
+    if (chargingInterval) {
+        clearInterval(chargingInterval);
+        chargingInterval = null;
+    }
+
+    // Reset UI elements
+    document.querySelectorAll('.usb-port').forEach(port => {
+        port.classList.remove('active');
+    });
+
+    document.querySelectorAll('.battery-cell').forEach(cell => {
+        cell.classList.remove('charging');
+        cell.style.background = 'linear-gradient(145deg, #666, #444)';
+    });
+
+    // Reset status text
+    if (elements.chargeStatus) elements.chargeStatus.textContent = 'Zaryadlanish kutilmoqda...';
+
+    // Update all displays
+    updateStatus();
+    
+    showNotification('Simulyatsiya qayta o\'rnatildi!', 'info');
+}
+
+// Show Notification
+function showNotification(message, type) {
+    // Remove existing notifications
+    document.querySelectorAll('.notification').forEach(notif => {
+        notif.remove();
+    });
+
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.textContent = message;
+    
+    document.body.appendChild(notification);
+    
+    // Show notification with animation
+    setTimeout(() => {
+        notification.classList.add('show');
+    }, 100);
+    
+    // Hide and remove notification after 3 seconds
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => {
+            if (notification.parentNode) {
+                document.body.removeChild(notification);
+            }
+        }, 300);
+    }, 3000);
+}
+
+// Temperature simulation
+function updateBatteryTemperature() {
+    if (charging) {
+        batteryTemperature += 0.1;
+        if (batteryTemperature > 45) {
+            isOverheating = true;
+            if (Math.random() < 0.1) { // 10% chance to show warning
+                showNotification('⚠️ Power Bank qizib ketdi!', 'warning');
+            }
+        }
+    } else {
+        batteryTemperature = Math.max(25, batteryTemperature - 0.05);
+        isOverheating = false;
+    }
+    
+    // Update temperature display if exists
+    const tempDisplay = document.getElementById('temperatureDisplay');
+    if (tempDisplay) {
+        tempDisplay.textContent = batteryTemperature.toFixed(1) + '°C';
+        tempDisplay.style.color = isOverheating ? '#dc3545' : '#28a745';
+    }
+}
+
+// Initialize the simulation on page load
+window.addEventListener('load', () => {
+    updateStatus();
+    showNotification('Power Bank Simulyatori tayyor!', 'info');
+    
+    // Add temperature monitoring
+    setInterval(updateBatteryTemperature, 1000);
+    
+    // Add temperature display to technical data if not exists
+    const techGroup = document.querySelector('.control-group:last-child');
+    if (techGroup && !document.getElementById('temperatureDisplay')) {
+        techGroup.insertAdjacentHTML('beforeend', `
+            <div class="status-row">
+                <span>Harorat:</span>
+                <span id="temperatureDisplay">25.0°C</span>
+            </div>
+        `);
+    }
+});
+
+// Keyboard shortcuts
+document.addEventListener('keydown', (event) => {
+    switch(event.key) {
+        case '1':
+            togglePowerBank();
+            break;
+        case '2':
+            if (powerbankOn) connectUSB();
+            break;
+        case '3':
+            if (usbConnected) connectPhone();
+            break;
+        case ' ':
+            event.preventDefault();
+            if (powerbankOn && usbConnected && phoneConnected) {
+                if (charging) {
+                    stopCharging();
+                } else {
+                    startCharging();
+                }
+            }
+            break;
+        case 'r':
+        case 'R':
+            resetSimulation();
+            break;
+        case 't':
+        case 'T':
+            runTest();
+            break;
+    }
+});
+
+// Error handling
+window.addEventListener('error', (event) => {
+    console.error('Simulyatorda xatolik:', event.error);
+    showNotification('Texnik xatolik yuz berdi. Sahifani yangilang.', 'error');
+});
+
+// Cleanup on page unload
+window.addEventListener('beforeunload', () => {
+    if (chargingInterval) {
+        clearInterval(chargingInterval);
+    }
+});
+
+// Console welcome message
+console.log(`
+⚡ Power Bank Zaryadka Simulyatori ⚡
+
+Klaviatura yorliqlari:
+1 - Power Bank yoqish/o'chirish
+2 - USB ulash  
+3 - Telefon ulash
+Space - Zaryadlash boshlash/to'xtatish
+R - Reset
+T - Test
+`);
+
+// Statistics (simplified version for artifacts environment)
+let statistics = {
+    totalChargingSessions: 0,
+    totalChargeTime: 0,
+    totalEnergyTransferred: 0
+};
+
+// Track charging sessions
+const originalStartCharging = startCharging;
+startCharging = function() {
+    statistics.totalChargingSessions++;
+    originalStartCharging();
+};
+
+// Settings modal functions
+function showSettings() {
+    const settingsModal = document.createElement('div');
+    settingsModal.innerHTML = `
+        <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 20000; display: flex; align-items: center; justify-content: center;">
+            <div style="background: white; padding: 30px; border-radius: 15px; max-width: 500px;">
+                <h2 style="color: #000075; margin-bottom: 20px;">⚙️ Sozlamalar</h2>
+                <div style="margin: 20px 0;">
+                    <label style="display: block; margin-bottom: 10px;"><strong>Power Bank Sig'imi:</strong></label>
+                    <select id="powerbankCapacitySetting" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px;">
+                        <option value="85">Standard (85%)</option>
+                        <option value="100">To'la (100%)</option>
+                        <option value="50">Yarmi (50%)</option>
+                        <option value="25">Kam (25%)</option>
+                    </select>
+                </div>
+                <div style="margin: 20px 0;">
+                    <label style="display: block; margin-bottom: 10px;"><strong>Telefon Batareya Darajasi:</strong></label>
+                    <select id="phoneBatterySetting" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px;">
+                        <option value="25">Kam (25%)</option>
+                        <option value="10">Juda Kam (10%)</option>
+                        <option value="50">O'rtacha (50%)</option>
+                        <option value="75">Yuqori (75%)</option>
+                    </select>
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button onclick="applySettings(); this.parentElement.parentElement.parentElement.remove();" style="background: #28a745; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer;">✅ Qo'llash</button>
+                    <button onclick="this.parentElement.parentElement.parentElement.remove()" style="background: #6c757d; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer;">Bekor qilish</button>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(settingsModal);
+}
+
+function applySettings() {
+    const powerbankCapacity = document.getElementById('powerbankCapacitySetting').value;
+    const phoneBatteryLevel = document.getElementById('phoneBatterySetting').value;
+    
+    powerbankBattery = parseInt(powerbankCapacity);
+    phoneBattery = parseInt(phoneBatteryLevel);
+    
+    updateStatus();
+    showNotification('Sozlamalar qo\'llandi!', 'success');
+}
+
+// Help modal
+function showHelp() {
+    const helpModal = document.createElement('div');
+    helpModal.innerHTML = `
+        <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 20000; display: flex; align-items: center; justify-content: center;">
+            <div style="background: white; padding: 30px; border-radius: 15px; max-width: 500px; max-height: 80%; overflow-y: auto;">
+                <h2 style="color: #000075; margin-bottom: 20px;">Yordam - Power Bank Simulyatori</h2>
+                
+                <h3 style="color: #333; margin-top: 20px;">Qadamlar:</h3>
+                <ol style="margin: 10px 0; padding-left: 20px;">
+                    <li>Power Bank'ni yoqing (1 tugmasi)</li>
+                    <li>USB avtomatik ulanadi</li>
+                    <li>Telefon avtomatik ulanadi</li>
+                    <li>Zaryadlashni boshlang (Space yoki tugma)</li>
+                </ol>
+                
+                <h3 style="color: #333; margin-top: 20px;">Klaviatura Yorliqlari:</h3>
+                <ul style="margin: 10px 0; padding-left: 20px;">
+                    <li><strong>1</strong> - Power Bank yoqish/o'chirish</li>
+                    <li><strong>Space</strong> - Zaryadlashni boshlash/to'xtatish</li>
+                    <li><strong>R</strong> - Reset qilish</li>
+                    <li><strong>T</strong> - Test rejimi</li>
+                </ul>
+                
+                <button onclick="this.parentElement.parentElement.remove()" style="background: #000075; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-top: 20px; float: right;">Yopish</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(helpModal);
+}
+    
+    </script>
+</body>
+</html>

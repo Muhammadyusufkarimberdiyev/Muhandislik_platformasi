@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arduino LED Button Boshqaruvi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #e6f3ff;
+            min-height: 100vh;
+            padding: 1.5vw;
+            overflow-x: hidden;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            background: #000075;
+            color: white;
+            padding: 0.8vw 2vw;
+            box-shadow: 0 0.3vw 1vw rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.8vw;
+            font-size: clamp(14px, 1.5vw, 18px);
+            font-weight: bold;
+        }
+
+        .logo img {
+            border-radius: 50%;
+            border: 0.15vw solid white;
+            width: clamp(35px, 4vw, 50px);
+            height: clamp(35px, 4vw, 50px);
+        }
+
+        .main-container {
+            display: flex;
+            margin-top: 2vh;
+            gap: 2vw;
+        }
+
+        .left-panel {
+            width: clamp(200px, 18vw, 250px);
+            background: white;
+            padding: 1.2vw;
+            border-radius: 0.6vw;
+            box-shadow: 0 0.3vw 0.6vw rgba(0,0,0,0.1);
+            height: fit-content;
+        }
+
+        .control-group {
+            margin-bottom: 1.5vw;
+            border-bottom: 0.1vw solid #ddd;
+            padding-bottom: 1.2vw;
+        }
+
+        .control-group h3 {
+            margin-bottom: 0.8vw;
+            color: #333;
+            font-size: clamp(13px, 1.3vw, 16px);
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 0.8vw;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 0.6vw;
+            font-size: clamp(11px, 1.1vw, 14px);
+            border-radius: 0.4vw;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .btn:hover {
+            transform: translateY(-0.15vw);
+            box-shadow: 0 0.3vw 0.6vw rgba(0,0,0,0.1);
+        }
+
+        .btn-success { background: #28a745; color: white; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-primary { background: #000075; color: white; }
+        .btn-info { background: #000075; color: white; }
+
+        .main-content {
+            flex: 1;
+            padding: 1.5vw;
+            background: white;
+            border-radius: 0.6vw;
+            box-shadow: 0 0.3vw 0.9vw rgba(0,0,0,0.1);
+        }
+
+        .title-header {
+            background: #000075;
+            color: white;
+            padding: 1vw 2vw;
+            border-radius: 1.5vw;
+            font-size: clamp(14px, 1.5vw, 18px);
+            font-weight: bold;
+            margin-bottom: 2vw;
+            text-align: center;
+            box-shadow: 0 0.3vw 1.2vw rgba(0,0,0,0.2);
+        }
+
+        .arduino-container {
+            position: relative;
+            width: 100%;
+            height: 0;
+            padding-bottom: 50%;
+            margin-top: 2vw;
+        }
+
+        .circuit-wrapper {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .breadboard {
+            position: absolute;
+            left: 8%;
+            top: 5%;
+            width: 35%;
+        }
+        
+        .breadboard img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .arduino-uno {
+            position: absolute;
+            left: 3.5%;
+            top: 40%;
+            width: 35%;
+        }
+
+        .arduino-uno img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .led {
+            width: 2%;
+            aspect-ratio: 0.65/1;
+            border-radius: 50% 50% 0 0;
+            position: absolute;
+            top: 30%;
+            left: 16%;
+            background: #ff0000;
+            border: 0.2vw solid #333;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            z-index: 20;
+        }
+
+        .led.on {
+            background: #ff4444;
+            box-shadow: 0 0 1.5vw #ff0000, 0 0 3vw #ff0000;
+            animation: ledGlow 1s ease-in-out infinite alternate;
+        }
+
+        @keyframes ledGlow {
+            from { box-shadow: 0 0 1.5vw #ff0000, 0 0 3vw #ff0000; }
+            to { box-shadow: 0 0 2vw #ff0000, 0 0 4vw #ff0000; }
+        }
+
+        .button-component {
+            width: 3%;
+            aspect-ratio: 1;
+            background: grey;
+            border: 0.2vw solid black;
+            border-radius: 0.4vw;
+            position: absolute;
+            top: 30%;
+            left: 28%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+        }
+
+        .button-component:hover {
+            background: #555;
+        }
+
+        .button-component.pressed {
+            background: #777;
+            transform: translateY(0.2vw);
+            box-shadow: inset 0 0.2vw 0.4vw rgba(0,0,0,0.3);
+        }
+
+        .button-top {
+            width: 50%;
+            height: 50%;
+            background: black;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .button-component.pressed .button-top {
+            background: #aaa;
+            transform: translateY(0.1vw);
+        }
+
+        .resistor {
+            position: absolute;
+            top: 33.5%;
+            left: 17.5%;
+            width: 5%;
+            z-index: 15;
+        }
+
+        .resistor img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .wire {
+            position: absolute;
+            border-radius: 0.1vw;
+            z-index: 10;
+        }
+
+        .wire1 {
+           display: none;
+        }
+
+        .wire2 {
+            width: 0.3%;
+            height: 19%;
+            top: 37%;
+            left: 22%;
+            background: #ff0000;
+        }
+
+        .wire3 {
+            width: 0.3%;
+            height: 11%;
+            top: 46%;
+            left: 18.5%;
+            background: #000000;
+            transform: rotate(-6deg);
+        }
+
+        .wire4 {
+            width: 0.3%;
+            height: 20%;
+            top: 36%;
+            left: 30.5%;
+            background: yellow;
+            transform: rotate(-3deg);
+        }
+
+        .wire5 {
+            width: 0.3%;
+            height: 11%;
+            top: 36%;
+            left: 16%;
+            background: black;
+            transform: rotate(5deg);
+        }
+
+        .wire6 {
+            width: 0.3%;
+            height: 11%;
+            top: 36%;
+            left: 28%;
+            background: #000000;
+            transform: rotate(7deg);
+        }
+
+        .status-display {
+            position: fixed;
+            top: clamp(70px, 8vh, 90px);
+            right: 1.5vw;
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 1.2vw;
+            border-radius: 0.9vw;
+            min-width: clamp(180px, 16vw, 220px);
+            backdrop-filter: blur(0.4vw);
+            box-shadow: 0 0.3vw 1.5vw rgba(0,0,0,0.3);
+            z-index: 100;
+        }
+
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 0.6vw 0;
+            font-size: clamp(11px, 1.1vw, 13px);
+        }
+
+        .status-led {
+            width: clamp(10px, 1vw, 13px);
+            height: clamp(10px, 1vw, 13px);
+            border-radius: 50%;
+            background: #dc3545;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 0 0.4vw rgba(0,0,0,0.5);
+        }
+
+        .status-led.on {
+            background: #28a745;
+            box-shadow: 0 0 0.8vw rgba(40, 167, 69, 0.8);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            backdrop-filter: blur(0.3vw);
+        }
+
+        .modal-content {
+            background: #000075;
+            color: white;
+            margin: 5% auto;
+            padding: 2vw;
+            width: 60%;
+            max-width: 700px;
+            border-radius: 1.2vw;
+            box-shadow: 0 0.8vw 2vw rgba(0,0,0,0.4);
+            animation: slideDown 0.4s ease;
+            position: relative;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+  /* Left panel */
+  .left-panel{width:280px;max-width:95%;background:#fff;border-radius:14px;padding:16px;box-shadow:0 6px 16px rgba(0,0,0,.08)}
+  .left-panel h3{margin:0 0 12px;font-size:16px;color:#333}
+  /* Buttons */
+  .btn{display:block;width:100%;padding:10px 12px;margin:8px 0;border:0;border-radius:10px;cursor:pointer;transition:.25s;text-align:left;font-weight:600}
+  .btn-primary{background:#000075;color:#fff}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 14px rgba(0,0,0,.1)}
+  /* Flex blocks */
+  .flex-container-40-60{display:flex;gap:20px;align-items:flex-start;background:rgba(255,255,255,.1);padding:20px;border-radius:15px;margin-bottom:20px}
+  .flex-video-40{flex:0 0 40%}
+  .flex-video-40 iframe{width:100%;height:250px;border-radius:10px}
+  .flex-text-60{flex:0 0 60%}
+  .flex-text-60 p{font-size:16px;line-height:1.8}
+  .flex-container-30-70{display:flex;gap:20px;align-items:flex-start;background:rgba(255,255,255,.1);padding:20px;border-radius:15px;margin-bottom:20px}
+  .flex-image-30{flex:0 0 30%}
+  .flex-image-30 img{width:100%;border-radius:10px}
+  .flex-text-70{flex:0 0 70%}
+  .flex-text-70 strong{color:#ffcc00;font-size:18px;display:block;margin-bottom:10px}
+  /* Modal */
+  .modal{display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.8);backdrop-filter:blur(5px);overflow-y:auto}
+  .modal-content{background:#000075;color:#fff;margin:5vh auto;padding:30px;width:90%;max-width:1000px;border-radius:20px;box-shadow:0 15px 40px rgba(0,0,0,.5);position:relative;animation:slideDown .4s ease}
+  @keyframes slideDown{from{transform:translateY(-50px);opacity:0}to{transform:translateY(0);opacity:1}}
+  .close{position:absolute;right:20px;top:15px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:bold;cursor:pointer;color:#fff;transition:.3s;border-radius:50%;background:rgba(255,255,255,.1)}
+  .close:hover{background:rgba(255,204,0,.3);color:#ffcc00;transform:rotate(90deg)}
+  .modal-content h2{font-size:28px;margin-bottom:25px;padding-bottom:15px;border-bottom:2px solid rgba(255,255,255,.3);padding-right:50px}
+  /* Tabs */
+  .tab-buttons{display:flex;gap:8px;margin:12px 0 16px}
+  .tab-btn{flex:1;background:rgba(255,255,255,.12);color:#fff;border:0;border-radius:10px 10px 0 0;padding:10px;cursor:pointer;font-weight:600;transition:.2s}
+  .tab-btn:hover{background:rgba(255,255,255,.2)}
+  .tab-btn.active{background:rgba(255,255,255,.28)}
+  .tab-content{display:none}
+  .tab-content.active{display:block}
+  pre{background:rgba(0,0,0,.35);padding:12px;border-radius:10px;overflow:auto;white-space:pre-wrap;word-break:break-word;color:#fff;font-size:13.5px;line-height:1.55}
+  /* Floating info */
+  #infoFloatingBtn{position:fixed;bottom:30px;right:30px;width:120px;height:120px;border-radius:50%;background:linear-gradient(135deg,#000075,#0000ff);color:#fff;border:4px solid #fff;cursor:pointer;font-size:16px;font-weight:bold;box-shadow:0 8px 20px rgba(0,0,0,.4);z-index:1500;transition:.3s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px}
+  #infoFloatingBtn:hover{transform:scale(1.1);box-shadow:0 12px 30px rgba(0,0,255,.6)}
+  #infoFloatingBtn span:first-child{font-size:36px}
+  .video-full{width:100%;border-radius:15px;background:#000}
+  .video-full video{width:100%;height:auto;border-radius:15px;max-height:70vh}
+  @media (max-width:1024px){.flex-container-40-60,.flex-container-30-70{flex-direction:column}.flex-video-40,.flex-text-60,.flex-image-30,.flex-text-70{flex:0 0 100%}}
+  @media (max-width:768px){.modal-content{width:96%;padding:20px 15px}#infoFloatingBtn{width:90px;height:90px;font-size:14px;bottom:20px;right:20px}#infoFloatingBtn span:first-child{font-size:28px}}
+
+        .close {
+            position: absolute;
+            right: 1.5vw;
+            top: 1vw;
+            font-size: clamp(20px, 2vw, 24px);
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+            transition: color 0.3s;
+        }
+
+        .close:hover {
+            color: #ffcc00;
+        }
+
+        .modal-content h2 {
+            font-size: clamp(18px, 1.8vw, 22px);
+            margin-bottom: 1.2vw;
+            border-bottom: 0.15vw solid rgba(255,255,255,0.2);
+            padding-bottom: 0.6vw;
+        }
+
+        .modal-content h3 {
+            font-size: clamp(15px, 1.5vw, 18px);
+            margin-top: 1vw;
+        }
+
+        .modal-content p, .modal-content ul {
+            font-size: clamp(12px, 1.2vw, 14px);
+            line-height: 1.6;
+        }
+
+        .tab-buttons {
+            display: flex;
+            margin-bottom: 0.8vw;
+        }
+
+        .tab-buttons button {
+            flex: 1;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            padding: 0.8vw;
+            border: none;
+            cursor: pointer;
+            font-size: clamp(12px, 1.2vw, 14px);
+            border-radius: 0.4vw 0.4vw 0 0;
+            transition: background 0.3s;
+        }
+
+        .tab-buttons button.active {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        pre {
+            background: rgba(0,0,0,0.4);
+            padding: 1vw;
+            border-radius: 0.6vw;
+            overflow-x: auto;
+            font-size: clamp(10px, 0.9vw, 12px);
+            white-space: pre-wrap;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @media (max-width: 1200px) {
+            .arduino-container { padding-bottom: 55%; }
+        }
+
+        @media (max-width: 1024px) {
+            .main-container { flex-direction: column; }
+            .left-panel { width: 100%; }
+            .arduino-container { padding-bottom: 65%; }
+            .status-display {
+                position: relative;
+                margin: 2vw auto;
+                width: fit-content;
+                top: 0;
+                right: 0;
+            }
+            .modal-content { width: 80%; }
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 3vw; }
+            .arduino-container { padding-bottom: 80%; }
+            .modal-content { width: 90%; margin: 10% auto; }
+        }
+
+        @media (max-width: 480px) {
+            .arduino-container { padding-bottom: 100%; }
+            .breadboard {
+            position: absolute;
+            left: 8%;
+            top: 20.5%;
+            width: 35%;
+        }
+          .led {
+            width: 2%;
+            aspect-ratio: 0.65/1;
+            border-radius: 50% 50% 0 0;
+            position: absolute;
+            top: 31.5%;
+            left: 16%;
+            background: #ff0000;
+            border: 0.2vw solid #333;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            z-index: 20;
+        }
+         .resistor {
+            position: absolute;
+            top: 32.5%;
+            left: 17.5%;
+            width: 5%;
+            z-index: 15;
+        }
+ .button-component {
+            width: 3%;
+            aspect-ratio: 1;
+            background: grey;
+            border: 0.2vw solid black;
+            border-radius: 0.4vw;
+            position: absolute;
+            top: 33%;
+            left: 28%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+        }
+        .wire3{
+            top: 47%;
+            height: 4px;
+            left: 19%;
+        }
+        .wire4{
+            height: 41px;
+        }
+         .wire2{
+            top: 34.5%;
+            height: 46px;
+        }
+        }
+       
+    
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+                <a href="/"><img src="/static/image/logo.png" width="80px" height="80px" alt=""></a>
+          
+            <span>Arduino LED Button Boshqaruvi</span>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <div class="left-panel">
+            <div class="control-group">
+                <h3>Boshqaruv</h3>
+                <button class="btn btn-success" onclick="startSimulation()">Start</button>
+                <button class="btn btn-danger" onclick="stopSimulation()">Stop</button>
+                <button class="btn btn-primary" onclick="togglePower()">Quvvat</button>
+                <button class="btn btn-info" onclick="runTest()">Test</button>
+            </div>
+<aside class="left-panel">
+  <h3>Ma'lumotlar</h3>
+  <button class="btn btn-primary" id="schemaBtn">💡 Sxema qayerda ishlatiladi</button>
+  <button class="btn btn-primary" id="codeBtn">💻 Kod</button>
+  <button class="btn btn-primary" id="componentsBtn">🔌 Qurilmalar</button>
+</aside>
+
+
+            <div class="control-group">
+                <h3>Qurilma holati</h3>
+                <div class="status-row">
+                    <span>Arduino:</span>
+                    <div class="status-led" id="arduinoLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Button:</span>
+                    <div class="status-led" id="buttonLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>LED:</span>
+                    <div class="status-led" id="ledStatusLed"></div>
+                </div>
+            </div>
+        </div>
+<div class="modal" id="schemaModal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>💡 Sxema qayerda ishlatiladi (LED)</h2>
+    
+    <div class="flex-container-40-60">
+         <div class="flex-video-40">
+                <iframe 
+                    src="https://www.youtube.com/embed/VdB4GWeVkvY?si=hYjMgcLpT605prLt" 
+                    title="YouTube video player" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+      <div class="flex-text-60" style="flex:1 1 auto">
+        <strong>LED Blink/Fade qo‘llanilishlari</strong>
+        <p>Holat indikatori (quvvat bor/yo‘q), ishga tushirish jarayonlari, foydalanuvchi ogohlantirishlari, ritmik vizual effektlar.</p>
+        <p>Fade — PWM yordamida yorqinlikni boshqarish (progress, nafas oluvchi LED animatsiyasi va h.k.).</p>
+      </div>
+    </div>
+
+     <div class="flex-container-40-60">
+         <div class="flex-video-40">
+                <iframe 
+                    src="https://www.youtube.com/embed/ZoaUlquC6x8?si=uurgh-kJfNFz49IL" 
+                    title="YouTube video player" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+      <div class="flex-text-60" style="flex:1 1 auto">
+        <strong>LED Blink/Fade qo‘llanilishlari</strong>
+        <p>Holat indikatori (quvvat bor/yo‘q), ishga tushirish jarayonlari, foydalanuvchi ogohlantirishlari, ritmik vizual effektlar.</p>
+        <p>Fade — PWM yordamida yorqinlikni boshqarish (progress, nafas oluvchi LED animatsiyasi va h.k.).</p>
+      </div>
+    </div>
+      <div class="flex-container-40-60">
+         <div class="flex-video-40">
+                <iframe 
+                    src="https://www.youtube.com/embed/5hYFX2mDNAY?si=UMEcqvhZZNVDpPSF" 
+                    title="YouTube video player" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+      <div class="flex-text-60" style="flex:1 1 auto">
+        <strong>Top Arduino Loyihalari</strong>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Kod (mBlock ↔ Arduino) -->
+<div class="modal" id="codeModal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>💻 Kod</h2>
+
+    <div class="tab-buttons">
+      <button class="tab-btn active" data-tab="mblock">mBlock Kodi</button>
+      <button class="tab-btn" data-tab="arduino">Arduino Kodi</button>
+    </div>
+
+    <div class="tab-content active" id="mblock">
+      <!-- mBlock blok kodi rasmi qo'ying: led_mblock.png -->
+      <pre><img src="/static/image/led pushbutton2.png" alt="mBlock – LED Blink/Fade" style="width:80%;height:auto"></pre>
+    </div>
+
+    <div class="tab-content" id="arduino">
+      <pre>
+// LED Blink va Fade (Arduino)
+// Ulanish: LED (+) -> D9 (PWM), LED (-) -> 220Ω -> GND
+const int LED = 9;
+
+void setup(){
+  pinMode(LED, OUTPUT);
+}
+
+void loop(){
+  // 1) Blink
+  digitalWrite(LED, HIGH);
+  delay(500);
+  digitalWrite(LED, LOW);
+  delay(500);
+
+  // 2) Fade (0..255..0)
+  for (int b=0; b<=255; b+=5){ analogWrite(LED, b); delay(15); }
+  for (int b=255; b>=0; b-=5){ analogWrite(LED, b); delay(15); }
+}
+      </pre>
+    </div>
+  </div>
+</div>
+
+<!-- Qurilmalar -->
+<div class="modal" id="componentsModal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>🔌 Ishlatilgan Qurilmalar</h2>
+
+    <div class="flex-container-30-70">
+      <div class="flex-image-30"><img src="/static/image/arduino1 - Copy.png" alt="Arduino UNO"></div>
+      <div class="flex-text-70">
+        <strong>Arduino UNO</strong>
+        <p>LED’ni digital va PWM orqali boshqarish.</p>
+      </div>
+    </div>
+
+    <div class="flex-container-30-70">
+      <div class="flex-image-30"><img src="/static/image/led-removebg-preview.png" alt="LED"></div>
+      <div class="flex-text-70">
+        <strong>LED</strong>
+        <p>Yorug‘lik diodi – indikator sifatida ishlatiladi.</p>
+      </div>
+    </div>
+
+    <div class="flex-container-30-70">
+      <div class="flex-image-30"><img src="/static/image/resistor.png" alt="220Ω resistor"></div>
+      <div class="flex-text-70">
+        <strong>220Ω qarshilik</strong>
+        <p>LEDni himoya qilish (tokni cheklash) uchun.</p>
+      </div>
+    </div>
+
+    <div class="flex-container-30-70">
+      <div class="flex-image-30"><img src="/static/image/breadboard-removebg-preview.png" alt="Breadboard"></div>
+      <div class="flex-text-70">
+        <strong>Breadboard + jumper simlar</strong>
+        <p>Lehimlashsiz ulash.</p>
+      </div>
+    </div>
+     <div class="flex-container-30-70">
+      <div class="flex-image-30"><img src="/static/image/button.jpg" alt="Breadboard"></div>
+      <div class="flex-text-70">
+        <strong>Button</strong>
+        <p>Raqamli signal orqali ishlovchi </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Info (ixtiyoriy lokal video) -->
+<div class="modal" id="infoModal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>📚 Qo'shimcha Ma'lumot</h2>
+    <div class="video-full">
+      <video controls>
+        <source src="/media/2.mp4" type="video/mp4">
+        Brauzeringiz video formatni qo'llab-quvvatlamaydi.
+      </video>
+    </div>
+  </div>
+</div>
+
+<button id="infoFloatingBtn"><span>📚</span><span>Ma'lumot</span></button>
+
+        <div class="main-content">
+           
+            <div class="arduino-container">
+                <div class="circuit-wrapper">
+                    <div class="breadboard">
+                        <img src="/static/image/breadboard-removebg-preview.png" alt="Breadboard">
+                    </div>
+
+                    <div class="arduino-uno">
+                        <img src="/static/image/arduino1 - Copy.png" alt="Arduino UNO">
+                    </div>
+
+                    <div class="led" id="led"></div>
+                    
+                    <div class="button-component" id="button" 
+                         onmousedown="pressButton()" 
+                         onmouseup="releaseButton()"
+                         ontouchstart="pressButton()" 
+                         ontouchend="releaseButton()">
+                        <div class="button-top"></div>
+                    </div>
+                    
+                    <div class="resistor">
+                        <img src="/static/image/resistor.png" alt="Resistor">
+                    </div>
+                    
+                    <div class="wire wire1"></div>
+                    <div class="wire wire2"></div>
+                    <div class="wire wire3"></div>
+                    <div class="wire wire4"></div>
+                    <div class="wire wire5"></div>
+                    <div class="wire wire6"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="status-display">
+        <div class="status-row">
+            <span>Arduino Holati:</span>
+            <div class="status-led" id="powerStatusLed"></div>
+        </div>
+        <div class="status-row">
+            <span>Button Bosildi:</span>
+            <div class="status-led" id="buttonStatusLed"></div>
+        </div>
+        <div class="status-row">
+            <span>LED Holati:</span>
+            <div class="status-led" id="ledMainStatusLed"></div>
+        </div>
+        <div class="status-row">
+            <span>Pin 10:</span>
+            <div class="status-led" id="pin13StatusLed"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="schemaModal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Sxema Ma'lumoti</h2>
+            <p><strong>Arduino LED Button Loyihasi</strong></p>
+            <p>Bu loyihada Arduino Uno, LED, button va rezistor ishlatilgan.</p>
+        </div>
+    </div>
+
+    <div class="modal" id="codeModal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Arduino Kodi</h2>
+            
+            <div class="tab-buttons">
+                <button class="tab-btn active" data-tab="arduino">Arduino C++</button>
+                <button class="tab-btn" data-tab="explanation">Tushuntirish</button>
+            </div>
+
+            <div class="tab-content active" id="arduino">
+                <pre>const int buttonPin = 2;
+const int ledPin = 13;
+int buttonState = 0;
+bool ledState = false;
+
+void setup() {
+  pinMode(ledPin, OUTPUT);
+  pinMode(buttonPin, INPUT);
+}</pre>
+            </div>
+
+            <div class="tab-content" id="explanation">
+                <pre>Button bosilganda LED holatini o'zgartiradi</pre>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="componentsModal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Ishlatilgan Qurilmalar</h2>
+            <div style="margin-bottom: 1vw;">
+                <h3>1. Arduino Uno R3</h3>
+                <p>Asosiy mikrokontroller</p>
+            </div>
+            <div style="margin-bottom: 1vw;">
+                <h3>2. LED</h3>
+                <p>Yorug'lik chiqaruvchi diod</p>
+            </div>
+            <div style="margin-bottom: 1vw;">
+                <h3>3. Push Button</h3>
+                <p>Bosma tugma</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let arduinoPowered = false;
+        let buttonPressed = false;
+        let ledOn = false;
+
+        const elements = {
+            button: document.getElementById('button'),
+            led: document.getElementById('led'),
+            arduinoLed: document.getElementById('arduinoLed'),
+            buttonLed: document.getElementById('buttonLed'),
+            ledStatusLed: document.getElementById('ledStatusLed'),
+            powerStatusLed: document.getElementById('powerStatusLed'),
+            buttonStatusLed: document.getElementById('buttonStatusLed'),
+            ledMainStatusLed: document.getElementById('ledMainStatusLed'),
+            pin13StatusLed: document.getElementById('pin13StatusLed')
+        };
+
+        function updateStatus() {
+            elements.arduinoLed.classList.toggle('on', arduinoPowered);
+            elements.buttonLed.classList.toggle('on', buttonPressed);
+            elements.ledStatusLed.classList.toggle('on', ledOn);
+            elements.powerStatusLed.classList.toggle('on', arduinoPowered);
+            elements.buttonStatusLed.classList.toggle('on', buttonPressed);
+            elements.ledMainStatusLed.classList.toggle('on', ledOn);
+            elements.pin13StatusLed.classList.toggle('on', ledOn);
+        }
+
+        function togglePower() {
+            arduinoPowered = !arduinoPowered;
+            if (!arduinoPowered) {
+                ledOn = false;
+                buttonPressed = false;
+                elements.led.classList.remove('on');
+                elements.button.classList.remove('pressed');
+            }
+            updateStatus();
+        }
+
+        function pressButton() {
+            if (!arduinoPowered) return;
+            buttonPressed = true;
+            elements.button.classList.add('pressed');
+            ledOn = !ledOn;
+            elements.led.classList.toggle('on', ledOn);
+            updateStatus();
+        }
+
+        function releaseButton() {
+            if (!arduinoPowered) return;
+            buttonPressed = false;
+            elements.button.classList.remove('pressed');
+            updateStatus();
+        }
+
+        function startSimulation() {
+            if (!arduinoPowered) {
+                alert('Avval Arduino ni yoqing!');
+                return;
+            }
+            alert('Simulyatsiya ishlamoqda. Button ni bosib LED ni boshqaring!');
+        }
+
+        function stopSimulation() {
+            ledOn = false;
+            buttonPressed = false;
+            elements.led.classList.remove('on');
+            elements.button.classList.remove('pressed');
+            updateStatus();
+        }
+
+  function openModal(id){ const m=document.getElementById(id); if(m) m.style.display='block'; }
+  function closeModal(el){ const m=el.closest('.modal'); if(m) m.style.display='none'; }
+
+  document.addEventListener('click', (e)=>{ if(e.target.matches('.modal .close')) closeModal(e.target); });
+  window.addEventListener('click', (e)=>{ document.querySelectorAll('.modal').forEach(m=>{ if(e.target===m) m.style.display='none'; }); });
+
+  // buttons
+  document.getElementById('schemaBtn')?.addEventListener('click', ()=>openModal('schemaModal'));
+  document.getElementById('codeBtn')?.addEventListener('click',   ()=>openModal('codeModal'));
+  document.getElementById('componentsBtn')?.addEventListener('click', ()=>openModal('componentsModal'));
+  document.getElementById('infoFloatingBtn')?.addEventListener('click', ()=>openModal('infoModal'));
+
+  // tabs
+  (function(){
+    const codeModal=document.getElementById('codeModal');
+    if(!codeModal) return;
+    codeModal.querySelectorAll('.tab-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const t=btn.dataset.tab;
+        codeModal.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        codeModal.querySelectorAll('.tab-content').forEach(p=>p.classList.toggle('active', p.id===t));
+      });
+    });
+  })();
+        function runTest() {
+            if (!arduinoPowered) {
+                alert('Avval Arduino ni yoqing!');
+                return;
+            }
+            let testStep = 0;
+            const testInterval = setInterval(() => {
+                if (testStep < 6) {
+                    pressButton();
+                    setTimeout(releaseButton, 200);
+                    testStep++;
+                } else {
+                    clearInterval(testInterval);
+                    alert('Test yakunlandi!');
+                }
+            }, 600);
+        }
+
+        function openModal(id) {
+            document.getElementById(id).style.display = "block";
+        }
+
+        document.querySelectorAll(".modal .close").forEach(btn => {
+            btn.addEventListener("click", function() {
+                this.closest(".modal").style.display = "none";
+            });
+        });
+
+        window.addEventListener("click", e => {
+            document.querySelectorAll(".modal").forEach(modal => {
+                if (e.target === modal) modal.style.display = "none";
+            });
+        });
+
+        document.querySelectorAll(".tab-btn").forEach(button => {
+            button.addEventListener("click", function() {
+                const tab = this.dataset.tab;
+                document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+                this.classList.add("active");
+                document.querySelectorAll(".tab-content").forEach(content => {
+                    content.classList.remove("active");
+                    if (content.id === tab) content.classList.add("active");
+                });
+            });
+        });
+
+        updateStatus();
+    </script>
+</body>
+</html>

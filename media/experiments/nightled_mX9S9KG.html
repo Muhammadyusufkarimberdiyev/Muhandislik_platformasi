@@ -1,0 +1,1395 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avtomatik Tungi Chiroq Tajribasi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+         
+            min-height: 100vh;
+            padding: 1vw;
+            overflow-x: auto;
+        }
+
+        /* HEADER */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #000075;
+            color: white;
+            padding: 1vw 2vw;
+            box-shadow: 0 0.4vw 2vw rgba(0,0,0,0.3);
+            border-radius: 1.5vw;
+            margin-bottom: 2vw;
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1.5vw;
+            font-size: clamp(14px, 1.5vw, 20px);
+            font-weight: bold;
+        }
+
+        .logo img {
+            width: clamp(50px, 6vw, 80px);
+            height: auto;
+        }
+
+        .logo-icon {
+            width: clamp(40px, 4vw, 50px);
+            height: clamp(40px, 4vw, 50px);
+            border-radius: 50%;
+            border: 0.3vw solid white;
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(18px, 2vw, 24px);
+            animation: logoGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes logoGlow {
+            0% { box-shadow: 0 0 1vw rgba(255, 215, 0, 0.5); }
+            100% { box-shadow: 0 0 2vw rgba(255, 215, 0, 0.8); }
+        }
+.left-panel{width:280px;max-width:95%;background:#fff;border-radius:14px;padding:16px;box-shadow:0 6px 16px rgba(0,0,0,.08)}
+  .left-panel h3{margin:0 0 12px;font-size:16px;color:#333}
+  .btn{display:block;width:100%;padding:10px 12px;margin:8px 0;border:0;border-radius:10px;cursor:pointer;transition:.25s;text-align:left;font-weight:600}
+  .btn-primary{background:#000075;color:#fff}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 14px rgba(0,0,0,.1)}
+  .flex-container-40-60{display:flex;gap:20px;align-items:flex-start;background:rgba(255,255,255,.1);padding:20px;border-radius:15px;margin-bottom:20px}
+  .flex-text-60{flex:1}
+  .flex-text-60 p{font-size:16px;line-height:1.8}
+  .flex-container-30-70{display:flex;gap:20px;align-items:flex-start;background:rgba(255,255,255,.1);padding:20px;border-radius:15px;margin-bottom:20px}
+  .flex-image-30{flex:0 0 30%}
+  .flex-image-30 img{width:100%;border-radius:10px}
+  .flex-text-70{flex:0 0 70%}
+  .flex-text-70 strong{color:#ffcc00;font-size:18px;display:block;margin-bottom:10px}
+  .modal{display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.8);backdrop-filter:blur(5px);overflow-y:auto}
+  .modal-content{background:#000075;color:#fff;margin:5vh auto;padding:30px;width:90%;max-width:1000px;border-radius:20px;box-shadow:0 15px 40px rgba(0,0,0,.5);position:relative;animation:slideDown .4s ease}
+  @keyframes slideDown{from{transform:translateY(-50px);opacity:0}to{transform:translateY(0);opacity:1}}
+  .close{position:absolute;right:20px;top:15px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:bold;cursor:pointer;color:#fff;transition:.3s;border-radius:50%;background:rgba(255,255,255,.1)}
+  .close:hover{background:rgba(255,204,0,.3);color:#ffcc00;transform:rotate(90deg)}
+  .modal-content h2{font-size:28px;margin-bottom:25px;padding-bottom:15px;border-bottom:2px solid rgba(255,255,255,.3);padding-right:50px}
+  .tab-buttons{display:flex;gap:8px;margin:12px 0 16px}
+  .tab-btn{flex:1;background:rgba(255,255,255,.12);color:#fff;border:0;border-radius:10px 10px 0 0;padding:10px;cursor:pointer;font-weight:600;transition:.2s}
+  .tab-btn:hover{background:rgba(255,255,255,.2)}
+  .tab-btn.active{background:rgba(255,255,255,.28)}
+  .tab-content{display:none}
+  .tab-content.active{display:block}
+  pre{background:rgba(0,0,0,.35);padding:12px;border-radius:10px;overflow:auto;white-space:pre-wrap;word-break:break-word;color:#fff;font-size:13.5px;line-height:1.55}
+  #infoFloatingBtn{position:fixed;bottom:30px;right:30px;width:120px;height:120px;border-radius:50%;background:linear-gradient(135deg,#000075,#0000ff);color:#fff;border:4px solid #fff;cursor:pointer;font-size:16px;font-weight:bold;box-shadow:0 8px 20px rgba(0,0,0,.4);z-index:1500;transition:.3s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px}
+  #infoFloatingBtn:hover{transform:scale(1.1);box-shadow:0 12px 30px rgba(0,0,255,.6)}
+  #infoFloatingBtn span:first-child{font-size:36px}
+  .video-full{width:100%;border-radius:15px;background:#000}
+  .video-full video{width:100%;height:auto;border-radius:15px;max-height:70vh}
+  @media (max-width:1024px){.flex-container-40-60,.flex-container-30-70{flex-direction:column}.flex-image-30,.flex-text-70{flex:0 0 100%}}
+  @media (max-width:768px){.modal-content{width:96%;padding:20px 15px}#infoFloatingBtn{width:90px;height:90px;font-size:14px;bottom:20px;right:20px}#infoFloatingBtn span:first-child{font-size:28px}}
+        .header-stats {
+            display: flex;
+            gap: 2vw;
+            font-size: clamp(11px, 1.1vw, 14px);
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5vw;
+            padding: 0.5vw 1vw;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2vw;
+        }
+
+        /* MAIN LAYOUT */
+        .main-container {
+            display: flex;
+            margin-top: 2vw;
+            gap: 2.5vw;
+        }
+
+        /* LEFT PANEL */
+        .left-panel {
+            width: 23vw;
+            min-width: 250px;
+            background: linear-gradient(145deg, #ffffff, #f0f0f0);
+            padding: 2vw;
+            border-radius: 1.5vw;
+            box-shadow: 0 0.8vw 2.5vw rgba(0,0,0,0.1);
+            height: fit-content;
+            position: relative;
+            z-index: 1;
+            border: 0.2vw solid rgba(255,255,255,0.2);
+        }
+
+        .control-group {
+            margin-bottom: 2.5vw;
+            border-bottom: 0.2vw solid #e0e0e0;
+            padding-bottom: 2vw;
+        }
+
+        .control-group:last-child {
+            border-bottom: none;
+        }
+
+        .control-group h3 {
+            margin-bottom: 1.5vw;
+            color: #000075;
+            font-size: clamp(14px, 1.3vw, 18px);
+            display: flex;
+            align-items: center;
+            gap: 0.8vw;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 1vw 1.5vw;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 1vw;
+            font-size: clamp(12px, 1.1vw, 15px);
+            border-radius: 1vw;
+            transition: all 0.3s ease;
+            text-align: left;
+            font-weight: 600;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-0.3vw);
+            box-shadow: 0 0.6vw 2vw rgba(0,0,0,0.15);
+        }
+
+        .btn:active {
+            transform: translateY(-0.1vw);
+        }
+
+        .btn-success { 
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white; 
+        }
+        .btn-danger { 
+            background: linear-gradient(135deg, #dc3545, #e74c3c);
+            color: white; 
+        }
+        .btn-primary { 
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white; 
+        }
+        .btn-info { 
+            background: linear-gradient(135deg, #17a2b8, #138496);
+            color: white; 
+        }
+        .btn-warning {
+            background: linear-gradient(135deg, #ffc107, #fd7e14);
+            color: #212529;
+        }
+
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 1vw 0;
+            font-size: clamp(11px, 1.1vw, 14px);
+            padding: 0.8vw 1.2vw;
+            background: rgba(0,0,0,0.05);
+            border-radius: 0.8vw;
+        }
+
+        .status-led {
+            width: clamp(14px, 1.3vw, 16px);
+            height: clamp(14px, 1.3vw, 16px);
+            border-radius: 50%;
+            background: #dc3545;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 0 0.5vw rgba(0,0,0,0.5);
+            position: relative;
+        }
+
+        .status-led.on {
+            background: #28a745;
+            box-shadow: 0 0 1.5vw rgba(40, 167, 69, 0.8);
+        }
+
+        .status-led::after {
+            content: '';
+            position: absolute;
+            top: 15%;
+            left: 15%;
+            width: 70%;
+            height: 70%;
+            background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.8), transparent);
+            border-radius: 50%;
+        }
+
+        /* SENSOR READINGS PANEL */
+        .readings-panel {
+            background: linear-gradient(145deg, #f8f9fa, #e9ecef);
+            border-radius: 1vw;
+            padding: 1.5vw;
+            margin-bottom: 2vw;
+        }
+
+        .reading-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 0.8vw 0;
+            padding: 0.8vw 1vw;
+            background: white;
+            border-radius: 0.6vw;
+            box-shadow: 0 0.2vw 0.4vw rgba(0,0,0,0.1);
+        }
+
+        .reading-value {
+            font-weight: bold;
+            color: #007bff;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* EXPERIMENT LOG */
+        .log-panel {
+            max-height: 20vh;
+            overflow-y: auto;
+            background: #000;
+            color: #00ff00;
+            padding: 1vw;
+            border-radius: 0.8vw;
+            font-family: 'Courier New', monospace;
+            font-size: clamp(10px, 1vw, 12px);
+            line-height: 1.4;
+        }
+
+        .log-entry {
+            margin: 0.2vw 0;
+            padding: 0.2vw 0;
+        }
+
+        .log-entry.info { color: #00ff00; }
+        .log-entry.warning { color: #ffff00; }
+        .log-entry.error { color: #ff4444; }
+
+        /* MAIN CONTENT */
+        .main-content {
+            flex: 1;
+            padding: 2.5vw;
+            background: linear-gradient(145deg, #ffffff, #f8f9fa);
+            border-radius: 1.5vw;
+            box-shadow: 0 0.8vw 3vw rgba(0,0,0,0.1);
+            border: 0.2vw solid rgba(255,255,255,0.3);
+        }
+
+        .circuit-container {
+            display: flex;
+            justify-content: center;
+            gap: 4vw;
+            margin-top: 4vw;
+            flex-wrap: wrap;
+            position: relative;
+        }
+
+        /* CIRCUIT BOARD - RESPONSIVE CONTAINER */
+        .circuit-board {
+            background: linear-gradient(135deg, skyblue, yellow);
+            width: 100%;
+            max-width: 700px;
+            aspect-ratio: 7 / 5;
+            border-radius: 1.5vw;
+            position: relative;
+            box-shadow: 0 1.2vw 4vw rgba(0,0,0,0.4);
+            border: 0.4vw solid #1a1a1a;
+            overflow: hidden;
+        }
+
+        .circuit-board.dark {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+        }
+
+        .circuit-board::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 20% 80%, rgba(255,255,255,0.1) 1px, transparent 1px),
+                radial-gradient(circle at 80% 20%, rgba(255,255,255,0.1) 1px, transparent 1px),
+                radial-gradient(circle at 40% 40%, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 7% 7%;
+        }
+
+        /* COMPONENTS - RESPONSIVE WITH % */
+        .component {
+            position: absolute;
+            border-radius: 0.8vw;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: clamp(10px, 1vw, 12px);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .component:hover {
+            transform: scale(1.1);
+            z-index: 20;
+        }
+
+        /* LED COMPONENT */
+        .led-component {
+            width: 20px;
+            height: 30px;
+            border-radius: 10px 10px 0 0;
+            aspect-ratio: 1;
+            background: linear-gradient(145deg, #333, #555);
+    
+            top: 22%;
+            left: 18.5%;
+          
+            transition: all 0.3s ease;
+            box-shadow: inset 0 0 0.8vw rgba(0,0,0,0.4);
+        }
+
+        .led-component.active {
+            background: radial-gradient(circle, #ffff00, #ffd700);
+            box-shadow: 0 0 3vw #ffff00, 0 0 6vw #ffff00, 0 0 9vw rgba(255, 255, 0, 0.5);
+            animation: ledPulse 1.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes ledPulse {
+            0% {
+                box-shadow: 0 0 3vw #ffff00, 0 0 6vw #ffff00, 0 0 9vw rgba(255, 255, 0, 0.5);
+                transform: scale(1);
+            }
+            100% {
+                box-shadow: 0 0 4vw #ffff00, 0 0 8vw #ffff00, 0 0 12vw rgba(255, 255, 0, 0.7);
+                transform: scale(1.05);
+            }
+        }
+
+        /* LDR SENSOR */
+        .ldr-sensor {
+            width: 21%;
+            aspect-ratio: 1;
+            top: 20%;
+            left: 34.5%;
+        }
+
+        .ldr-sensor img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* TRANSISTOR */
+        .transistor {
+            width: 7.5%;
+            aspect-ratio: 0.42;
+            top: 15%;
+            left: 32%;
+        }
+
+        .transistor img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* RESISTOR */
+        .resistor {
+            width: 7%;
+            aspect-ratio: 1;
+            top: 38.5%;
+            left: 18.5%;
+        }
+
+        .resistor img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* BATTERY */
+        .battery {
+            width: 23%;    
+            aspect-ratio: 0.53;
+            top: 45%;
+            left: 25.5%;
+        }
+
+        .battery img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* WIRES - RESPONSIVE WITH % */
+        .wire {
+            position: absolute;
+            background: #ff0000;
+            z-index: 5;
+            border-radius: 0.2vw;
+        }
+
+        .wire-horizontal {
+            height: 0.6%;
+        }
+
+        .wire-vertical {
+            width: 0.6%;
+        }
+
+        /* WIRE POSITIONS IN % */
+        .wire1 { width: 14.3%; height: 0.6%; top: 43%; left: 22.9%; background: #000; }
+        .wire2 { width: 0.6%; height: 10%; top: 28%; left: 21.4%; }
+        .wire3 { width: 12.6%; height: 0.6%; top: 37.5%; left: 21.4%; }
+        .wire4 { width: 10.7%; height: 0.6%; top: 43%; left: 36.4%; background: #000; }
+        .wire5 { width: 0.6%; height: 30%; top: 28%; left: 17.9%; background: red; }
+        .wire6 { width: 21.4%; height: 0.6%; top: 57.6%; left: 17.9%; background: red; }
+        .wire7 { width: 0.6%; height: 3.5%; top: 34.2%; left: 33.4%; }
+        .wire8 { width: 7.1%; height: 0.6%; top: 41.5%; left: 35.7%; }
+        .wire9 { width: 0.6%; height: 7.6%; top: 34.2%; left: 35.3%; }
+        .wire10 { width: 0.6%; height: 9%; top: 34.2%; left: 37.3%; background: #000; }
+        .wire11 { width: 0.6%; height: 1.6%; top: 42%; left: 46.7%; background: #000; }
+        .wire12 { width: 0.6%; height: 20%; top: 42.6%; left: 35.9%; transform: rotate(12deg); background: #000; }
+        .wire13 { width: 0.6%; height: 4%; top: 57.6%; left: 38.9%; background: red; }
+
+        /* LIGHT SIMULATION */
+        .light-simulation {
+            position: absolute;
+            top: 6%;
+            right: 4.3%;
+            width: 17%;
+            aspect-ratio: 1.5;
+            background: linear-gradient(135deg, #ffd700, #ffed4a);
+            border-radius: 2vw;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+            font-size: clamp(11px, 1.1vw, 14px);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            border: 0.4vw solid #fff;
+            box-shadow: 0 0.4vw 1.5vw rgba(255, 215, 0, 0.3);
+        }
+
+        .light-simulation.dark {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: #ecf0f1;
+            box-shadow: 0 0.4vw 1.5vw rgba(44, 62, 80, 0.3);
+        }
+
+        .light-simulation::before {
+            content: '🌞 Yorug\'lik';
+            font-size: clamp(10px, 1vw, 12px);
+        }
+
+        .light-simulation.dark::before {
+            content: '🌙 Qorong\'ulik';
+        }
+
+        /* CONTROL PANEL */
+        .control-panel {
+            position: fixed;
+            bottom: 3vw;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 2vw;
+            flex-wrap: wrap;
+            justify-content: center;
+            z-index: 100;
+            padding: 1.5vw 2.5vw;
+            border-radius: 2.5vw;
+        }
+
+        .control-button {
+            padding: 1.5vw 2.5vw;
+            border: none;
+            border-radius: 3vw;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: clamp(12px, 1.1vw, 14px);
+            transition: all 0.3s ease;
+            box-shadow: 0 0.6vw 2vw rgba(0,0,0,0.2);
+            min-width: 14vw;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .control-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            transition: left 0.5s;
+        }
+
+        .control-button:hover::before {
+            left: 100%;
+        }
+
+        .control-button:hover {
+            transform: translateY(-0.5vw);
+            box-shadow: 0 0.8vw 2.5vw rgba(0,0,0,0.3);
+        }
+
+        /* MODAL STYLES */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: linear-gradient(145deg, #667eea, #764ba2);
+            color: white;
+            margin: 3% auto;
+            padding: 3vw;
+            width: 60%;
+            max-width: 800px;
+            border-radius: 2vw;
+            box-shadow: 0 1.5vw 3.5vw rgba(0,0,0,0.5);
+            animation: slideDown 0.4s ease;
+            position: relative;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-5vw); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .close {
+            position: absolute;
+            right: 2.5vw;
+            top: 2vw;
+            font-size: clamp(24px, 2.5vw, 28px);
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+            transition: color 0.3s;
+        }
+
+        .close:hover {
+            color: #ffcc00;
+            transform: scale(1.1);
+        }
+
+        .modal-content h2 {
+            font-size: clamp(18px, 1.8vw, 22px);
+            margin-bottom: 2vw;
+            border-bottom: 0.3vw solid rgba(255,255,255,0.3);
+            padding-bottom: 1vw;
+        }
+
+        .card {
+            background: rgba(255,255,255,0.1);
+            padding: 1.5vw;
+            border-radius: 1.5vw;
+            margin-bottom: 2vw;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 2vw;
+            border: 0.1vw solid rgba(255,255,255,0.2);
+        }
+
+        .card:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateX(0.5vw);
+        }
+
+        .card .component-placeholder {
+            width: 10vw;
+            height: 10vw;
+            max-width: 100px;
+            max-height: 100px;
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            border-radius: 1.2vw;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: clamp(12px, 1.2vw, 14px);
+            font-weight: bold;
+            border: 0.2vw solid rgba(255,255,255,0.3);
+        }
+
+        .card .text {
+            flex: 1;
+        }
+
+        .card h3 {
+            margin: 0;
+            font-size: clamp(14px, 1.3vw, 16px);
+            margin-bottom: 0.8vw;
+        }
+
+        .card p {
+            margin: 0;
+            font-size: clamp(12px, 1.1vw, 14px);
+            line-height: 1.5;
+            opacity: 0.9;
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 1vw;
+            margin-bottom: 2vw;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 1vw 2vw;
+            border: none;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border-radius: 1vw;
+            cursor: pointer;
+            font-size: clamp(12px, 1.1vw, 14px);
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active,
+        .tab-btn:hover {
+            background: rgba(255,255,255,0.4);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .tab-content pre {
+            background: rgba(0,0,0,0.3);
+            padding: 1.5vw;
+            border-radius: 1vw;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            font-size: clamp(10px, 1vw, 12px);
+            line-height: 1.5;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .left-panel {
+                width: 100%;
+                order: 2;
+            }
+            
+            .main-content {
+                order: 1;
+            }
+            
+            .control-panel {
+                position: relative;
+                margin-top: 3vw;
+                transform: none;
+                left: auto;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-stats {
+                display: none;
+            }
+            
+            .circuit-board {
+                aspect-ratio: 1;
+            }
+            
+            .modal-content {
+                width: 90%;
+                margin: 10% auto;
+            }
+
+            .control-button {
+                min-width: 30vw;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .left-panel {
+                min-width: unset;
+            }
+            
+            .card {
+                flex-direction: column;
+            }
+              .led-component {
+            width: 14px;
+            height: 20px;
+            border-radius: 10px 10px 0 0;
+          
+            background: linear-gradient(145deg, #333, #555);
+    
+            top: 22.5%;
+            left: 18%;
+          
+            transition: all 0.3s ease;
+            box-shadow: inset 0 0 0.8vw rgba(0,0,0,0.4);
+            
+        }
+          .ldr-sensor {
+            width: 21%;
+            aspect-ratio: 1;
+            top: 26%;
+            left: 34.5%;
+        }
+            .transistor {
+            width: 7.5%;
+            aspect-ratio: 0.42;
+            top: 19%;
+            left: 32%;
+        }
+            .battery {
+            width: 15%;    
+            
+            top: 54%;
+            left: 30%;
+        }
+               .wire12 { width: 0.6%; height: 20%; top: 42.6%; left: 35.9%; transform: rotate(10deg); background: #000; }
+             .resistor {
+            width: 5%;
+          
+            top: 40.9%;
+            left: 18.5%;
+        }
+        }
+
+        /* ANIMATIONS */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(2vw); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .main-container {
+            animation: fadeIn 0.8s ease;
+        }
+
+        .circuit-board {
+            animation: fadeIn 1s ease 0.2s both;
+        }
+
+        .left-panel {
+            animation: fadeIn 1s ease 0.1s both;
+        }
+
+        a {
+            text-decoration: none;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="logo">
+            <a href="/"><img src="/static/image/logo.png" alt="Logo"></a>  
+            <span>Avtomatik Tungi Chiroq Tajribasi</span>
+        </div>
+        <div class="header-stats">
+            <div class="stat-item">
+                <span>⏱️</span>
+                <span id="runTime">00:00</span>
+            </div>
+            <div class="stat-item">
+                <span>🔄</span>
+                <span id="cycleCount">0</span>
+            </div>
+            <div class="stat-item">
+                <span>📊</span>
+                <span id="efficiency">0%</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <div class="main-container">
+        <!-- LEFT PANEL -->
+        <div class="left-panel">
+            <div class="control-group">
+                <h3>🎮 Boshqaruv</h3>
+                <button class="btn btn-success" onclick="startExperiment()" id="startBtn">
+                    🚀 Tajribani Boshlash
+                </button>
+                <button class="btn btn-danger" onclick="stopExperiment()" id="stopBtn">
+                    🛑 To'xtatish
+                </button>
+                <button class="btn btn-primary" onclick="togglePower()">
+                    ⚡ Quvvat Yoqish/O'chirish
+                </button>
+                <button class="btn btn-info" onclick="runTest()">
+                    🔬 Avtomatik Test
+                </button>
+                <button class="btn btn-warning" onclick="runDemo()">
+                    🎭 Demo Rejim
+                </button>
+            </div>
+
+
+            <div class="control-group">
+                <h3>📚 Ma'lumotlar</h3>
+                <button class="btn btn-primary" id="schemaBtn">
+                    📋 Sxema Haqida
+                </button>
+               
+                <button class="btn btn-primary" id="componentsBtn">
+                    🔌 Qurilmalar
+                </button>
+           
+            </div>
+
+            <div class="control-group">
+                <h3>⚡ Tizim Holati</h3>
+                <div class="status-row">
+                    <span>Quvvat:</span>
+                    <div class="status-led" id="powerLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>LDR Sensor:</span>
+                    <div class="status-led" id="ldrLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Transistor:</span>
+                    <div class="status-led" id="transistorLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>LED Chiroq:</span>
+                    <div class="status-led" id="ledLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Avtomatik Rejim:</span>
+                    <div class="status-led" id="autoLed"></div>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <h3>📝 Tajriba Jurnali</h3>
+                <div class="log-panel" id="experimentLog">
+                    <div class="log-entry info">Tizim ishga tayyor...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+            <div class="circuit-container">
+                <div class="circuit-board">
+                    <!-- Light Simulation Control -->
+                    <div class="light-simulation" id="lightControl" onclick="toggleLight()"></div>
+
+                    <!-- LED Component -->
+                    <div class="component led-component" id="ledComponent" title="LED Chiroq"></div>
+
+                    <!-- Resistor -->
+                    <div class="component resistor" title="220Ω Qarshilik">
+                        <img src="/static/image/resistor.png" alt="Resistor">
+                    </div>
+
+                    <!-- LDR Sensor -->
+                    <div class="component ldr-sensor" id="ldrSensor" title="LDR Yorug'lik Sensori">
+                        <img src="/static/image/ldr.png" alt="LDR">
+                    </div>
+
+                    <!-- Transistor -->
+                    <div class="component transistor" id="transistorComponent" title="BC547 Transistor">
+                        <img src="/static/image/bc547 - Copy.png" alt="Transistor">
+                    </div>
+
+                    <!-- Battery -->
+                    <div class="component battery" title="9V Batareya">
+                        <img src="/static/image/battery - touch.png" alt="Battery">
+                    </div>
+
+                    <!-- Wires -->
+                    <div class="wire wire-horizontal wire1"></div>
+                    <div class="wire wire-vertical wire2"></div>
+                    <div class="wire wire-horizontal wire3"></div>
+                    <div class="wire wire-horizontal wire4"></div>
+                    <div class="wire wire-vertical wire5"></div>
+                    <div class="wire wire-horizontal wire6"></div>
+                    <div class="wire wire-vertical wire7"></div>
+                    <div class="wire wire-horizontal wire8"></div>
+                    <div class="wire wire-vertical wire9"></div>
+                    <div class="wire wire-vertical wire10"></div>
+                    <div class="wire wire-vertical wire11"></div>
+                    <div class="wire wire-vertical wire12"></div>
+                    <div class="wire wire-vertical wire13"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONTROL PANEL -->
+    <div class="control-panel">
+        <button class="control-button" onclick="togglePower()">
+            ⚡ Quvvat Yoqish/O'chirish
+        </button>
+        <button class="control-button" onclick="toggleLight()">
+            🌓 Yorug'likni O'zgartirish
+        </button>
+        <button class="control-button" onclick="resetAll()">
+            🔄 Qayta O'rnatish
+        </button>
+        <button class="control-button" onclick="runDemo()">
+            🎭 Demo Ko'rsatish
+        </button>
+    </div>
+
+   <!-- 1) Sxema qayerda ishlatiladi (Night LED / LDR) -->
+<div class="modal" id="schemaModal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>💡 Sxema qayerda ishlatiladi (Night LED – LDR)</h2>
+
+    <div class="flex-container-40-60">
+      <div class="flex-video-40">
+        <!-- xohlasangiz videoni almashtiring -->
+        <iframe
+          src="https://www.youtube.com/embed/4fN1aJMH9mM?si=4I6_fo9MxXHRqJPz"
+          title="Night Light with LDR"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen>
+        </iframe>
+      </div>
+      <div class="flex-text-60">
+        <strong>Ulanish sxemasi</strong>
+<p>Fotorezistor → analog pin (masalan, A0)
+
+Bir uchi 5V ga
+
+Ikkinchi uchi GND ga, analog pin bilan ulanadi
+
+Fotorezistor bilan GND orasida 10kΩ rezistor
+
+LED → raqamli pin (masalan, D9)
+
+Seriya rezistor bilan (220Ω) GND ga ulanadi
+
+Izoh: Fotorezistor yorug‘lik darajasini kamaytirganda analog signal oshadi yoki kamayadi (sensor turiga qarab).</p>
+      </div>
+    </div>
+
+    <div class="flex-container-40-60">
+      <div class="flex-video-40">
+        <!-- ikkinchi misol video/rasm ham bo‘lishi mumkin -->
+        <iframe
+          src="https://www.youtube.com/embed/-_QmAYBrWAI?si=OAMNjlppGVtsg-jw"
+          title="LDR based lamp"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen>
+        </iframe>
+      </div>
+      <div class="flex-text-60">
+        <strong>Qo‘shimcha imkoniyatlar</strong>
+        <p>PWM LED boshqaruvi: Yorug‘lik darajasiga qarab LEDni asta-sekin yoqish (breathing effect)
+
+RGB LED bilan: Tungi yorug‘lik rangini sozlash
+
+Buzzer qo‘shish: Qorong‘i paytda ogohlantirish signalini berish
+
+IoT integratsiyasi: Masofadan LEDni yoqish/o‘chirish</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 2) Kod (mBlock ↔ Arduino) -->
+
+
+<!-- 3) Qurilmalar -->
+<div class="modal" id="componentsModal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>🔌 Ishlatilgan Qurilmalar</h2>
+
+    <div class="flex-container-30-70">
+      <div class="flex-image-30"><img src="/static/image/arduino1 - Copy.png" alt="Arduino UNO"></div>
+      <div class="flex-text-70">
+        <strong>Arduino UNO</strong>
+        <p>LDR dan analog o'qish, PWM orqali chiroq yorqinligini boshqarish.</p>
+      </div>
+    </div>
+
+    <div class="flex-container-30-70">
+      <div class="flex-image-30"><img src="/static/image/ldr.png" alt="LDR (fotoqarshilik)"></div>
+      <div class="flex-text-70">
+        <strong>LDR (fotoqarshilik) + 10kΩ</strong>
+        <p>Yorug'likka qarab qarshilik o'zgaradi. 10k bilan bo'luvchi orqali A0 ga ulanadi.</p>
+      </div>
+    </div>
+
+    <div class="flex-container-30-70">
+      <div class="flex-image-30"><img src="/static/image/led-removebg-preview.png" alt="LED"></div>
+      <div class="flex-text-70">
+        <strong>LED + 220Ω</strong>
+        <p>Oddiy LED uchun. Katta yuk bo‘lsa, tranzistor/MOSFET yoki relay bilan boshqaring.</p>
+      </div>
+    </div>
+
+    <div class="flex-container-30-70">
+      <div class="flex-image-30"><img src="/static/image/bc547 - Copy.png" alt="Tranzistor / MOSFET"></div>
+      <div class="flex-text-70">
+        <strong>NPN tranzistor/MOSFET (ixtiyoriy)</strong>
+        <p>12V LED strip yoki kattaroq chiroqni boshqarish uchun (baza/eshik qarshilik, flyback diod).</p>
+      </div>
+    </div>
+
+    <div class="flex-container-30-70">
+      <div class="flex-image-30"><img src="/static/image/breadboard-removebg-preview.png" alt="Breadboard"></div>
+      <div class="flex-text-70">
+        <strong>Breadboard + jumper simlar</strong>
+        <p>Tez yig‘ish va sinov uchun.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 4) Qo'shimcha info (ixtiyoriy) -->
+<div class="modal" id="infoModal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>📚 Qo'shimcha Ma'lumot</h2>
+    <div class="video-full">
+      <video controls>
+        <source src="/media/2.mp4" type="video/mp4">
+        Brauzeringiz video formatni qo'llab-quvvatlamaydi.
+      </video>
+    </div>
+  </div>
+</div>
+
+<button id="infoFloatingBtn"><span>📚</span><span>Ma'lumot</span></button>
+
+    <script>
+        let powerOn = false;
+        let isDark = false;
+        let ledOn = false;
+        let experimentRunning = false;
+        let autoMode = false;
+        let startTime = Date.now();
+        let cycleCount = 0;
+        let demoMode = false;
+        let ldrValue = 500;
+        let lightLevel = 50;
+        let transistorState = "OFF";
+        let ledPower = "0V";
+
+        const elements = {
+            powerLed: document.getElementById('powerLed'),
+            ldrLed: document.getElementById('ldrLed'),
+            transistorLed: document.getElementById('transistorLed'),
+            ledLed: document.getElementById('ledLed'),
+            autoLed: document.getElementById('autoLed'),
+            lightControl: document.getElementById('lightControl'),
+            ledComponent: document.getElementById('ledComponent'),
+            ldrValue: document.getElementById('ldrValue'),
+            lightLevel: document.getElementById('lightLevel'),
+            transistorState: document.getElementById('transistorState'),
+            ledPower: document.getElementById('ledPower'),
+            runTime: document.getElementById('runTime'),
+            cycleCount: document.getElementById('cycleCount'),
+            efficiency: document.getElementById('efficiency'),
+            experimentLog: document.getElementById('experimentLog')
+        };
+
+        function addLogEntry(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString('uz-UZ');
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry ${type}`;
+            logEntry.innerHTML = `[${timestamp}] ${message}`;
+            elements.experimentLog.appendChild(logEntry);
+            elements.experimentLog.scrollTop = elements.experimentLog.scrollHeight;
+            while (elements.experimentLog.children.length > 50) {
+                elements.experimentLog.removeChild(elements.experimentLog.firstChild);
+            }
+        }
+
+        function updateReadings() {
+            if (isDark) {
+                ldrValue = 800 + Math.random() * 200;
+                lightLevel = Math.floor(Math.random() * 30);
+            } else {
+                ldrValue = 50 + Math.random() * 100;
+                lightLevel = 70 + Math.floor(Math.random() * 30);
+            }
+            transistorState = (powerOn && isDark) ? "ON" : "OFF";
+            ledPower = ledOn ? "3.0V" : "0V";
+            elements.ldrValue.textContent = Math.round(ldrValue);
+            elements.lightLevel.textContent = lightLevel + '%';
+            elements.transistorState.textContent = transistorState;
+            elements.ledPower.textContent = ledPower;
+        }
+
+        function updateStatus() {
+            elements.powerLed.classList.toggle('on', powerOn);
+            elements.ldrLed.classList.toggle('on', powerOn && isDark);
+            elements.transistorLed.classList.toggle('on', powerOn && isDark);
+            elements.ledLed.classList.toggle('on', ledOn);
+            elements.autoLed.classList.toggle('on', autoMode);
+            updateReadings();
+        }
+
+  function openModal(id){ const m=document.getElementById(id); if(m) m.style.display='block'; }
+  function closeModal(el){ const m=el.closest('.modal'); if(m) m.style.display='none'; }
+
+  document.addEventListener('click', (e)=>{ if(e.target.matches('.modal .close')) closeModal(e.target); });
+  window.addEventListener('click', (e)=>{ document.querySelectorAll('.modal').forEach(m=>{ if(e.target===m) m.style.display='none'; }); });
+
+  // buttons
+  document.getElementById('schemaBtn')?.addEventListener('click', ()=>openModal('schemaModal'));
+  document.getElementById('codeBtn')?.addEventListener('click',   ()=>openModal('codeModal'));
+  document.getElementById('componentsBtn')?.addEventListener('click', ()=>openModal('componentsModal'));
+  document.getElementById('infoFloatingBtn')?.addEventListener('click', ()=>openModal('infoModal'));
+
+  // tabs
+  (function(){
+    const codeModal=document.getElementById('codeModal');
+    if(!codeModal) return;
+    codeModal.querySelectorAll('.tab-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const t=btn.dataset.tab;
+        codeModal.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        codeModal.querySelectorAll('.tab-content').forEach(p=>p.classList.toggle('active', p.id===t));
+      });
+    });
+  })();
+        function updateStats() {
+            if (experimentRunning) {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                const minutes = Math.floor(elapsed / 60);
+                const seconds = elapsed % 60;
+                elements.runTime.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                elements.cycleCount.textContent = cycleCount;
+                const efficiency = cycleCount > 0 ? Math.min(100, Math.floor((cycleCount / elapsed) * 100)) : 0;
+                elements.efficiency.textContent = efficiency + '%';
+            }
+        }
+
+        function togglePower() {
+            powerOn = !powerOn;
+            if (!powerOn) {
+                ledOn = false;
+                autoMode = false;
+                elements.ledComponent.classList.remove('active');
+                addLogEntry("Quvvat o'chirildi", 'warning');
+            } else {
+                addLogEntry("Quvvat yoqildi", 'info');
+                checkLightCondition();
+            }
+            updateStatus();
+        }
+
+        function checkLightCondition() {
+            if (!powerOn) return;
+            const shouldBeOn = isDark;
+            if (shouldBeOn !== ledOn) {
+                ledOn = shouldBeOn;
+                cycleCount++;
+                if (ledOn) {
+                    elements.ledComponent.classList.add('active');
+                    addLogEntry("LED yondi (Qorong'u)", 'info');
+                } else {
+                    elements.ledComponent.classList.remove('active');
+                    addLogEntry("LED o'chdi (Yorug')", 'info');
+                }
+            }
+            updateStatus();
+        }
+
+        function startExperiment() {
+            experimentRunning = true;
+            autoMode = true;
+            powerOn = true;
+            startTime = Date.now();
+            cycleCount = 0;
+            addLogEntry("Tajriba boshlandi", 'info');
+            checkLightCondition();
+            updateStatus();
+        }
+
+        function stopExperiment() {
+            experimentRunning = false;
+            autoMode = false;
+            powerOn = false;
+            ledOn = false;
+            elements.ledComponent.classList.remove('active');
+            addLogEntry("Tajriba to'xtatildi", 'warning');
+            updateStatus();
+        }
+
+        function runTest() {
+            if (!powerOn) {
+                alert('Avval quvvatni yoqing!');
+                return;
+            }
+            addLogEntry("Test boshlandi", 'info');
+            let testStep = 0;
+            const originalState = isDark;
+            const testInterval = setInterval(() => {
+                switch(testStep) {
+                    case 0:
+                        isDark = false;
+                        elements.lightControl.classList.remove('dark');
+                        document.querySelector('.circuit-board').classList.remove('dark');
+                        checkLightCondition();
+                        break;
+                    case 1:
+                        isDark = true;
+                        elements.lightControl.classList.add('dark');
+                        document.querySelector('.circuit-board').classList.add('dark');
+                        checkLightCondition();
+                        break;
+                    default:
+                        isDark = originalState;
+                        elements.lightControl.classList.toggle('dark', isDark);
+                        document.querySelector('.circuit-board').classList.toggle('dark', isDark);
+                        checkLightCondition();
+                        clearInterval(testInterval);
+                        addLogEntry("Test yakunlandi", 'info');
+                        return;
+                }
+                testStep++;
+            }, 2000);
+        }
+
+        function runDemo() {
+            if (!powerOn) togglePower();
+            demoMode = !demoMode;
+            if (demoMode) {
+                addLogEntry("Demo boshlandi", 'info');
+                const demoInterval = setInterval(() => {
+                    if (!demoMode) {
+                        clearInterval(demoInterval);
+                        return;
+                    }
+                    toggleLight();
+                }, 3000);
+            }
+        }
+
+        function toggleLight() {
+            isDark = !isDark;
+            elements.lightControl.classList.toggle('dark', isDark);
+            document.querySelector('.circuit-board').classList.toggle('dark', isDark);
+            const led = document.querySelector('.led-component');
+            if (isDark) {
+                led.classList.add('active');
+            } else {
+                led.classList.remove('active');
+            }
+            checkLightCondition();
+        }
+
+        function resetAll() {
+            powerOn = false;
+            isDark = false;
+            ledOn = false;
+            experimentRunning = false;
+            autoMode = false;
+            demoMode = false;
+            cycleCount = 0;
+            elements.ledComponent.classList.remove('active');
+            elements.lightControl.classList.remove('dark');
+            document.querySelector('.circuit-board').classList.remove('dark');
+            elements.experimentLog.innerHTML = '<div class="log-entry info">Tizim qayta o\'rnatildi...</div>';
+            updateStatus();
+        }
+
+        function openModal(id) {
+            document.getElementById(id).style.display = "block";
+        }
+
+        document.getElementById("schemaBtn").addEventListener("click", () => openModal("schemaModal"));
+        document.getElementById("codeBtn").addEventListener("click", () => openModal("codeModal"));
+        document.getElementById("componentsBtn").addEventListener("click", () => openModal("componentsModal"));
+        document.getElementById("tutorialBtn").addEventListener("click", () => openModal("tutorialModal"));
+
+        document.querySelectorAll(".modal .close").forEach(btn => {
+            btn.addEventListener("click", function() {
+                this.closest(".modal").style.display = "none";
+            });
+        });
+
+        window.addEventListener("click", function(e) {
+            document.querySelectorAll(".modal").forEach(modal => {
+                if (e.target === modal) modal.style.display = "none";
+            });
+        });
+
+        document.querySelectorAll(".tab-btn").forEach(button => {
+            button.addEventListener("click", function() {
+                const tab = this.dataset.tab;
+                const modal = this.closest('.modal');
+                modal.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+                this.classList.add("active");
+                modal.querySelectorAll(".tab-content").forEach(content => {
+                    content.classList.remove("active");
+                    if (content.id === tab) content.classList.add("active");
+                });
+            });
+        });
+
+        setInterval(() => {
+            if (experimentRunning || powerOn) {
+                updateStats();
+                updateReadings();
+            }
+        }, 1000);
+
+        updateStatus();
+    </script>
+</body>
+</html>

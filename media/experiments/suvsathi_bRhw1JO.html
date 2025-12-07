@@ -1,0 +1,2437 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suv Sathi Ko'rsatkichi Qurilmasi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #e6f3ff;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: auto;
+        }
+
+        /* HEADER */
+        .header {
+            display: flex;
+            align-items: center;
+            background: #000075;
+            color: white;
+            padding: 10px 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            width: 100%;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 50%;
+            border: 2px solid white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000075;
+            font-weight: bold;
+        }
+
+        /* MAIN LAYOUT */
+        .main-container {
+            display: flex;
+            margin-top: 20px;
+            gap: 20px;
+        }
+
+        /* LEFT PANEL */
+        .left-panel {
+            width: 250px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            height: fit-content;
+            position: relative;
+            z-index: 1;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 15px;
+        }
+
+        .control-group h3 {
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 8px;
+            font-size: 14px;
+            border-radius: 5px;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn-success { 
+            background: #28a745; 
+            color: white; 
+        }
+        .btn-danger { 
+            background: #dc3545; 
+            color: white; 
+        }
+        .btn-primary { 
+            background: #000075; 
+            color: white; 
+        }
+        .btn-info { 
+            background: #17a2b8; 
+            color: white; 
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            flex:1;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .title-header {
+            background: #000075;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0 auto 30px;
+            text-align: center;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        /* CIRCUIT CONTAINER */
+        .circuit-container {
+            display: flex;
+            gap: 40px;
+            justify-content: center;
+            align-items: flex-start;
+            margin-top: 30px;
+            flex-wrap: wrap;
+            border: #000075 2px solid;
+        }
+
+/* MODAL TUZATISH - Responsive va to'g'ri ko'rinish */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    overflow-y: auto;
+    padding: 20px 0;
+}
+
+.modal-content {
+    background: #000075;
+    color: white;
+    margin: 10vh auto 5vh;
+    padding: 30px;
+    width: 90%;
+    max-width: 800px;
+    border-radius: 20px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+    position: relative;
+    animation: slideDown 0.4s ease;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+/* Scroll bar stilizatsiyasi */
+.modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.close {
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    font-size: 32px;
+    font-weight: bold;
+    cursor: pointer;
+    color: white;
+    transition: all 0.3s;
+    z-index: 2010;
+    line-height: 1;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.close:hover {
+    background: rgba(255, 204, 0, 0.3);
+    color: #ffcc00;
+    transform: rotate(90deg);
+}
+
+.modal-content h2 {
+    font-size: 28px;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+    padding-right: 50px;
+}
+
+.card {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    transition: all 0.3s;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    z-index: 1;
+}
+
+.card:hover {
+    background: rgba(255, 255, 255, 0.18);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.card video {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    background: #000;
+    position: relative;
+    z-index: 2;
+}
+
+.card p {
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 10px 0 0;
+    position: relative;
+    z-index: 2;
+}
+
+.card strong {
+    color: #ffcc00;
+    font-size: 18px;
+}
+
+/* Tab buttons */
+.tab-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 2;
+}
+
+.tab-buttons button {
+    flex: 1;
+    min-width: 150px;
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s;
+    position: relative;
+    z-index: 2;
+}
+
+.tab-buttons button:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+}
+
+.tab-buttons button.active {
+    background: rgba(255, 204, 0, 0.4);
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(255, 204, 0, 0.3);
+}
+
+.tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease;
+    position: relative;
+    z-index: 2;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.tab-content pre {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    border-radius: 12px;
+    overflow-x: auto;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #00ff00;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    z-index: 2;
+}
+
+.tab-content pre::-webkit-scrollbar {
+    height: 8px;
+}
+
+.tab-content pre::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.tab-content pre::-webkit-scrollbar-thumb {
+    background: rgba(0, 255, 0, 0.3);
+    border-radius: 10px;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+/* Flex Layout: 40% Video + 60% Text */
+.flex-container-40-60 {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+}
+
+.flex-video-40 {
+    flex: 0 0 40%;
+}
+
+.flex-video-40 iframe {
+    width: 100%;
+    height: 250px;
+    border-radius: 10px;
+}
+
+.flex-text-60 {
+    flex: 0 0 60%;
+}
+
+.flex-text-60 p {
+    font-size: 16px;
+    line-height: 1.8;
+}
+
+/* Flex Layout: 30% Image + 70% Text */
+.flex-container-30-70 {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+}
+
+.flex-image-30 {
+    flex: 0 0 30%;
+}
+
+.flex-image-30 img {
+    width: 100%;
+    border-radius: 10px;
+}
+
+.flex-text-70 {
+    flex: 0 0 70%;
+}
+
+.flex-text-70 strong {
+    color: #ffcc00;
+    font-size: 18px;
+    display: block;
+    margin-bottom: 10px;
+}
+
+/* 100% Video */
+.video-full video {
+    width: 100%;
+    border-radius: 15px;
+}
+
+/* Dumaloq tugma */
+#infoFloatingBtn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #000075, #0000ff);
+    color: white;
+    border: 4px solid white;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    z-index: 1500;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+#infoFloatingBtn:hover {
+    transform: scale(1.1);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .flex-container-40-60,
+    .flex-container-30-70 {
+        flex-direction: column;
+    }
+    
+    .flex-video-40, .flex-text-60,
+    .flex-image-30, .flex-text-70 {
+        flex: 0 0 100%;
+    }
+}
+/* Tablet responsive */
+@media (max-width: 1024px) {
+    .modal {
+        padding: 15px 0;
+    }
+    
+    .modal-content {
+        width: 95%;
+        padding: 25px;
+        max-height: 75vh;
+        margin: 8vh auto 5vh;
+    }
+    
+    .modal-content h2 {
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+    
+    .card {
+        padding: 15px;
+    }
+    
+    .card p {
+        font-size: 15px;
+    }
+    
+    .tab-buttons button {
+        font-size: 15px;
+        padding: 10px 15px;
+    }
+}
+
+/* Mobile responsive */ 
+@media (max-width: 768px) {
+    .modal {
+        padding: 10px 0;
+    }
+    
+    .modal-content {
+        width: 96%;
+        padding: 20px 15px;
+        margin: 5vh auto 3vh;
+        max-height: 85vh;
+        border-radius: 15px;
+    }
+    
+    .close {
+        right: 10px;
+        top: 10px;
+        font-size: 28px;
+        width: 35px;
+        height: 35px;
+    }
+    
+    .modal-content h2 {
+        font-size: 20px;
+        margin-bottom: 15px;
+        padding-bottom: 12px;
+        padding-right: 45px;
+    }
+    
+    .card {
+        padding: 12px;
+        margin-bottom: 15px;
+        border-radius: 12px;
+    }
+    
+    .card video {
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+    
+    .card p {
+        font-size: 14px;
+        line-height: 1.5;
+    }
+    
+    .card strong {
+        font-size: 16px;
+    }
+    
+    .tab-buttons {
+        gap: 8px;
+        margin-bottom: 15px;
+    }
+    
+    .tab-buttons button {
+        min-width: 120px;
+        font-size: 14px;
+        padding: 10px 12px;
+        border-radius: 8px;
+    }
+    
+    .tab-content pre {
+        padding: 15px;
+        font-size: 12px;
+        line-height: 1.5;
+        border-radius: 10px;
+    }
+}
+
+
+/* Small mobile */
+@media (max-width: 480px) {
+    .modal {
+        padding: 5px 0;
+    }
+    
+    .modal-content {
+        width: 98%;
+        padding: 15px 12px;
+        margin: 3vh auto 2vh;
+        max-height: 90vh;
+        border-radius: 12px;
+    }
+    
+    .close {
+        right: 8px;
+        top: 8px;
+        font-size: 24px;
+        width: 30px;
+        height: 30px;
+    }
+    
+    .modal-content h2 {
+        font-size: 18px;
+        margin-bottom: 12px;
+        padding-bottom: 10px;
+        padding-right: 40px;
+    }
+    
+    .card {
+        padding: 10px;
+        margin-bottom: 12px;
+        border-radius: 10px;
+    }
+    
+    .card p {
+        font-size: 13px;
+    }
+    
+    .card strong {
+        font-size: 15px;
+    }
+    
+    .tab-buttons {
+        flex-direction: column;
+        gap: 6px;
+    }
+    
+    .tab-buttons button {
+        width: 100%;
+        min-width: 100%;
+        font-size: 13px;
+        padding: 10px;
+    }
+    
+    .tab-content pre {
+        padding: 12px;
+        font-size: 11px;
+        line-height: 1.4;
+    }
+}
+
+/* Very small mobile */
+@media (max-width: 360px) {
+    .modal-content {
+        padding: 12px 10px;
+        margin: 2vh auto 1vh;
+    }
+    
+    .modal-content h2 {
+        font-size: 16px;
+    }
+    
+    .card {
+        padding: 8px;
+    }
+    
+    .card p {
+        font-size: 12px;
+    }
+    
+    .tab-buttons button {
+        font-size: 12px;
+        padding: 8px;
+    }
+    
+    .tab-content pre {
+        padding: 10px;
+        font-size: 10px;
+    }
+}
+
+/* Landscape mode fixes */
+@media (max-width: 1024px) and (orientation: landscape) {
+    .modal-content {
+        max-height: 80vh;
+        margin: 5vh auto 3vh;
+    }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .tab-buttons button {
+        min-height: 44px;
+    }
+    
+    .close {
+        min-width: 44px;
+        min-height: 44px;
+    }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    .modal-content {
+        border: 3px solid white;
+    }
+    
+    .card {
+        border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .modal-content,
+    .card,
+    .tab-buttons button,
+    .close {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+/* Print styles */
+@media print {
+    .modal {
+        display: none !important;
+    }
+}
+
+/* Scroll bar stilizatsiyasi */
+.modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.close {
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    font-size: 32px;
+    font-weight: bold;
+    cursor: pointer;
+    color: white;
+    transition: all 0.3s;
+    z-index: 10;
+    line-height: 1;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.close:hover {
+    background: rgba(255, 204, 0, 0.3);
+    color: #ffcc00;
+    transform: rotate(90deg);
+}
+
+.modal-content h2 {
+    font-size: 28px;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+    padding-right: 50px;
+}
+
+.card {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    transition: all 0.3s;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.card:hover {
+    background: rgba(255, 255, 255, 0.18);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.card video {
+    width: 100%;
+    max-width: 70%;
+    height: auto;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    background: #000;
+}
+
+.card p {
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 10px 0 0;
+}
+
+
+.card strong {
+    color: #ffcc00;
+    font-size: 18px;
+}
+
+/* Tab buttons */
+.tab-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.tab-buttons button {
+    flex: 1;
+    min-width: 150px;
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.tab-buttons button:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+}
+
+.tab-buttons button.active {
+    background: rgba(255, 204, 0, 0.4);
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(255, 204, 0, 0.3);
+}
+
+.tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.tab-content pre {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    border-radius: 12px;
+    overflow-x: auto;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #00ff00;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tab-content pre::-webkit-scrollbar {
+    height: 8px;
+}
+
+.tab-content pre::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.tab-content pre::-webkit-scrollbar-thumb {
+    background: rgba(0, 255, 0, 0.3);
+    border-radius: 10px;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Tablet responsive */
+@media (max-width: 1024px) {
+    .modal {
+        padding: 15px 0;
+    }
+    
+    .modal-content {
+        width: 95%;
+        padding: 25px;
+        max-height: 80vh;
+    }
+    
+    .modal-content h2 {
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+    
+    .card {
+        padding: 15px;
+    }
+    
+    .card p {
+        font-size: 15px;
+    }
+    
+    .tab-buttons button {
+        font-size: 15px;
+        padding: 10px 15px;
+    }
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .modal {
+        padding: 10px 0;
+    }
+    
+    .modal-content {
+        width: 96%;
+        padding: 20px 15px;
+        margin: 2vh auto;
+        max-height: 90vh;
+        border-radius: 15px;
+    }
+    
+    .close {
+        right: 10px;
+        top: 10px;
+        font-size: 28px;
+        width: 35px;
+        height: 35px;
+    }
+    
+    .modal-content h2 {
+        font-size: 20px;
+        margin-bottom: 15px;
+        padding-bottom: 12px;
+        padding-right: 45px;
+    }
+    
+    .card {
+        padding: 12px;
+        margin-bottom: 15px;
+        border-radius: 12px;
+    }
+    
+    .card video {
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+    
+    .card p {
+        font-size: 14px;
+        line-height: 1.5;
+    }
+    
+    .card strong {
+        font-size: 16px;
+    }
+    
+    .tab-buttons {
+        gap: 8px;
+        margin-bottom: 15px;
+    }
+    
+    .tab-buttons button {
+        min-width: 120px;
+        font-size: 14px;
+        padding: 10px 12px;
+        border-radius: 8px;
+    }
+    
+    .tab-content pre {
+        padding: 15px;
+        font-size: 12px;
+        line-height: 1.5;
+        border-radius: 10px;
+    }
+}
+
+
+/* Small mobile */
+@media (max-width: 480px) {
+    .modal {
+        padding: 5px 0;
+    }
+    
+    .modal-content {
+        width: 98%;
+        padding: 15px 12px;
+        margin: 1vh auto;
+        max-height: 92vh;
+        border-radius: 12px;
+    }
+    
+    .close {
+        right: 8px;
+        top: 8px;
+        font-size: 24px;
+        width: 30px;
+        height: 30px;
+    }
+    
+    .modal-content h2 {
+        font-size: 18px;
+        margin-bottom: 12px;
+        padding-bottom: 10px;
+        padding-right: 40px;
+    }
+    
+    .card {
+        padding: 10px;
+        margin-bottom: 12px;
+        border-radius: 10px;
+    }
+    
+    .card p {
+        font-size: 13px;
+    }
+    
+    .card strong {
+        font-size: 15px;
+    }
+    
+    .tab-buttons {
+        flex-direction: column;
+        gap: 6px;
+    }
+    
+    .tab-buttons button {
+        width: 100%;
+        min-width: 100%;
+        font-size: 13px;
+        padding: 10px;
+    }
+    
+    .tab-content pre {
+        padding: 12px;
+        font-size: 11px;
+        line-height: 1.4;
+    }
+}
+
+/* Very small mobile */
+@media (max-width: 360px) {
+    .modal-content {
+        padding: 12px 10px;
+    }
+    
+    .modal-content h2 {
+        font-size: 16px;
+    }
+    
+    .card {
+        padding: 8px;
+    }
+    
+    .card p {
+        font-size: 12px;
+    }
+    
+    .tab-buttons button {
+        font-size: 12px;
+        padding: 8px;
+    }
+    
+    .tab-content pre {
+        padding: 10px;
+        font-size: 10px;
+    }
+}
+
+/* Landscape mode fixes */
+@media (max-width: 1024px) and (orientation: landscape) {
+    .modal-content {
+        max-height: 85vh;
+        margin: 2vh auto;
+    }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .tab-buttons button {
+        min-height: 44px;
+    }
+    
+    .close {
+        min-width: 44px;
+        min-height: 44px;
+    }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    .modal-content {
+        border: 3px solid white;
+    }
+    
+    .card {
+        border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .modal-content,
+    .card,
+    .tab-buttons button,
+    .close {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+/* Print styles */
+@media print {
+    .modal {
+        display: none !important;
+    }
+}
+        /* BATTERY SECTION */
+        .battery-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+                    position: absolute;
+        top: 450px;
+        left: 450px;
+        }
+
+        
+
+        .battery::before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 8px;
+         
+            border-radius: 2px;
+        }
+
+        .battery-label {
+            background: #e74c3c;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        /* LED SECTION */
+        .led-section {
+            display: flex;
+            flex-direction: column;
+    
+          
+            
+    
+        }
+
+        .led-row {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+           
+        }
+
+        .led {
+             width: 20px;
+            height: 30px;
+            border-radius: 10px 10px 0 0;
+            position: relative;
+            transition: all 0.3s ease;
+            box-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+            margin-bottom: 50px;
+        }
+
+        .led.green {
+            background: #27ae60;
+            box-shadow: 0 0 20px rgba(39, 174, 96, 0.5);
+        }
+
+        .led.pink {
+            background: #e91e63;
+            box-shadow: 0 0 20px rgba(233, 30, 99, 0.5);
+        }
+
+        .led.yellow {
+            background: #f1c40f;
+            box-shadow: 0 0 20px rgba(241, 196, 15, 0.5);
+        }
+
+        .led.orange {
+            background: #e67e22;
+            box-shadow: 0 0 20px rgba(230, 126, 34, 0.5);
+        }
+
+        .led.off {
+            background: #7f8c8d;
+            box-shadow: none;
+        }
+
+        .led.active {
+            animation: ledPulse 1.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes ledPulse {
+            0% { 
+                transform: scale(1);
+                filter: brightness(1);
+            }
+            100% { 
+                transform: scale(1.1);
+                filter: brightness(1.3);
+            }
+        }
+
+        .resistor {
+            
+
+            border-radius: 4px;
+            position: relative;
+           
+        }
+
+        .resistor::after {
+            content: '470Ω';
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* TRANSISTOR SECTION */
+        .transistor-section {
+            display: flex;
+            flex-direction: column;
+          
+        }
+
+        .transistor-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            
+        }
+
+        .transistor {
+    
+            margin-bottom: 50px;
+            border-radius: 3px;
+            position: relative;
+            
+        }
+
+        .transistor::after {
+            content: 'T';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        /* WATER TANK */
+        .water-tank-section {
+            display: flex;
+            flex-direction: column;
+           align-items: center;
+            gap: 15px;
+        }
+
+        .water-tank {
+            width: 300px;
+            height: 440px;
+            background: white;
+            border-radius: 25px;
+            position: relative;
+            box-shadow: 5px 5px 15px rgba(0,0,0,0.3);
+            overflow: hidden;
+            border: 3px solid #2c3e50;
+        }
+
+        .water-level {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background: linear-gradient(to top, 
+                rgba(52, 152, 219, 0.9) 0%,
+                rgba(155, 207, 255, 0.8) 100%);
+            transition: height 1s ease;
+            border-radius: 0 0 12px 12px;
+        }
+
+        .tank-sensors {
+            position: absolute;
+            right: -30px;
+            top: 0;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px 0;
+        }
+
+        .sensor-probe {
+            width: 25px;
+            height: 2px;
+            background: #e74c3c;
+            position: relative;
+        }
+
+        .sensor-probe::before {
+            content: '';
+            position: absolute;
+            right: -5px;
+            top: -2px;
+            width: 6px;
+            height: 6px;
+            background: #e74c3c;
+            border-radius: 50%;
+        }
+
+        .tank-label {
+            background: #2c3e50;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        /* CONTROL PANEL */
+        .control-panel {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        .control-button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            min-width: 120px;
+        }
+
+        .btn-fill {
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            color: white;
+        }
+
+        .btn-empty {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            color: white;
+        }
+
+        .btn-power {
+            background: linear-gradient(45deg, #27ae60, #229954);
+            color: white;
+        }
+
+        .control-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        /* STATUS DISPLAY */
+        .status-display {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            min-width: 220px;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            z-index: 100;
+        }
+
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 8px 0;
+            font-size: 13px;
+        }
+
+        .status-led {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #dc3545;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+        }
+
+        .status-led.on {
+            background: #28a745;
+            box-shadow: 0 0 10px rgba(40, 167, 69, 0.8);
+        }
+
+        /* WIRING */
+        .wire {
+            position: absolute;
+            z-index: 1;
+        }
+
+        .wire-red {
+          
+              width: 3px;
+            height: 75px;
+            bottom: 65px;
+            left: 520px;
+            background-color: red;
+        }
+
+        .wire-black {
+             width: 3px;
+            height: 50px;
+            bottom: 90px;
+            left: 490px;
+            background-color: black;
+        }
+         .wire-red1 {
+          
+            width: 345px;
+            height: 3px;
+            bottom: 65px;
+            left: 520px;
+            background-color: red;
+        }
+           .wire-black1 {
+             width: 300px;
+            height: 3px;
+            bottom: 90px;
+            left: 490px;
+            background-color: black;
+        }
+          .wire-red2 {
+          
+            width: 3px;
+            height: 420px;
+            bottom: 65px;
+            left: 865px;
+            background-color: red;
+        }
+           .wire-black2 {
+             width: 3px;
+            height: 395px;
+            bottom: 90px;
+            left: 790px;
+            background-color: black;
+        }
+           .wire-red3 {
+          
+            width: 60px;
+            height: 3px;
+            top: 242px;
+            left: 865px;
+            background-color: red;
+        }
+        .wire-red4 {
+          
+            width: 3px;
+            height: 330px;
+            top: 242px;
+            left: 922px;
+            background-color: red;
+        }
+         .wire-red5 {
+          
+            width: 85px;
+            height: 3px;
+            bottom: 140px;
+            left: 525px;
+            background-color: red;
+        }
+           .wire-red6 {
+          
+            width: 3px;
+            height: 345px;
+            bottom: 140px;
+            left: 570px;
+            background-color: red;
+        }
+            .wire-red7 {
+          
+            width: 40px;
+            height: 3px;
+            bottom: 255px;
+            left: 570px;
+            background-color: red;
+        }
+              .wire-red8 {
+          
+            width: 40px;
+            height: 3px;
+            bottom: 370px;
+            left: 570px;
+            background-color: red;
+        }
+              .wire-red9 {
+          
+            width: 40px;
+            height: 3px;
+            bottom: 485px;
+            left: 570px;
+            background-color: red;
+        }
+           .wire-black3 {
+             width: 26px;
+            height: 3px;
+            top: 245px;
+            right: 729px;
+            background-color: black;
+        }
+           .wire-black4 {
+             width: 26px;
+            height: 3px;
+            top: 357px;
+            right: 729px;
+            background-color: black;
+        }
+           .wire-black5 {
+             width: 26px;
+            height: 3px;
+            top: 472px;
+            right: 729px;
+            background-color: black;
+        }
+           .wire-black6 {
+             width: 26px;
+            height: 3px;
+            top: 585px;
+            right: 729px;
+            background-color: black;
+        }
+        .wire-grey{
+              width: 35px;
+            height: 3px;
+            top: 585px;
+            left: 709px;
+            background-color: grey;
+        }
+          .wire-grey1{
+              width: 35px;
+            height: 3px;
+            top: 472px;
+            left: 709px;
+            background-color: grey;
+        }
+          .wire-grey2{
+              width: 35px;
+            height: 3px;
+            top: 357px;
+            left: 709px;
+            background-color: grey;
+        }
+          .wire-grey3{
+              width: 35px;
+            height: 3px;
+            top: 245px;
+            left: 709px;
+            background-color: grey;
+        }
+            .wire-grey4{
+              width: 35px;
+            height: 3px;
+            top: 585px;
+            left: 620px;
+            background-color: grey;
+        }
+          .wire-grey5{
+                 width: 35px;
+            height: 3px;
+            top: 471px;
+            left: 620px;
+            background-color: grey;
+        }
+          .wire-grey6{
+                     width: 35px;
+            height: 3px;
+            top: 357px;
+            left: 620px;
+            background-color: grey;
+        }
+          .wire-grey7{
+            width: 35px;
+            height: 3px;
+            top: 243px;
+            left: 620px;
+            background-color: grey;
+        }
+        .wire-purple {
+             width: 3px;
+            height: 30px;
+            top: 245px;
+            right: 765px;
+            background-color: purple;
+        }
+          .wire-green {
+             width: 3px;
+            height: 30px;
+            top: 355px;
+            right: 765px;
+            background-color: green;
+        }
+              .wire-orange {
+             width: 3px;
+            height: 30px;
+            top: 465px;
+            right: 765px;
+            background-color: orange;
+        }
+          .wire-yellow {
+             width: 3px;
+            height: 30px;
+            top: 575px;
+            right: 765px;
+            background-color: yellow;
+        }
+         .wire-purple1 {
+             width: 100px;
+            height: 3px;
+            top: 272px;
+            right: 668px;
+            background-color: purple;
+        }
+          .wire-green1 {
+             width: 88px;
+            height: 3px;
+            top: 385px;
+             right: 680px;
+            background-color: green;
+        }
+              .wire-orange1 {
+             width: 73px;
+            height: 3px;
+            top: 495px;
+            right: 695px;
+            background-color: orange;
+        }
+          .wire-yellow1 {
+             width: 48px;
+            height: 3px;
+            top: 605px;
+            right: 720px;
+            background-color: yellow;
+        }
+          .wire-purple2 {
+             width: 3px;
+            height: 50px;
+            top: 225px;
+            right: 665px;
+            background-color: purple;
+        }
+          .wire-green2 {
+             width: 3px;
+            height: 180px;
+            top: 208px;
+            right: 680px;
+            background-color: green;
+        }
+              .wire-orange2 {
+             width: 3px;
+            height: 310px;
+            top: 185px;
+            right: 695px;
+            background-color: orange;
+        }
+          .wire-yellow2 {
+             width: 3px;
+            height: 440px;
+            top: 165px;
+            right: 720px;
+            background-color: yellow;
+        }
+          .wire-purple3 {
+            width: 90px;
+            height: 3px;
+            top: 225px;
+            right: 575px;
+            background-color: purple;
+        }
+        .wire-purple4 {
+            width: 3px;
+            height: 320px;
+            top: 225px;
+            right: 575px;
+            background-color: purple;
+        }
+        .wire-green3{
+              width: 130px;
+            height: 3px;
+            top: 205px;
+            right: 553.5px;
+            background-color: green;
+        }
+        .wire-green4 {
+            width: 3px;
+            height: 200px;
+            top: 205px;
+            right: 552px;
+            background-color: green;
+        }
+          .wire-orange3{
+              width: 155px;
+            height: 3px;
+            top: 185px;
+            right: 540.5px;
+            background-color:orange;
+        }
+        .wire-orange4 {
+            width: 3px;
+            height: 150px;
+            top: 185px;
+            right: 540px;
+            background-color: orange;
+        }
+          .wire-yellow3{
+              width: 205px;
+            height: 3px;
+            top: 165px;
+            right: 515.5px;
+            background-color: yellow;
+        }
+        .wire-yellow4 {
+            width: 3px;
+            height: 50px;
+            top: 165px;
+            right: 515px;
+            background-color: yellow;
+        }
+        /* RESPONSIVE DESIGN */
+        @media (max-width: 1024px) {
+            .circuit-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .status-display {
+                position: relative;
+                margin: 20px auto;
+                width: fit-content;
+            }
+            
+            .control-panel {
+                position: relative;
+                margin-top: 30px;
+                transform: none;
+                left: auto;
+            }
+        }
+        
+        .image{
+            display: none;
+        }
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .left-panel {
+                width: 100%;
+            }
+            
+            .control-button {
+                padding: 10px 15px;
+                font-size: 12px;
+                min-width: 100px;
+            }
+        }
+          @media (min-width: 1601px) and (max-width: 4068px) {
+            .led-section{
+                display: none;
+
+            }
+            .wire{
+                display: none;
+            }
+            .battery-section{
+                display: none;
+            }
+            .water-tank-section{
+                display: none;
+            }
+            .image{
+                display: inline;
+            }
+            .circuit-container {
+    width: 100%;
+    /* display: flex endi ishlaydi! */
+    display: flex; 
+    
+    /* Rasmlarni konteyner ichida teng taqsimlash uchun qo'shimcha xususiyatlar: */
+    justify-content: space-between; 
+    align-items: center; 
+     /* Ko'rinish uchun balandlik berildi (misol) */
+
+    /* Fonga endi rasm kerak emas, shuning uchun background-image olib tashlandi. */
+}
+
+/* Har bir rasm uchun maxsus stil */
+.circuit-container img {
+    /* Konteynerning taxminan 1/3 qismini egallasin */
+    width: 32%; 
+    height: auto;
+    object-fit: cover; /* Rasmlarni sifatli ko'rsatish uchun */
+}
+          }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="logo">
+                   <a href="/"><img src="/static/image/logo.png" width="80px" height="80px" alt=""></a>
+            <span>Suv Sathi Ko'rsatkichi Qurilmasi</span>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <div class="main-container">
+        <!-- LEFT PANEL -->
+        <div class="left-panel">
+            <div class="control-group">
+                <h3>Boshqaruv</h3>
+                <button class="btn btn-success" onclick="powerOn()">
+                    Tajribani boshlash
+                </button>
+                <button class="btn btn-danger" onclick="powerOff()">
+                    Tajribani tugatish
+                </button>
+                <button class="btn btn-primary" onclick="fillTank()">
+                    💧 Tankni To'ldirish
+                </button>
+                <button class="btn btn-info" onclick="emptyTank()">
+                    🔽 Tankni Bo'shatish
+                </button>
+            </div>
+    <div class="control-group">
+    <h3>Ma'lumotlar</h3>
+    <button class="btn btn-primary" id="schemaBtn">💡 Sxema qayerda ishlatiladi</button>
+      <button class="btn btn-primary" id="codeBtn">💻 Kod</button>
+    <button class="btn btn-primary" id="componentsBtn">🔌 Qurilmalar</button>
+</div>
+            <div class="control-group">
+                <h3>Suv Sathi</h3>
+                <button class="btn btn-primary" onclick="setWaterLevel(25)">
+                    1-chi Sensor (25%)
+                </button>
+                <button class="btn btn-primary" onclick="setWaterLevel(50)">
+                    2-chi Sensor (50%)
+                </button>
+                <button class="btn btn-primary" onclick="setWaterLevel(75)">
+                    3-chi Sensor (75%)
+                </button>
+                <button class="btn btn-primary" onclick="setWaterLevel(100)">
+                    4-chi Sensor (100%)
+                </button>
+            </div>
+
+            <div class="control-group">
+                <h3>Tizim Holati</h3>
+                <div class="status-row">
+                    <span>Quvvat:</span>
+                    <div class="status-led" id="powerStatus"></div>
+                </div>
+                <div class="status-row">
+                    <span>LED 1 (Yashil):</span>
+                    <div class="status-led" id="led1Status"></div>
+                </div>
+                <div class="status-row">
+                    <span>LED 2 (Pushti):</span>
+                    <div class="status-led" id="led2Status"></div>
+                </div>
+                <div class="status-row">
+                    <span>LED 3 (Sariq):</span>
+                    <div class="status-led" id="led3Status"></div>
+                </div>
+                <div class="status-row">
+                    <span>LED 4 (Qizil):</span>
+                    <div class="status-led" id="led4Status"></div>
+                </div>
+                <div class="status-row">
+                    <span>Suv Sathi:</span>
+                    <span id="waterLevelDisplay">0%</span>
+                </div>
+            </div>
+        </div>
+<!-- ✅ 1) Sxema qayerda ishlatiladi (DC Motor / L298N) -->
+    <div class="modal" id="schemaModal">
+        <div class="modal-content">
+            <span class="close" title="Yopish">&times;</span>
+            <h2>💡 Sxema qayerda ishlatiladi </h2>
+
+            <div class="flex-container-40-60">
+                <div class="flex-video-40">
+                    <!-- 1-video (xohlasangiz almashtiring) -->
+                    <iframe src="https://www.youtube.com/embed/TXJylh_Sz2o?si=6B99ypvtK55i6_8-" title="DC Motor Control with L298N"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen></iframe>
+                </div>
+                <div class="flex-text-60">
+                    <strong>Tajriba Maqsadi</strong>
+                   <p>Ushbu qurilmaning asosiy maqsadi suv idishi (bak)dagi suv miqdorini nazorat qilishdir. Bu tizim orqali suv toshib ketishining oldini olish, nasosni o'z vaqtida o'chirish va suv zaxirasini kuzatib borish mumkin.</p>
+                </div>
+            </div>
+
+            <div class="flex-container-40-60">
+                <div class="flex-video-40">
+                    <!-- 2-video (ixtiyoriy) -->
+                    <iframe src="https://www.youtube.com/embed/NAEHjpAoOQc?si=yzAbSG7n9MRWxPUZ" title="PWM Speed Control"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen></iframe>
+                </div>
+                <div class="flex-text-60">
+                    <strong>🔄 Ishlash prinsipi</strong>
+                    <p>Suv sathi ko'tarilib, ma'lum bir simga yetganda, suv orqali musbat tok tranzistorning bazasiga o'tadi.
+
+Tranzistor "kalit" vazifasini bajaradi va ochiladi.
+
+Natijada tok Collector dan Emitter ga oqib o'tadi va zanjirga ulangan LED chiroq yonadi.</p>
+                </div>
+            </div>
+              <div class="flex-container-40-60">
+                <div class="flex-video-40">
+                    <!-- 2-video (ixtiyoriy) -->
+                    <iframe src="https://www.youtube.com/embed/MnX36KHOw6Q?si=eFmjBSuhtROGL9du" title="PWM Speed Control"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen></iframe>
+                </div>
+                <div class="flex-text-60">
+                    <strong>Natija</strong>
+               <p>Suv qancha baland bo'lsa, shuncha ko'p LEDlar yonib turadi (Pastdagi LED birinchi, eng yuqoridagi oxirgi).</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+<div class="modal" id="componentsModal">
+        <div class="modal-content">
+            <span class="close" title="Yopish">&times;</span>
+            <h2>🔌 Ishlatilgan Qurilmalar</h2>
+
+            <div class="flex-container-30-70">
+                <div class="flex-image-30">
+                   <img src="/static/image/5v battery.png" alt="9V Battery"></div>
+                <div class="flex-text-70">
+                    <strong>9V/5V Batareya</strong>
+                    <p>Butun tizimni elektr energiyasi bilan ta'minlovchi manba. Tok manbai suv orqali signal yuborish uchun xizmat qiladi.</p>
+                </div>
+            </div>
+
+            <hr> <div class="flex-container-30-70">
+                <div class="flex-image-30">
+                   <img src="/static/image/bc547 - Copy.png" alt="BC547 Transistor"></div>
+                <div class="flex-text-70">
+                    <strong>BC547 Tranzistor (4 dona)</strong>
+                    <p>NPN turidagi tranzistor. Bu yerda elektron kalit vazifasini bajaradi. Suvdan kelgan kichik signal orqali LEDni yoqadi.</p>
+                </div>
+            </div>
+
+            <hr>
+
+            <div class="flex-container-30-70">
+                <div class="flex-image-30">
+                   <img src="/static/image/resistor.png" alt="Resistor 470 Ohm"></div>
+                <div class="flex-text-70">
+                    <strong>Rezistor 470Ω (4 dona)</strong>
+                    <p>Tokni cheklovchi qurilma. LEDlarga haddan tashqari ko'p tok borishi va ularning kuyib qolishini oldini oladi.</p>
+                </div>
+            </div>
+
+            <hr>
+
+            <div class="flex-container-30-70">
+                <div class="flex-image-30">
+                   <img src="/static/image/led.png" alt="LED Chiroqlar" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3681/3681728.png'"></div>
+                <div class="flex-text-70">
+                    <strong>LED Chiroqlar (4 xil rang)</strong>
+                    <p>Yorug'lik diodlari. Suv sathini vizual ko'rsatib berish uchun (Yashil, Sariq, Zarg'aldoq, Pushti).</p>
+                </div>
+            </div>
+
+            <hr>
+
+     
+
+        </div>
+    </div>
+    <!-- ✅ 4) Qo'shimcha info (ixtiyoriy) + suzuvchi tugma -->
+    <div class="modal" id="infoModal">
+        <div class="modal-content">
+            <span class="close" title="Yopish">&times;</span>
+            <h2>📚 Qo'shimcha Ma'lumot</h2>
+            <div class="video-full">
+                <video controls>
+                    <source src="/media/2.mp4" type="video/mp4">
+                    Brauzeringiz video formatni qo'llab-quvvatlamaydi.
+                </video>
+            </div>
+        </div>
+    </div>
+
+    <button id="infoFloatingBtn"><span>📚</span><span>Ma'lumot</span></button>
+
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+
+            
+            <div class="circuit-container">
+                <div class="image">   <img src="/static/image/water-full.jpg" alt="To'liq suv">
+   <img src="/static/image/water-half.jpg" alt="Yarim suv">
+   <img src="/static/image/nowater.jpg" alt="Suvsiz"></div>
+            
+                <!-- BATTERY SECTION -->
+                <div class="battery-section">
+                               <div class="battery-label">
+                        
+                        5V Batareya</div>
+                    <div class="battery">
+                       <img src="/static/image/5v battery.png" width="100px" height="120px" alt=""></div>
+         
+                </div>
+                <div class="wire wire-red"></div>
+                <div class="wire wire-black"></div>
+                <div class="wire wire-red"></div>
+                <div class="wire wire-red1"></div>
+                <div class="wire wire-black1"></div>
+                <div class="wire wire-red2"></div>
+                <div class="wire wire-black2"></div>
+                <div class="wire wire-red3"></div>
+                <div class="wire wire-black3"></div>
+                <div class="wire wire-red4"></div>
+                <div class="wire wire-black4"></div>
+                <div class="wire wire-red5"></div>
+                <div class="wire wire-black5"></div>
+                <div class="wire wire-red6"></div>
+                <div class="wire wire-black6"></div>
+                <div class="wire wire-red7"></div>
+                <div class="wire wire-red8"></div>
+                <div class="wire wire-red9"></div>
+                <div class="wire wire-grey"></div>
+                <div class="wire wire-grey1"></div>
+                <div class="wire wire-grey2"></div>
+                <div class="wire wire-grey3 "></div>
+                 <div class="wire wire-grey4"></div>
+                <div class="wire wire-grey5"></div>
+                <div class="wire wire-grey6"></div>
+                <div class="wire wire-grey7 "></div>
+                <div class="wire wire-orange"></div>
+                <div class="wire wire-yellow "></div>
+                <div class="wire wire-purple"></div>
+                <div class="wire wire-green "></div>
+                 <div class="wire wire-orange1"></div>
+                <div class="wire wire-yellow1 "></div>
+                <div class="wire wire-purple1"></div>
+                <div class="wire wire-green1 "></div>
+                 <div class="wire wire-orange2"></div>
+                <div class="wire wire-yellow2 "></div>
+                <div class="wire wire-purple2"></div>
+                <div class="wire wire-purple3"></div>
+                <div class="wire wire-purple4"></div>
+                <div class="wire wire-green2"></div>
+                     <div class="wire wire-green3"></div>
+                          <div class="wire wire-green4"></div>
+                              <div class="wire wire-orange3"></div>
+                          <div class="wire wire-orange4"></div>
+                              <div class="wire wire-yellow3"></div>
+                          <div class="wire wire-yellow4"></div>
+                <!-- LED SECTION -->
+                <div class="led-section">
+                    <div class="led-row">
+                        <div class="led green off" id="led1"></div>
+                        <div class="resistor">
+                           <img src="/static/image/resistor.png" width="60px" height="50px" alt=""></div>
+                        <div class="transistor">
+                           <img src="/static/image/bc547 - Copy.png" width="40px" height="60px" alt=""></div>
+                      
+                    </div>
+                      <div class="led-row">
+                        <div class="led yellow off" id="led2"></div>
+                        <div class="resistor">
+                           <img src="/static/image/resistor.png" width="60px" height="50px" alt=""></div>
+                        <div class="transistor">
+                           <img src="/static/image/bc547 - Copy.png" width="40px" height="60px" alt=""></div>
+                     
+                    </div>
+                      <div class="led-row">
+                        <div class="led orange off" id="led3"></div>
+                        <div class="resistor">
+                           <img src="/static/image/resistor.png" width="60px" height="50px" alt=""></div>
+                        <div class="transistor">
+                           <img src="/static/image/bc547 - Copy.png" width="40px" height="60px" alt=""></div>
+                      
+                    </div>
+                      <div class="led-row">
+                        <div class="led pink off" id="led4"></div>
+                        <div class="resistor">
+                           <img src="/static/image/resistor.png" width="60px" height="50px" alt=""></div>
+                        <div class="transistor">
+                           <img src="/static/image/bc547 - Copy.png" width="40px" height="60px" alt=""></div>
+                        <span>LED-4</span>
+                    </div>
+                   
+                </div>
+
+                <!-- WATER TANK SECTION -->
+                <div class="water-tank-section">
+                    <div class="water-tank">
+                        <div class="water-level" id="waterLevel"></div>
+                        <div class="tank-sensors">
+                            <div class="sensor-probe" data-level="4"></div>
+                            <div class="sensor-probe" data-level="3"></div>
+                            <div class="sensor-probe" data-level="2"></div>
+                            <div class="sensor-probe" data-level="1"></div>
+                        </div>
+                    </div>
+                    <div class="tank-label">Suv Tanki</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- STATUS DISPLAY -->
+    <div class="status-display">
+        <h4>Tizim Monitori</h4>
+        <div class="status-row">
+            <span>Quvvat:</span>
+            <div class="status-led" id="powerStatusMain"></div>
+        </div>
+        <div class="status-row">
+            <span>Suv Sathi:</span>
+            <span id="waterPercentage">0%</span>
+        </div>
+        <div class="status-row">
+            <span>Faol LEDlar:</span>
+            <span id="activeLeds">0</span>
+        </div>
+    </div>
+
+    <!-- CONTROL PANEL -->
+    <div class="control-panel">
+        <button class="control-button btn-power" onclick="togglePower()">
+            ⚡ Quvvat Boshqaruvi
+        </button>
+        <button class="control-button btn-fill" onclick="startFilling()">
+            💧 To'ldirishni Boshlash
+        </button>
+        <button class="control-button btn-empty" onclick="startEmptying()">
+            🔽 Bo'shatishni Boshlash
+        </button>
+    </div>
+
+    <script>
+        // System State
+        let systemPowered = false;
+        let currentWaterLevel = 0;
+        let isAnimating = false;
+
+        // DOM Elements
+        const elements = {
+            powerStatus: document.getElementById('powerStatus'),
+            powerStatusMain: document.getElementById('powerStatusMain'),
+            led1: document.getElementById('led1'),
+            led2: document.getElementById('led2'),
+            led3: document.getElementById('led3'),
+            led4: document.getElementById('led4'),
+            led1Status: document.getElementById('led1Status'),
+            led2Status: document.getElementById('led2Status'),
+            led3Status: document.getElementById('led3Status'),
+            led4Status: document.getElementById('led4Status'),
+            waterLevel: document.getElementById('waterLevel'),
+            waterLevelDisplay: document.getElementById('waterLevelDisplay'),
+            waterPercentage: document.getElementById('waterPercentage'),
+            activeLeds: document.getElementById('activeLeds')
+        };
+
+        // Power Control
+        function powerOn() {
+            systemPowered = true;
+            updateSystem();
+        }
+
+        function powerOff() {
+            systemPowered = false;
+            currentWaterLevel = 0;
+            updateSystem();
+        }
+
+        function togglePower() {
+            systemPowered = !systemPowered;
+            if (!systemPowered) {
+                currentWaterLevel = 0;
+            }
+            updateSystem();
+        }
+
+        // Water Level Control
+        function setWaterLevel(level) {
+            if (!systemPowered) {
+                alert('Avval quvvatni yoqing!');
+                return;
+            }
+            
+            currentWaterLevel = level;
+            updateSystem();
+        }
+
+        function fillTank() {
+            if (!systemPowered) {
+                alert('Avval quvvatni yoqing!');
+                return;
+            }
+            
+            animateWaterLevel(100);
+        }
+
+        function emptyTank() {
+            if (!systemPowered) {
+                alert('Avval quvvatni yoqing!');
+                return;
+            }
+            
+            animateWaterLevel(0);
+        }
+
+        function startFilling() {
+            if (!systemPowered) {
+                powerOn();
+            }
+            fillTank();
+        }
+
+        function startEmptying() {
+            if (!systemPowered) {
+                alert('Tank bo\'sh!');
+                return;
+            }
+            emptyTank();
+        }
+
+        // Animation Functions
+        function animateWaterLevel(targetLevel) {
+            if (isAnimating) return;
+            
+            isAnimating = true;
+            const startLevel = currentWaterLevel;
+            const duration = 2000; // 2 seconds
+            const startTime = Date.now();
+
+            function animate() {
+                const elapsed = Date.now() - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // Easing function for smooth animation
+                const easeInOut = t => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+                const easedProgress = easeInOut(progress);
+                
+                currentWaterLevel = startLevel + (targetLevel - startLevel) * easedProgress;
+                updateSystem();
+                
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                } else {
+                    currentWaterLevel = targetLevel;
+                    isAnimating = false;
+                    updateSystem();
+                }
+            }
+            
+            animate();
+        }
+// Modalni ochish
+function openModal(id) {
+    document.getElementById(id).style.display = "block";
+}
+
+// Tugmalarni ulash
+document.getElementById("schemaBtn").addEventListener("click", () => openModal("schemaModal"));
+document.getElementById("codeBtn").addEventListener("click", () => openModal("codeModal"));
+document.getElementById("componentsBtn").addEventListener("click", () => openModal("componentsModal"));
+document.getElementById("infoFloatingBtn").addEventListener("click", () => openModal("infoModal"));
+
+// Yopish tugmalari
+document.querySelectorAll(".close").forEach(btn => {
+    btn.addEventListener("click", function() {
+        this.closest(".modal").style.display = "none";
+    });
+});
+
+// Tab switching (Kod uchun)
+document.querySelectorAll(".tab-btn").forEach(button => {
+    button.addEventListener("click", function() {
+        const tab = this.dataset.tab;
+        document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+        this.classList.add("active");
+        document.querySelectorAll(".tab-content").forEach(content => {
+            content.classList.remove("active");
+            if (content.id === tab) content.classList.add("active");
+        });
+    });
+});
+        // System Update
+        function updateSystem() {
+            // Update power status
+            elements.powerStatus.classList.toggle('on', systemPowered);
+            elements.powerStatusMain.classList.toggle('on', systemPowered);
+
+            if (!systemPowered) {
+                // Turn off all LEDs
+                elements.led1.className = 'led green off';
+                elements.led2.className = 'led pink off';
+                elements.led3.className = 'led yellow off';
+                elements.led4.className = 'led orange off';
+                
+                elements.led1Status.classList.remove('on');
+                elements.led2Status.classList.remove('on');
+                elements.led3Status.classList.remove('on');
+                elements.led4Status.classList.remove('on');
+                
+                elements.waterLevel.style.height = '0%';
+                elements.waterLevelDisplay.textContent = '0%';
+                elements.waterPercentage.textContent = '0%';
+                elements.activeLeds.textContent = '0';
+                return;
+            }
+
+            // Update water level display
+            const levelPercent = Math.round(currentWaterLevel);
+            elements.waterLevel.style.height = levelPercent + '%';
+            elements.waterLevelDisplay.textContent = levelPercent + '%';
+            elements.waterPercentage.textContent = levelPercent + '%';
+
+            // Update LEDs based on water level
+            let activeLedCount = 0;
+
+            // LED 1 (Green) - 25%
+            if (currentWaterLevel >= 25) {
+                elements.led1.className = 'led green active';
+                elements.led1Status.classList.add('on');
+                activeLedCount++;
+            } else {
+                elements.led1.className = 'led green off';
+                elements.led1Status.classList.remove('on');
+            }
+
+            // LED 2 (Pink) - 50%
+            if (currentWaterLevel >= 50) {
+                elements.led2.className = 'led pink active';
+                elements.led2Status.classList.add('on');
+                activeLedCount++;
+            } else {
+                elements.led2.className = 'led pink off';
+                elements.led2Status.classList.remove('on');
+            }
+
+            // LED 3 (Yellow) - 75%
+            if (currentWaterLevel >= 75) {
+                elements.led3.className = 'led yellow active';
+                elements.led3Status.classList.add('on');
+                activeLedCount++;
+            } else {
+                elements.led3.className = 'led yellow off';
+                elements.led3Status.classList.remove('on');
+            }
+
+            // LED 4 (Orange) - 100%
+            if (currentWaterLevel >= 100) {
+                elements.led4.className = 'led orange active';
+                elements.led4Status.classList.add('on');
+                activeLedCount++;
+            } else {
+                elements.led4.className = 'led orange off';
+                elements.led4Status.classList.remove('on');
+            }
+
+            elements.activeLeds.textContent = activeLedCount;
+        }
+
+        // Automatic demo when page loads
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                powerOn();
+                setTimeout(() => {
+                    fillTank();
+                }, 1000);
+            }, 500);
+        });
+
+        // Initialize system
+        updateSystem();
+    </script>
+</body>
+</html>

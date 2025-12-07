@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DC Motor Forward/Reverse Circuit</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #e6f3ff;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: auto;
+        }
+
+        /* HEADER */
+        .header {
+            display: flex;
+            align-items: center;
+            background: #000075;
+            color: white;
+            padding: 10px 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            width: 100%;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: #fff;
+            border-radius: 50%;
+            border: 2px solid white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000075;
+            font-size: 20px;
+        }
+
+        /* MAIN LAYOUT */
+        .main-container {
+            display: flex;
+            margin-top: 20px;
+            gap: 20px;
+        }
+
+        /* LEFT PANEL */
+        .left-panel {
+            width: 250px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            height: fit-content;
+            position: relative;
+            z-index: 1;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 15px;
+        }
+
+        .control-group h3 {
+            margin-bottom: 10px;
+            color: #000075;
+            font-size: 16px;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 8px;
+            font-size: 14px;
+            border-radius: 5px;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn-success { 
+            background: #28a745; 
+            color: white; 
+        }
+        .btn-danger { 
+            background: #dc3545; 
+            color: white; 
+        }
+        .btn-primary { 
+            background: #000075; 
+            color: white; 
+        }
+        .btn-info { 
+            background: #000075; 
+            color: white; 
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .title-header {
+            background: #000075;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0 auto 30px;
+            text-align: center;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        /* CIRCUIT CONTAINER */
+        .circuit-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 500px;
+            position: relative;
+            background: #f8f9fa;
+            border: 3px solid #000075;
+            border-radius: 15px;
+            padding: 30px;
+        }
+
+        /* DC MOTOR - pozitsiyada */
+        .motor-container {
+            position: absolute;
+            top: 0%;
+        }
+
+        .motor-container img {
+            width: 200px;
+            height: 200px;
+        }
+
+        .motor-shaft {
+            border-radius: 4px;
+            margin-bottom: 10px;
+            transition: transform 0.1s linear;
+            position: absolute;
+            top: 5px;
+            left: 0px;
+            width: 70px;
+            height: 70px;
+        }
+
+        .motor-shaft.rotating-forward {
+            animation: rotateForward 0.1s linear infinite;
+        }
+
+        .motor-shaft.rotating-reverse {
+            animation: rotateReverse 0.1s linear infinite;
+        }
+
+        @keyframes rotateForward {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes rotateReverse {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(-360deg); }
+        }
+
+        /* PUSH BUTTONS */
+        .button-container {
+            position: absolute;
+            display: flex;
+            gap: 100px;
+        }
+
+        .push-button {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(145deg, #f0f0f0, #e0e0e0);
+            border: 4px solid #333;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            box-shadow: 4px 4px 8px rgba(0,0,0,0.3);
+            user-select: none;
+        }
+
+        .push-button:active {
+            transform: translateY(2px);
+            box-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .push-button.pressed {
+            background: linear-gradient(145deg, #000075, #0056b3);
+            color: white;
+            transform: translateY(2px);
+        }
+
+        .button-center {
+            width: 30px;
+            height: 30px;
+            background: #000;
+            border-radius: 50%;
+            margin-bottom: 5px;
+        }
+
+        .push-button.pressed .button-center {
+            background: #fff;
+        }
+
+        .button-label {
+            font-size: 10px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .push-button.pressed .button-label {
+            color: white;
+        }
+
+        /* BATTERIES - pozitsiyada */
+        .battery-container {
+            position: absolute;
+            bottom: 20px;
+            display: flex;
+            gap: 60px;
+        }
+
+        .battery-container img {
+            width: 150px;
+            height: 150px;
+        }
+
+        /* WIRES - foizlarda */
+        .wire {
+            position: absolute;
+            z-index: 5;
+        }
+
+        .wire-red {
+            background: #ff0000;
+        }
+
+        .wire-black {
+            background: #000000;
+        }
+
+        .wire-blue {
+            background: #0066ff;
+        }
+
+        .wire-vertical {
+            width: 3px;
+        }
+
+        /* Wire connections - foizlarda (1200px kenglik, 600px balandlik asosida) */
+        .wire1 { width: 10.83%; height: 0.5%; top: 60%; left: 44.83%; }
+        .wire9 { width: 0.25%; height: 2.5%; top: 57.83%; right: 44.2%; }
+        .wire10 { width: 0.25%; height: 2.5%; top: 57.83%; left: 44.8%; }
+        .wire2 { width: 0.25%; height: 31.33%; top: 28.67%; left: 49.83%; }
+        .wire3 { height: 8%; top: 58%; left: 40.75%; }
+        .wire4 { height: 8%; top: 58%; right: 40.75%; }
+        .wire5 { width: 25%; height: 0.5%; bottom: 3.33%; left: 34.2%; }
+        .wire6 { width: 12.2%; height: 0.5%; top: 18.33%; left: 34.17%; }
+        .wire7 { width: 0.25%; height: 77.83%; top: 18.33%; left: 34.17%; }
+        
+        /* STATUS DISPLAY */
+        .status-display {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: rgba(0, 0, 117, 0.95);
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            min-width: 220px;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            z-index: 100;
+        }
+
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 8px 0;
+            font-size: 13px;
+        }
+
+        .status-led {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #dc3545;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+        }
+
+        .status-led.on {
+            background: #28a745;
+            box-shadow: 0 0 10px rgba(40, 167, 69, 0.8);
+        }
+
+        .status-led.forward {
+            background: #007bff;
+            box-shadow: 0 0 10px rgba(0, 123, 255, 0.8);
+        }
+
+        .status-led.reverse {
+            background: #ffc107;
+            box-shadow: 0 0 10px rgba(255, 193, 7, 0.8);
+        }
+
+        /* CONTROL PANEL */
+        .control-panel {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        .control-button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            min-width: 120px;
+            background: #000075;
+            color: white;
+        }
+
+        .control-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .control-button:active {
+            transform: translateY(-1px);
+        }
+
+        /* MODAL STYLES */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            backdrop-filter: blur(3px);
+        }
+
+        .modal-content {
+            background: #000075;
+            color: white;
+            margin: 5% auto;
+            padding: 20px;
+            width: 50%;
+            max-width: 700px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+            animation: slideDown 0.4s ease;
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+            transition: color 0.3s;
+        }
+
+        .close:hover {
+            color: #ffcc00;
+        }
+
+        .modal-content h2 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            border-bottom: 2px solid rgba(255,255,255,0.2);
+            padding-bottom: 8px;
+        }
+
+        .card {
+            background: rgba(255,255,255,0.08);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            transition: background 0.3s;
+        }
+
+        .card:hover {
+            background: rgba(255,255,255,0.15);
+        }
+
+        .tab-buttons {
+            display: flex;
+            margin-bottom: 10px;
+        }
+
+        .tab-buttons button {
+            flex: 1;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            border-radius: 5px 5px 0 0;
+            transition: background 0.3s;
+        }
+
+        .tab-buttons button.active {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        pre {
+            background: rgba(0,0,0,0.4);
+            padding: 12px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 0.9rem;
+        }
+.left-panel{width:280px;max-width:95%;background:#fff;border-radius:14px;padding:16px;box-shadow:0 6px 16px rgba(0,0,0,.08)}
+  .left-panel h3{margin:0 0 12px;font-size:16px;color:#333}
+  .btn{display:block;width:100%;padding:10px 12px;margin:8px 0;border:0;border-radius:10px;cursor:pointer;transition:.25s;text-align:left;font-weight:600}
+  .btn-primary{background:#000075;color:#fff}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 14px rgba(0,0,0,.1)}
+  .flex-container-40-60{display:flex;gap:20px;align-items:flex-start;background:rgba(255,255,255,.1);padding:20px;border-radius:15px;margin-bottom:20px}
+  .flex-text-60{flex:1}
+  .flex-text-60 p{font-size:16px;line-height:1.8}
+  .flex-container-30-70{display:flex;gap:20px;align-items:flex-start;background:rgba(255,255,255,.1);padding:20px;border-radius:15px;margin-bottom:20px}
+  .flex-image-30{flex:0 0 30%}
+  .flex-image-30 img{width:100%;border-radius:10px}
+  .flex-text-70{flex:0 0 70%}
+  .flex-text-70 strong{color:#ffcc00;font-size:18px;display:block;margin-bottom:10px}
+  .modal{display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.8);backdrop-filter:blur(5px);overflow-y:auto}
+  .modal-content{background:#000075;color:#fff;margin:5vh auto;padding:30px;width:90%;max-width:1000px;border-radius:20px;box-shadow:0 15px 40px rgba(0,0,0,.5);position:relative;animation:slideDown .4s ease}
+  @keyframes slideDown{from{transform:translateY(-50px);opacity:0}to{transform:translateY(0);opacity:1}}
+  .close{position:absolute;right:20px;top:15px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:bold;cursor:pointer;color:#fff;transition:.3s;border-radius:50%;background:rgba(255,255,255,.1)}
+  .close:hover{background:rgba(255,204,0,.3);color:#ffcc00;transform:rotate(90deg)}
+  .modal-content h2{font-size:28px;margin-bottom:25px;padding-bottom:15px;border-bottom:2px solid rgba(255,255,255,.3);padding-right:50px}
+  .tab-buttons{display:flex;gap:8px;margin:12px 0 16px}
+  .tab-btn{flex:1;background:rgba(255,255,255,.12);color:#fff;border:0;border-radius:10px 10px 0 0;padding:10px;cursor:pointer;font-weight:600;transition:.2s}
+  .tab-btn:hover{background:rgba(255,255,255,.2)}
+  .tab-btn.active{background:rgba(255,255,255,.28)}
+  .tab-content{display:none}
+  .tab-content.active{display:block}
+  pre{background:rgba(0,0,0,.35);padding:12px;border-radius:10px;overflow:auto;white-space:pre-wrap;word-break:break-word;color:#fff;font-size:13.5px;line-height:1.55}
+  #infoFloatingBtn{position:fixed;bottom:30px;right:30px;width:120px;height:120px;border-radius:50%;background:linear-gradient(135deg,#000075,#0000ff);color:#fff;border:4px solid #fff;cursor:pointer;font-size:16px;font-weight:bold;box-shadow:0 8px 20px rgba(0,0,0,.4);z-index:1500;transition:.3s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px}
+  #infoFloatingBtn:hover{transform:scale(1.1);box-shadow:0 12px 30px rgba(0,0,255,.6)}
+  #infoFloatingBtn span:first-child{font-size:36px}
+  .video-full{width:100%;border-radius:15px;background:#000}
+  .video-full video{width:100%;height:auto;border-radius:15px;max-height:70vh}
+  @media (max-width:1024px){.flex-container-40-60,.flex-container-30-70{flex-direction:column}.flex-image-30,.flex-text-70{flex:0 0 100%}}
+  @media (max-width:768px){.modal-content{width:96%;padding:20px 15px}#infoFloatingBtn{width:90px;height:90px;font-size:14px;bottom:20px;right:20px}#infoFloatingBtn span:first-child{font-size:28px}}
+        @keyframes slideDown {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    @media (min-width: 1700px) and (max-width: 4800px) {
+    /* shu oraliqdagi ekranlar uchun style */
+ 
+  .wire1 { width: 5.83%; height: 0.5%; top: 60%; left: 46.83%; }
+        .wire9 { width: 0.25%; height: 2.5%; top: 57.83%; right: 47.2%; }
+        .wire10 { width: 0.25%; height: 2.5%; top: 57.83%; left: 46.8%; }
+        .wire2 { width: 0.25%; height: 31.33%; top: 28.67%; left: 49.83%; }
+        .wire3 { height: 8%; top: 58%; left: 45.75%; }
+        .wire4 { height: 8%; top: 58%; right: 45.75%; }
+        .wire5 { width: 19.5%; height: 0.5%; bottom: 3.33%; left: 34.2%; }
+        .wire6 { width: 14.3%; height: 0.5%; top: 18.33%; left: 34.17%; }
+        .wire7 { width: 0.25%; height: 77.83%; top: 18.33%; left: 34.17%; }
+}
+        /* RESPONSIVE DESIGN */
+        @media (max-width: 1024px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .status-display {
+                position: relative;
+                margin: 20px auto;
+                width: fit-content;
+            }
+            
+            .control-panel {
+                position: relative;
+                margin-top: 30px;
+                transform: none;
+                left: auto;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .left-panel {
+                width: 100%;
+            }
+            
+            .circuit-container {
+                min-height: 400px;
+                padding: 20px;
+            }
+            
+            .button-container {
+                gap: 50px;
+            }
+            
+            .modal-content {
+                width: 90%;
+                margin: 10% auto;
+            }
+        }
+ @media (min-width: 268px) and (max-width: 480px){
+          .wire1 { width: 21.83%; height: 0.5%; top: 60%; left: 38.83%; }
+        .wire9 { display: none;}
+        .wire10 { display: none; }
+        .wire2 { width: 0.25%; height: 24.5%; top:35.67%; left: 49.83%; }
+        .wire3 { height: 10%; top: 60%; left: 22%; }
+        .wire4 { height: 10%; top: 60%; right: 22%; }
+        .wire5 { width: 82.5%; height: 0.5%; bottom: 4.5%; left: 5.2%; }
+        .wire6 { width: 32.3%; height: 0.5%; top: 18.33%; left: 5.2%; }
+        .wire7 { width: 0.5%; height: 77%; top: 18.33%; left: 5.2%; }
+            .battery-container {
+            position: absolute;
+            bottom: 20px;
+            display: flex;
+            gap: 60px;
+        }
+
+        .battery-container img {
+            width: 100px;
+            height: 100px;
+        }
+}
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="logo">
+               <a href="/"><img src="/static/image/logo.png" width="80px" height="80px" alt=""></a>
+          
+            <span>DC Dvigatelning oldinga/teskari aylanishi</span>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <div class="main-container">
+        <!-- LEFT PANEL -->
+        <div class="left-panel">
+            <div class="control-group">
+                <h3>Boshqaruv</h3>
+                <button class="btn btn-primary" onclick="togglePower()" id="powerBtn">
+                    🔌 Quvvat Yoqish
+                </button>
+                <button class="btn btn-success" onclick="testForward()">
+                    ▶️ Oldin Test
+                </button>
+                <button class="btn btn-info" onclick="testReverse()">
+                    ◀️ Orqa Test
+                </button>
+                <button class="btn btn-danger" onclick="stopMotor()">
+                    ⏹️ To'xtatish
+                </button>
+            </div>
+ <div class="control-group">
+                <h3>Ma'lumotlar</h3>
+                <button class="btn btn-primary" id="schemaBtn">
+                    Sxema qayerda ishlatiladi
+                </button>
+
+                <button class="btn btn-primary" id="componentsBtn">
+                    Qurilmalar
+                </button>
+            </div>
+
+            <div class="control-group">
+                <h3>Motor holati</h3>
+                <div class="status-row">
+                    <span>Quvvat:</span>
+                    <div class="status-led" id="powerLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Oldin tugma:</span>
+                    <div class="status-led" id="forwardLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Orqa tugma:</span>
+                    <div class="status-led" id="reverseLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Motor:</span>
+                    <div class="status-led" id="motorLed"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+            <div class="circuit-container">
+                <!-- DC MOTOR -->
+                <div class="motor-container">
+                    <img src="/static/image/dcmotor.png" alt="">
+                    <img class="motor-shaft" id="motorShaft" src="/static/image/hep.png" alt="">
+                </div>
+
+                <!-- PUSH BUTTONS -->
+                <div class="button-container">
+                    <div class="push-button" id="forwardBtn" 
+                         onmousedown="pressForward()" 
+                         onmouseup="releaseButton()" 
+                         onmouseleave="releaseButton()">
+                        <div class="button-center"></div>
+                        <div class="button-label">Oldinga</div>
+                    </div>
+                    
+                    <div class="push-button" id="reverseBtn" 
+                         onmousedown="pressReverse()" 
+                         onmouseup="releaseButton()" 
+                         onmouseleave="releaseButton()">
+                        <div class="button-center"></div>
+                        <div class="button-label">Ortga</div>
+                    </div>
+                </div>
+
+                <!-- BATTERIES -->
+                <div class="battery-container">
+                    <img src="/static/image/duracell3.7.png" alt="">
+                    <img src="/static/image/duracell3.7 - Copy.png" alt="">
+                </div>
+
+                <!-- WIRES -->
+                <div class="wire wire-red wire1"></div>
+                <div class="wire wire-red wire2"></div>
+                <div class="wire wire-blue wire3 wire-vertical"></div>
+                <div class="wire wire-blue wire4 wire-vertical"></div>
+                <div class="wire wire-black wire5"></div>
+                <div class="wire wire-black wire6"></div>
+                <div class="wire wire-black wire7"></div>
+                <div class="wire wire-black wire8"></div>
+                <div class="wire wire-red wire9"></div>
+                <div class="wire wire-red wire10"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- STATUS DISPLAY -->
+    <div class="status-display">
+        <h3>Tizim holati</h3>
+        <div class="status-row">
+            <span>Quvvat:</span>
+            <div class="status-led" id="powerStatus"></div>
+        </div>
+        <div class="status-row">
+            <span>Motor holati:</span>
+            <span id="motorDirection">To'xtagan</span>
+        </div>
+        <div class="status-row">
+            <span>Tezlik:</span>
+            <span id="motorSpeed">0 RPM</span>
+        </div>
+    </div>
+
+    <!-- CONTROL PANEL -->
+    <div class="control-panel">
+        <button class="control-button" onclick="togglePower()">
+            ⚡ Quvvat
+        </button>
+        <button class="control-button" onclick="resetSystem()">
+            🔄 Qayta o'rnatish
+        </button>
+        <button class="control-button" onclick="playDemo()">
+            ▶️ Demo
+        </button>
+    </div>
+
+    <!-- MODALS -->
+    <div class="modal" id="schemaModal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>💡 Sxema qayerda ishlatiladi (RGB LED)</h2>
+    <div class="flex-container-40-60">
+         <div class="flex-video-40">
+                <iframe 
+                    src="https://www.youtube.com/embed/HZE6cg5IN9o?si=vwmyYKQlDFm8TYf8" 
+                    title="YouTube video player" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+      <div class="flex-text-60">
+        <strong>🔄  Ishlash Prinsipi</strong>
+<p>
+
+Batareya yoki quvvat manbai motor terminallariga ulanganida, motor aylana boshlaydi.
+
+Yo‘nalishni o‘zgartirish: Motor terminalining musbat va manfiy qismlarini almashtirish orqali aylanish yo‘nalishini o‘zgartirish mumkin.
+
+Tezlikni boshqarish (PWM): Arduino yoki motor driver orqali motorga keladigan tokni modulatsiya qilish (Pulse Width Modulation) orqali tezlikni sozlash mumkin.
+
+Orqaga tokdan himoya: Diode motorni o‘chirganda yoki tezlik o‘zgarganda orqaga tokni yo‘q qiladi va motor driverni himoya qiladi.</p>
+      </div>
+    </div>
+    <div class="flex-container-40-60">
+         <div class="flex-video-40">
+                <iframe 
+                    src="https://www.youtube.com/embed/X7qCjhXvBI8?si=P3m6zpAnBewwbj_y" 
+                    title="YouTube video player" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+      <div class="flex-text-60">
+        <strong>DC Motor Vertolyot</strong>
+<p>Dc motordan foydalanib vertolyot yasash loyihasi ko'rsatilgan ushbu videoda</p>
+      </div>
+    </div>
+    <div class="flex-container-40-60">
+         <div class="flex-video-40">
+                <iframe 
+                    src="https://www.youtube.com/embed/oyCW9JkZv6Q?si=EUujUwj1v8ML3-qR" 
+                    title="YouTube video player" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+      <div class="flex-text-60">
+        <strong>20 ta Ixtiro</strong>
+       <p>Ajoyib Ixtirolar dc motor bilan tayyorlanadigan</p>
+   
+    </div>
+    </div>
+  </div>
+</div>
+<!-- Ishlatilgan qurilmalar (modal) -->
+
+<div class="modal" id="componentsModal">
+  <div class="modal-content">
+    <span class="close" title="Yopish">&times;</span>
+    <h2>🔌 Ishlatilgan Qurilmalar</h2>
+
+
+
+    <div class="flex-container-30-70">
+      <div class="flex-image-30"><img src="/static/image/dcmotor.png" alt="DC motor"></div>
+      <div class="flex-text-70">
+        <strong>DC motor</strong>
+        <p>Nominal voltajga mos quvvat manbasi bilan ishlating.</p>
+      </div>
+    </div>
+
+    <div class="flex-container-30-70">
+      <div class="flex-image-30"><img src="/static/image/battery - touch.png" alt="Quvvat manbai"></div>
+      <div class="flex-text-70">
+        <strong>Batareya quvvat manbai</strong>
+        <p>Batareya — bu elektr energiyasini saqlab, qurilmaga tok manbai sifatida ta’minlovchi elementdir.
+</p>
+      </div>
+    </div>
+
+    <div class="flex-container-30-70">
+      <div class="flex-image-30"><img src="/static/image/button.jpg" alt="Breadboard"></div>
+      <div class="flex-text-70">
+        <strong>Button </strong>
+        <p>Button (tugma) — bu elektr zanjirini yoqish yoki o‘chirish, ya’ni boshqarish signalini berish uchun ishlatiladigan qurilma.
+</p>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal" id="infoModal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>📚 Qo'shimcha Ma'lumot</h2>
+    <div class="video-full">
+      <video controls>
+        <source src="/media/2.mp4" type="video/mp4">
+        Brauzeringiz video formatni qo'llab-quvvatlamaydi.
+      </video>
+    </div>
+  </div>
+</div>
+
+<button id="infoFloatingBtn"><span>📚</span><span>Ma'lumot</span></button>
+    <script>
+        let audioContext;
+        let motorSound;
+        let powerOn = false;
+        let forwardPressed = false;
+        let reversePressed = false;
+        let motorRunning = false;
+        let motorDirection = 'stop';
+
+        function initAudio() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playMotorSound() {
+            initAudio();
+            
+            if (motorSound) {
+                motorSound.stop();
+            }
+
+            motorSound = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            motorSound.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            motorSound.frequency.setValueAtTime(80 + Math.random() * 40, audioContext.currentTime);
+            gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+            
+            motorSound.start();
+            
+            const interval = setInterval(() => {
+                if (motorRunning) {
+                    motorSound.frequency.setValueAtTime(80 + Math.random() * 40, audioContext.currentTime);
+                } else {
+                    clearInterval(interval);
+                }
+            }, 100);
+        }
+
+  function openModal(id){ const m=document.getElementById(id); if(m) m.style.display='block'; }
+  function closeModal(el){ const m=el.closest('.modal'); if(m) m.style.display='none'; }
+
+  document.addEventListener('click', (e)=>{ if(e.target.matches('.modal .close')) closeModal(e.target); });
+  window.addEventListener('click', (e)=>{ document.querySelectorAll('.modal').forEach(m=>{ if(e.target===m) m.style.display='none'; }); });
+
+  // buttons
+  document.getElementById('schemaBtn')?.addEventListener('click', ()=>openModal('schemaModal'));
+  document.getElementById('codeBtn')?.addEventListener('click',   ()=>openModal('codeModal'));
+  document.getElementById('componentsBtn')?.addEventListener('click', ()=>openModal('componentsModal'));
+  document.getElementById('infoFloatingBtn')?.addEventListener('click', ()=>openModal('infoModal'));
+
+  // tabs
+  (function(){
+    const codeModal=document.getElementById('codeModal');
+    if(!codeModal) return;
+    codeModal.querySelectorAll('.tab-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const t=btn.dataset.tab;
+        codeModal.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        codeModal.querySelectorAll('.tab-content').forEach(p=>p.classList.toggle('active', p.id===t));
+      });
+    });
+  })();
+        function stopMotorSound() {
+            if (motorSound) {
+                motorSound.stop();
+                motorSound = null;
+            }
+        }
+
+        function playClickSound() {
+            initAudio();
+            
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.1);
+        }
+
+        function updateStatus() {
+            document.getElementById('powerLed').classList.toggle('on', powerOn);
+            document.getElementById('forwardLed').classList.toggle('on', forwardPressed);
+            document.getElementById('reverseLed').classList.toggle('on', reversePressed);
+            document.getElementById('motorLed').classList.toggle('on', motorRunning);
+            
+            document.getElementById('powerStatus').classList.toggle('on', powerOn);
+            document.getElementById('motorDirection').textContent = getMotorStatusText();
+            document.getElementById('motorSpeed').textContent = motorRunning ? '1500 RPM' : '0 RPM';
+            
+            document.getElementById('powerBtn').innerHTML = powerOn ? '🔌 Quvvat O\'chirish' : '🔌 Quvvat Yoqish';
+        }
+
+        function getMotorStatusText() {
+            if (!powerOn) return 'O\'chiq';
+            if (!motorRunning) return 'To\'xtagan';
+            return motorDirection === 'forward' ? 'Oldin aylanmoqda' : 'Orqaga aylanmoqda';
+        }
+
+        function togglePower() {
+            playClickSound();
+            powerOn = !powerOn;
+            
+            if (!powerOn) {
+                stopMotor();
+            }
+            
+            updateStatus();
+        }
+
+        function pressForward() {
+            if (!powerOn) return;
+            
+            playClickSound();
+            forwardPressed = true;
+            reversePressed = false;
+            
+            document.getElementById('forwardBtn').classList.add('pressed');
+            document.getElementById('reverseBtn').classList.remove('pressed');
+            
+            startMotor('forward');
+        }
+
+        function pressReverse() {
+            if (!powerOn) return;
+            
+            playClickSound();
+            reversePressed = true;
+            forwardPressed = false;
+            
+            document.getElementById('reverseBtn').classList.add('pressed');
+            document.getElementById('forwardBtn').classList.remove('pressed');
+            
+            startMotor('reverse');
+        }
+
+        function releaseButton() {
+            forwardPressed = false;
+            reversePressed = false;
+            
+            document.getElementById('forwardBtn').classList.remove('pressed');
+            document.getElementById('reverseBtn').classList.remove('pressed');
+            
+            stopMotor();
+        }
+
+        function startMotor(direction) {
+            if (!powerOn) return;
+            
+            motorRunning = true;
+            motorDirection = direction;
+            
+            const shaft = document.getElementById('motorShaft');
+            shaft.classList.remove('rotating-forward', 'rotating-reverse');
+            
+            if (direction === 'forward') {
+                shaft.classList.add('rotating-forward');
+            } else {
+                shaft.classList.add('rotating-reverse');
+            }
+            
+            playMotorSound();
+            updateStatus();
+        }
+
+        function stopMotor() {
+            motorRunning = false;
+            motorDirection = 'stop';
+            
+            const shaft = document.getElementById('motorShaft');
+            shaft.classList.remove('rotating-forward', 'rotating-reverse');
+            
+            stopMotorSound();
+            updateStatus();
+        }
+
+        function testForward() {
+            if (!powerOn) {
+                alert('Avval quvvatni yoqing!');
+                return;
+            }
+            
+            pressForward();
+            setTimeout(() => {
+                releaseButton();
+            }, 2000);
+        }
+
+        function testReverse() {
+            if (!powerOn) {
+                alert('Avval quvvatni yoqing!');
+                return;
+            }
+            
+            pressReverse();
+            setTimeout(() => {
+                releaseButton();
+            }, 2000);
+        }
+
+        function resetSystem() {
+            playClickSound();
+            powerOn = false;
+            stopMotor();
+            releaseButton();
+            updateStatus();
+        }
+
+        function playDemo() {
+            if (!powerOn) {
+                togglePower();
+            }
+            
+            setTimeout(() => {
+                testForward();
+                setTimeout(() => {
+                    testReverse();
+                }, 3000);
+            }, 1000);
+        }
+
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            updateStatus();
+            
+            document.querySelectorAll('.close').forEach(closeBtn => {
+                closeBtn.addEventListener('click', function() {
+                    this.closest('.modal').style.display = 'none';
+                });
+            });
+            
+            window.addEventListener('click', function(event) {
+                document.querySelectorAll('.modal').forEach(modal => {
+                    if (event.target === modal) {
+                        modal.style.display = 'none';
+                    }
+                });
+            });
+            
+            document.addEventListener('keydown', function(event) {
+                if (!powerOn) return;
+                
+                switch(event.key) {
+                    case 'f':
+                    case 'F':
+                        pressForward();
+                        break;
+                    case 'r':
+                    case 'R':
+                        pressReverse();
+                        break;
+                    case ' ':
+                        event.preventDefault();
+                        stopMotor();
+                        break;
+                    case 'p':
+                    case 'P':
+                        togglePower();
+                        break;
+                }
+            });
+            
+            document.addEventListener('keyup', function(event) {
+                switch(event.key) {
+                    case 'f':
+                    case 'F':
+                    case 'r':
+                    case 'R':
+                        releaseButton();
+                        break;
+                }
+            });
+            
+            document.getElementById('forwardBtn').addEventListener('mousedown', function(e) {
+                if (reversePressed) {
+                    e.preventDefault();
+                    alert('⚠️ Ikki tugmani bir vaqtda bosmang! Short circuit xavfi!');
+                    return;
+                }
+                pressForward();
+            });
+            
+            document.getElementById('reverseBtn').addEventListener('mousedown', function(e) {
+                if (forwardPressed) {
+                    e.preventDefault();
+                    alert('⚠️ Ikki tugmani bir vaqtda bosmang! Short circuit xavfi!');
+                    return;
+                }
+                pressReverse();
+            });
+        });
+
+        document.getElementById('forwardBtn').addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            if (!reversePressed) {
+                pressForward();
+            }
+        });
+
+        document.getElementById('forwardBtn').addEventListener('touchend', function(e) {
+            e.preventDefault();
+            releaseButton();
+        });
+
+        document.getElementById('reverseBtn').addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            if (!forwardPressed) {
+                pressReverse();
+            }
+        });
+
+        document.getElementById('reverseBtn').addEventListener('touchend', function(e) {
+            e.preventDefault();
+            releaseButton();
+        });
+    </script>
+</body>
+</html>

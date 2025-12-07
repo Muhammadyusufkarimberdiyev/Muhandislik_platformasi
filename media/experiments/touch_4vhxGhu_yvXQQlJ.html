@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Touch Switch Tajriba Simulyatori</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #e6f3ff;
+            min-height: 100vh;
+            padding: clamp(10px, 2vw, 20px);
+            overflow-x: auto;
+        }
+.left-panel{width:280px;max-width:95%;background:#fff;border-radius:14px;padding:16px;box-shadow:0 6px 16px rgba(0,0,0,.08)}
+  .left-panel h3{margin:0 0 12px;font-size:16px;color:#333}
+  .btn{display:block;width:100%;padding:10px 12px;margin:8px 0;border:0;border-radius:10px;cursor:pointer;transition:.25s;text-align:left;font-weight:600}
+  .btn-primary{background:#000075;color:#fff}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 14px rgba(0,0,0,.1)}
+  .flex-container-40-60{display:flex;gap:20px;align-items:flex-start;background:rgba(255,255,255,.1);padding:20px;border-radius:15px;margin-bottom:20px}
+  .flex-text-60{flex:1}
+  .flex-text-60 p{font-size:16px;line-height:1.8}
+  .flex-container-30-70{display:flex;gap:20px;align-items:flex-start;background:rgba(255,255,255,.1);padding:20px;border-radius:15px;margin-bottom:20px}
+  .flex-image-30{flex:0 0 30%}
+  .flex-image-30 img{width:100%;border-radius:10px}
+  .flex-text-70{flex:0 0 70%}
+  .flex-text-70 strong{color:#ffcc00;font-size:18px;display:block;margin-bottom:10px}
+  .modal{display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.8);backdrop-filter:blur(5px);overflow-y:auto}
+  .modal-content{background:#000075;color:#fff;margin:5vh auto;padding:30px;width:90%;max-width:1000px;border-radius:20px;box-shadow:0 15px 40px rgba(0,0,0,.5);position:relative;animation:slideDown .4s ease}
+  @keyframes slideDown{from{transform:translateY(-50px);opacity:0}to{transform:translateY(0);opacity:1}}
+  .close{position:absolute;right:20px;top:15px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:bold;cursor:pointer;color:#fff;transition:.3s;border-radius:50%;background:rgba(255,255,255,.1)}
+  .close:hover{background:rgba(255,204,0,.3);color:#ffcc00;transform:rotate(90deg)}
+  .modal-content h2{font-size:28px;margin-bottom:25px;padding-bottom:15px;border-bottom:2px solid rgba(255,255,255,.3);padding-right:50px}
+  .tab-buttons{display:flex;gap:8px;margin:12px 0 16px}
+  .tab-btn{flex:1;background:rgba(255,255,255,.12);color:#fff;border:0;border-radius:10px 10px 0 0;padding:10px;cursor:pointer;font-weight:600;transition:.2s}
+  .tab-btn:hover{background:rgba(255,255,255,.2)}
+  .tab-btn.active{background:rgba(255,255,255,.28)}
+  .tab-content{display:none}
+  .tab-content.active{display:block}
+  pre{background:rgba(0,0,0,.35);padding:12px;border-radius:10px;overflow:auto;white-space:pre-wrap;word-break:break-word;color:#fff;font-size:13.5px;line-height:1.55}
+  #infoFloatingBtn{position:fixed;bottom:30px;right:30px;width:120px;height:120px;border-radius:50%;background:linear-gradient(135deg,#000075,#0000ff);color:#fff;border:4px solid #fff;cursor:pointer;font-size:16px;font-weight:bold;box-shadow:0 8px 20px rgba(0,0,0,.4);z-index:1500;transition:.3s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px}
+  #infoFloatingBtn:hover{transform:scale(1.1);box-shadow:0 12px 30px rgba(0,0,255,.6)}
+  #infoFloatingBtn span:first-child{font-size:36px}
+  .video-full{width:100%;border-radius:15px;background:#000}
+  .video-full video{width:100%;height:auto;border-radius:15px;max-height:70vh}
+  @media (max-width:1024px){.flex-container-40-60,.flex-container-30-70{flex-direction:column}.flex-image-30,.flex-text-70{flex:0 0 100%}}
+  @media (max-width:768px){.modal-content{width:96%;padding:20px 15px}#infoFloatingBtn{width:90px;height:90px;font-size:14px;bottom:20px;right:20px}#infoFloatingBtn span:first-child{font-size:28px}}
+        /* HEADER */
+        .header {
+            display: flex;
+            align-items: center;
+            background: #000075;
+            color: white;
+            padding: clamp(8px, 1.5vw, 10px) clamp(15px, 3vw, 20px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            width: 100%;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: clamp(14px, 2.5vw, 18px);
+            font-weight: bold;
+        }
+
+        .logo-icon {
+            width: clamp(30px, 5vw, 40px);
+            height: clamp(30px, 5vw, 40px);
+            background: #000075;
+            border-radius: 50%;
+            border: 2px solid white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(16px, 3vw, 20px);
+        }
+
+        /* MAIN LAYOUT */
+        .main-container {
+            display: flex;
+            margin-top: clamp(15px, 2vw, 20px);
+            gap: clamp(15px, 2vw, 20px);
+        }
+
+        /* LEFT PANEL */
+        .left-panel {
+            width: 280px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            height: fit-content;
+            position: relative;
+            z-index: 1;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 15px;
+        }
+
+        .control-group h3 {
+            margin-bottom: 10px;
+            color: #000075;
+            font-size: clamp(14px, 2vw, 16px);
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 8px;
+            font-size: clamp(12px, 1.8vw, 14px);
+            border-radius: 5px;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn-success { background: #28a745; color: white; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-primary { background: #000075; color: white; }
+        .btn-info { background: #000075; color: white; }
+
+        /* MAIN CONTENT */
+        .main-content {
+            flex: 1;
+            padding: clamp(15px, 2.5vw, 20px);
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .title-header {
+            background: #000075;
+            color: white;
+            padding: clamp(10px, 2vw, 12px) clamp(20px, 4vw, 25px);
+            border-radius: 20px;
+            font-size: clamp(14px, 2.5vw, 18px);
+            font-weight: bold;
+            margin: 0 auto 30px;
+            text-align: center;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .circuit-container {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .circuit-board {
+            background: #ffffff;
+            border: 4px solid #000075;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 600px;
+            aspect-ratio: 6 / 5;
+            position: relative;
+            margin: 0 auto;
+            display: flex;
+            box-shadow: 0 0 25px rgba(0, 0, 117, 0.3);
+        }
+
+        .circuit-title {
+            background: #000075;
+            color: white;
+            padding: clamp(6px, 1.2vw, 8px) clamp(15px, 3vw, 20px);
+            border-radius: 15px;
+            font-size: clamp(11px, 2vw, 14px);
+            font-weight: bold;
+            position: absolute;
+            top: -12px;
+            right: 5%;
+            box-shadow: 0 3px 10px rgba(0, 0, 117, 0.3);
+            white-space: nowrap;
+        }
+
+        /* RESPONSIVE ABSOLUTE POSITIONING */
+        .abs { position: absolute; will-change: transform; }
+
+        /* BATTERY */
+        .battery{
+            width: 150px;
+            height: 150px;
+            position: absolute;
+            top: 67%;
+            left: 17%;
+        }
+
+        /* LED */
+        .led {
+                    width: 20px;
+            height: 30px;
+            border-radius: 10px 10px 0 0;
+            background: linear-gradient(145deg, #00ff44, #00cc33);
+           
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(8px, 1.5vw, 10px);
+            font-weight: bold;
+            color: white;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px rgba(0, 255, 68, 0.3);
+        }
+
+        .led.on {
+            background: linear-gradient(145deg, #00ff44, #00cc33);
+            box-shadow: 0 0 20px rgba(0, 255, 68, 0.8);
+            animation: ledGlow 1s ease-in-out infinite alternate;
+        }
+
+        .led.off {
+            background: linear-gradient(145deg, #444444, #333333);
+            box-shadow: none;
+        }
+
+        @keyframes ledGlow {
+            0% { box-shadow: 0 0 20px rgba(0, 255, 68, 0.8); }
+            100% { box-shadow: 0 0 30px rgba(0, 255, 68, 1); }
+        }
+
+        /* BC547 TRANSISTOR */
+        .transistor {
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: clamp(8px, 1.3vw, 9px);
+            font-weight: bold;
+          
+        }
+
+        .transistor img {
+            width: 100px;
+            height: 100px;
+            object-fit: contain;
+            position: absolute;
+            top: 1%;
+            left: 33.7%;
+        }
+
+
+        /* RESISTORS */
+        .resistor {
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(7px, 1.2vw, 8px);
+            font-weight: bold;
+            color: white;
+             width: 100px;
+            height: 50px;
+        }
+
+        .resistor img {
+            width: 100px;
+            height: 50px;
+            object-fit: contain;
+        }
+
+        /* TOUCH SENSOR AREA */
+        .touch-sensor {
+            background: linear-gradient(145deg, #f0f0f0, #e0e0e0);
+            border: 3px dashed #000075;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .touch-sensor:hover {
+            background: linear-gradient(145deg, #e0e0f0, #d0d0e0);
+            border-color: #0066ff;
+            box-shadow: 0 0 15px rgba(0, 102, 255, 0.3);
+        }
+
+        .touch-sensor.active {
+            background: linear-gradient(145deg, #ffeeee, #ffdddd);
+            border-color: #ff4444;
+            box-shadow: 0 0 20px rgba(255, 68, 68, 0.5);
+        }
+
+        .touch-icon {
+            font-size: clamp(20px, 4vw, 30px);
+            margin-bottom: 5px;
+        }
+
+        .touch-label {
+            font-size: clamp(10px, 1.8vw, 12px);
+            font-weight: bold;
+            color: #000075;
+        }
+
+        /* HAND ANIMATION */
+        .hand-demo {
+            font-size: clamp(30px, 6vw, 40px);
+            opacity: 0;
+            transition: all 0.4s ease;
+            z-index: 10;
+        }
+
+        .hand-demo.visible {
+            opacity: 1;
+            animation: handTouch 1.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes handTouch {
+            0% { transform: translateX(-50%) translateY(0); }
+            100% { transform: translateX(-50%) translateY(-10px); }
+        }
+
+        /* WIRES */
+        .wire {
+            z-index: 5;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .wire-red { 
+            background: linear-gradient(90deg, #ff0000, #ff4444);
+            box-shadow: 0 2px 6px rgba(255,0,0,0.5);
+        }
+        .wire-black { 
+            background: linear-gradient(90deg, #000000, #333333);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.6);
+        }
+        .wire-green { 
+            background: linear-gradient(90deg, #00ff00, #44ff44);
+            box-shadow: 0 2px 6px rgba(0,255,0,0.5);
+        }
+        .wire-blue { 
+            background: linear-gradient(90deg, #0066ff, #4488ff);
+            box-shadow: 0 2px 6px rgba(0,102,255,0.5);
+        }
+
+        /* STATUS DISPLAY */
+        .status-display {
+            position: fixed;
+            top: 90px;
+            right: 20px;
+            background: rgba(0, 0, 117, 0.9);
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            min-width: 220px;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            z-index: 100;
+        }
+
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 8px 0;
+            font-size: clamp(11px, 1.8vw, 13px);
+        }
+
+        .status-led {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #dc3545;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+        }
+
+        .status-led.on {
+            background: #28a745;
+            box-shadow: 0 0 10px rgba(40, 167, 69, 0.8);
+        }
+
+        /* MODAL STYLES */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            backdrop-filter: blur(3px);
+        }
+
+        .modal-content {
+            background: #000075;
+            color: white;
+            margin: 5% auto;
+            padding: 20px;
+            width: 90%;
+            max-width: 700px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+            animation: slideDown 0.4s ease;
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+            transition: color 0.3s;
+        }
+
+        .close:hover { color: #ffcc00; }
+
+        .modal-content h2 {
+            font-size: clamp(1.2em, 3vw, 1.5em);
+            margin-bottom: 15px;
+            border-bottom: 2px solid rgba(255,255,255,0.2);
+            padding-bottom: 8px;
+        }
+
+        .card {
+            background: rgba(255,255,255,0.08);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            transition: background 0.3s;
+        }
+
+        .card:hover { background: rgba(255,255,255,0.15); }
+
+        pre {
+            background: rgba(0,0,0,0.4);
+            padding: 12px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: clamp(0.7rem, 1.5vw, 0.9rem);
+            line-height: 1.4;
+        }
+
+        /* RESPONSIVE DESIGN */
+        @media (max-width: 1024px) {
+            .main-container { flex-direction: column; }
+            .left-panel { width: 100%; }
+            .circuit-board { max-width: 500px; }
+        }
+
+        @media (max-width: 768px) {
+            .status-display {
+                position: relative;
+                margin: 20px auto;
+                width: fit-content;
+                top: 0;
+                right: 0;
+            }
+            .modal-content { width: 95%; margin: 10% auto; }
+            .circuit-title { font-size: clamp(9px, 2.5vw, 12px); }
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes wireGlow {
+            0% { box-shadow: 0 0 5px rgba(255, 255, 0, 0.8); }
+            100% { box-shadow: 0 0 10px rgba(255, 255, 0, 1); }
+        }
+        
+@media (max-width:480px){
+  .battery{
+    width: 85px !important;
+    height: 80px !important;
+    top: 67% !important;
+    left: 18% !important;
+  }
+  .resistor img {
+    width: 55px !important;
+    height: 30px !important;
+      position: absolute;
+    top: 2px;
+    left: 178px;
+  }
+  .transistor img {
+    width: 25px !important;
+    position: absolute;
+    top: -10px;
+    left: 113px;
+  }
+}
+
+        
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="logo">
+                       <a href="/"><img src="/static/image/logo.png" width="80px" height="80px" alt=""></a>
+          
+   <span>Touch Switch Tajriba Simulyatori</span>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <div class="main-container">
+        <!-- LEFT PANEL -->
+        <div class="left-panel">
+            <div class="control-group">
+                <h3>🔧 Boshqaruv</h3>
+                <button class="btn btn-success" onclick="startSimulation()">▶️ Tajribani boshlash</button>
+                <button class="btn btn-danger" onclick="stopSimulation()">⏹️ Tajribani to'xtatish</button>
+                <button class="btn btn-primary" onclick="togglePower()">🔋 Quvvatni yoqish/o'chirish</button>
+                <button class="btn btn-info" onclick="runTest()">🧪 Test rejimi</button>
+            </div>
+
+      <!-- ✅ LEFT PANEL: 3 ta tugma -->
+<aside class="left-panel">
+  <h3>Ma'lumotlar</h3>
+  <button class="btn btn-primary" id="schemaBtn">💡 Sxema qayerda ishlatiladi</button>
+
+  <button class="btn btn-primary" id="componentsBtn">🔌 Qurilmalar</button>
+</aside>
+
+            <div class="control-group">
+                <h3>📊 Holat ko'rsatkichlari</h3>
+                <div class="status-row">
+                    <span>🔋 Quvvat manbai:</span>
+                    <div class="status-led" id="powerLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>💡 LED holati:</span>
+                    <div class="status-led" id="ledLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>👆 Touch sensori:</span>
+                    <div class="status-led" id="touchLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>🔧 Tranzistor:</span>
+                    <div class="status-led" id="transistorLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>⚡ Zanjir holati:</span>
+                    <div class="status-led" id="circuitLed"></div>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <h3>📊 Ovoz sozlamalari</h3>
+                <button class="btn btn-info" onclick="toggleSound()">🔊 Ovozni yoqish/o'chirish</button>
+                <div style="margin-top: 10px;">
+                    <label style="font-size: 12px;">Ovoz balandligi:</label>
+                    <input type="range" id="volumeSlider" min="0" max="100" value="50" style="width: 100%;" onchange="setVolume(this.value)">
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+            <div class="circuit-container">
+                <div class="circuit-board" id="stage">
+                    <div class="circuit-title">BC547 Sensorli almashtirish davri</div>
+                    
+                    <!-- HAND DEMO -->
+                    <div class="hand-demo abs" id="handDemo" data-top="40" data-left="4">✋</div>
+                    
+                    <!-- BATTERY -->
+                    <div class="battery" id="battery" data-bottom="10" data-left="25" data-width="10" data-height="20">
+                       
+                        <img src="/static/image/battery - touch.png" style="  width: 100%;
+            height: 100%;" alt="">
+                    </div>
+                    
+                    <!-- LED -->
+                    <div class="abs" data-top="16" data-left="13.3" data-width="5" data-height="8">
+                        <div class="led off" id="led">
+                            <div></div>
+                        </div>
+                    </div>
+                    
+                    <!-- BC547 TRANSISTOR -->
+                    <div class="transistor" >
+                        <img src="/static/image/bc547 - Copy.png" style="  width: 100px;
+            height: 100px; @media(max-width:480px){
+                width: 100px; height: 100px;
+            }" alt="">
+                    </div>
+                    
+                    <!-- RESISTORS -->
+                    <div class="resistor r330-1 " data-top="36" data-left="13.3" data-width="8.3" data-height="2.4">330Ω
+                        <img src="/static/image/resistor.png" width="100% " height="100%" style="position:absolute;width:80px;height:60px;-fit:contain;top:17.8% ;right:29%;" alt="">
+                    </div>
+                    <div class="resistor r330-2  " data-top="22.7" data-right="33.3" data-width="2.3" data-height="2.4">330Ω
+                        <img src="/static/image/resistor.png" style="position:absolute;width:75px;height:60px;object-fit:contain;top:31.2%; left: 13%;@media (max-width:480px){width:55px;height:40px;}" alt="">
+                    </div>
+                    
+                    <!-- TOUCH SENSOR AREA -->
+                    <div class="touch-sensor abs" id="touchSensor" 
+                         data-top="30" data-left="41.7" data-width="20" data-height="16"
+                         onmousedown="startTouch()" 
+                         onmouseup="endTouch()"
+                         onmouseleave="endTouch()">
+                        <div class="touch-icon">👆</div>
+                        <div class="touch-label">Bu yerga bosing</div>
+                    </div>
+                    
+                    <!-- WIRES (% based) - HAMMASI KO'RINADI -->
+                    <!-- Qizil simlar -->
+                    <div class="wire wire-red abs" data-bottom="33.3" data-left="12.5" data-width="13.8" data-height="0.8"></div>
+                    <div class="wire wire-red abs" data-top="26.8" data-left="12.5" data-width="27.2" data-height="0.8"></div>
+                    <div class="wire wire-red abs" data-bottom="34" data-left="12.5" data-width="0.8" data-height="38.6"></div>
+                    <div class="wire wire-red abs" data-top="19.8" data-left="39.5" data-width="1" data-height="7.8"></div>
+                    <div class="wire wire-red abs" data-bottom="31.4" data-left="25.8" data-width="0.8" data-height="2.6"></div>
+                    
+                    <!-- Qora simlar -->
+                    <div class="wire wire-black abs" data-bottom="35" data-right="23.3" data-width="44.5" data-height="0.8"></div>
+                    <div class="wire wire-black abs" data-bottom="31.8" data-left="32" data-width="0.8" data-height="4"></div>
+                    
+                    <!-- Yashil simlar -->
+                    <div class="wire wire-green abs" data-top="20" data-left="41.5" data-width="1" data-height="10"></div>
+                    <div class="wire wire-green abs" data-top="36.8" data-left="25" data-width="16.3" data-height="1"></div>
+                    
+                    <!-- Ko'k simlar -->
+                    <div class="wire wire-black abs" data-top="23.4" data-right="23.3" data-width="0.8" data-height="41"></div>
+                    <div class="wire wire-black abs" data-top="23.4" data-right="23.3" data-width="6" data-height="0.8"></div>
+                    <div class="wire wire-black abs" data-top="23.4" data-right="41.7" data-width="14" data-height="0.8"></div>
+                    <div class="wire wire-black abs" data-top="18.4" data-right="55.7" data-width="0.8" data-height="5.7"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- STATUS DISPLAY -->
+    <div class="status-display">
+        <div style="font-weight: bold; margin-bottom: 10px; text-align: center;">🔬 Tajriba holati</div>
+        <div class="status-row">
+            <span>Zanjir:</span>
+            <div class="status-led" id="circuitStatus"></div>
+        </div>
+        <div class="status-row">
+            <span>Teginish:</span>
+            <div class="status-led" id="touchStatus"></div>
+        </div>
+        <div class="status-row">
+            <span>LED:</span>
+            <div class="status-led" id="ledStatus"></div>
+        </div>
+    </div>
+
+  
+
+
+
+<!-- ✅ 1) Sxema qayerda ishlatiladi (Night LED / LDR) -->
+<div class="modal" id="schemaModal">
+  <div class="modal-content">
+    <span class="close" title="Yopish">&times;</span>
+    <h2>💡 Sxema qayerda ishlatiladi (Night LED – LDR)</h2>
+
+    <div class="flex-container-40-60">
+      <div class="flex-video-40">
+        <iframe
+          src="https://www.youtube.com/embed/Vgsb9PGus9Q?si=4VBPOn3pmYuUaEdE"
+          title="Night Light with LDR"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen></iframe>
+      </div>
+      <div class="flex-text-60">
+        <strong>🔄 Ulanish sxemasi</strong>
+<p>Touch sensor → BC547 baza (base) orqali ulanadi
+
+Baza va sensor orasida 10kΩ rezistor
+
+BC547 kolektor (C) → LEDning manfiy qismi
+
+BC547 emitter (E) → GND
+
+LEDning musbat uchi → 220Ω rezistor orqali 5V
+
+Arduino → baza signali o‘qib, kerak bo‘lsa LED yoki boshqa qurilmani boshqaradi
+
+    </div>
+    </div>
+
+    <div class="flex-container-40-60">
+      <div class="flex-video-40">
+        <iframe
+        src=" https://www.youtube.com/embed/Gjnk_Vw-m14?si=7HjLPCPn_Cp5Rkik"
+    
+          src="https://www.youtube.com/embed/hlgIDz4ie1M?si=EjPcVwIKmCVfhBTx"
+          title="LDR based lamp"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen></iframe>
+      </div>
+      <div class="flex-text-60">
+        <strong>🧩 Qo‘shimcha imkoniyatlar</strong>
+<p>Buzzer qo‘shish: Tugma bosilganda signal berish
+
+RGB LED bilan: Tugma bosilganda rangli vizual effekt
+
+Relay bilan: Touch sensor orqali kichik quvvatli qurilmalarni yoqish/o‘chirish
+
+Capacitive touch sensor bilan: BC547 bilan barqaror signal olish</p>
+      </div>
+    </div>
+ 
+    <div class="flex-container-40-60">
+      <div class="flex-video-40">
+        <iframe
+        src=" https://www.youtube.com/embed/Gjnk_Vw-m14?si=7HjLPCPn_Cp5Rkik"
+    
+   
+          title="LDR based lamp"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen></iframe>
+      </div>
+      <div class="flex-text-60">
+        <strong>Afzalliklari</strong>
+<p>Touch sensorlarni o‘rganish uchun ideal loyiha
+
+BC547 orqali signalni kuchaytirish va qurilmalarni boshqarish mumkin
+
+LED, buzzer yoki boshqa tizimlarni qo‘shib amaliy loyiha yaratish oson</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- ✅ 3) Qurilmalar -->
+<div class="modal" id="componentsModal">
+  <div class="modal-content">
+    <span class="close" title="Yopish">&times;</span>
+    <h2>🔌 Ishlatilgan Qurilmalar</h2>
+
+    <div class="flex-container-30-70">
+      <div class="flex-image-30"><img src="/static/image/arduino1 - Copy.png" alt="Arduino UNO"></div>
+      <div class="flex-text-70">
+        <strong>Arduino UNO</strong>
+        <p> PWM orqali chiroq yorqinligini boshqarish.</p>
+      </div>
+    </div>
+
+    <div class="flex-container-30-70">
+      <div class="flex-image-30"><img src="/static/image/resistor.png" alt="LDR (fotoqarshilik)"></div>
+      <div class="flex-text-70">
+        <strong>Resistor + 220kΩ</strong>
+        <p></p>
+      </div>
+    </div>
+
+    <div class="flex-container-30-70">
+      <div class="flex-image-30"><img src="/static/image/led-removebg-preview.png" alt="LED"></div>
+      <div class="flex-text-70">
+        <strong>LED + 220Ω</strong>
+        <p>Oddiy LED uchun. Katta yuk bo‘lsa, tranzistor/MOSFET yoki relay bilan boshqaring.</p>
+      </div>
+    </div>
+
+    <div class="flex-container-30-70">
+      <div class="flex-image-30"><img src="/static/image/bc547 - Copy.png" alt="Tranzistor / MOSFET"></div>
+      <div class="flex-text-70">
+        <strong>NPN tranzistor/MOSFET (ixtiyoriy)</strong>
+        <p>12V LED strip yoki kattaroq chiroqni boshqarish uchun.</p>
+      </div>
+    </div>
+
+    <div class="flex-container-30-70">
+      <div class="flex-image-30"><img src="/static/image/battery - Copy.png" alt="Breadboard"></div>
+      <div class="flex-text-70">
+        <strong>Battareya</strong>
+        <p>Quvvat manbai</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ✅ 4) Qo'shimcha info (ixtiyoriy) + suzuvchi tugma -->
+<div class="modal" id="infoModal">
+  <div class="modal-content">
+    <span class="close" title="Yopish">&times;</span>
+    <h2>📚 Qo'shimcha Ma'lumot</h2>
+    <div class="video-full">
+      <video controls>
+        <source src="/media/2.mp4" type="video/mp4">
+        Brauzeringiz video formatni qo'llab-quvvatlamaydi.
+      </video>
+    </div>
+  </div>
+</div>
+
+<button id="infoFloatingBtn"><span>📚</span><span>Ma'lumot</span></button>
+
+    <script>
+        let powerOn = false;
+        let touchActive = false;
+        let ledOn = false;
+        let soundEnabled = true;
+        let volume = 0.5;
+
+        const elements = {
+            battery: document.getElementById('battery'),
+            led: document.getElementById('led'),
+            transistor: document.getElementById('transistor'),
+            touchSensor: document.getElementById('touchSensor'),
+            handDemo: document.getElementById('handDemo'),
+            powerLed: document.getElementById('powerLed'),
+            ledLed: document.getElementById('ledLed'),
+            touchLed: document.getElementById('touchLed'),
+            transistorLed: document.getElementById('transistorLed'),
+            circuitLed: document.getElementById('circuitLed'),
+            circuitStatus: document.getElementById('circuitStatus'),
+            touchStatus: document.getElementById('touchStatus'),
+            ledStatus: document.getElementById('ledStatus'),
+        };
+
+  function openModal(id){ const m=document.getElementById(id); if(m) m.style.display='block'; }
+  function closeModal(el){ const m=el.closest('.modal'); if(m) m.style.display='none'; }
+
+  document.addEventListener('click', (e)=>{ if(e.target.matches('.modal .close')) closeModal(e.target); });
+  window.addEventListener('click', (e)=>{ document.querySelectorAll('.modal').forEach(m=>{ if(e.target===m) m.style.display='none'; }); });
+
+  // buttons
+  document.getElementById('schemaBtn')?.addEventListener('click', ()=>openModal('schemaModal'));
+  document.getElementById('codeBtn')?.addEventListener('click',   ()=>openModal('codeModal'));
+  document.getElementById('componentsBtn')?.addEventListener('click', ()=>openModal('componentsModal'));
+  document.getElementById('infoFloatingBtn')?.addEventListener('click', ()=>openModal('infoModal'));
+
+  // tabs
+  (function(){
+    const codeModal=document.getElementById('codeModal');
+    if(!codeModal) return;
+    codeModal.querySelectorAll('.tab-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const t=btn.dataset.tab;
+        codeModal.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        codeModal.querySelectorAll('.tab-content').forEach(p=>p.classList.toggle('active', p.id===t));
+      });
+    });
+  })();
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playBeep(frequency = 800, duration = 200) {
+            if (!soundEnabled) return;
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+            oscillator.type = 'sine';
+            gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+            gainNode.gain.linearRampToValueAtTime(volume * 0.3, audioContext.currentTime + 0.01);
+            gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + duration / 1000);
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + duration / 1000);
+        }
+
+        function playClickSound() { playBeep(1200, 100); }
+        function playActivationSound() { playBeep(800, 200); setTimeout(() => playBeep(1000, 150), 100); }
+        function playDeactivationSound() { playBeep(600, 200); setTimeout(() => playBeep(400, 150), 100); }
+        function playErrorSound() { playBeep(300, 300); setTimeout(() => playBeep(250, 200), 150); }
+        function playSuccessSound() { playBeep(600, 100); setTimeout(() => playBeep(800, 100), 100); setTimeout(() => playBeep(1000, 100), 200); }
+
+        function updateStatus() {
+            elements.powerLed.classList.toggle('on', powerOn);
+            elements.ledLed.classList.toggle('on', ledOn);
+            elements.touchLed.classList.toggle('on', touchActive);
+            elements.transistorLed.classList.toggle('on', touchActive && powerOn);
+            elements.circuitLed.classList.toggle('on', powerOn);
+            elements.circuitStatus.classList.toggle('on', powerOn);
+            elements.touchStatus.classList.toggle('on', touchActive);
+            elements.ledStatus.classList.toggle('on', ledOn);
+        }
+
+        function togglePower() {
+            powerOn = !powerOn;
+            playClickSound();
+            if (!powerOn) {
+                ledOn = false;
+                touchActive = false;
+                elements.led.className = 'led off';
+                elements.touchSensor.classList.remove('active');
+                elements.handDemo.classList.remove('visible');
+                playDeactivationSound();
+            } else {
+                playActivationSound();
+            }
+            updateStatus();
+        }
+
+        function startTouch() {
+            if (!powerOn) {
+                playErrorSound();
+                alert('⚠️ Avval quvvatni yoqing!');
+                return;
+            }
+            touchActive = true;
+            ledOn = true;
+            elements.touchSensor.classList.add('active');
+            elements.led.className = 'led on';
+            elements.handDemo.classList.add('visible');
+            playBeep(1000, 300);
+            updateStatus();
+        }
+
+        function endTouch() {
+            if (!powerOn) return;
+            touchActive = false;
+            ledOn = false;
+            elements.touchSensor.classList.remove('active');
+            elements.led.className = 'led off';
+            elements.handDemo.classList.remove('visible');
+            playBeep(400, 200);
+            updateStatus();
+        }
+
+        function startSimulation() {
+            playClickSound();
+            if (!powerOn) {
+                togglePower();
+                setTimeout(() => {
+                    playSuccessSound();
+                    alert('🎉 Tajriba boshlandi! Touch sensor joyiga bosing.');
+                }, 500);
+            } else {
+                playSuccessSound();
+                alert('🎉 Tajriba allaqachon ishlamoqda!');
+            }
+        }
+
+        function stopSimulation() {
+            playClickSound();
+            if (powerOn) {
+                togglePower();
+                setTimeout(() => {
+                    playDeactivationSound();
+                    alert('⏹️ Tajriba to\'xtatildi.');
+                }, 200);
+            } else {
+                alert('⚠️ Tajriba allaqachon to\'xtatilgan.');
+            }
+        }
+
+        function runTest() {
+            playClickSound();
+            if (!powerOn) {
+                alert('⚠️ Avval quvvatni yoqing!');
+                playErrorSound();
+                return;
+            }
+            playSuccessSound();
+            alert('🧪 Test rejimi boshlandi!');
+            let testStep = 0;
+            const testSequence = setInterval(() => {
+                switch(testStep) {
+                    case 0: startTouch(); testStep++; break;
+                    case 1: endTouch(); testStep++; break;
+                    case 2: startTouch(); testStep++; break;
+                    case 3: endTouch(); testStep++; break;
+                    default:
+                        clearInterval(testSequence);
+                        playSuccessSound();
+                        alert('✅ Test muvaffaqiyatli yakunlandi!');
+                        break;
+                }
+            }, 1000);
+        }
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            playClickSound();
+            alert(soundEnabled ? '🔊 Ovoz yoqildi' : '🔇 Ovoz o\'chirildi');
+        }
+
+        function setVolume(value) {
+            volume = value / 100;
+            playBeep(800, 100);
+        }
+
+        function openModal(id) {
+            document.getElementById(id).style.display = "block";
+            playClickSound();
+        }
+
+        document.querySelectorAll(".modal .close").forEach(btn => {
+            btn.addEventListener("click", function() {
+                this.closest(".modal").style.display = "none";
+                playClickSound();
+            });
+        });
+
+        window.addEventListener("click", function(e) {
+            document.querySelectorAll(".modal").forEach(modal => {
+                if (e.target === modal) {
+                    modal.style.display = "none";
+                    playClickSound();
+                }
+            });
+        });
+
+        document.addEventListener('keydown', function(e) {
+            switch(e.key) {
+                case 'p':
+                case 'P': togglePower(); break;
+                case 's':
+                case 'S': startSimulation(); break;
+                case 'x':
+                case 'X': stopSimulation(); break;
+                case 't':
+                case 'T': runTest(); break;
+                case ' ':
+                    e.preventDefault();
+                    if (powerOn) { touchActive ? endTouch() : startTouch(); }
+                    break;
+            }
+        });
+
+        elements.touchSensor.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            startTouch();
+        });
+
+        elements.touchSensor.addEventListener('touchend', function(e) {
+            e.preventDefault();
+            endTouch();
+        });
+
+        // RESPONSIVE POSITIONING
+        function applyResponsivePositions() {
+            const stage = document.getElementById('stage');
+            const items = stage.querySelectorAll('.abs');
+            
+            items.forEach(el => {
+                const leftPct = el.dataset.left;
+                const topPct = el.dataset.top;
+                const rightPct = el.dataset.right;
+                const bottomPct = el.dataset.bottom;
+                const wPct = el.dataset.width;
+                const hPct = el.dataset.height;
+
+                if(leftPct) { el.style.left = leftPct+'%'; el.style.right='auto'; }
+                if(topPct) { el.style.top = topPct+'%'; el.style.bottom='auto'; }
+                if(rightPct) { el.style.right = rightPct+'%'; el.style.left='auto'; }
+                if(bottomPct) { el.style.bottom = bottomPct+'%'; el.style.top='auto'; }
+                if(wPct) { el.style.width = wPct+'%'; }
+                if(hPct) { el.style.height = hPct+'%'; }
+            });
+        }
+
+        window.addEventListener('load', applyResponsivePositions);
+        window.addEventListener('resize', applyResponsivePositions);
+
+        updateStatus();
+
+        setTimeout(() => {
+            if (soundEnabled) { playSuccessSound(); }
+            alert('🎉 Touch Switch Tajriba Simulyatoriga xush kelibsiz!\n\n' +
+                  '📋 Qo\'llanma:\n' +
+                  '• P - Quvvatni yoqish/o\'chirish\n' +
+                  '• S - Simulyatsiyani boshlash\n' +
+                  '• X - Simulyatsiyani to\'xtatish\n' +
+                  '• T - Test rejimi\n' +
+                  '• SPACE - Touch sensor\n\n' +
+                  '🔬 Tajribani boshlash uchun tugmani bosing!');
+        }, 1000);
+
+        setInterval(updateStatus, 1000);
+
+     
+        setInterval(addVisualFeedback, 500);
+
+        function updateWireAnimations() {
+            const wires = document.querySelectorAll('.wire');
+            wires.forEach(wire => {
+                if (powerOn && (touchActive || wire.classList.contains('wire-black'))) {
+                    wire.style.boxShadow = '0 0 5px rgba(255, 255, 0, 0.8)';
+                    wire.style.animation = 'wireGlow 1s ease-in-out infinite alternate';
+                } else if (powerOn) {
+                    wire.style.boxShadow = '0 0 3px rgba(255, 255, 0, 0.4)';
+                    wire.style.animation = 'none';
+                } else {
+                    wire.style.boxShadow = 'none';
+                    wire.style.animation = 'none';
+                }
+            });
+        }
+
+        setInterval(updateWireAnimations, 200);
+    </script>
+</body>
+</html>

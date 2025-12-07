@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elektromagnit Simulatori</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+
+            min-height: 100vh;
+            padding: 1vw;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            background: #000075;
+            color: white;
+            padding: 1vw 2vw;
+            box-shadow: 0 0.4vw 1.2vw rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-radius: 1vw;
+            margin-bottom: 2vw;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1vw;
+            font-size: clamp(14px, 1.4vw, 18px);
+            font-weight: bold;
+        }
+
+        .logo img {
+            width: clamp(50px, 6vw, 80px);
+            height: auto;
+        }
+
+        .logo-icon {
+            width: clamp(35px, 3.5vw, 40px);
+            height: clamp(35px, 3.5vw, 40px);
+            background: #ff6b35;
+            border-radius: 50%;
+            border: 0.2vw solid white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(18px, 2vw, 20px);
+        }
+
+        .main-container {
+            display: flex;
+            gap: 2vw;
+        }
+
+        .left-panel {
+            width: 20vw;
+            min-width: 200px;
+            background: white;
+            padding: 1.5vw;
+            border-radius: 0.8vw;
+            box-shadow: 0 0.4vw 0.8vw rgba(0,0,0,0.1);
+            height: fit-content;
+        }
+
+        .control-group {
+            margin-bottom: 2vw;
+            border-bottom: 0.1vw solid #ddd;
+            padding-bottom: 1.5vw;
+        }
+
+        .control-group:last-child {
+            border-bottom: none;
+        }
+
+        .control-group h3 {
+            margin-bottom: 1vw;
+            color: #333;
+            font-size: clamp(13px, 1.3vw, 16px);
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 1vw;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 0.8vw;
+            font-size: clamp(12px, 1.1vw, 14px);
+            border-radius: 0.5vw;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .btn:hover {
+            transform: translateY(-0.2vw);
+            box-shadow: 0 0.4vw 0.8vw rgba(0,0,0,0.1);
+        }
+
+        .btn-success { background: #28a745; color: white; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-primary { background: #000075; color: white; }
+        .btn-info { background: #000075; color: white; }
+
+        .main-content {
+            flex: 1;
+            padding: 2vw;
+            background: white;
+            border-radius: 0.8vw;
+            box-shadow: 0 0.4vw 1.2vw rgba(0,0,0,0.1);
+        }
+
+        .title-header {
+            background: #000075;
+            color: white;
+            padding: 1.2vw 2.5vw;
+            border-radius: 2vw;
+            font-size: clamp(15px, 1.5vw, 18px);
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 3vw;
+            box-shadow: 0 0.4vw 1.5vw rgba(0,0,0,0.2);
+        }
+
+        /* EXPERIMENT CONTAINER - RESPONSIVE */
+        .experiment-container {
+            position: relative;
+            width: 100%;
+            max-width: 900px;
+            aspect-ratio: 6 / 4;
+    
+            background: #f8f9fa;
+            border: 0.2vw solid #dee2e6;
+            border-radius: 1.5vw;
+        }
+
+        .electromagnet-setup {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* IRON NAIL - CORE */
+        .iron-nail {
+            position: absolute;
+            width: 33.3%;
+            height: 2%;
+            background: linear-gradient(145deg, #8e8e8e, #606060);
+            border-radius: 0.4vw;
+            top: 50%;
+            left: 33.3%;
+            box-shadow: 0.2vw 0.2vw 0.8vw rgba(0,0,0,0.3);
+        }
+
+        .nail-point {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 2.5% solid #606060;
+            border-top: 1% solid transparent;
+            border-bottom: 1% solid transparent;
+            right: -2.5%;
+            top: 0;
+        }
+
+        /* COILED WIRE */
+        .coil-container {
+            position: absolute;
+            top: 45%;
+            left: 41.7%;
+            width: 16.7%;
+            height: 12.5%;
+        }
+
+        .coil-wire {
+            position: absolute;
+            width: 100%;
+            height: 16%;
+            border: 0.3vw solid #ffd700;
+            border-radius: 50%;
+            background: transparent;
+        }
+
+        .coil-wire:nth-child(1) { top: 0; transform: scaleY(0.3); }
+        .coil-wire:nth-child(2) { top: 10%; transform: scaleY(0.4); }
+        .coil-wire:nth-child(3) { top: 20%; transform: scaleY(0.5); }
+        .coil-wire:nth-child(4) { top: 30%; transform: scaleY(0.6); }
+        .coil-wire:nth-child(5) { top: 40%; transform: scaleY(0.7); }
+        .coil-wire:nth-child(6) { top: 50%; transform: scaleY(0.6); }
+        .coil-wire:nth-child(7) { top: 60%; transform: scaleY(0.5); }
+        .coil-wire:nth-child(8) { top: 70%; transform: scaleY(0.4); }
+        .coil-wire:nth-child(9) { top: 80%; transform: scaleY(0.3); }
+
+        /* BATTERY */
+        .battery {
+            position: absolute;
+            top: 75%;
+            left: 29.2%;
+            width: 41.7%;
+            height: auto;
+        }
+
+        .battery img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* CONNECTING WIRES - RESPONSIVE */
+        .wire {
+            position: absolute;
+            background: #ffd700;
+            border-radius: 0.2vw;
+        }
+
+        .wire-1 { width: 0.5%; height: 35%; top: 50.5%; left: 16.7%; }
+        .wire-2 { width: 16.7%; height: 0.75%; top: 50.5%; left: 16.7%; }
+        .wire-4 { width: 12.5%; height: 0.75%; top: 85%; left: 16.7%; }
+        .wire-5 { width: 0.5%; height: 35%; top: 50.5%; right: 16.7%; }
+        .wire-6 { width: 16.7%; height: 0.75%; top: 50.5%; right: 16.7%; }
+        .wire-7 { width: 12.5%; height: 0.75%; top: 85%; right: 16.7%; }
+
+        /* MAGNETIC FIELD LINES - KO'RINADIGAN */
+        .magnetic-field {
+            position: absolute;
+            opacity: 0.4; /* Doimo biroz ko'rinadi */
+            transition: opacity 0.5s ease;
+        }
+
+        .magnetic-field.active {
+            opacity: 1;
+            animation: magneticPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes magneticPulse {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+
+        .field-line {
+            position: absolute;
+            height: 0.75%;
+            background: rgba(74, 144, 226, 0.6);
+            border: 0.15vw dashed #4a90e2;
+            border-radius: 50%;
+        }
+
+        /* 4 ta magnit chiziq - temir mix atrofida */
+        .field-line-1 { width: 50%; top: 45%; left: 25%; }
+        .field-line-2 { width: 53.3%; top: 60%; left: 23.3%; }
+        .field-line-3 { width: 50%; top: 50%; left: 25%; }
+        .field-line-4 { width: 46.7%; top: 55%; left: 26.7%; }
+
+        /* METAL OBJECTS - KO'RINADIGAN */
+        .metal-objects {
+            position: absolute;
+            top: 48%;
+            right: 10%;
+            width: 10%;
+            height: 10%;
+        }
+
+        .metal-object {
+            position: absolute;
+            width: 15%;
+            height: 40%;
+            background: linear-gradient(145deg, #888, #555);
+            border-radius: 0.3vw;
+            transition: all 0.8s ease;
+            transform-origin: bottom center;
+            box-shadow: 0.2vw 0.2vw 0.5vw rgba(0,0,0,0.4);
+        }
+
+        .metal-object:nth-child(1) { left: 0; top: 0; }
+        .metal-object:nth-child(2) { left: 30%; top: 10%; }
+        .metal-object:nth-child(3) { left: 60%; top: -5%; }
+
+        .metal-object.attracted {
+            transform: rotate(-45deg) translateX(-150%);
+        }
+
+        /* CURRENT FLOW ANIMATION */
+        .current-flow {
+            position: absolute;
+            width: 1.3%;
+            height: 2%;
+            background: #ffff00;
+            border-radius: 50%;
+            opacity: 0;
+            animation: currentFlow 2s linear infinite;
+        }
+
+        @keyframes currentFlow {
+            0% { opacity: 0; transform: translateX(0); }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { opacity: 0; transform: translateX(33.3%); }
+        }
+
+        .current-1 { top: 62%; left: 30%; animation-delay: 0s; }
+        .current-2 { top: 62%; left: 30%; animation-delay: 0.5s; }
+        .current-3 { top: 62%; left: 30%; animation-delay: 1s; }
+
+        /* STATUS DISPLAY */
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 0.8vw 0;
+            font-size: clamp(11px, 1.1vw, 13px);
+        }
+
+        .status-led {
+            width: clamp(10px, 1vw, 12px);
+            height: clamp(10px, 1vw, 12px);
+            border-radius: 50%;
+            background: #dc3545;
+            transition: all 0.3s;
+            box-shadow: inset 0 0 0.5vw rgba(0,0,0,0.5);
+        }
+
+        .status-led.on {
+            background: #28a745;
+            box-shadow: 0 0 1vw rgba(40, 167, 69, 0.8);
+        }
+
+        /* MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(0.3vw);
+        }
+
+        .modal-content {
+            background: #000075;
+            color: white;
+            margin: 5% auto;
+            padding: 2vw;
+            width: 50%;
+            max-width: 700px;
+            border-radius: 1.5vw;
+            box-shadow: 0 1vw 2.5vw rgba(0,0,0,0.4);
+            animation: slideDown 0.4s ease;
+            position: relative;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-2vw); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .close {
+            position: absolute;
+            right: 2vw;
+            top: 1.5vw;
+            font-size: clamp(20px, 2vw, 24px);
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+        }
+
+        .close:hover { color: #ffcc00; }
+
+        .modal-content h2 {
+            font-size: clamp(16px, 1.5vw, 20px);
+            margin-bottom: 1.5vw;
+            border-bottom: 0.2vw solid rgba(255,255,255,0.2);
+            padding-bottom: 0.8vw;
+        }
+
+        .card {
+            background: rgba(255,255,255,0.08);
+            padding: 1vw;
+            border-radius: 1vw;
+            margin-bottom: 1.5vw;
+            transition: background 0.3s;
+        }
+
+        .card:hover {
+            background: rgba(255,255,255,0.15);
+        }
+
+        .card h3 {
+            margin: 0 0 1vw 0;
+            font-size: clamp(14px, 1.1vw, 16px);
+        }
+
+        .card p {
+            margin: 0.5vw 0;
+            font-size: clamp(12px, 0.9vw, 14px);
+            line-height: 1.4;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .main-container {
+                flex-direction: column;
+            }
+            .left-panel {
+                width: 100%;
+                order: 2;
+            }
+            .main-content {
+                order: 1;
+            }
+            .experiment-container {
+                aspect-ratio: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .modal-content {
+                width: 90%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .left-panel {
+                min-width: unset;
+            }
+        }
+  .card {
+    display: flex;
+    gap: 15px;
+    background: #000075;
+    color: white;
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    align-items: center;
+}
+
+.card img {
+    width: 150px;
+    border-radius: 10px;
+}
+
+.card .text h3 {
+    margin-bottom: 8px;
+    color: white;
+}
+        .left-panel{width:280px;max-width:95%;background:#fff;border-radius:14px;padding:16px;box-shadow:0 6px 16px rgba(0,0,0,.08)}
+  .left-panel h3{margin:0 0 12px;font-size:16px;color:#333}
+  .btn{display:block;width:100%;padding:10px 12px;margin:8px 0;border:0;border-radius:10px;cursor:pointer;transition:.25s;text-align:left;font-weight:600}
+  .btn-primary{background:#000075;color:#fff}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 14px rgba(0,0,0,.1)}
+  .flex-container-40-60{display:flex;gap:20px;align-items:flex-start;background:rgba(255,255,255,.1);padding:20px;border-radius:15px;margin-bottom:20px}
+  .flex-text-60{flex:1}
+  .flex-text-60 p{font-size:16px;line-height:1.8}
+  .flex-container-30-70{display:flex;gap:20px;align-items:flex-start;background:rgba(255,255,255,.1);padding:20px;border-radius:15px;margin-bottom:20px}
+  .flex-image-30{flex:0 0 30%}
+  .flex-image-30 img{width:100%;border-radius:10px}
+  .flex-text-70{flex:0 0 70%}
+  .flex-text-70 strong{color:#ffcc00;font-size:18px;display:block;margin-bottom:10px}
+  .modal{display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.8);backdrop-filter:blur(5px);overflow-y:auto}
+  .modal-content{background:#000075;color:#fff;margin:5vh auto;padding:30px;width:90%;max-width:1000px;border-radius:20px;box-shadow:0 15px 40px rgba(0,0,0,.5);position:relative;animation:slideDown .4s ease}
+  @keyframes slideDown{from{transform:translateY(-50px);opacity:0}to{transform:translateY(0);opacity:1}}
+  .close{position:absolute;right:20px;top:15px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:bold;cursor:pointer;color:#fff;transition:.3s;border-radius:50%;background:rgba(255,255,255,.1)}
+  .close:hover{background:rgba(255,204,0,.3);color:#ffcc00;transform:rotate(90deg)}
+  .modal-content h2{font-size:28px;margin-bottom:25px;padding-bottom:15px;border-bottom:2px solid rgba(255,255,255,.3);padding-right:50px}
+  .tab-buttons{display:flex;gap:8px;margin:12px 0 16px}
+  .tab-btn{flex:1;background:rgba(255,255,255,.12);color:#fff;border:0;border-radius:10px 10px 0 0;padding:10px;cursor:pointer;font-weight:600;transition:.2s}
+  .tab-btn:hover{background:rgba(255,255,255,.2)}
+  .tab-btn.active{background:rgba(255,255,255,.28)}
+  .tab-content{display:none}
+  .tab-content.active{display:block}
+  pre{background:rgba(0,0,0,.35);padding:12px;border-radius:10px;overflow:auto;white-space:pre-wrap;word-break:break-word;color:#fff;font-size:13.5px;line-height:1.55}
+  #infoFloatingBtn{position:fixed;bottom:30px;right:30px;width:120px;height:120px;border-radius:50%;background:linear-gradient(135deg,#000075,#0000ff);color:#fff;border:4px solid #fff;cursor:pointer;font-size:16px;font-weight:bold;box-shadow:0 8px 20px rgba(0,0,0,.4);z-index:1500;transition:.3s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px}
+  #infoFloatingBtn:hover{transform:scale(1.1);box-shadow:0 12px 30px rgba(0,0,255,.6)}
+  #infoFloatingBtn span:first-child{font-size:36px}
+  .video-full{width:100%;border-radius:15px;background:#000}
+  .video-full video{width:100%;height:auto;border-radius:15px;max-height:70vh}
+  @media (max-width:1024px){.flex-container-40-60,.flex-container-30-70{flex-direction:column}.flex-image-30,.flex-text-70{flex:0 0 100%}}
+  @media (max-width:768px){.modal-content{width:96%;padding:20px 15px}#infoFloatingBtn{width:90px;height:90px;font-size:14px;bottom:20px;right:20px}#infoFloatingBtn span:first-child{font-size:28px}}
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+                  <a href="/"><img src="/static/image/logo.png" width="80px" height="80px" alt=""></a>
+           
+            <span>Elektromagnit Simulatori</span>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <div class="left-panel">
+            <div class="control-group">
+                <h3>Boshqaruv</h3>
+                <button class="btn btn-success" onclick="connectBattery()">Batareyani Ulash</button>
+                <button class="btn btn-danger" onclick="disconnectBattery()">Batareyani Uzish</button>
+                <button class="btn btn-primary" onclick="testMagnetism()">Magnetizm Sinovi</button>
+                <button class="btn btn-info" onclick="resetExperiment()">Qayta Boshlash</button>
+            </div>
+
+                <div class="control-group">
+                <h3>📚 Ma'lumotlar</h3>
+                <button class="btn btn-primary" id="schemaBtn">
+                    📋 Sxema Haqida
+                </button>
+               
+                <button class="btn btn-primary" id="componentsBtn">
+                    🔌 Qurilmalar
+                </button>
+           
+            </div>
+            <div class="control-group">
+                <h3>Holat Ko'rsatkichi</h3>
+                <div class="status-row">
+                    <span>Batareya:</span>
+                    <div class="status-led" id="batteryLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Tok Oqimi:</span>
+                    <div class="status-led" id="currentLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Magnit Maydon:</span>
+                    <div class="status-led" id="magneticLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Tortishish:</span>
+                    <div class="status-led" id="attractionLed"></div>
+                </div>
+            </div>
+        </div>
+<div class="modal" id="schemaModal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>💡 Sxema qayerda ishlatiladi (RGB LED)</h2>
+    <div class="flex-container-40-60">
+         <div class="flex-video-40">
+                <iframe 
+                    src="https://www.youtube.com/embed/Vpb7IQ2Ib_Y?si=BY98W203xoEahNqL" 
+                    title="YouTube video player" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+      <div class="flex-text-60">
+        <strong>⚙️ Qurilishi</strong>
+<p>Elektromagnit quyidagi qismlardan iborat:
+
+Temir yadro (Iron core) – magnit maydonni kuchaytiradi.
+
+Izolyatsiyalangan sim (Copper wire) – tok o‘tadi va magnit maydon hosil qiladi.
+
+Quvvat manbai (batareya yoki DC adapter) – tok beradi.
+
+Oddiy ko‘rinishi:
+
+Temir yadro → sim o‘ralgan → tok ulangan → elektromagnit faol.</p>
+      </div>
+    </div>
+    <div class="flex-container-40-60">
+         <div class="flex-video-40">
+                <iframe 
+                    src="https://www.youtube.com/embed/Fd3O6sXBXqA?si=IXoNzz-tqwLAWTB4" 
+                    title="YouTube video player" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+      <div class="flex-text-60">
+        <strong>🔄 Ishlash prinsipi</strong>
+    <p>Tok sim orqali o‘tganda magnetik maydon hosil bo‘ladi.
+
+Temir yadro magnit maydonini kuchaytiradi.
+
+Elektromagnit temir buyumlarni tortadi yoki harakatlantiradi.
+
+Tok o‘chirilsa, magnitlik yo‘qoladi.</p>
+      </div>
+    </div>
+    <div class="flex-container-40-60">
+         <div class="flex-video-40">
+                <iframe 
+                    src="https://www.youtube.com/embed/Wm9_DqQKmd0?si=oTVQvDEUfIAjd-X4" 
+                    title="YouTube video player" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+      <div class="flex-text-60">
+        <strong>💡 Amaliy qo‘llanilishlar</strong>
+<p>Elektr motorlar va generatorlar – rotor va statorlarni harakatlantirish.
+
+Relays va solenoidlar – elektr signallarini mexanik harakatga aylantirish.
+
+Crane va yuk ko‘tarish tizimlari – metall buyumlarni ko‘tarish.
+
+Magnetik eshik qulflari – elektr orqali ochish va yopish.
+
+Robototexnika loyihalari – avtomatik tortish yoki harakat.</p>
+   
+    </div>
+    </div>
+  </div>
+</div>
+  <!-- Ishlatilgan qurilmalar (modal) -->
+    <div class="modal" id="componentsModal">
+        <div class="modal-content">
+            <span class="close" title="Yopish">&times;</span>
+            <h2>🔌 Ishlatilgan Qurilmalar</h2>
+
+       
+
+            <div class="card">
+                <img src="/static/image/litium - Copy.png" alt="LM393P Komparator">
+                <div class="text">
+                    <h3>3.7V Li-ion qayta zaryadlanadigan batareya va mis simlar va mix</h3>
+                    <p>
+                        Vazifasi: Energiya manbai sifatida ishlaydi, sxemani mustaqil quvvat bilan ta’minlaydi.
+
+                        Izoh: USB orqali zaryadlanadi; sxemadagi LED’lar zaryad holatini bildiradi.
+                    </p>
+                </div>
+            </div>
+
+            
+        </div>
+    </div>
+
+<div class="modal" id="infoModal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>📚 Qo'shimcha Ma'lumot</h2>
+    <div class="video-full">
+      <video controls>
+        <source src="/media/2.mp4" type="video/mp4">
+        Brauzeringiz video formatni qo'llab-quvvatlamaydi.
+      </video>
+    </div>
+  </div>
+</div>
+
+<button id="infoFloatingBtn"><span>📚</span><span>Ma'lumot</span></button>
+        <div class="main-content">
+      
+            <div class="experiment-container">
+                <div class="electromagnet-setup">
+                    <div class="iron-nail">
+                        <div class="nail-point"></div>
+                    </div>
+
+                    <div class="coil-container">
+                        <div class="coil-wire"></div>
+                        <div class="coil-wire"></div>
+                        <div class="coil-wire"></div>
+                        <div class="coil-wire"></div>
+                        <div class="coil-wire"></div>
+                        <div class="coil-wire"></div>
+                        <div class="coil-wire"></div>
+                        <div class="coil-wire"></div>
+                        <div class="coil-wire"></div>
+                    </div>
+
+                    <div class="battery" id="battery">
+                        <img src="/static/image/litium - Copy.png" alt="Battery">
+                    </div>
+
+                    <div class="wire wire-1"></div>
+                    <div class="wire wire-2"></div>
+                    <div class="wire wire-4"></div>
+                    <div class="wire wire-5"></div>
+                    <div class="wire wire-6"></div>
+                    <div class="wire wire-7"></div>
+
+                    <div class="current-flow current-1" id="current1"></div>
+                    <div class="current-flow current-2" id="current2"></div>
+                    <div class="current-flow current-3" id="current3"></div>
+
+                    <div class="magnetic-field" id="magneticField">
+                        <div class="field-line field-line-1"></div>
+                        <div class="field-line field-line-2"></div>
+                        <div class="field-line field-line-3"></div>
+                        <div class="field-line field-line-4"></div>
+                    </div>
+
+                    <div class="metal-objects">
+                        <div class="metal-object" id="object1"></div>
+                        <div class="metal-object" id="object2"></div>
+                        <div class="metal-object" id="object3"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALS -->
+    <div class="modal" id="theoryModal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Elektromagnit Nazariyasi</h2>
+            <div class="card">
+                <h3>Elektromagnit nima?</h3>
+                <p>Elektr toki o'tganda magnit xususiyatlarini namoyon qiladigan qurilma.</p>
+            </div>
+            <div class="card">
+                <h3>Qanday ishlaydi?</h3>
+                <p>Simdan tok o'tganda magnit maydon hosil bo'ladi va temir predmetlarni tortadi.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="stepsModal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Tajriba Bosqichlari</h2>
+            <div class="card">
+                <h3>1. Tayyorgarlik</h3>
+                <p>Temir mix, mis sim va batareyani tayyorlang.</p>
+            </div>
+            <div class="card">
+                <h3>2. Sim o'rash</h3>
+                <p>Simni mixga 20-30 marta o'rang.</p>
+            </div>
+            <div class="card">
+                <h3>3. Ulash</h3>
+                <p>Simni batareyaga ulang.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="materialsModal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Kerakli Materiallar</h2>
+            <div class="card">
+                <h3>Temir Mix</h3>
+                <p>10-15 sm uzunlikda.</p>
+            </div>
+            <div class="card">
+                <h3>Mis Sim</h3>
+                <p>1-2 metr uzunlikda.</p>
+            </div>
+            <div class="card">
+                <h3>9V Batareya</h3>
+                <p>Elektr toki manbayi.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let batteryConnected = false;
+        let currentFlowing = false;
+        let magneticFieldActive = false;
+        let objectsAttracted = false;
+        let elements = {};
+
+        document.addEventListener('DOMContentLoaded', function() {
+            elements = {
+                batteryLed: document.getElementById('batteryLed'),
+                currentLed: document.getElementById('currentLed'),
+                magneticLed: document.getElementById('magneticLed'),
+                attractionLed: document.getElementById('attractionLed'),
+                magneticField: document.getElementById('magneticField'),
+                current1: document.getElementById('current1'),
+                current2: document.getElementById('current2'),
+                current3: document.getElementById('current3'),
+                object1: document.getElementById('object1'),
+                object2: document.getElementById('object2'),
+                object3: document.getElementById('object3'),
+                battery: document.getElementById('battery')
+            };
+            updateStatus();
+
+            document.querySelectorAll(".modal .close").forEach(btn => {
+                btn.addEventListener("click", function() {
+                    this.closest(".modal").style.display = "none";
+                });
+            });
+
+            window.addEventListener("click", function(e) {
+                document.querySelectorAll(".modal").forEach(modal => {
+                    if (e.target === modal) modal.style.display = "none";
+                });
+            });
+        });
+
+        function updateStatus() {
+            if (!elements.batteryLed) return;
+            elements.batteryLed.classList.toggle('on', batteryConnected);
+            elements.currentLed.classList.toggle('on', currentFlowing);
+            elements.magneticLed.classList.toggle('on', magneticFieldActive);
+            elements.attractionLed.classList.toggle('on', objectsAttracted);
+        }
+
+        function connectBattery() {
+            batteryConnected = true;
+            setTimeout(() => {
+                if (batteryConnected) startCurrentFlow();
+            }, 500);
+            updateStatus();
+        }
+
+        function disconnectBattery() {
+            batteryConnected = false;
+            currentFlowing = false;
+            magneticFieldActive = false;
+            objectsAttracted = false;
+            if (elements.magneticField) elements.magneticField.classList.remove('active');
+            if (elements.current1) elements.current1.style.animation = 'none';
+            if (elements.current2) elements.current2.style.animation = 'none';
+            if (elements.current3) elements.current3.style.animation = 'none';
+            if (elements.object1) elements.object1.classList.remove('attracted');
+            if (elements.object2) elements.object2.classList.remove('attracted');
+            if (elements.object3) elements.object3.classList.remove('attracted');
+            updateStatus();
+        }
+
+        function startCurrentFlow() {
+            if (!batteryConnected) return;
+            currentFlowing = true;
+            if (elements.current1) elements.current1.style.animation = 'currentFlow 2s linear infinite';
+            if (elements.current2) elements.current2.style.animation = 'currentFlow 2s linear infinite';
+            if (elements.current3) elements.current3.style.animation = 'currentFlow 2s linear infinite';
+            setTimeout(() => {
+                if (currentFlowing) activateMagneticField();
+            }, 1000);
+            updateStatus();
+        }
+
+        function activateMagneticField() {
+            magneticFieldActive = true;
+            if (elements.magneticField) elements.magneticField.classList.add('active');
+            setTimeout(() => {
+                if (magneticFieldActive) attractObjects();
+            }, 800);
+            updateStatus();
+        }
+
+        function attractObjects() {
+            objectsAttracted = true;
+            if (elements.object1) elements.object1.classList.add('attracted');
+            setTimeout(() => {
+                if (elements.object2) elements.object2.classList.add('attracted');
+            }, 200);
+            setTimeout(() => {
+                if (elements.object3) elements.object3.classList.add('attracted');
+            }, 400);
+            updateStatus();
+        }
+
+        function testMagnetism() {
+            if (!batteryConnected) {
+                alert('Avval batareyani ulang!');
+                return;
+            }
+            
+            // Magnit maydonni kuchaytiramiz
+            if (elements.magneticField) {
+                elements.magneticField.style.opacity = '1';
+                elements.magneticField.style.animation = 'magneticPulse 0.5s ease-in-out 3';
+                
+                // Metal predmetlarni kuchliroq tortamiz
+                if (elements.object1) {
+                    elements.object1.style.transform = 'rotate(-60deg) translateX(-60px)';
+                }
+                if (elements.object2) {
+                    elements.object2.style.transform = 'rotate(-60deg) translateX(-60px)';
+                }
+                if (elements.object3) {
+                    elements.object3.style.transform = 'rotate(-60deg) translateX(-60px)';
+                }
+                
+                // 2 sekunddan keyin qaytaramiz
+                setTimeout(() => {
+                    if (elements.object1) elements.object1.style.transform = 'rotate(-45deg) translateX(-50px)';
+                    if (elements.object2) elements.object2.style.transform = 'rotate(-45deg) translateX(-50px)';
+                    if (elements.object3) elements.object3.style.transform = 'rotate(-45deg) translateX(-50px)';
+                }, 2000);
+                
+                alert('Magnetizm sinovi amalga oshirildi! Metal predmetlar tortildi.');
+            } else {
+                alert('Xatolik: Magnit maydon elementi topilmadi.');
+            }
+        }
+
+        function resetExperiment() {
+            disconnectBattery();
+        }
+
+        function openModal(id) {
+            document.getElementById(id).style.display = "block";
+        }
+
+  function openModal(id){ const m=document.getElementById(id); if(m) m.style.display='block'; }
+  function closeModal(el){ const m=el.closest('.modal'); if(m) m.style.display='none'; }
+
+  document.addEventListener('click', (e)=>{ if(e.target.matches('.modal .close')) closeModal(e.target); });
+  window.addEventListener('click', (e)=>{ document.querySelectorAll('.modal').forEach(m=>{ if(e.target===m) m.style.display='none'; }); });
+
+  // buttons
+  document.getElementById('schemaBtn')?.addEventListener('click', ()=>openModal('schemaModal'));
+  document.getElementById('codeBtn')?.addEventListener('click',   ()=>openModal('codeModal'));
+  document.getElementById('componentsBtn')?.addEventListener('click', ()=>openModal('componentsModal'));
+  document.getElementById('infoFloatingBtn')?.addEventListener('click', ()=>openModal('infoModal'));
+
+  // tabs
+  (function(){
+    const codeModal=document.getElementById('codeModal');
+    if(!codeModal) return;
+    codeModal.querySelectorAll('.tab-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const t=btn.dataset.tab;
+        codeModal.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        codeModal.querySelectorAll('.tab-content').forEach(p=>p.classList.toggle('active', p.id===t));
+      });
+    });
+  })();
+    </script>
+</body>
+</html>

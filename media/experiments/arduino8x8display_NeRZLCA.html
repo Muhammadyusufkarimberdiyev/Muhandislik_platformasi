@@ -1,0 +1,2448 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arduino va 8x8 LED Matrix Simulyatsiyasi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #e6f3ff;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+        
+        /* HEADER */
+        .header {
+            display: flex;
+            align-items: center;
+            background: #000075;
+            color: white;
+            padding: 10px 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            width: 100%;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .logo img {
+            width: 80px;
+            height: 80px;
+        }
+
+        /* MAIN LAYOUT */
+        .main-container {
+            display: flex;
+            gap: 20px;
+            padding: 20px;
+            height: calc(100vh - 100px);
+            overflow-y: auto;
+        }
+
+        /* LEFT PANEL */
+        .left-panel {
+            width: 250px;
+            min-width: 250px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            height: fit-content;
+            position: relative;
+            z-index: 1;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 15px;
+        }
+
+        .control-group h3 {
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 8px;
+            font-size: 14px;
+            border-radius: 5px;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn-success { background: #28a745; color: white; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-primary { background: #000075; color: white; }
+        .btn-info { background: #000075; color: white; }
+
+        /* MAIN CONTENT */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            overflow-y: auto;
+        }
+
+        .title-header {
+            background: #000075;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0 auto 30px;
+            text-align: center;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .circuit-container {
+            position: relative;
+            width: 100%;
+            min-height: 500px;
+            margin-top: 30px;
+        }
+
+        /* ARDUINO SECTION */
+        .arduino-section {
+            position: absolute;
+            left: 5%;
+            top: 10%;
+        }
+
+        .arduino-section img {
+            width: 450px;
+            height: 400px;
+        }
+
+        /* LED MATRIX SECTION */
+        .matrix-section {
+            position: absolute;
+            right: 8%;
+            top: 15%;
+            width: 300px;
+        }
+/* RESPONSIVE DESIGN FOR LARGE MONITORS */
+@media (min-width: 1600px) {
+    .matrix-section{
+        position: absolute;
+        right: 1%;
+    }
+    body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 0 auto;
+    }
+
+    .header {
+        width: 100%;
+    }
+
+    .main-container {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .main-content {
+        width: 80%;
+        max-width: none;
+    }
+
+    .circuit-container {
+        width: 100%;
+        justify-content: center;
+        gap: 5%;
+    }
+
+    .arduino-section {
+        flex-shrink: 0;
+    }
+
+    .arduino-section img {
+        width: 28vw;
+        height: 25vw;
+        max-width: 450px;
+        max-height: 400px;
+       
+    }
+
+    .matrix-section {
+        position: relative;
+        right: auto;
+        width: 18vw;
+        max-width: 300px;
+        margin-left: 0;
+    }
+
+    .led-matrix-container {
+        width: 100%;
+    }
+
+    .led {
+        width: 1.5vw;
+        height: 1.5vw;
+        max-width: 25px;
+        max-height: 25px;
+    }
+
+    /* Simlar uchun - pozitsiyalarni % da */
+    .wire-purple {
+        width: 46%;
+        left: 15.8%;
+    }
+
+    .wire-purple1 {
+        height: 8.4%;
+        left: 15.8%;
+    }
+
+    .wire-purple2 {
+        height: 3.3%;
+        right: 11.1%;
+    }
+
+    .wire-green {
+        width: 46%;
+        left: 15%;
+    }
+
+    .wire-green1 {
+        height: 9%;
+        left: 15%;
+    }
+
+    .wire-green2 {
+        height: 3.9%;
+        right: 11.9%;
+    }
+
+    .wire-yellow {
+        width: 48.7%;
+        left: 14.2%;
+    }
+
+    .wire-yellow1 {
+        height: 8.1%;
+        left: 14.2%;
+    }
+
+    .wire-yellow2 {
+        height: 2.8%;
+        right: 10.3%;
+    }
+/* Flex Layout: 40% Video + 60% Text */
+.flex-container-40-60 {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+}
+
+.flex-video-40 {
+    flex: 0 0 40%;
+}
+
+.flex-video-40 iframe {
+    width: 100%;
+    height: 250px;
+    border-radius: 10px;
+}
+
+.flex-text-60 {
+    flex: 0 0 60%;
+}
+
+.flex-text-60 p {
+    font-size: 16px;
+    line-height: 1.8;
+}
+
+/* Flex Layout: 30% Image + 70% Text */
+.flex-container-30-70 {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+}
+
+.flex-image-30 {
+    flex: 0 0 30%;
+}
+
+.flex-image-30 img {
+    width: 100%;
+    border-radius: 10px;
+}
+
+.flex-text-70 {
+    flex: 0 0 70%;
+}
+
+.flex-text-70 strong {
+    color: #ffcc00;
+    font-size: 18px;
+    display: block;
+    margin-bottom: 10px;
+}
+
+/* 100% Video */
+.video-full video {
+    width: 100%;
+    border-radius: 15px;
+}
+
+/* Dumaloq tugma */
+#infoFloatingBtn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #000075, #0000ff);
+    color: white;
+    border: 4px solid white;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    z-index: 1500;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+#infoFloatingBtn:hover {
+    transform: scale(1.1);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .flex-container-40-60,
+    .flex-container-30-70 {
+        flex-direction: column;
+    }
+    
+    .flex-video-40, .flex-text-60,
+    .flex-image-30, .flex-text-70 {
+        flex: 0 0 100%;
+    }
+}
+    .wire-red {
+        width: 28.1%;
+        left: 16.4%;
+    }
+
+    .wire-red1 {
+        height: 0.9%;
+        left: 16.4%;
+    }
+
+    .wire-red2 {
+        height: 22.2%;
+        right: 28.6%;
+    }
+
+    .wire-red3 {
+        width: 15.6%;
+        right: 13.1%;
+    }
+
+    .wire-red4 {
+        height: 2.5%;
+        right: 13.1%;
+    }
+
+    .wire-blue {
+        width: 28.1%;
+        left: 17%;
+    }
+
+    .wire-blue1 {
+        height: 1.6%;
+        left: 17%;
+    }
+
+    .wire-blue2 {
+        height: 22.2%;
+        right: 27.9%;
+    }
+
+    .wire-blue3 {
+        width: 15.6%;
+        right: 12.5%;
+    }
+
+    .wire-blue4 {
+        height: 1.9%;
+        right: 12.5%;
+    }
+}
+
+@media (min-width: 1920px) {
+    .main-content {
+        width: 75%;
+    }
+      .arduino-section{
+         position: absolute;
+        left: 2%;
+    }
+
+}
+
+@media (min-width: 2560px) {
+    .main-content {
+        width: 70%;
+    }
+
+    .circuit-container {
+        gap: 8%;
+    }
+    .arduino-section{
+         position: absolute;
+        left: 20%;
+    }
+    .arduino-section img{
+        width: 400px;
+    }
+       .matrix-section {
+        position: absolute;
+        right: 16.7%;
+        width: 18vw;
+        max-width: 300px;
+        margin-left: 0;
+    }
+
+    .led-matrix-container {
+        width: 100%;
+
+    }
+
+}
+
+@media (min-width: 3840px) {
+    .main-content {
+        width: 60%;
+    }
+}
+        .connect {
+            width: 100%;
+            height: 60px;
+            background: #000000;
+            border-radius: 20px;
+        }
+
+        .led-matrix-container {
+            background: green;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 5px 5px 15px rgba(0,0,0,0.3);
+        }
+a
+        .led-matrix-container h4 {
+            text-align: center;
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        .led-matrix {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            grid-template-rows: repeat(8, 1fr);
+            gap: 3px;
+            background: #34495e;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .led {
+            width: 25px;
+            height: 25px;
+            background: white;
+            border-radius: 50%;
+            border: 2px solid #333;
+            transition: all 0.3s ease;
+        }
+
+        .led.on {
+            background: #ff0000;
+            border-color: #ff6666;
+            box-shadow: 0 0 10px #ff0000, inset 0 0 5px rgba(255,255,255,0.3);
+        }
+
+        .led.green {
+            background: #00ff00;
+            border-color: #66ff66;
+            box-shadow: 0 0 10px #00ff00, inset 0 0 5px rgba(255,255,255,0.3);
+        }
+
+        .led.blue {
+            background: #0080ff;
+            border-color: #66b3ff;
+            box-shadow: 0 0 10px #0080ff, inset 0 0 5px rgba(255,255,255,0.3);
+        }
+
+        /* WIRING SECTION */
+        .wire {
+            position: absolute;
+            border-radius: 2px;
+            z-index: 5;
+        }
+
+        /* Purple wires */
+        .wire-purple {
+            background: purple;
+            height: 3px;
+            width: 50%;
+            bottom: 90%;
+            left: 28%;
+        }
+        .wire-purple1 {
+            background: purple;
+            width: 3px;
+            height: 18%;
+            bottom: 72%;
+            left: 28%;
+        }
+        .wire-purple2 {
+            background: purple;
+            width: 3px;
+            height: 7%;
+            bottom: 83.5%;
+            right: 22%;
+        }
+
+        /* Green wires */
+        .wire-green {
+            background: #00ff00;
+            height: 3px;
+            width: 52%;
+            bottom: 91.5%;
+            left: 27%;
+        }
+        .wire-green1 {
+            background: #00ff00;
+            width: 3px;
+            height: 19.5%;
+            bottom: 72%;
+            left: 27%;
+        }
+        .wire-green2 {
+            background: #00ff00;
+            width: 3px;
+            height: 8.5%;
+            bottom: 83.5%;
+            right: 21%;
+        }
+
+        /* Red wires */
+        .wire-red {
+            background: #ff0000;
+            width: 30.6%;
+            height: 3px;
+            bottom: 25%;
+            left: 27.5%;
+        }
+        .wire-red1 {
+            background: #ff0000;
+            width: 3px;
+            height: 2%;
+            bottom: 25%;
+            left: 27.5%;
+        }
+        .wire-red2 {
+            background: #ff0000;
+            width: 3px;
+            height: 63.2%;
+            bottom: 25.5%;
+            right: 41.9%;
+        }
+        .wire-red3 {
+            background: #ff0000;
+            width: 22%;
+            height: 3px;
+            bottom: 88%;
+            right: 20%;
+        }
+        .wire-red4 {
+            background: #ff0000;
+            width: 3px;
+            height: 5.5%;
+            bottom: 83%;
+            right: 20%;
+        }
+
+        /* Blue wires */
+        .wire-blue {
+            background: #0080ff;
+            height: 3px;
+            width: 32.5%;
+            bottom: 24%;
+            left: 26.5%;
+        }
+        .wire-blue1 {
+            background: blue;
+            width: 3px;
+            height: 3.5%;
+            bottom: 24%;
+            left: 26.5%;
+        }
+        .wire-blue2 {
+            background: blue;
+            width: 3px;
+            height: 63%;
+            bottom: 24%;
+            right: 41%;
+        }
+        .wire-blue3 {
+            background: blue;
+            width: 22%;
+            height: 3px;
+            bottom: 86.5%;
+            right: 19%;
+        }
+        .wire-blue4 {
+            background: blue;
+            width: 3px;
+            height: 4%;
+            bottom: 83%;
+            right: 19%;
+        }
+
+        /* Yellow wires */
+        .wire-yellow {
+            background: yellow;
+            height: 3px;
+            width: 50.9%;
+            bottom: 89%;
+            left: 26%;
+        }
+        .wire-yellow1 {
+            background: yellow;
+            width: 3px;
+            height: 17.5%;
+            bottom: 72%;
+            left: 26%;
+        }
+        .wire-yellow2 {
+            background: yellow;
+            width: 3px;
+            height: 6%;
+            bottom: 83.5%;
+            right: 23%;
+        }
+
+        /* STATUS DISPLAY */
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 8px 0;
+            font-size: 13px;
+        }
+
+        .status-led {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #dc3545;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+        }
+
+        .status-led.on {
+            background: #28a745;
+            box-shadow: 0 0 10px rgba(40, 167, 69, 0.8);
+        }
+
+        /* CONTROL PANEL */
+        .control-panel {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .control-button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            min-width: 120px;
+        }
+
+        .btn-power {
+            background: linear-gradient(45deg, #4169e1, #8a2be2);
+            color: white;
+        }
+
+        .btn-test {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+        }
+
+        .btn-reset {
+            background: #000075;
+            color: white;
+        }
+
+        .control-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        /* MODAL STYLES */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            backdrop-filter: blur(3px);
+        }
+
+        .modal-content {
+            background: #000075;
+            color: white;
+            margin: 5% auto;
+            padding: 20px;
+            width: 90%;
+            max-width: 700px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+            animation: slideDown 0.4s ease;
+            position: relative;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .close {
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+            transition: color 0.3s;
+        }
+
+        .close:hover {
+            color: #ffcc00;
+        }
+
+        .modal-content h2 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            border-bottom: 2px solid rgba(255,255,255,0.2);
+            padding-bottom: 8px;
+        }
+
+        .modal-content h3 {
+            margin-top: 15px;
+        }
+
+        pre {
+            background: rgba(0,0,0,0.4);
+            padding: 12px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* RESPONSIVE DESIGN */
+        @media (max-width: 1400px) {
+            .main-container {
+                flex-direction: column;
+                height: auto;
+            }
+            .left-panel {
+                width: 100%;
+            }
+            .circuit-container {
+                min-height: 600px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 8px 12px;
+            }
+            .logo {
+                font-size: 14px;
+            }
+            .logo img {
+                width: 50px;
+                height: 50px;
+            }
+            .title-header {
+                font-size: 16px;
+                padding: 10px 15px;
+            }
+            .circuit-container {
+                min-height: 700px;
+            }
+            .arduino-section {
+                left: 50%;
+                transform: translateX(-50%);
+                top: 5%;
+            }
+            .arduino-section img {
+                width: 300px;
+                height: 267px;
+            }
+            .matrix-section {
+                left: 50%;
+                transform: translateX(-50%);
+                top: 55%;
+                right: auto;
+                width: 250px;
+            }
+            .led-matrix-container {
+                padding: 15px;
+            }
+            .led {
+                width: 20px;
+                height: 20px;
+            }
+            .connect {
+                height: 40px;
+            }
+            .wire {
+                display: none;
+            }
+        }
+     /* MODAL TUZATISH - Responsive va to'g'ri ko'rinish */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    overflow-y: auto;
+    padding: 20px 0;
+}
+
+.modal-content {
+    background: #000075;
+    color: white;
+    margin: 10vh auto 5vh;
+    padding: 30px;
+    width: 90%;
+    max-width: 800px;
+    border-radius: 20px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+    position: relative;
+    animation: slideDown 0.4s ease;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+/* Scroll bar stilizatsiyasi */
+.modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.close {
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    font-size: 32px;
+    font-weight: bold;
+    cursor: pointer;
+    color: white;
+    transition: all 0.3s;
+    z-index: 2010;
+    line-height: 1;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.close:hover {
+    background: rgba(255, 204, 0, 0.3);
+    color: #ffcc00;
+    transform: rotate(90deg);
+}
+
+.modal-content h2 {
+    font-size: 28px;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+    padding-right: 50px;
+}
+
+.card {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    transition: all 0.3s;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    z-index: 1;
+}
+
+.card:hover {
+    background: rgba(255, 255, 255, 0.18);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.card video {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    background: #000;
+    position: relative;
+    z-index: 2;
+}
+
+.card p {
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 10px 0 0;
+    position: relative;
+    z-index: 2;
+}
+
+.card strong {
+    color: #ffcc00;
+    font-size: 18px;
+}
+
+/* Tab buttons */
+.tab-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 2;
+}
+
+.tab-buttons button {
+    flex: 1;
+    min-width: 150px;
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s;
+    position: relative;
+    z-index: 2;
+}
+
+.tab-buttons button:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+}
+
+.tab-buttons button.active {
+    background: rgba(255, 204, 0, 0.4);
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(255, 204, 0, 0.3);
+}
+
+.tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease;
+    position: relative;
+    z-index: 2;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.tab-content pre {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    border-radius: 12px;
+    overflow-x: auto;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #00ff00;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    z-index: 2;
+}
+
+.tab-content pre::-webkit-scrollbar {
+    height: 8px;
+}
+
+.tab-content pre::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.tab-content pre::-webkit-scrollbar-thumb {
+    background: rgba(0, 255, 0, 0.3);
+    border-radius: 10px;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+/* Flex Layout: 40% Video + 60% Text */
+.flex-container-40-60 {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+}
+
+.flex-video-40 {
+    flex: 0 0 40%;
+}
+
+.flex-video-40 iframe {
+    width: 100%;
+    height: 250px;
+    border-radius: 10px;
+}
+
+.flex-text-60 {
+    flex: 0 0 60%;
+}
+
+.flex-text-60 p {
+    font-size: 16px;
+    line-height: 1.8;
+}
+
+/* Flex Layout: 30% Image + 70% Text */
+.flex-container-30-70 {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+}
+
+.flex-image-30 {
+    flex: 0 0 30%;
+}
+
+.flex-image-30 img {
+    width: 100%;
+    border-radius: 10px;
+}
+
+.flex-text-70 {
+    flex: 0 0 70%;
+}
+
+.flex-text-70 strong {
+    color: #ffcc00;
+    font-size: 18px;
+    display: block;
+    margin-bottom: 10px;
+}
+
+/* 100% Video */
+.video-full video {
+    width: 100%;
+    border-radius: 15px;
+}
+
+/* Dumaloq tugma */
+#infoFloatingBtn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #000075, #0000ff);
+    color: white;
+    border: 4px solid white;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    z-index: 1500;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+#infoFloatingBtn:hover {
+    transform: scale(1.1);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .flex-container-40-60,
+    .flex-container-30-70 {
+        flex-direction: column;
+    }
+    
+    .flex-video-40, .flex-text-60,
+    .flex-image-30, .flex-text-70 {
+        flex: 0 0 100%;
+    }
+}
+/* Tablet responsive */
+@media (max-width: 1024px) {
+    .modal {
+        padding: 15px 0;
+    }
+    
+    .modal-content {
+        width: 95%;
+        padding: 25px;
+        max-height: 75vh;
+        margin: 8vh auto 5vh;
+    }
+    
+    .modal-content h2 {
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+    
+    .card {
+        padding: 15px;
+    }
+    
+    .card p {
+        font-size: 15px;
+    }
+    
+    .tab-buttons button {
+        font-size: 15px;
+        padding: 10px 15px;
+    }
+}
+
+/* Mobile responsive */ 
+@media (max-width: 768px) {
+    .modal {
+        padding: 10px 0;
+    }
+    
+    .modal-content {
+        width: 96%;
+        padding: 20px 15px;
+        margin: 5vh auto 3vh;
+        max-height: 85vh;
+        border-radius: 15px;
+    }
+    
+    .close {
+        right: 10px;
+        top: 10px;
+        font-size: 28px;
+        width: 35px;
+        height: 35px;
+    }
+    
+    .modal-content h2 {
+        font-size: 20px;
+        margin-bottom: 15px;
+        padding-bottom: 12px;
+        padding-right: 45px;
+    }
+    
+    .card {
+        padding: 12px;
+        margin-bottom: 15px;
+        border-radius: 12px;
+    }
+    
+    .card video {
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+    
+    .card p {
+        font-size: 14px;
+        line-height: 1.5;
+    }
+    
+    .card strong {
+        font-size: 16px;
+    }
+    
+    .tab-buttons {
+        gap: 8px;
+        margin-bottom: 15px;
+    }
+    
+    .tab-buttons button {
+        min-width: 120px;
+        font-size: 14px;
+        padding: 10px 12px;
+        border-radius: 8px;
+    }
+    
+    .tab-content pre {
+        padding: 15px;
+        font-size: 12px;
+        line-height: 1.5;
+        border-radius: 10px;
+    }
+}
+
+/* Small mobile */
+@media (max-width: 480px) {
+    .modal {
+        padding: 5px 0;
+    }
+    
+    .modal-content {
+        width: 98%;
+        padding: 15px 12px;
+        margin: 3vh auto 2vh;
+        max-height: 90vh;
+        border-radius: 12px;
+    }
+    
+    .close {
+        right: 8px;
+        top: 8px;
+        font-size: 24px;
+        width: 30px;
+        height: 30px;
+    }
+    
+    .modal-content h2 {
+        font-size: 18px;
+        margin-bottom: 12px;
+        padding-bottom: 10px;
+        padding-right: 40px;
+    }
+    
+    .card {
+        padding: 10px;
+        margin-bottom: 12px;
+        border-radius: 10px;
+    }
+    
+    .card p {
+        font-size: 13px;
+    }
+    
+    .card strong {
+        font-size: 15px;
+    }
+    
+    .tab-buttons {
+        flex-direction: column;
+        gap: 6px;
+    }
+    
+    .tab-buttons button {
+        width: 100%;
+        min-width: 100%;
+        font-size: 13px;
+        padding: 10px;
+    }
+    
+    .tab-content pre {
+        padding: 12px;
+        font-size: 11px;
+        line-height: 1.4;
+    }
+}
+
+/* Very small mobile */
+@media (max-width: 360px) {
+    .modal-content {
+        padding: 12px 10px;
+        margin: 2vh auto 1vh;
+    }
+    
+    .modal-content h2 {
+        font-size: 16px;
+    }
+    
+    .card {
+        padding: 8px;
+    }
+    
+    .card p {
+        font-size: 12px;
+    }
+    
+    .tab-buttons button {
+        font-size: 12px;
+        padding: 8px;
+    }
+    
+    .tab-content pre {
+        padding: 10px;
+        font-size: 10px;
+    }
+}
+
+/* Landscape mode fixes */
+@media (max-width: 1024px) and (orientation: landscape) {
+    .modal-content {
+        max-height: 80vh;
+        margin: 5vh auto 3vh;
+    }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .tab-buttons button {
+        min-height: 44px;
+    }
+    
+    .close {
+        min-width: 44px;
+        min-height: 44px;
+    }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    .modal-content {
+        border: 3px solid white;
+    }
+    
+    .card {
+        border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .modal-content,
+    .card,
+    .tab-buttons button,
+    .close {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+/* Print styles */
+@media print {
+    .modal {
+        display: none !important;
+    }
+}
+
+/* Scroll bar stilizatsiyasi */
+.modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.close {
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    font-size: 32px;
+    font-weight: bold;
+    cursor: pointer;
+    color: white;
+    transition: all 0.3s;
+    z-index: 10;
+    line-height: 1;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.close:hover {
+    background: rgba(255, 204, 0, 0.3);
+    color: #ffcc00;
+    transform: rotate(90deg);
+}
+
+.modal-content h2 {
+    font-size: 28px;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+    padding-right: 50px;
+}
+
+.card {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    transition: all 0.3s;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.card:hover {
+    background: rgba(255, 255, 255, 0.18);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.card video {
+    width: 100%;
+    max-width: 70%;
+    height: auto;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    background: #000;
+}
+
+.card p {
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 10px 0 0;
+}
+
+.card strong {
+    color: #ffcc00;
+    font-size: 18px;
+}
+
+/* Tab buttons */
+.tab-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.tab-buttons button {
+    flex: 1;
+    min-width: 150px;
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.tab-buttons button:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+}
+
+.tab-buttons button.active {
+    background: rgba(255, 204, 0, 0.4);
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(255, 204, 0, 0.3);
+}
+
+.tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.tab-content pre {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    border-radius: 12px;
+    overflow-x: auto;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #00ff00;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tab-content pre::-webkit-scrollbar {
+    height: 8px;
+}
+
+.tab-content pre::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.tab-content pre::-webkit-scrollbar-thumb {
+    background: rgba(0, 255, 0, 0.3);
+    border-radius: 10px;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Tablet responsive */
+@media (max-width: 1024px) {
+    .modal {
+        padding: 15px 0;
+    }
+    
+    .modal-content {
+        width: 95%;
+        padding: 25px;
+        max-height: 80vh;
+    }
+    
+    .modal-content h2 {
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+    
+    .card {
+        padding: 15px;
+    }
+    
+    .card p {
+        font-size: 15px;
+    }
+    
+    .tab-buttons button {
+        font-size: 15px;
+        padding: 10px 15px;
+    }
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .modal {
+        padding: 10px 0;
+    }
+    
+    .modal-content {
+        width: 96%;
+        padding: 20px 15px;
+        margin: 2vh auto;
+        max-height: 90vh;
+        border-radius: 15px;
+    }
+    
+    .close {
+        right: 10px;
+        top: 10px;
+        font-size: 28px;
+        width: 35px;
+        height: 35px;
+    }
+    
+    .modal-content h2 {
+        font-size: 20px;
+        margin-bottom: 15px;
+        padding-bottom: 12px;
+        padding-right: 45px;
+    }
+    
+    .card {
+        padding: 12px;
+        margin-bottom: 15px;
+        border-radius: 12px;
+    }
+    
+    .card video {
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+    
+    .card p {
+        font-size: 14px;
+        line-height: 1.5;
+    }
+    
+    .card strong {
+        font-size: 16px;
+    }
+    
+    .tab-buttons {
+        gap: 8px;
+        margin-bottom: 15px;
+    }
+    
+    .tab-buttons button {
+        min-width: 120px;
+        font-size: 14px;
+        padding: 10px 12px;
+        border-radius: 8px;
+    }
+    
+    .tab-content pre {
+        padding: 15px;
+        font-size: 12px;
+        line-height: 1.5;
+        border-radius: 10px;
+    }
+}
+
+/* Small mobile */
+@media (max-width: 480px) {
+    .modal {
+        padding: 5px 0;
+    }
+    
+    .modal-content {
+        width: 98%;
+        padding: 15px 12px;
+        margin: 1vh auto;
+        max-height: 92vh;
+        border-radius: 12px;
+    }
+    
+    .close {
+        right: 8px;
+        top: 8px;
+        font-size: 24px;
+        width: 30px;
+        height: 30px;
+    }
+    
+    .modal-content h2 {
+        font-size: 18px;
+        margin-bottom: 12px;
+        padding-bottom: 10px;
+        padding-right: 40px;
+    }
+    
+    .card {
+        padding: 10px;
+        margin-bottom: 12px;
+        border-radius: 10px;
+    }
+    
+    .card p {
+        font-size: 13px;
+    }
+    
+    .card strong {
+        font-size: 15px;
+    }
+    
+    .tab-buttons {
+        flex-direction: column;
+        gap: 6px;
+    }
+    
+    .tab-buttons button {
+        width: 100%;
+        min-width: 100%;
+        font-size: 13px;
+        padding: 10px;
+    }
+    
+    .tab-content pre {
+        padding: 12px;
+        font-size: 11px;
+        line-height: 1.4;
+    }
+}
+
+/* Very small mobile */
+@media (max-width: 360px) {
+    .modal-content {
+        padding: 12px 10px;
+    }
+    
+    .modal-content h2 {
+        font-size: 16px;
+    }
+    
+    .card {
+        padding: 8px;
+    }
+    
+    .card p {
+        font-size: 12px;
+    }
+    
+    .tab-buttons button {
+        font-size: 12px;
+        padding: 8px;
+    }
+    
+    .tab-content pre {
+        padding: 10px;
+        font-size: 10px;
+    }
+}
+
+/* Landscape mode fixes */
+@media (max-width: 1024px) and (orientation: landscape) {
+    .modal-content {
+        max-height: 85vh;
+        margin: 2vh auto;
+    }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .tab-buttons button {
+        min-height: 44px;
+    }
+    
+    .close {
+        min-width: 44px;
+        min-height: 44px;
+    }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    .modal-content {
+        border: 3px solid white;
+    }
+    
+    .card {
+        border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .modal-content,
+    .card,
+    .tab-buttons button,
+    .close {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+/* Print styles */
+@media print {
+    .modal {
+        display: none !important;
+    }
+}
+  
+
+   
+        @media (max-width: 480px) {
+            .main-container {
+                padding: 10px;
+            }
+            .header {
+                padding: 5px 8px;
+            }
+            .logo {
+                font-size: 12px;
+            }
+            .logo img {
+                width: 40px;
+                height: 40px;
+            }
+            .title-header {
+                font-size: 14px;
+                padding: 8px 12px;
+            }
+            .arduino-section img {
+                width: 250px;
+                height: 222px;
+            }
+            .matrix-section {
+                width: 220px;
+                top: 50%;
+            }
+            .led {
+                width: 18px;
+                height: 18px;
+            }
+            .control-group h3 {
+                font-size: 14px;
+            }
+            .btn {
+                padding: 8px;
+                font-size: 12px;
+            }
+            .control-button {
+                padding: 10px 15px;
+                font-size: 11px;
+                min-width: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="logo">
+                  <a href="/"><img src="/static/image/logo.png" width="80px" height="80px" alt=""></a>
+            <span>Arduino va 8x8 LED Matrix Simulyatsiyasi</span>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <div class="main-container">
+        <!-- LEFT PANEL -->
+        <div class="left-panel">
+            <div class="control-group">
+                <h3>Boshqaruv</h3>
+                <button class="btn btn-success" onclick="startSimulation()">Start</button>
+                <button class="btn btn-danger" onclick="stopSimulation()">Stop</button>
+                <button class="btn btn-primary" onclick="togglePower()">Quvvat</button>
+                <button class="btn btn-info" onclick="runTest()">Test</button>
+            </div>
+
+            <div class="control-group">
+                <h3>Animatsiyalar</h3>
+                <button class="btn btn-primary" onclick="showNumbers()">Raqamlar</button>
+                <button class="btn btn-primary" onclick="showLetters()">Harflar</button>
+                <button class="btn btn-primary" onclick="showPatterns()">Naqshlar</button>
+                <button class="btn btn-info" onclick="showHeart()">Yurak</button>
+            </div>
+
+            <div class="control-group">
+                <h3>Ma'lumotlar</h3>
+                <button class="btn btn-primary" id="schemaBtn">Sxema</button>
+                <button class="btn btn-primary" id="codeBtn">Kod</button>
+                <button class="btn btn-primary" id="componentsBtn">Qurilmalar</button>
+            </div>
+
+            <div class="control-group">
+                <h3>Qurilma holati</h3>
+                <div class="status-row">
+                    <span>Quvvat:</span>
+                    <div class="status-led" id="powerLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Arduino:</span>
+                    <div class="status-led" id="arduinoLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>LED Matrix:</span>
+                    <div class="status-led" id="matrixLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Animatsiya:</span>
+                    <div class="status-led" id="animationLed"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+            <div class="title-header">Arduino va 8x8 LED Matrix Boshqaruvi</div>
+            
+            <div class="circuit-container">
+                <!-- ARDUINO SECTION -->
+                <div class="arduino-section">
+                   <img src="/static/image/arduino1 - Copy.png" alt="Arduino">
+                </div>
+
+                <!-- LED MATRIX SECTION -->
+                <div class="matrix-section">
+                    <div class="led-matrix-container">
+                        <h4>8x8 LED Matrix</h4>
+                        <div class="connect"></div>
+                        <div class="led-matrix" id="ledMatrix"></div>
+                    </div>
+                </div>
+
+                <!-- WIRING -->
+                <div class="wire wire-purple"></div>
+                <div class="wire wire-purple1"></div>
+                <div class="wire wire-purple2"></div>
+                <div class="wire wire-green"></div>
+                <div class="wire wire-green1"></div>
+                <div class="wire wire-green2"></div>
+                <div class="wire wire-red"></div>
+                <div class="wire wire-red1"></div>
+                <div class="wire wire-red2"></div>
+                <div class="wire wire-red3"></div>
+                <div class="wire wire-red4"></div>
+                <div class="wire wire-blue"></div>
+                <div class="wire wire-blue1"></div>
+                <div class="wire wire-blue2"></div>
+                <div class="wire wire-blue3"></div>
+                <div class="wire wire-blue4"></div>
+                <div class="wire wire-yellow"></div>
+                <div class="wire wire-yellow1"></div>
+                <div class="wire wire-yellow2"></div>
+            </div>
+
+            <!-- CONTROL PANEL -->
+            <div class="control-panel">
+                <button class="control-button btn-power" onclick="togglePower()">Quvvat Yoqish/O'chirish</button>
+                <button class="control-button btn-test" onclick="runFullTest()">Tizimni Sinash</button>
+                <button class="control-button btn-reset" onclick="resetAll()">Qayta O'rnatish</button>
+            </div>
+        </div>
+    </div>
+<!-- ✅ 1) Sxema qayerda ishlatiladi (DC Motor / L298N) -->
+    <div class="modal" id="schemaModal">
+        <div class="modal-content">
+            <span class="close" title="Yopish">&times;</span>
+            <h2>💡 Sxema qayerda ishlatiladi </h2>
+
+            <div class="flex-container-40-60">
+                <div class="flex-video-40">
+                    <!-- 1-video (xohlasangiz almashtiring) -->
+                    <iframe src="https://www.youtube.com/embed/H6Vs98-Cev0?si=vB4D2hY79OmQCaqr" title="DC Motor Control with L298N"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen></iframe>
+                </div>
+                <div class="flex-text-60">
+                <strong>Arduino va 8x8 LED Matrix Sxemasi</strong>
+            <p>Bu sxema Arduino UNO va MAX7219 asosida ishlaydi:
+       
+Arduino UNO -> MAX7219 LED Matrix Driver
+VCC      -> 5V
+GND      -> GND
+DIN      -> Digital Pin 2
+CS       -> Digital Pin 3  
+CLK      -> Digital Pin 4
+ 
+     MAX7219 LED drayveri 8x8 LED matrixni boshqarish uchun ishlatiladi.</p>
+                </div>
+            </div>
+
+            <div class="flex-container-40-60">
+                <div class="flex-video-40">
+                    <!-- 2-video (ixtiyoriy) -->
+                    <iframe src="https://www.youtube.com/embed/pHw3AokxRXM?si=1-iej2goKBKqR27P" title="PWM Speed Control"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen></iframe>
+                </div>
+                <div class="flex-text-60">
+                    <strong>🔄 Ishlash prinsipi</strong>
+                    <p>🔍 Multiplexing — bir paytda bitta qatorni yoqish, juda tez almashlab turish orqali to‘liq tasvir chiqarish!
+
+Misol:
+
+Arduino 1-qatorni yoqadi → shu qatordagi kerakli ustunlar yonadi
+
+Keyin darhol 2-qatorga o‘tadi
+
+… va shu tarzda 8 qator almashinadi</p>
+                </div>
+            </div>
+              <div class="flex-container-40-60">
+                <div class="flex-video-40">
+                    <!-- 2-video (ixtiyoriy) -->
+                    <iframe src="https://www.youtube.com/embed/wn0A8AB5uG0?si=d19fuLz3EAhev7-I" title="PWM Speed Control"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen></iframe>
+                </div>
+                <div class="flex-text-60">
+                    <strong>Qo‘shimcha tajriba g‘oyalari</strong>
+               <p>Bluetooth orqali boshqaruv</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal" id="codeModal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>💻 Kod</h2>
+
+        <div class="tab-buttons">
+            <button class="tab-btn active" data-tab="mblock">mBlock Kodi</button>
+            <button class="tab-btn" data-tab="arduino">Arduino Kodi</button>
+        </div>
+
+        <div class="tab-content active" id="mblock">
+            <pre><img src="/static/image/88 matritsa ko'z.jpg" alt="mBlock Code" style="width: 80%; height: auto;"></pre>
+        </div>
+
+        <div class="tab-content" id="arduino">
+            <pre>
+#include LedControl.h>
+
+int DIN = 2;
+int CS = 3;
+int CLK = 4;
+
+LedControl lc = LedControl(DIN, CLK, CS, 1);
+
+void setup() {
+  lc.shutdown(0, false);
+  lc.setIntensity(0, 8);
+  lc.clearDisplay(0);
+}
+
+void loop() {
+  showNumbers();
+  delay(1000);
+  showLetters();
+  delay(1000);
+  showHeart();
+  delay(2000);
+}
+            </pre>
+        </div>
+    </div>
+</div>
+
+    <!-- ✅ 3) Qurilmalar -->
+    <div class="modal" id="componentsModal">
+        <div class="modal-content">
+            <span class="close" title="Yopish">&times;</span>
+            <h2>🔌 Ishlatilgan Qurilmalar</h2>
+
+
+            <div class="flex-container-30-70">
+                <div class="flex-image-30"><img src="/static/image/arduino1 - Copy.png" alt="Breadboard"></div>
+                <div class="flex-text-70">
+                    <strong>Arduino UNO</strong>
+                    <p>Microcontroller board - asosiy boshqaruv bloki</p>
+                </div>
+            </div>
+    
+            <div class="flex-container-30-70">
+                <div class="flex-image-30"><img src="/static/image/led-matrix.jpg" alt="Breadboard"></div>
+                <div class="flex-text-70">
+                    <strong>MAX7219 LED Matrix Driver</strong>
+                    <p>8x8 LED matrixni boshqarish uchun maxsus mikroschema</p>
+                </div>
+            </div>
+                <div class="flex-container-30-70">
+                <div class="flex-image-30"><img src="/static/image/led-matrix.jpg" alt="Breadboard"></div>
+                <div class="flex-text-70">
+                    <strong>8x8 LED Matrix</strong>
+                      <p>64 ta LEDdan tashkil topgan displey</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ✅ 4) Qo'shimcha info (ixtiyoriy) + suzuvchi tugma -->
+    <div class="modal" id="infoModal">
+        <div class="modal-content">
+            <span class="close" title="Yopish">&times;</span>
+            <h2>📚 Qo'shimcha Ma'lumot</h2>
+            <div class="video-full">
+                <video controls>
+                    <source src="/media/2.mp4" type="video/mp4">
+                    Brauzeringiz video formatni qo'llab-quvvatlamaydi.
+                </video>
+            </div>
+        </div>
+    </div>
+
+    <button id="infoFloatingBtn"><span>📚</span><span>Ma'lumot</span></button>
+    <!-- MODALS -->
+   
+
+ 
+    <div class="modal" id="componentsModal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Ishlatilgan Qurilmalar</h2>
+            <h3>1. </h3>
+            <p></p>
+        
+        </div>
+    </div>
+
+    <script>
+        let powerOn = false;
+        let animationRunning = false;
+        let currentAnimation = null;
+
+        const elements = {
+            powerLed: document.getElementById('powerLed'),
+            arduinoLed: document.getElementById('arduinoLed'),
+            matrixLed: document.getElementById('matrixLed'),
+            animationLed: document.getElementById('animationLed'),
+            ledMatrix: document.getElementById('ledMatrix')
+        };
+
+        function initializeLEDMatrix() {
+            const matrix = elements.ledMatrix;
+            matrix.innerHTML = '';
+            for (let i = 0; i < 64; i++) {
+                const led = document.createElement('div');
+                led.className = 'led';
+                led.id = `led-${i}`;
+                matrix.appendChild(led);
+            }
+        }
+
+        function updateStatus() {
+            elements.powerLed.classList.toggle('on', powerOn);
+            elements.arduinoLed.classList.toggle('on', powerOn);
+            elements.matrixLed.classList.toggle('on', powerOn && animationRunning);
+            elements.animationLed.classList.toggle('on', animationRunning);
+        }
+
+        function togglePower() {
+            powerOn = !powerOn;
+            if (!powerOn) {
+                stopSimulation();
+                clearMatrix();
+            }
+            updateStatus();
+        }
+        function showPattern(pattern, className = 'on') {
+    clearMatrix();
+    for (let row = 0; row < 8; row++) {
+        for (let col = 0; col < 8; col++) {
+            if (pattern[row][col] === 1) {
+                setLED(row, col, className);
+            }
+        }
+    }
+}
+
+// Modalni ochish
+function openModal(id) {
+    document.getElementById(id).style.display = "block";
+}
+
+// Tugmalarni ulash
+document.getElementById("schemaBtn").addEventListener("click", () => openModal("schemaModal"));
+document.getElementById("codeBtn").addEventListener("click", () => openModal("codeModal"));
+document.getElementById("componentsBtn").addEventListener("click", () => openModal("componentsModal"));
+document.getElementById("infoFloatingBtn").addEventListener("click", () => openModal("infoModal"));
+
+// Yopish tugmalari
+document.querySelectorAll(".close").forEach(btn => {
+    btn.addEventListener("click", function() {
+        this.closest(".modal").style.display = "none";
+    });
+});
+
+// Tab switching (Kod uchun)
+document.querySelectorAll(".tab-btn").forEach(button => {
+    button.addEventListener("click", function() {
+        const tab = this.dataset.tab;
+        document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+        this.classList.add("active");
+        document.querySelectorAll(".tab-content").forEach(content => {
+            content.classList.remove("active");
+            if (content.id === tab) content.classList.add("active");
+        });
+    });
+});
+        function clearMatrix() {
+            for (let i = 0; i < 64; i++) {
+                document.getElementById(`led-${i}`).className = 'led';
+            }
+        }
+
+        function setLED(row, col, className = 'on') {
+            const index = row * 8 + col;
+            document.getElementById(`led-${index}`).className = `led ${className}`;
+        }
+
+        const patterns = {
+            numbers: [
+                [[0,1,1,1,1,1,0,0],[0,1,0,0,0,1,0,0],[0,1,0,0,0,1,0,0],[0,1,0,0,0,1,0,0],[0,1,0,0,0,1,0,0],[0,1,0,0,0,1,0,0],[0,1,1,1,1,1,0,0],[0,0,0,0,0,0,0,0]],
+                [[0,0,0,1,0,0,0,0],[0,0,1,1,0,0,0,0],[0,0,0,1,0,0,0,0],[0,0,0,1,0,0,0,0],[0,0,0,1,0,0,0,0],[0,0,0,1,0,0,0,0],[0,0,1,1,1,0,0,0],[0,0,0,0,0,0,0,0]],
+                [[0,1,1,1,1,1,0,0],[0,0,0,0,0,1,0,0],[0,0,0,0,0,1,0,0],[0,1,1,1,1,1,0,0],[0,1,0,0,0,0,0,0],[0,1,0,0,0,0,0,0],[0,1,1,1,1,1,0,0],[0,0,0,0,0,0,0,0]]
+            ],
+            letters: [
+                [[0,0,1,1,1,0,0,0],[0,1,0,0,0,1,0,0],[0,1,0,0,0,1,0,0],[0,1,1,1,1,1,0,0],[0,1,0,0,0,1,0,0],[0,1,0,0,0,1,0,0],[0,1,0,0,0,1,0,0],[0,0,0,0,0,0,0,0]],
+                [[0,1,1,1,1,0,0,0],[0,1,0,0,0,1,0,0],[0,1,0,0,0,1,0,0],[0,1,1,1,1,0,0,0],[0,1,0,0,0,1,0,0],[0,1,0,0,0,1,0,0],[0,1,1,1,1,0,0,0],[0,0,0,0,0,0,0,0]],
+                [[0,1,1,1,1,1,0,0],[0,1,0,0,0,0,0,0],[0,1,0,0,0,0,0,0],[0,1,0,0,0,0,0,0],[0,1,0,0,0,0,0,0],[0,1,0,0,0,0,0,0],[0,1,1,1,1,1,0,0],[0,0,0,0,0,0,0,0]]
+            ],
+            heart: [[0,0,0,0,0,0,0,0],[0,1,1,0,0,1,1,0],[1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1],[0,1,1,1,1,1,1,0],[0,0,1,1,1,1,0,0],[0,0,0,1,1,0,0,0],[0,0,0,0,0,0,0,0]],
+            patterns: [
+                [[1,0,0,0,0,0,0,0],[0,1,0,0,0,0,0,0],[0,0,1,0,0,0,0,0],[0,0,0,1,0,0,0,0],[0,0,0,0,1,0,0,0],[0,0,0,0,0,1,0,0],[0,0,0,0,0,0,1,0],[0,0,0,0,0,0,0,1]],
+                [[0,0,0,1,1,0,0,0],[0,0,0,1,1,0,0,0],[0,0,0,1,1,0,0,0],[1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1],[0,0,0,1,1,0,0,0],[0,0,0,1,1,0,0,0],[0,0,0,1,1,0,0,0]]
+            ]
+        };
+
+        function showNumbers() {
+            if (!powerOn) return;
+            animationRunning = true;
+            updateStatus();
+            let index = 0;
+            currentAnimation = setInterval(() => {
+                if (index < patterns.numbers.length) {
+                    showPattern(patterns.numbers[index], 'on');
+                    index++;
+                } else {
+                    clearInterval(currentAnimation);
+                    animationRunning = false;
+                    updateStatus();
+                }
+            }, 1000);
+        }
+
+        function showLetters() {
+            if (!powerOn) return;
+            animationRunning = true;
+            updateStatus();
+            let index = 0;
+            currentAnimation = setInterval(() => {
+                if (index < patterns.letters.length) {
+                    showPattern(patterns.letters[index], 'blue');
+                    index++;
+                } else {
+                    clearInterval(currentAnimation);
+                    animationRunning = false;
+                    updateStatus();
+                }
+            }, 1500);
+        }
+
+        function showPatterns() {
+            if (!powerOn) return;
+            animationRunning = true;
+            updateStatus();
+            let index = 0;
+            currentAnimation = setInterval(() => {
+                if (index < patterns.patterns.length) {
+                    showPattern(patterns.patterns[index], 'green');
+                    index++;
+                } else {
+                    clearInterval(currentAnimation);
+                    animationRunning = false;
+                    updateStatus();
+                }
+            }, 2000);
+        }
+
+        function showHeart() {
+            if (!powerOn) return;
+            animationRunning = true;
+            updateStatus();
+            let beats = 0;
+            currentAnimation = setInterval(() => {
+                if (beats < 6) {
+                    if (beats % 2 === 0) {
+                        showPattern(patterns.heart, 'on');
+                    } else {
+                        clearMatrix();
+                    }
+                    beats++;
+                } else {
+                    showPattern(patterns.heart, 'on');
+                    clearInterval(currentAnimation);
+                    animationRunning = false;
+                    updateStatus();
+                }
+            }, 500);
+        }
+
+        function startSimulation() {
+            if (!powerOn) {
+                alert('Avval quvvatni yoqing!');
+                return;
+            }
+            setTimeout(() => showNumbers(), 500);
+            setTimeout(() => showLetters(), 4000);
+            setTimeout(() => showPatterns(), 8500);
+            setTimeout(() => showHeart(), 12500);
+        }
+
+        function stopSimulation() {
+            if (currentAnimation) {
+                clearInterval(currentAnimation);
+                currentAnimation = null;
+            }
+            animationRunning = false;
+            clearMatrix();
+            updateStatus();
+        }
+
+        function runTest() {
+            if (!powerOn) {
+                alert('Avval quvvatni yoqing!');
+                return;
+            }
+            animationRunning = true;
+            updateStatus();
+            let ledIndex = 0;
+            currentAnimation = setInterval(() => {
+                if (ledIndex < 64) {
+                    clearMatrix();
+                    document.getElementById(`led-${ledIndex}`).className = 'led on';
+                    ledIndex++;
+                } else {
+                    clearMatrix();
+                    clearInterval(currentAnimation);
+                    animationRunning = false;
+                    updateStatus();
+                }
+            }, 50);
+        }
+
+        function runFullTest() {
+            if (!powerOn) {
+                alert('Avval quvvatni yoqing!');
+                return;
+            }
+            runTest();
+            setTimeout(() => {
+                showNumbers();
+                setTimeout(() => {
+                    showLetters();
+                    setTimeout(() => {
+                        showHeart();
+                    }, 5000);
+                }, 4000);
+            }, 3500);
+        }
+
+        function resetAll() {
+            stopSimulation();
+            clearMatrix();
+            powerOn = false;
+            updateStatus();
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeLEDMatrix();
+            updateStatus();
+            
+            document.getElementById("schemaBtn").addEventListener("click", function() {
+                document.getElementById("schemaModal").style.display = "block";
+            });
+            
+            document.getElementById("codeBtn").addEventListener("click", function() {
+                document.getElementById("codeModal").style.display = "block";
+            });
+            
+            document.getElementById("componentsBtn").addEventListener("click", function() {
+                document.getElementById("componentsModal").style.display = "block";
+            });
+
+            document.querySelectorAll(".modal .close").forEach(btn => {
+                btn.addEventListener("click", function() {
+                    this.closest(".modal").style.display = "none";
+                });
+            });
+
+            window.addEventListener("click", function(e) {
+                document.querySelectorAll(".modal").forEach(modal => {
+                    if (e.target === modal) {
+                        modal.style.display = "none";
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

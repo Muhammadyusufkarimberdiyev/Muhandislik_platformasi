@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DHT11 LCD Arduino Tajribasi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #e6f3ff;
+            min-height: 100vh;
+            padding: 1.5vw;
+            overflow-x: hidden;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            background: #000075;
+            color: white;
+            padding: 0.8vw 2vw;
+            box-shadow: 0 0.3vw 1vw rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.8vw;
+            font-size: clamp(14px, 1.5vw, 18px);
+            font-weight: bold;
+        }
+
+        .logo img {
+            border-radius: 50%;
+            border: 0.15vw solid white;
+            width: clamp(35px, 4vw, 50px);
+            height: clamp(35px, 4vw, 50px);
+        }
+
+        .main-container {
+            display: flex;
+            margin-top: 2vh;
+            gap: 2vw;
+        }
+
+        .left-panel {
+            width: clamp(200px, 18vw, 250px);
+            background: white;
+            padding: 1.2vw;
+            border-radius: 0.6vw;
+            box-shadow: 0 0.3vw 0.6vw rgba(0,0,0,0.1);
+            height: fit-content;
+        }
+
+        .control-group {
+            margin-bottom: 1.5vw;
+            border-bottom: 0.1vw solid #ddd;
+            padding-bottom: 1.2vw;
+        }
+
+        .control-group h3 {
+            margin-bottom: 0.8vw;
+            color: #333;
+            font-size: clamp(13px, 1.3vw, 16px);
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 0.8vw;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 0.6vw;
+            font-size: clamp(11px, 1.1vw, 14px);
+            border-radius: 0.4vw;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .btn:hover {
+            transform: translateY(-0.15vw);
+            box-shadow: 0 0.3vw 0.6vw rgba(0,0,0,0.1);
+        }
+
+        .btn-success { background: #28a745; color: white; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-primary { background: #000075; color: white; }
+        .btn-info { background: #000075; color: white; }
+
+        .main-content {
+            flex: 1;
+            padding: 1.5vw;
+            background: white;
+            border-radius: 0.6vw;
+            box-shadow: 0 0.3vw 0.9vw rgba(0,0,0,0.1);
+        }
+
+        .title-header {
+            background: #000075;
+            color: white;
+            padding: 1vw 2vw;
+            border-radius: 1.5vw;
+            font-size: clamp(14px, 1.5vw, 18px);
+            font-weight: bold;
+            margin-bottom: 2vw;
+            text-align: center;
+            box-shadow: 0 0.3vw 1.2vw rgba(0,0,0,0.2);
+        }
+
+        .circuit-board {
+            position: relative;
+            width: 100%;
+            height: 0;
+            padding-bottom: 55%;
+            margin-top: 2vw;
+        }
+
+        .circuit-wrapper {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .arduino-uno {
+            position: absolute;
+            left: 6.5%;
+            top: 4.5%;
+            width: 37%;
+        }
+
+        .arduino-uno img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .dht11-sensor {
+            position: absolute;
+            right: 28%;
+            top: 5.5%;
+            width: 12%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 20;
+        }
+
+        .dht11-sensor img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .dht11-sensor:hover {
+            transform: scale(1.05);
+            filter: drop-shadow(0 0 1vw rgba(74, 144, 226, 0.6));
+        }
+
+        .lcd-display {
+            background: green;
+            width: 28%;
+            aspect-ratio: 2.3/1;
+            border-radius: 0.6vw;
+            position: absolute;
+            right: 22%;
+            top: 35%;
+            box-shadow: 0.3vw 0.3vw 1.2vw rgba(0,0,0,0.4);
+            z-index: 15;
+        }
+
+        .lcd-screen {
+            background: #0f3460;
+            width: 92%;
+            height: 66%;
+            margin: 4% auto;
+            border-radius: 0.3vw;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            font-size: clamp(10px, 1.1vw, 14px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .lcd-line {
+            margin: 0.6vw 0;
+            transition: all 0.5s ease;
+        }
+
+        .lcd-line.updating {
+            animation: textUpdate 0.5s ease;
+        }
+
+        @keyframes textUpdate {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .wire {
+            position: absolute;
+            border-radius: 0.12vw;
+            z-index: 10;
+        }
+
+        /* DHT11 simlar */
+        .wire-red {
+            width: 0.3%;
+            height: 43%;
+            background: red;
+            left: 28%;
+            top: 14.5%;
+        }
+
+        .wire-black {
+            width: 0.3%;
+            height: 3.5%;
+            background: black;
+            left: 23%;
+            top: 16.3%;
+        }
+
+        .wire-yellow {
+            width: 0.3%;
+            height: 2%;
+            background: yellow;
+            left: 36.5%;
+            top: 18%;
+        }
+
+        .wire-red-h1 {
+            width: 33%;
+            height: 0.3%;
+            background: red;
+            left: 28%;
+            top: 14.5%;
+        }
+
+        .wire-black-h1 {
+            width: 38%;
+            height: 0.3%;
+            background: black;
+            left: 23%;
+            top: 16.3%;
+        }
+
+        .wire-yellow-h1 {
+            width: 24.5%;
+            height: 0.3%;
+            background: yellow;
+            left: 36.5%;
+            top: 18%;
+        }
+
+        /* LCD simlar */
+        .wire-green {
+            width: 0.3%;
+            height: 20%;
+            background: black;
+            left: 29%;
+            top: 37%;
+        }
+
+        .wire-blue {
+            width: 0.3%;
+            height: 18%;
+            background: red;
+            left: 28%;
+            top: 39%;
+        }
+
+        .wire-purple {
+            width: 0.3%;
+            height: 16%;
+            background: purple;
+            left: 37.5%;
+            top: 41%;
+        }
+
+        .wire-orange {
+            width: 0.3%;
+            height: 13%;
+            background: orange;
+            left: 38.5%;
+            top: 44%;
+        }
+
+        .wire-green-h2 {
+            width: 23%;
+            height: 0.3%;
+            background: black;
+            left: 29%;
+            top: 37%;
+        }
+
+        .wire-blue-h2 {
+            width: 24%;
+            height: 0.3%;
+            background: red;
+            left: 28%;
+            top: 39%;
+        }
+
+        .wire-purple-h2 {
+            width: 14%;
+            height: 0.3%;
+            background: purple;
+            left: 37.5%;
+            top: 41%;
+        }
+
+        .wire-orange-h2 {
+            width: 13%;
+            height: 0.3%;
+            background: orange;
+            left: 38.5%;
+            top: 44%;
+        }
+
+        .status-led {
+            width: clamp(10px, 1vw, 13px);
+            height: clamp(10px, 1vw, 13px);
+            border-radius: 50%;
+            background: #dc3545;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 0 0.4vw rgba(0,0,0,0.5);
+        }
+
+        .status-led.on {
+            background: #28a745;
+            box-shadow: 0 0 0.8vw rgba(40, 167, 69, 0.8);
+        }
+
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 0.6vw 0;
+            font-size: clamp(11px, 1.1vw, 13px);
+        }
+
+        .data-display {
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 1.5vw;
+            border-radius: 0.8vw;
+            margin-top: 2vw;
+        }
+
+        .data-display h3 {
+            font-size: clamp(13px, 1.3vw, 16px);
+            margin-bottom: 1vw;
+            text-align: center;
+        }
+
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 0.8vw 0;
+            font-size: clamp(12px, 1.2vw, 14px);
+        }
+
+        .data-value {
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            backdrop-filter: blur(0.3vw);
+        }
+
+        .modal-content {
+            background: #000075;
+            color: white;
+            margin: 5% auto;
+            padding: 2vw;
+            width: 70%;
+            max-width: 700px;
+            border-radius: 1.2vw;
+            box-shadow: 0 0.8vw 2vw rgba(0,0,0,0.4);
+            animation: slideDown 0.4s ease;
+            position: relative;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .close {
+            position: absolute;
+            right: 1.5vw;
+            top: 1vw;
+            font-size: clamp(20px, 2vw, 24px);
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+            transition: color 0.3s;
+        }
+
+        .close:hover { color: #ffcc00; }
+
+        .modal-content h2 {
+            font-size: clamp(18px, 1.8vw, 22px);
+            margin-bottom: 1.2vw;
+            border-bottom: 0.15vw solid rgba(255,255,255,0.2);
+            padding-bottom: 0.6vw;
+        }
+
+        .tab-buttons {
+            display: flex;
+            margin-bottom: 0.8vw;
+        }
+
+        .tab-buttons button {
+            flex: 1;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            padding: 0.8vw;
+            border: none;
+            cursor: pointer;
+            font-size: clamp(12px, 1.2vw, 14px);
+            border-radius: 0.4vw 0.4vw 0 0;
+            transition: background 0.3s;
+        }
+
+        .tab-buttons button.active {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        pre {
+            background: rgba(0,0,0,0.4);
+            padding: 1vw;
+            border-radius: 0.6vw;
+            overflow-x: auto;
+            font-size: clamp(10px, 0.9vw, 12px);
+            white-space: pre-wrap;
+        }
+
+        .card {
+            background: rgba(255,255,255,0.08);
+            padding: 1.2vw;
+            border-radius: 0.8vw;
+            margin-bottom: 1.2vw;
+        }
+
+        .card h3 {
+            font-size: clamp(14px, 1.4vw, 17px);
+            margin-bottom: 0.6vw;
+        }
+
+        .card p {
+            font-size: clamp(12px, 1.2vw, 14px);
+            line-height: 1.6;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .connection-active {
+            animation: connectionGlow 1.5s ease-in-out infinite;
+        }
+
+        @keyframes connectionGlow {
+            0%, 100% { filter: drop-shadow(0 0 0.5vw rgba(0,255,0,0.3)); }
+            50% { filter: drop-shadow(0 0 1.2vw rgba(0,255,0,0.8)); }
+        }
+
+        @media (max-width: 1200px) {
+            .circuit-board { padding-bottom: 60%; }
+        }
+
+        @media (max-width: 1024px) {
+            .main-container { flex-direction: column; }
+            .left-panel { width: 100%; }
+            .circuit-board { padding-bottom: 70%; }
+            .modal-content { width: 80%; }
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 3vw; }
+            .circuit-board { padding-bottom: 85%; }
+            .modal-content { width: 90%; margin: 10% auto; }
+        }
+
+        @media (max-width: 480px) {
+            .circuit-board { padding-bottom: 110%; }
+            
+        .arduino-uno {
+            position: absolute;
+            left: 6.5%;
+            top: 12.5%;
+            width: 37%;
+        }
+            .dht11-sensor {
+            position: absolute;
+            right: 27%;
+            top: 7.4%;
+            width: 15%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 20;
+        }
+              .dht11-sensor img {
+            width: 100%;
+            height: 70px;
+            display: block;
+        }
+        
+        .lcd-display {
+            background: green;
+            width: 28%;
+            aspect-ratio: 2.3/1;
+            border-radius: 0.6vw;
+            position: absolute;
+            right: 22%;
+            top: 28%;
+            box-shadow: 0.3vw 0.3vw 1.2vw rgba(0,0,0,0.4);
+            z-index: 15;
+        }
+         .wire {
+            position: absolute;
+            border-radius: 0.12vw;
+            z-index: 10;
+        }
+
+        /* DHT11 simlar */
+        .wire-red {
+            width: 0.3%;
+            height: 23.5%;
+            background: red;
+            left: 28%;
+            top: 15%;
+        }
+
+        .wire-black {
+            width: 0.3%;
+            height: 3%;
+            background: black;
+            left: 23%;
+            top: 17%;
+        }
+
+        .wire-yellow {
+            width: 0.3%;
+            height: 2%;
+            background: yellow;
+            left: 36%;
+            top: 18%;
+        }
+
+        .wire-red-h1 {
+            width: 33%;
+            height: 0.3%;
+            background: red;
+            left: 28%;
+            top: 15%;
+        }
+
+        .wire-black-h1 {
+            width: 38%;
+            height: 0.3%;
+            background: black;
+            left: 23%;  
+            top: 17%;
+        }
+
+        .wire-yellow-h1 {
+            width: 25%;
+            height: 0.3%;
+            background: yellow;
+            left: 36%;
+            top: 18%;
+        }
+
+        /* LCD simlar */
+        .wire-green {
+            width: 0.3%;
+            height: 7%;
+            background: black;
+            left: 29%;
+            top: 32%;
+        }
+
+        .wire-blue {
+            width: 0.3%;
+            height: 8%;
+            background: red;
+            left: 28%;
+            top: 30%;
+        }
+
+        .wire-purple {
+            width: 0.3%;
+            height: 4.5%;
+            background: purple;
+            left: 37.5%;
+            top: 34%;
+        }
+
+        .wire-orange {
+            width: 0.3%;
+            height: 3.5%;
+            background: orange;
+            left: 38.5%;
+            top: 35%;
+        }
+
+        .wire-green-h2 {
+            width: 23%;
+            height: 0.3%;
+            background: black;
+            left: 29%;
+            top: 32%;
+        }
+
+        .wire-blue-h2 {
+            width: 24%;
+            height: 0.3%;
+            background: red;
+            left: 28%;
+            top: 33%;
+        }
+
+        .wire-purple-h2 {
+            width: 14%;
+            height: 0.3%;
+            background: purple;
+            left: 37.5%;
+            top: 34%;
+        }
+
+        .wire-orange-h2 {
+            width: 13%;
+            height: 0.3%;
+            background: orange;
+            left: 38.5%;
+            top: 35%;
+        }
+
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <img src="../image/logo.png" alt="Logo">
+            <span>DHT11 LCD Arduino Tajribasi</span>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <div class="left-panel">
+            <div class="control-group">
+                <h3>Boshqaruv</h3>
+                <button class="btn btn-success" onclick="startReading()">O'qishni boshlash</button>
+                <button class="btn btn-danger" onclick="stopReading()">To'xtatish</button>
+                <button class="btn btn-primary" onclick="togglePower()">Quvvat</button>
+                <button class="btn btn-info" onclick="testConnection()">Ulanishni tekshirish</button>
+            </div>
+
+            <div class="control-group">
+                <h3>Ma'lumotlar</h3>
+                <button class="btn btn-primary" onclick="openModal('schemaModal')">Sxema haqida</button>
+                <button class="btn btn-primary" onclick="openModal('codeModal')">Kod</button>
+                <button class="btn btn-primary" onclick="openModal('componentsModal')">Qurilmalar</button>
+            </div>
+
+            <div class="control-group">
+                <h3>Qurilma holati</h3>
+                <div class="status-row">
+                    <span>Quvvat:</span>
+                    <div class="status-led" id="powerLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>DHT11:</span>
+                    <div class="status-led" id="dhtLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>LCD:</span>
+                    <div class="status-led" id="lcdLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Arduino:</span>
+                    <div class="status-led" id="arduinoLed"></div>
+                </div>
+            </div>
+
+            <div class="data-display">
+                <h3>Joriy ma'lumotlar</h3>
+                <div class="data-row">
+                    <span>Harorat:</span>
+                    <span class="data-value" id="tempValue">--°C</span>
+                </div>
+                <div class="data-row">
+                    <span>Namlik:</span>
+                    <span class="data-value" id="humidityValue">--%</span>
+                </div>
+                <div class="data-row">
+                    <span>Holat:</span>
+                    <span class="data-value" id="statusValue">O'chirilgan</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="title-header">DHT11 va LCD 16x2 bilan harorat va namlik o'lchash</div>
+            
+            <div class="circuit-board">
+                <div class="circuit-wrapper">
+                    <div class="arduino-uno">
+                        <img src="arduino1 - Copy.png" alt="Arduino UNO">
+                    </div>
+
+                    <div class="dht11-sensor" id="dht11" onclick="simulateReading()">
+                        <img src="DHT11.jpg-removebg-preview - Copy.png" alt="DHT11">
+                    </div>
+
+                    <div class="lcd-display">
+                        <div class="lcd-screen">
+                            <div class="lcd-line" id="lcdLine1">Temp: --°C</div>
+                            <div class="lcd-line" id="lcdLine2">Humidity: --%</div>
+                        </div>
+                    </div>
+
+                    <div class="wire wire-red"></div>
+                    <div class="wire wire-black"></div>
+                    <div class="wire wire-yellow"></div>
+                    <div class="wire wire-red-h1"></div>
+                    <div class="wire wire-black-h1"></div>
+                    <div class="wire wire-yellow-h1"></div>
+                    <div class="wire wire-green"></div>
+                    <div class="wire wire-blue"></div>
+                    <div class="wire wire-purple"></div>
+                    <div class="wire wire-orange"></div>
+                    <div class="wire wire-green-h2"></div>
+                    <div class="wire wire-blue-h2"></div>
+                    <div class="wire wire-purple-h2"></div>
+                    <div class="wire wire-orange-h2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="schemaModal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Sxema haqida ma'lumot</h2>
+            <div class="card">
+                <h3>DHT11 + LCD Loyihasi</h3>
+                <p>Bu loyiha DHT11 sensor yordamida harorat va namlikni o'lchab, LCD displeyda ko'rsatadi.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="codeModal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Kod</h2>
+            <div class="tab-buttons">
+                <button class="tab-btn active" data-tab="arduino">Arduino IDE</button>
+                <button class="tab-btn" data-tab="libraries">Kutubxonalar</button>
+            </div>
+            <div class="tab-content active" id="arduino">
+                <pre>#include &lt;DHT.h&gt;
+#include &lt;LiquidCrystal.h&gt;
+
+DHT dht(2, DHT11);
+LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
+
+void setup() {
+  dht.begin();
+  lcd.begin(16, 2);
+}</pre>
+            </div>
+            <div class="tab-content" id="libraries">
+                <pre>Kerakli kutubxonalar:
+1. DHT sensor library
+2. LiquidCrystal library</pre>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="componentsModal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Ishlatilgan qurilmalar</h2>
+            <div class="card">
+                <h3>DHT11 Sensor</h3>
+                <p>Harorat va namlikni o'lchash</p>
+            </div>
+            <div class="card">
+                <h3>LCD 16x2 Display</h3>
+                <p>Ma'lumotlarni ko'rsatish</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let powerOn = false;
+        let readingActive = false;
+        let readingInterval;
+
+        const elements = {
+            powerLed: document.getElementById('powerLed'),
+            dhtLed: document.getElementById('dhtLed'),
+            lcdLed: document.getElementById('lcdLed'),
+            arduinoLed: document.getElementById('arduinoLed'),
+            tempValue: document.getElementById('tempValue'),
+            humidityValue: document.getElementById('humidityValue'),
+            statusValue: document.getElementById('statusValue'),
+            lcdLine1: document.getElementById('lcdLine1'),
+            lcdLine2: document.getElementById('lcdLine2'),
+            dht11: document.getElementById('dht11')
+        };
+
+        function updateLED(led, state) {
+            led.classList.toggle('on', state);
+        }
+
+        function togglePower() {
+            powerOn = !powerOn;
+            updateLED(elements.powerLed, powerOn);
+            updateLED(elements.arduinoLed, powerOn);
+            elements.statusValue.textContent = powerOn ? "Quvvat yoqilgan" : "O'chirilgan";
+            if (!powerOn) stopReading();
+        }
+
+        function startReading() {
+            if (!powerOn) {
+                alert("Avval quvvatni yoqing!");
+                return;
+            }
+            readingActive = true;
+            updateLED(elements.dhtLed, true);
+            updateLED(elements.lcdLed, true);
+            elements.statusValue.textContent = "O'qish boshlandi";
+            readingInterval = setInterval(simulateReading, 2000);
+        }
+
+        function stopReading() {
+            readingActive = false;
+            clearInterval(readingInterval);
+            updateLED(elements.dhtLed, false);
+            updateLED(elements.lcdLed, false);
+            elements.statusValue.textContent = powerOn ? "Kutish holati" : "O'chirilgan";
+        }
+
+        function simulateReading() {
+            if (!readingActive) return;
+            const temp = (20 + Math.random() * 10).toFixed(1);
+            const humidity = (40 + Math.random() * 30).toFixed(1);
+            elements.tempValue.textContent = `${temp}°C`;
+            elements.humidityValue.textContent = `${humidity}%`;
+            elements.lcdLine1.textContent = `Temp: ${temp}°C`;
+            elements.lcdLine2.textContent = `Humidity: ${humidity}%`;
+            elements.lcdLine1.classList.add("updating");
+            elements.lcdLine2.classList.add("updating");
+            setTimeout(() => {
+                elements.lcdLine1.classList.remove("updating");
+                elements.lcdLine2.classList.remove("updating");
+            }, 600);
+        }
+
+        function testConnection() {
+            if (!powerOn) {
+                alert("Avval quvvatni yoqing!");
+                return;
+            }
+            elements.statusValue.textContent = "Ulanish muvaffaqiyatli!";
+            elements.dht11.classList.add("connection-active");
+            setTimeout(() => elements.dht11.classList.remove("connection-active"), 3000);
+        }
+
+        function openModal(id) {
+            document.getElementById(id).style.display = "block";
+        }
+
+        document.querySelectorAll(".close").forEach(btn => {
+            btn.onclick = () => btn.parentElement.parentElement.style.display = "none";
+        });
+
+        window.onclick = (e) => {
+            if (e.target.classList.contains("modal")) e.target.style.display = "none";
+        };
+
+        document.querySelectorAll(".tab-btn").forEach(btn => {
+            btn.addEventListener("click", () => {
+                document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+                document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+                btn.classList.add("active");
+                document.getElementById(btn.dataset.tab).classList.add("active");
+            });
+        });
+    </script>
+</body>
+</html>

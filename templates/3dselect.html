@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Milliy Muhandislik Platformasi - 3D Chizmalar</title>
+  <link rel="stylesheet" href="/static/style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    section {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 3rem 2rem;
+    }
+    
+    .videos-title {
+      color: #000075;
+      font-size: 2.5rem;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 2rem;
+      margin-bottom: 3rem;
+    }
+
+    .video-card {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      cursor: pointer;
+    }
+
+    .video-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    .video-thumbnail {
+      position: relative;
+      width: 100%;
+      height: 220px;
+      background: #f0f0f0;
+      overflow: hidden;
+    }
+
+    .video-thumbnail iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    .video-thumbnail img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .video-thumbnail .robot-image {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .video-thumbnail .robot-image i {
+      font-size: 80px;
+      color: white;
+    }
+
+    .video-info {
+      padding: 1.5rem;
+    }
+
+    .video-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 1rem;
+      line-height: 1.4;
+      display: -webkit-box;
+
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .video-duration {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #666;
+      font-size: 0.9rem;
+    }
+
+    .video-duration i {
+      color: #000075;
+    }
+
+    .no-results {
+      text-align: center;
+      color: #666;
+      font-size: 1.2rem;
+      padding: 3rem;
+      grid-column: 1 / -1;
+    }
+
+    .pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 2rem;
+    }
+
+    .page-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #ddd;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .page-dot:hover {
+      background: #000075;
+      transform: scale(1.2);
+    }
+
+    .page-dot.active {
+      background: #000075;
+      width: 32px;
+      border-radius: 6px;
+    }
+
+    .page-prev, .page-next {
+      padding: 0.5rem 1rem;
+      background: #000075;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .page-prev:hover, .page-next:hover {
+      background: #0000a0;
+      transform: scale(1.05);
+    }
+
+    @media (max-width: 768px) {
+      .video-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+
+      .videos-title {
+        font-size: 2rem;
+      }
+
+      .video-thumbnail {
+        height: 200px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <nav>
+      <a href="/"><img src="/static/image/logo.png" alt="Logo" /></a>
+      
+      <form class="search-box" action="" method="get">
+        <i class="fa fa-search"></i>
+        <input type="text" name="q" placeholder="Qidiruv..." value="{{ equery|default:'' }}">
+      </form>
+
+      <div class="menu-toggle" id="menuToggle">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+
+      <ul id="navMenu">
+        <a href="/"><li>Asosiy sahifa</li></a>
+        <a href="#we"><li>Biz haqimizda</li></a>
+        <a href="#techno"><li>Texnologiya</li></a>
+        <a href="#partners"><li>Hamkorlarimiz</li></a>
+      </ul>
+    </nav>
+  </header>
+
+  <section>
+    <h1 class="videos-title">3D Chizmalar Videolari</h1>
+
+    <div class="video-grid">
+      {% for e in experiments %}
+      <div class="video-card">
+        <div class="video-thumbnail">
+          {% if e.link %}
+            <iframe 
+              src="{{ e.link }}" 
+              title="{{ e.name }}" 
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerpolicy="strict-origin-when-cross-origin" 
+              allowfullscreen>
+            </iframe>
+          {% elif e.link %}
+            <iframe 
+              src="{{ e.youtubelink1 }}" 
+              title="{{ e.name }}" 
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerpolicy="strict-origin-when-cross-origin" 
+              allowfullscreen>
+            </iframe>
+         
+          {% else %}
+            <iframe 
+              src="{{ e.link }}" 
+              title="{{ e.name }}" 
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerpolicy="strict-origin-when-cross-origin" 
+              allowfullscreen>
+            </iframe>
+          {% endif %}
+        </div>
+        
+        <div class="video-info">
+          <div class="video-title">{{ e.name }}</div>
+          {% if e.min %}
+            <div class="video-duration">
+              <i class="fas fa-clock"></i>
+              <span>{{ e.min }}</span>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+      {% empty %}
+        <p class="no-results">Hech qanday 3D chizma videosi topilmadi.</p>
+      {% endfor %}
+    </div>
+
+    {% if page and page.has_other_pages %}
+    <div class="pagination">
+      {% if page.has_previous %}
+        <a class="page-prev" href="?q={{ equery }}&page={{ page.previous_page_number }}">←</a>
+      {% endif %}
+      
+      {% for num in paginator.page_range %}
+        <a class="page-dot{% if page.number == num %} active{% endif %}" 
+           href="?q={{ equery }}&page={{ num }}"></a>
+      {% endfor %}
+      
+      {% if page.has_next %}
+        <a class="page-next" href="?q={{ equery }}&page={{ page.next_page_number }}">→</a>
+      {% endif %}
+    </div>
+    {% endif %}
+  </section>
+
+  <footer>
+      <div class="footer">
+        <div class="left">
+          <img src="/static/image/muallif.jpg" alt="Muallif logotipi">
+          <p>
+<span style="display: block; text-align: center; font-size: 20px; font-weight: bold;">
+    Muallif : Muhammad Al-Xorazmiy Nomidagi Ixtisoslashtirilgan Maktab Andijon Filiali
+</span>
+
+              <br>Ushbu platforma O'zbekiston Respublikasi Prezidentining <br> 2024-yil 1-apreldagi PF-55-son
+            Farmoniga asosan tashkil etilgan 2025-yilgi Ixtirochilikka qadam tanlovini 1-o'rin <br> sohibi hamda
+            amaliyotgan tadbiq etish uchun Oliy ta'lim <br> va innovatsiyalar vazirligi huzuridagi
+            Ilm-fanni moliyalashtirish va innovatsiyalarni qo'llab-quvvatlash jamg'armasi tomonidan
+            56 mln so'm miqdorida moliyalashtirilgan.
+          </p>
+        </div>
+        <div class="center">
+          <h2>Aloqa uchun</h2>
+          <p>Manzil: Andijon shahar, Qalandarxona mahalla fuqarolar yig'ini,<br> Buxoro ko'chasi, 4 uy</p>
+          <p>Tel: +998 94 212 14 48</p>
+          <p>Gmail: ixm337@piima.uz</p>
+          <ul class="social-icons">
+            <li><a href="https://www.facebook.com/share/1C2cE7VJQR/?mibextid=wwXIfr" target="_blank"><i class="fab fa-facebook-f"></i></a></li>
+            <li><a href="https://www.youtube.com/@Milliy_muhandislik_platformasi" target="_blank"><i class="fab fa-youtube"></i></a></li>
+            <li><a href="https://www.instagram.com/itschool_andijan?igsh=MWdkMzQ4Zmt5MzhxaA==" target="_blank"><i class="fab fa-instagram"></i></a></li>
+            <li><a href="https://t.me/milliy_muhandislik" target="_blank"><i class="fab fa-telegram"></i></a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="bottom">
+        <p>Yaratilgan 2025 MMP | Dizayn va Dasturlash muallifi</p>
+      </div>
+    </footer>
+
+
+  <script src="/static/index.js"></script>
+
+  <script>
+    const menuToggle = document.getElementById('menuToggle');
+    const navMenu = document.getElementById('navMenu');
+
+    menuToggle.addEventListener('click', function() {
+      navMenu.classList.toggle('active');
+      this.classList.toggle('active');
+    });
+
+    document.addEventListener('click', function(e) {
+      if (!menuToggle.contains(e.target) && !navMenu.contains(e.target)) {
+        navMenu.classList.remove('active');
+        menuToggle.classList.remove('active');
+      }
+    });
+
+    // Video card hover animation
+    document.querySelectorAll('.video-card').forEach(card => {
+      card.addEventListener('mouseenter', function() {
+        this.style.transform = 'translateY(-8px) scale(1.02)';
+      });
+      
+      card.addEventListener('mouseleave', function() {
+        this.style.transform = 'translateY(0) scale(1)';
+      });
+    });
+  </script>
+</body>
+</html>

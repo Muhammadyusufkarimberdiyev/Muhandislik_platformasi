@@ -1,0 +1,1362 @@
+
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buzz Wire Game - Elektr Sim O'yini</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+     
+            min-height: 100vh;
+            padding: 10px;
+            overflow-x: hidden;
+        }
+
+        .header {
+            background-color: #000075;
+            color: white;
+            padding: 15px 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            border-radius: 15px;
+            margin-bottom: 20px;
+           
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            font-size: clamp(16px, 4vw, 22px);
+            font-weight: bold;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            border-radius: 50%;
+            border: 3px solid white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .main-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        @media (min-width: 1024px) {
+            .main-container {
+                grid-template-columns: 280px 1fr 280px;
+            }
+        }
+
+        .control-panel {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .control-group:last-child {
+            border-bottom: none;
+        }
+
+        .control-group h3 {
+            margin-bottom: 12px;
+            color: #2a5298;
+            font-size: 16px;
+            text-align: center;
+            text-transform: uppercase;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 12px 15px;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 10px;
+            font-size: 14px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+
+        .btn-success { background: linear-gradient(135deg, #28a745, #20c997); color: white; }
+        .btn-danger { background: linear-gradient(135deg, #dc3545, #fd7e14); color: white; }
+        .btn-primary { background: linear-gradient(135deg, #007bff, #6610f2); color: white; }
+        .btn-info { background: linear-gradient(135deg, #17a2b8, #6f42c1); color: white; }
+
+        .game-area {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .game-container {
+            position: relative;
+            width: 100%;
+            max-width: 900px;
+            height: 0;
+            padding-bottom: 60%;
+            margin: 0 auto;
+            background: linear-gradient(145deg, #8B7355, #A0826D);
+            border: 8px solid #654321;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4), inset 0 0 30px rgba(0,0,0,0.3);
+            overflow: visible;
+        }
+
+.game-inner {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 5%;
+        }
+
+        .wire-container {
+            position: relative;
+            width: 100%;
+            height: 50%;
+            margin-top: 3%;
+        }
+
+        .wire-path {
+            position: absolute;
+            top: 0;
+            left: 5%;
+            width: 90%;
+            height: 100%;
+        }
+
+        .wire-loop {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(135deg, #FF6B35, #DC143C);
+            border: 3px solid #FFD700;
+            border-radius: 50%;
+            cursor: grab;
+            z-index: 100;
+            box-shadow: 0 0 20px rgba(255, 107, 53, 0.8);
+            left: -20px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .wire-loop:active {
+            cursor: grabbing;
+        }
+
+        .wire-loop::before {
+            content: '⚡️';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 16px;
+        }
+
+        .wire-loop.buzzing {
+            animation: buzz 0.1s infinite;
+            background: radial-gradient(circle, #FF0000, #8B0000);
+            box-shadow: 0 0 30px rgba(255, 0, 0, 1);
+        }
+
+        @keyframes buzz {
+            0%, 100% { transform: translateY(-50%) scale(1); }
+            50% { transform: translateY(-50%) scale(1.1); }
+        }
+
+        .wire-maze {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .wire-segment {
+            position: absolute;
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+            cursor: crosshair;
+            border: 2px solid #B8860B;
+            top: 50%;
+            transform-origin: left center;
+        }
+
+        .wire-segment.touched {
+            background: linear-gradient(45deg, #FF4444, #CC0000);
+            box-shadow: 0 0 25px rgba(255, 68, 68, 1);
+            animation: wireShock 0.3s ease;
+        }
+
+        @keyframes wireShock {
+            0%, 100% { transform: translateY(-50%) scale(1); }
+            50% { transform: translateY(-50%) scale(1.05); }
+        }
+
+        .wire-segment-1 {
+            left: 0%;
+            width: 10%;
+            height: 8px;
+            transform: translateY(-50%) rotate(0deg);
+        }
+
+        .wire-segment-2 {
+            left: 9%;
+            width: 12%;
+            height: 8px;
+            transform: translateY(-50%) rotate(-35deg);
+            border-radius: 30px;
+        }
+
+        .wire-segment-3 {
+            left: 19%;
+            width: 11%;
+            height: 8px;
+            transform: translateY(-50%) rotate(30deg);
+            border-radius: 25px;
+        }
+
+        .wire-segment-4 {
+            left: 28%;
+            width: 13%;
+            height: 8px;
+            transform: translateY(-50%) rotate(-32deg);
+            border-radius: 28px;
+        }
+
+        .wire-segment-5 {
+            left: 39%;
+            width: 12%;
+            height: 8px;
+            transform: translateY(-50%) rotate(28deg);
+            border-radius: 22px;
+        }
+
+        .wire-segment-6 {
+            left: 49%;
+            width: 13%;
+            height: 8px;
+            transform: translateY(-50%) rotate(-30deg);
+            border-radius: 26px;
+        }
+
+        .wire-segment-7 {
+            left: 60%;
+            width: 11%;
+            height: 8px;
+            transform: translateY(-50%) rotate(25deg);
+            border-radius: 24px;
+        }
+
+        .wire-segment-8 {
+            left: 69%;
+            width: 13%;
+            height: 8px;
+            transform: translateY(-50%) rotate(-28deg);
+            border-radius: 20px;
+        }
+
+.wire-segment-9 {
+            left: 80%;
+            width: 12%;
+            height: 8px;
+            transform: translateY(-50%) rotate(20deg);
+        }
+
+        .wire-segment-10 {
+            left: 90%;
+            width: 10%;
+            height: 8px;
+            transform: translateY(-50%) rotate(0deg);
+        }
+
+        .start-end-point {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+            color: white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            z-index: 10;
+            top: 50%;
+        }
+
+        .start-point {
+            background: linear-gradient(135deg, #28A745, #20c997);
+            left: -30px;
+            transform: translateY(-50%);
+            animation: pulse 2s infinite;
+        }
+
+        .end-point {
+            background: linear-gradient(135deg, #DC3545, #fd7e14);
+            right: -30px;
+            transform: translateY(-50%);
+            animation: pulse 2s infinite 1s;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: translateY(-50%) scale(1); }
+            50% { transform: translateY(-50%) scale(1.1); }
+        }
+
+        .components-row {
+            position: absolute;
+            bottom: 8%;
+            left: 5%;
+            right: 5%;
+            display: flex;
+            gap: 10px;
+            align-items:center;
+            flex-wrap: wrap;
+            
+        }
+
+        .battery {
+            width: clamp(80px, 15%, 120px);
+            height: clamp(50px, 10%, 70px);
+         
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: clamp(10px, 2vw, 14px);
+      
+            position: relative;
+        }
+
+        .battery::after {
+            
+            position: absolute;
+            right: -8px;
+         
+            color: white;
+            width: 8px;
+            height: 60%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .buzzer {
+            width: clamp(50px, 10%, 70px);
+            height: clamp(50px, 10%, 70px);
+           
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: clamp(8px, 1.5vw, 11px);
+        
+            transition: all 0.3s ease;
+        }
+
+        .buzzer.active {
+            background: linear-gradient(135deg, #FF4444, #CC0000);
+            animation: buzzerPulse 0.2s infinite;
+            box-shadow: 0 0 25px rgba(255, 68, 68, 0.8);
+        }
+
+        @keyframes buzzerPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+
+        .lamp {
+            width: 20px;
+            height: 30px;
+            border-radius: 10px 10px 0 0;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #6c757d;
+            font-size: clamp(16px, 3vw, 24px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .lamp.active {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.9);
+            animation: lampGlow 0.5s ease;
+        }
+
+
+@keyframes lampGlow {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+        }
+
+        .connection-wires {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .conn-wire {
+            position: absolute;
+            
+            border-radius: 2px;
+        }
+
+        .wire-1 { bottom: 75%; left: 14%; width: 3px; height: 10%;background: black; }
+        .wire-2 { bottom: 75%; left: 10%; width: 4.2%; height: 3px; background: black; }
+        .wire-3 { bottom: 70.5%; left: 21%; width: 6.2%; height: 3px; background: red;  }
+        .wire-4 { bottom: 70.5%; left: 12%; width: 6.2%; height: 3px; background: red; }
+        .wire-5 { bottom: 85%; left: 0%; width: 14.4%; height: 3px; background: black;  }
+        .wire-6 { bottom: 85%;  width: 3px; height: 36%; background: black; }
+        .wire-7 { bottom: 70.5%; left: 23%; width: 11%; height: 3px; background: red;  }
+        .wire-8 { bottom: 60%; left: 18%; width: 3px; height: 72%; background: red; transform: rotate(-45deg); }
+        .status-panel {
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+        }
+
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+
+        .status-led {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #dc3545;
+            transition: all 0.4s ease;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+        }
+
+        .status-led.on {
+            background: #28a745;
+            box-shadow: 0 0 15px rgba(40, 167, 69, 0.9);
+        }
+
+        .score-display {
+            text-align: center;
+            margin-top: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            padding: 10px;
+            border-radius: 10px;
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+
+        .score-good { color: #28a745; background: rgba(40, 167, 69, 0.1); }
+        .score-bad { color: #dc3545; background: rgba(220, 53, 69, 0.1); }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            backdrop-filter: blur(8px);
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            margin: 20px auto;
+            padding: 30px;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.1);
+            transition: all 0.3s;
+        }
+
+        .close:hover {
+            background: rgba(255,255,255,0.2);
+            transform: rotate(90deg);
+        }
+
+        .modal-content h2 {
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(255,255,255,0.3);
+        }
+
+        @media (max-width: 768px) {
+            .header { padding: 12px 15px; }
+            .logo { font-size: 14px; }
+            .logo-icon { width: 40px; height: 40px; font-size: 20px; }
+            .game-container { padding-bottom: 75%; }
+            .modal-content { padding: 25px; width: 95%; }
+        }
+
+           .card {
+    display: flex;
+    gap: 15px;
+    background: #000075;
+    color: white;
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    align-items: center;
+}
+
+.card img {
+    width: 150px;
+    border-radius: 10px;
+}
+
+.card .text h3 {
+    margin-bottom: 8px;
+    color: white;
+}
+.modal{ display:none; position:fixed; inset:0; z-index:1000; background:rgba(0,0,0,.6); backdrop-filter:blur(3px); }
+.modal-content{ position:relative; z-index:1001; }
+.modal .close{
+  position:absolute; right:16px; top:10px; 
+  font-size:26px; line-height:1; cursor:pointer;
+  z-index:1002; /* close har doim tepada bo'lsin */
+  background: rgba(255,255,255,.15); border-radius:50%; padding:4px 10px;
+}
+.modal .close:hover{ background: rgba(255,255,255,.25); }
+@media (max-width: 480px) {
+            .components-row { gap: 5px; }
+            .wire-loop { width: 25px; height: 25px; }
+            .start-end-point { width: 35px; height: 35px; font-size: 16px; }
+        }
+        .lamp{
+            display: none;
+        }
+.left-panel{width:280px;max-width:95%;background:#fff;border-radius:14px;padding:16px;box-shadow:0 6px 16px rgba(0,0,0,.08)}
+  .left-panel h3{margin:0 0 12px;font-size:16px;color:#333}
+  .btn{display:block;width:100%;padding:10px 12px;margin:8px 0;border:0;border-radius:10px;cursor:pointer;transition:.25s;text-align:left;font-weight:600}
+  .btn-primary{background:#000075;color:#fff}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 14px rgba(0,0,0,.1)}
+  .flex-container-40-60{display:flex;gap:20px;align-items:flex-start;background:rgba(255,255,255,.1);padding:20px;border-radius:15px;margin-bottom:20px}
+  .flex-text-60{flex:1}
+  .flex-text-60 p{font-size:16px;line-height:1.8}
+  .flex-container-30-70{display:flex;gap:20px;align-items:flex-start;background:rgba(255,255,255,.1);padding:20px;border-radius:15px;margin-bottom:20px}
+  .flex-image-30{flex:0 0 30%}
+  .flex-image-30 img{width:100%;border-radius:10px}
+  .flex-text-70{flex:0 0 70%}
+  .flex-text-70 strong{color:#ffcc00;font-size:18px;display:block;margin-bottom:10px}
+  .modal{display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.8);backdrop-filter:blur(5px);overflow-y:auto}
+  .modal-content{background:#000075;color:#fff;margin:5vh auto;padding:30px;width:90%;max-width:1000px;border-radius:20px;box-shadow:0 15px 40px rgba(0,0,0,.5);position:relative;animation:slideDown .4s ease}
+  @keyframes slideDown{from{transform:translateY(-50px);opacity:0}to{transform:translateY(0);opacity:1}}
+  .close{position:absolute;right:20px;top:15px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:bold;cursor:pointer;color:#fff;transition:.3s;border-radius:50%;background:rgba(255,255,255,.1)}
+  .close:hover{background:rgba(255,204,0,.3);color:#ffcc00;transform:rotate(90deg)}
+  .modal-content h2{font-size:28px;margin-bottom:25px;padding-bottom:15px;border-bottom:2px solid rgba(255,255,255,.3);padding-right:50px}
+  .tab-buttons{display:flex;gap:8px;margin:12px 0 16px}
+  .tab-btn{flex:1;background:rgba(255,255,255,.12);color:#fff;border:0;border-radius:10px 10px 0 0;padding:10px;cursor:pointer;font-weight:600;transition:.2s}
+  .tab-btn:hover{background:rgba(255,255,255,.2)}
+  .tab-btn.active{background:rgba(255,255,255,.28)}
+  .tab-content{display:none}
+  .tab-content.active{display:block}
+  pre{background:rgba(0,0,0,.35);padding:12px;border-radius:10px;overflow:auto;white-space:pre-wrap;word-break:break-word;color:#fff;font-size:13.5px;line-height:1.55}
+  #infoFloatingBtn{position:fixed;bottom:30px;right:30px;width:120px;height:120px;border-radius:50%;background:linear-gradient(135deg,#000075,#0000ff);color:#fff;border:4px solid #fff;cursor:pointer;font-size:16px;font-weight:bold;box-shadow:0 8px 20px rgba(0,0,0,.4);z-index:1500;transition:.3s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px}
+  #infoFloatingBtn:hover{transform:scale(1.1);box-shadow:0 12px 30px rgba(0,0,255,.6)}
+  #infoFloatingBtn span:first-child{font-size:36px}
+  .video-full{width:100%;border-radius:15px;background:#000}
+  .video-full video{width:100%;height:auto;border-radius:15px;max-height:70vh}
+  @media (max-width:1024px){.flex-container-40-60,.flex-container-30-70{flex-direction:column}.flex-image-30,.flex-text-70{flex:0 0 100%}}
+  @media (max-width:768px){.modal-content{width:96%;padding:20px 15px}#infoFloatingBtn{width:90px;height:90px;font-size:14px;bottom:20px;right:20px}#infoFloatingBtn span:first-child{font-size:28px}}
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+               <a href="/"><img src="/static/image/logo.png" width="80px" height="80px" alt=""></a>
+          
+            <span>Buzz Wire Game - Elektr Sim O'yini</span>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <div class="control-panel">
+            <div class="control-group">
+                <h3>🎮 Boshqaruv</h3>
+                <button class="btn btn-success" id="startBtn">O'yinni Boshlash</button>
+                <button class="btn btn-danger" id="resetBtn">Qayta Boshlash</button>
+                <button class="btn btn-primary" id="soundBtn">🔊 Ovoz On</button>
+            </div>
+
+            <div class="control-group">
+                <h3>📋 Ma'lumot</h3>
+                <button class="btn btn-info" id="rulesBtn">O'yin Qoidalari</button>
+                <button class="btn btn-info" id="howToBtn">Qanday O'ynash</button>
+            </div>
+
+             <div class="control-group">
+                <h3>📚 Ma'lumotlar</h3>
+                <button class="btn btn-primary" id="schemaBtn">
+                    📋 Sxema Haqida
+                </button>
+               
+                <button class="btn btn-primary" id="componentsBtn">
+                    🔌 Qurilmalar
+                </button>
+           
+            </div>
+            <div class="control-group">
+                <h3>📊 Holat</h3>
+                <div class="status-row">
+                    <span>🎮 Faol:</span>
+                    <div class="status-led" id="gameLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>⚡️ Tegdi:</span>
+                    <div class="status-led" id="touchLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>🔊 Buzzer:</span>
+                    <div class="status-led" id="buzzerLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>💡 Chiroq:</span>
+                    <div class="status-led" id="lampLed"></div>
+                </div>
+            </div>
+        </div>
+<div class="modal" id="schemaModal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>💡 Sxema qayerda ishlatiladi (RGB LED)</h2>
+    <div class="flex-container-40-60">
+         <div class="flex-video-40">
+                <iframe 
+                    src="https://www.youtube.com/embed/l9PTQ7GhbpI?si=Ba65WOKF-UGyukFU" 
+                    title="YouTube video player" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+      <div class="flex-text-60">
+        <strong>Ishlash prinsipi</strong>
+<p>
+    Halqa sim bo‘ylab harakatlanadi.
+
+Agar halqa simga tegsa:
+
+Buzzer signal beradi (“buzz”)
+
+LED yoqilishi mumkin
+
+O‘yinchi maqsad qilgan oxirgi nuqtaga tegmasdan yetib borishi kerak.
+
+Har bir tegish xatolik hisoblanadi, o‘yin statistikasi Arduino orqali hisoblanishi mumkin.
+</p>
+      </div>
+    </div>
+    <div class="flex-container-40-60">
+         <div class="flex-video-40">
+                <iframe 
+                    src="https://www.youtube.com/embed/inY7Ll6xEt8?si=HfzEmIChNSG66SJ_" 
+                    title="YouTube video player" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+      <div class="flex-text-60">
+        <strong>Qo‘shimcha funksiyalar</strong>
+     <p>LED indikator: har safar buzzer bilan birga yonadi
+
+Xatoliklarni hisoblash: Arduino LCD yoki Serial Monitor orqali ko‘rsatadi
+
+O‘yin murakkabligi: sim yo‘lini murakkab qilish, halqa kattaligini kamaytirish
+
+Bluetooth yoki WiFi integratsiyasi: ballarni mobil ilovaga yuborish</p>
+      </div>
+    </div>
+    <div class="flex-container-40-60">
+         <div class="flex-video-40">
+                <iframe 
+                    src="https://www.youtube.com/embed/jXyLnSHwXTA?si=AupcstO8DAj3njCg" 
+                    title="YouTube video player" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+      <div class="flex-text-60">
+        <strong>Afzalliklari</strong>
+    <p>Qo‘l barqarorligini oshiradi
+
+Diqqat va koordinatsiyani rivojlantiradi
+
+Arduino bilan oddiy sensor va buzzerni boshqarishni o‘rganish uchun ideal
+
+Oddiy, ammo qiziqarli DIY (Do It Yourself) loyiha</p>
+   
+    </div>
+    </div>
+  </div>
+</div>
+
+  <!-- Ishlatilgan qurilmalar (modal) -->
+    <div class="modal" id="componentsModal">
+        <div class="modal-content">
+            <span class="close" title="Yopish">&times;</span>
+            <h2>🔌 Ishlatilgan Qurilmalar</h2>
+
+         
+
+            <div class="card">
+                <img src="/static/image/battery - touch.png" alt="LM393P Komparator">
+                <div class="text">
+                    <h3> Batareya</h3>
+                    <p>
+                        Vazifasi: Energiya manbai sifatida ishlaydi, sxemani mustaqil quvvat bilan ta’minlaydi.
+
+                        Izoh: USB orqali zaryadlanadi; sxemadagi LED’lar zaryad holatini bildiradi.
+                    </p>
+                </div>
+            </div>
+
+            <div class="card">
+                <img src="/static/image/led-removebg-preview.png" alt="5V Relay modul">
+                <div class="text">
+                    <h3>Led diode</h3>
+                    <p>Vazifasi: Zaryadlanish jarayoni davom etayotganini bildiradi.
+
+                        Izoh: Batareya hali to‘liq zaryadlanmagan bo‘lsa, bu LED yonadi.</p>
+                </div>
+            </div>
+          
+
+
+      
+        </div>
+    </div>
+  
+<div class="modal" id="infoModal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>📚 Qo'shimcha Ma'lumot</h2>
+    <div class="video-full">
+      <video controls>
+        <source src="/media/2.mp4" type="video/mp4">
+        Brauzeringiz video formatni qo'llab-quvvatlamaydi.
+      </video>
+    </div>
+  </div>
+</div>
+
+<button id="infoFloatingBtn"><span>📚</span><span>Ma'lumot</span></button>
+        <div class="game-area">
+            <div class="game-container">
+                <div class="game-inner">
+                    <div class="wire-container">
+                        <div class="wire-path">
+                            <div class="start-end-point start-point">S</div>
+                            <div class="start-end-point end-point">F</div>
+                            
+                            <div class="wire-maze">
+                                <div class="wire-segment wire-segment-1"></div>
+                                <div class="wire-segment wire-segment-2"></div>
+                                <div class="wire-segment wire-segment-3"></div>
+                                <div class="wire-segment wire-segment-4"></div>
+                                <div class="wire-segment wire-segment-5"></div>
+                                <div class="wire-segment wire-segment-6"></div>
+                                <div class="wire-segment wire-segment-7"></div>
+                                <div class="wire-segment wire-segment-8"></div>
+                                <div class="wire-segment wire-segment-9"></div>
+                                <div class="wire-segment wire-segment-10"></div>
+                            </div>
+                            
+                            <div class="wire-loop" id="wireLoop"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="connection-wires">
+                        <div class="conn-wire wire-1"></div>
+                        <div class="conn-wire wire-2"></div>
+                        <div class="conn-wire wire-3"></div>
+                        <div class="conn-wire wire-4"></div>
+                        <div class="conn-wire wire-5"></div>
+                        <div class="conn-wire wire-6"></div>
+                          <div class="conn-wire wire-7"></div>
+                                 <div class="conn-wire wire-8"></div>
+                    </div>
+                    
+                    <div class="components-row">
+                        <div class="battery"><img src="/static/image/battery.png" width="100%" height="100%" alt=""></div>
+                        <div class="buzzer" id="buzzer"><img src="/static/image/buzzer3.png" width="100%" height="100%" alt=""></div>
+                        <div class="lamp" id="lamp"></div>
+
+
+</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="status-panel">
+            <div class="control-group">
+                <h3>⏱️ Vaqt & Natija</h3>
+                <div class="status-row">
+                    <span>⏱️ Vaqt:</span>
+                    <span id="timer">00:00</span>
+                </div>
+                <div class="status-row">
+                    <span>🏆 Eng yaxshi:</span>
+                    <span id="bestScore">-</span>
+                </div>
+                <div class="status-row">
+                    <span>🎯 Joriy:</span>
+                    <span id="currentScore">0</span>
+                </div>
+                <div id="scoreDisplay" class="score-display score-good">
+                    ⚡️ Tegishlar: <span id="touchCount">0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="rulesModal">
+        <div class="modal-content">
+            <span class="close" data-modal="rulesModal">&times;</span>
+            <h2>🎯 O'yin Qoidalari</h2>
+            <p><strong>🎮 Maqsad:</strong> Elektr halqani boshlanish (S) dan yakunlanish (F) gacha simga tegmasdan olib boring.</p>
+            <br>
+            <p><strong>⚡️ Qoidalar:</strong></p>
+            <ul style="margin-left: 20px; line-height: 1.8;">
+                <li>🖱 Qizil halqani sichqoncha bilan harakatlantiring</li>
+                <li>⚠️ Sariq simlarga tegmang!</li>
+                <li>🔊 Tegish buzzer va chiroqni faollashtiradi</li>
+                <li>📊 Har tegish hisoblanadi</li>
+                <li>🏆 Eng kam tegish bilan maqsadga yeting!</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="modal" id="howToPlayModal">
+        <div class="modal-content">
+            <span class="close" data-modal="howToPlayModal">&times;</span>
+            <h2>🕹 Qanday O'ynash</h2>
+            <p><strong>1️⃣</strong> "O'yinni Boshlash" tugmasini bosing</p>
+            <p><strong>2️⃣</strong> Qizil elektr halqani ushlang</p>
+            <p><strong>3️⃣</strong> "S" dan "F" gacha olib boring</p>
+            <p><strong>4️⃣</strong> Sariq simlarga tegmaslikka harakat qiling</p>
+            <br>
+            <p><strong>💡 Maslahatlar:</strong></p>
+            <ul style="margin-left: 20px; line-height: 1.8;">
+                <li>🐌 Sekin harakat qiling</li>
+                <li>👀 Yo'lni oldindan ko'ring</li>
+                <li>🎯 Qo'lingizni barqaror ushlab turing</li>
+            </ul>
+        </div>
+    </div>
+
+   <script>
+let gameActive = false;
+let touchCount = 0;
+let startTime = 0;
+let timer = null;
+let soundEnabled = true;
+let bestScore = localStorage.getItem('buzzWireBestScore') || null;
+let isDragging = false;
+let audioContext = null;
+
+let wireLoop, buzzer, lamp, wireSegments;
+
+document.addEventListener('DOMContentLoaded', function () {
+    initGame();
+    initAudio();
+    setupButtons();
+});
+
+function initAudio() {
+    try {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    } catch (e) {
+        console.log('Audio not supported');
+    }
+}
+function openModal(id){ const m=document.getElementById(id); if(m) m.style.display='block'; }
+  function closeModal(el){ const m=el.closest('.modal'); if(m) m.style.display='none'; }
+
+  document.addEventListener('click', (e)=>{ if(e.target.matches('.modal .close')) closeModal(e.target); });
+  window.addEventListener('click', (e)=>{ document.querySelectorAll('.modal').forEach(m=>{ if(e.target===m) m.style.display='none'; }); });
+
+  // buttons
+  document.getElementById('schemaBtn')?.addEventListener('click', ()=>openModal('schemaModal'));
+  document.getElementById('codeBtn')?.addEventListener('click',   ()=>openModal('codeModal'));
+  document.getElementById('componentsBtn')?.addEventListener('click', ()=>openModal('componentsModal'));
+  document.getElementById('infoFloatingBtn')?.addEventListener('click', ()=>openModal('infoModal'));
+
+  // tabs
+  (function(){
+    const codeModal=document.getElementById('codeModal');
+    if(!codeModal) return;
+    codeModal.querySelectorAll('.tab-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const t=btn.dataset.tab;
+        codeModal.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        codeModal.querySelectorAll('.tab-content').forEach(p=>p.classList.toggle('active', p.id===t));
+      });
+    });
+  })();
+function setupButtons() {
+    document.getElementById('startBtn').addEventListener('click', startGame);
+    document.getElementById('resetBtn').addEventListener('click', resetGame);
+    document.getElementById('soundBtn').addEventListener('click', toggleSound);
+    document.getElementById('rulesBtn').addEventListener('click', () => openModal('rulesModal'));
+    document.getElementById('howToBtn').addEventListener('click', () => openModal('howToPlayModal'));
+
+    document.querySelectorAll('.close').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const modalId = this.getAttribute('data-modal');
+            closeModal(modalId);
+        });
+    });
+
+    window.addEventListener('click', function (e) {
+        if (e.target.classList.contains('modal')) {
+            e.target.style.display = 'none';
+        }
+    });
+}
+document.addEventListener('DOMContentLoaded', () => {
+  // Helper: modalni ochish/yopish
+  const openModal  = id => { const m = document.getElementById(id); if (m) m.style.display = 'block'; };
+  const closeModal = el => { const m = el?.closest('.modal'); if (m) m.style.display = 'none'; };
+  const closeAll   = () => document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+
+  // Tugmalar (faqat mavjud bo‘lsa ulaymiz)
+  document.getElementById('schemaBtn')?.addEventListener('click', () => openModal('schemaModal'));
+  document.getElementById('componentsBtn')?.addEventListener('click', () => openModal('componentsModal'));
+  // Agar "Kod" tugmasi bo'lsa, kerak bo'lsa shu yerda ulaysiz:
+  // document.getElementById('codeBtn')?.addEventListener('click', () => openModal('codeModal'));
+
+  // “X” tugmalarini ishlatish
+  document.querySelectorAll('.modal .close').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      closeModal(btn);
+    });
+  });
+
+  // Overlay (fon)ga bosilganda yopish
+  window.addEventListener('click', (e) => {
+    // faqat overlayning o'ziga bosilganda
+    if (e.target.classList && e.target.classList.contains('modal')) {
+      e.target.style.display = 'none';
+    }
+  });
+
+  // ESC bilan yopish
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeAll();
+  });
+});
+function startGame() {
+    gameActive = true;
+    touchCount = 0;
+    startTime = Date.now();
+
+    updateStatusLEDs();
+    updateScore();
+    startTimer();
+
+    document.getElementById('startBtn').textContent = '🎮 O‘yin Faol';
+    document.getElementById('startBtn').disabled = true;
+    document.getElementById('startBtn').style.opacity = '0.6';
+
+    if (soundEnabled) playStartSound();
+    showNotification('🎮 O‘yin boshlandi!', 'success');
+}
+
+function resetGame() {
+    gameActive = false;
+    touchCount = 0;
+    clearInterval(timer);
+    isDragging = false;
+
+    if (buzzer) buzzer.classList.remove('active');
+    if (lamp) lamp.classList.remove('active');
+    if (wireLoop) wireLoop.classList.remove('buzzing');
+
+    wireSegments.forEach(seg => seg.classList.remove('touched'));
+    updateStatusLEDs();
+    updateScore();
+
+    document.getElementById('startBtn').textContent = "O'yinni Boshlash";
+    document.getElementById('startBtn').disabled = false;
+    document.getElementById('startBtn').style.opacity = '1';
+    document.getElementById('timer').textContent = '00:00';
+
+    if (wireLoop) {
+        wireLoop.style.left = '-20px';
+        wireLoop.style.top = '50%';
+    }
+
+    showNotification('🔄 Qayta boshlandi!', 'info');
+}
+
+function toggleSound() {
+    soundEnabled = !soundEnabled;
+    const btn = document.getElementById('soundBtn');
+    btn.textContent = soundEnabled ? '🔊 Ovoz On' : '🔇 Ovoz Off';
+    showNotification(soundEnabled ? '🔊 Ovoz yoqildi' : '🔇 Ovoz o‘chirildi', 'info');
+}
+
+function openModal(modalId) {
+    document.getElementById(modalId).style.display = 'block';
+}
+
+function closeModal(modalId) {
+    document.getElementById(modalId).style.display = 'none';
+}
+
+function initGame() {
+    wireLoop = document.getElementById('wireLoop');
+    buzzer = document.getElementById('buzzer');
+    lamp = document.getElementById('lamp');
+    wireSegments = document.querySelectorAll('.wire-segment');
+
+    if (bestScore) {
+        document.getElementById('bestScore').textContent = bestScore;
+    }
+
+    setupDragging();
+    updateStatusLEDs();
+}
+
+function setupDragging() {
+    if (!wireLoop) return;
+
+    wireLoop.addEventListener('mousedown', startDrag);
+    document.addEventListener('mousemove', drag);
+    document.addEventListener('mouseup', stopDrag);
+
+    wireLoop.addEventListener('touchstart', startDrag, { passive: false });
+    document.addEventListener('touchmove', drag, { passive: false });
+    document.addEventListener('touchend', stopDrag);
+
+    function startDrag(e) {
+        if (!gameActive) return;
+        e.preventDefault();
+        isDragging = true;
+
+        if (audioContext && audioContext.state === 'suspended') {
+            audioContext.resume();
+        }
+    }
+
+    function drag(e) {
+        if (!isDragging || !gameActive) return;
+        e.preventDefault();
+
+        const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+        const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+
+        const container = document.querySelector('.wire-path');
+        const rect = container.getBoundingClientRect();
+
+        const x = clientX - rect.left - 15;
+        const y = clientY - rect.top - 15;
+
+        const maxX = rect.width - 30;
+        const maxY = rect.height - 30;
+
+        const newX = Math.max(0, Math.min(maxX, x));
+        const newY = Math.max(0, Math.min(maxY, y));
+
+        wireLoop.style.left = newX + 'px';
+        wireLoop.style.top = newY + 'px';
+
+        checkCollision();
+        checkEndPoint();
+    }
+
+    function stopDrag() {
+        isDragging = false;
+    }
+}
+
+function checkCollision() {
+    if (!wireLoop || !wireSegments) return;
+
+    const loopRect = wireLoop.getBoundingClientRect();
+    const tolerance = 3;
+
+    wireSegments.forEach(segment => {
+        const segRect = segment.getBoundingClientRect();
+
+        if (isColliding(loopRect, segRect, tolerance)) {
+            if (!segment.classList.contains('touched')) {
+                triggerBuzz();
+                segment.classList.add('touched');
+
+                setTimeout(() => {
+                    segment.classList.remove('touched');
+                }, 500);
+            }
+        }
+    });
+}
+
+function isColliding(rect1, rect2, tolerance = 0) {
+    return !(
+        rect1.right < rect2.left - tolerance ||
+        rect1.left > rect2.right + tolerance ||
+        rect1.bottom < rect2.top - tolerance ||
+        rect1.top > rect2.bottom + tolerance
+    );
+}
+
+function triggerBuzz() {
+    touchCount++;
+    updateScore();
+
+    if (buzzer) buzzer.classList.add('active');
+    if (lamp) lamp.classList.add('active');
+    if (wireLoop) wireLoop.classList.add('buzzing');
+
+    if (soundEnabled) playBuzzSound();
+
+    document.getElementById('touchLed').classList.add('on');
+    document.getElementById('buzzerLed').classList.add('on');
+    document.getElementById('lampLed').classList.add('on');
+
+    setTimeout(() => {
+        if (buzzer) buzzer.classList.remove('active');
+        if (lamp) lamp.classList.remove('active');
+        if (wireLoop) wireLoop.classList.remove('buzzing');
+        document.getElementById('touchLed').classList.remove('on');
+        document.getElementById('buzzerLed').classList.remove('on');
+        document.getElementById('lampLed').classList.remove('on');
+    }, 400);
+}
+
+function checkEndPoint() {
+    if (!wireLoop) return;
+
+    const loopRect = wireLoop.getBoundingClientRect();
+    const endPoint = document.querySelector('.end-point');
+    const endRect = endPoint.getBoundingClientRect();
+
+    if (isColliding(loopRect, endRect, 15)) {
+        gameComplete();
+    }
+}
+
+function gameComplete() {
+    gameActive = false;
+    isDragging = false;
+    clearInterval(timer);
+
+    const endTime = Date.now();
+    const totalTime = Math.floor((endTime - startTime) / 1000);
+
+    let isNewRecord = false;
+
+    if (!bestScore || touchCount < parseInt(bestScore)) {
+        bestScore = touchCount.toString();
+        localStorage.setItem('buzzWireBestScore', bestScore);
+        document.getElementById('bestScore').textContent = bestScore;
+        isNewRecord = true;
+    }
+
+    const message = isNewRecord
+        ? `🏆 Yangi rekord! Tegishlar soni: ${touchCount}`
+        : `✅ Tugallandi! Tegishlar: ${touchCount}`;
+
+    if (soundEnabled) playSuccessSound();
+
+    setTimeout(() => {
+        alert(message);
+        resetGame();
+    }, 500);
+}
+
+function playBuzzSound() {
+    if (!audioContext) return;
+
+    try {
+        const osc = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+
+        osc.connect(gain);
+        gain.connect(audioContext.destination);
+
+        osc.frequency.value = 200;
+        osc.type = 'square';
+
+        gain.gain.setValueAtTime(0, audioContext.currentTime);
+        gain.gain.linearRampToValueAtTime(0.2, audioContext.currentTime + 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+
+        osc.start(audioContext.currentTime);
+        osc.stop(audioContext.currentTime + 0.3);
+    } catch (e) { }
+}
+
+function playStartSound() {
+    if (!audioContext) return;
+
+    try {
+        const osc = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+
+        osc.connect(gain);
+        gain.connect(audioContext.destination);
+
+        osc.frequency.setValueAtTime(440, audioContext.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(880, audioContext.currentTime + 0.1);
+        osc.type = 'sine';
+
+        gain.gain.setValueAtTime(0, audioContext.currentTime);
+        gain.gain.linearRampToValueAtTime(0.15, audioContext.currentTime + 0.05);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+
+        osc.start(audioContext.currentTime);
+        osc.stop(audioContext.currentTime + 0.2);
+    } catch (e) { }
+}
+
+function playSuccessSound() {
+    if (!audioContext) return;
+
+    try {
+        const notes = [523, 659, 784];
+        notes.forEach((freq, i) => {
+            const osc = audioContext.createOscillator();
+            const gain = audioContext.createGain();
+
+            osc.connect(gain);
+            gain.connect(audioContext.destination);
+
+            osc.frequency.value = freq;
+            osc.type = 'sine';
+
+            const startTime = audioContext.currentTime + (i * 0.15);
+            gain.gain.setValueAtTime(0, startTime);
+            gain.gain.linearRampToValueAtTime(0.1, startTime + 0.05);
+            gain.gain.exponentialRampToValueAtTime(0.01, startTime + 0.2);
+
+            osc.start(startTime);
+            osc.stop(startTime + 0.2);
+        });
+    } catch (e) { }
+}
+
+function updateScore() {
+    document.getElementById('touchCount').textContent = touchCount;
+    document.getElementById('currentScore').textContent = touchCount;
+    const scoreClass = touchCount === 0 ? 'score-good' : 'score-bad';
+    document.getElementById('scoreDisplay').className = 'score-display ' + scoreClass;
+}
+
+function startTimer() {
+    timer = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - startTime) / 1000);
+        const mins = Math.floor(elapsed / 60);
+        const secs = elapsed % 60;
+        document.getElementById('timer').textContent =
+            `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }, 1000);
+}
+
+function updateStatusLEDs() {
+    document.getElementById('gameLed').classList.toggle('on', gameActive);
+}
+
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: ${type === 'success' ? 'linear-gradient(135deg, #28a745, #20c997)' :
+        type === 'error' ? 'linear-gradient(135deg, #dc3545, #fd7e14)' :
+            'linear-gradient(135deg, #007bff, #6610f2)'};
+        color: white;
+        padding: 12px 25px;
+        border-radius: 10px;
+        font-weight: bold;
+        z-index: 3000;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    `;
+    notification.textContent = message;
+    document.body.appendChild(notification);
+
+    setTimeout(() => notification.remove(), 2000);
+}
+</script>
+
+</body>
+</html>

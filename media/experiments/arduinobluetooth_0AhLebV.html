@@ -1,0 +1,1551 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arduino Bluetooth LED Boshqaruv</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #e6f3ff;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: auto;
+        }
+
+        /* HEADER */
+        .header {
+            display: flex;
+            align-items: center;
+            background: #000075;
+            color: white;
+            padding: 10px 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            width: 100%;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: #4CAF50;
+            border-radius: 50%;
+            border: 2px solid white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        /* MAIN LAYOUT */
+        .main-container {
+            display: flex;
+            margin-top: 20px;
+            gap: 20px;
+        }
+
+        /* LEFT PANEL */
+        .left-panel {
+            width: 250px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            height: fit-content;
+            position: relative;
+            z-index: 1;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 15px;
+        }
+
+        .control-group h3 {
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 8px;
+            font-size: 14px;
+            border-radius: 5px;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn-success { 
+            background: #28a745; 
+            color: white; 
+        }
+        .btn-danger { 
+            background: #dc3545; 
+            color: white; 
+        }
+        .btn-primary { 
+            background: #000075; 
+            color: white; 
+        }
+        .btn-info { 
+            background: #17a2b8; 
+            color: white; 
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .title-header {
+            background: #000075;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0 auto 30px;
+            text-align: center;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        /* CIRCUIT BOARD */
+        .circuit-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 30px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .arduino-section {
+            width: 200px;
+            position: absolute;
+            top: 300px;
+            left: 450px;
+        }
+
+        .arduino-board {
+            background: #006080;
+            width: 180px;
+            height: 280px;
+            border-radius: 8px;
+            position: relative;
+            box-shadow: 3px 3px 10px rgba(0,0,0,0.3);
+        }
+
+        .arduino-label {
+            background: white;
+            color: #006080;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .usb-port {
+            background: silver;
+            width: 20px;
+            height: 8px;
+            border-radius: 2px;
+            position: absolute;
+            top: 30px;
+            left: -10px;
+        }
+
+        .pins-section {
+            position: absolute;
+            top: 60px;
+            left: 10px;
+            right: 10px;
+        }
+
+        .pins-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .pin {
+            width: 8px;
+            height: 15px;
+            background: #333;
+            border-radius: 2px;
+        }
+
+        .breadboard-section {
+            width: 350px;
+            position: absolute;
+            left: 700px;
+        }
+
+        .breadboard {
+        
+            width: 100%;
+            height: 200px;
+            border-radius: 8px;
+            position: relative;
+     
+            display: grid;
+            grid-template-rows: repeat(10, 1fr);
+            grid-template-columns: repeat(20, 1fr);
+            gap: 2px;
+            padding: 10px;
+        }
+
+        .breadboard-hole {
+         
+            border-radius: 50%;
+            width: 8px;
+            height: 8px;
+            justify-self: center;
+            align-self: center;
+        }
+
+        .bluetooth-module {
+            
+            width: 60px;
+            height: 40px;
+            border-radius: 4px;
+            position: absolute;
+            top: 20px;
+            left: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+            box-shadow: 2px 2px 6px rgba(0,0,0,0.3);
+        }
+
+        .bluetooth-status {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: #dc3545;
+            transition: all 0.3s ease;
+        }
+
+        .bluetooth-status.connected {
+            background: #28a745;
+            box-shadow: 0 0 10px rgba(40, 167, 69, 0.8);
+        }
+
+
+/* ===== MODAL ===== */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 2000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(5px);
+  overflow-y: auto;
+}
+
+.modal-content {
+  background: #000075;
+  color: white;
+  margin: 5vh auto;
+  padding: 30px;
+  width: 90%;
+  max-width: 1000px;
+  border-radius: 20px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+  position: relative;
+  animation: slideDown 0.4s ease;
+}
+
+@keyframes slideDown {
+  from { transform: translateY(-50px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.close {
+  position: absolute;
+  right: 20px;
+  top: 15px;
+  font-size: 32px;
+  cursor: pointer;
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close:hover {
+  background: rgba(255, 204, 0, 0.3);
+  color: #ffcc00;
+  transform: rotate(90deg);
+}
+
+/* ===== FLEX ===== */
+.flex-container-40-60 {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 20px;
+  border-radius: 15px;
+}
+
+.flex-video-40 { flex: 0 0 40%; }
+.flex-video-40 iframe {
+  width: 100%;
+  height: 250px;
+  border-radius: 10px;
+}
+.flex-text-60 { flex: 0 0 60%; }
+
+/* ===== CIRCLE BUTTONS ===== */
+.circle-btn {
+  position: fixed;
+  bottom: 40px;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: none;
+  font-size: 14px;
+  font-weight: bold;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+  color: white;
+}
+
+.circle-btn.blue { background: #0000ff; left: 40px; }
+.circle-btn.yellow { background: #ffcc00; color: black; left: 180px; }
+.circle-btn.green { background: #00cc66; left: 320px; }
+
+@media (max-width: 768px) {
+  .flex-container-40-60 { flex-direction: column; }
+  .circle-btn { width: 90px; height: 90px; font-size: 12px; }
+}
+
+        .led-section {
+            position: absolute;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+        }
+
+        .led {
+                     width: 20px;
+            height: 30px;
+            border-radius: 10px 10px 0 0;
+            position: relative;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+
+        .led-red {
+            margin-bottom: 10px;
+            background: #f29b9b;
+        }
+
+        .led-red.on {
+            background: #ff0000;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.8);
+        }
+
+        .led-green {
+            background: #666;
+        }
+
+        .led-green.on {
+            background: #00ff00;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.8);
+        }
+
+        .led-blue {
+            background: #666;
+        }
+
+        .led-blue.on {
+            background: #0080ff;
+            box-shadow: 0 0 20px rgba(0, 128, 255, 0.8);
+        }
+
+        .led-yellow {
+            background: #666;
+        }
+
+        .led-yellow.on {
+            background: #ffff00;
+            box-shadow: 0 0 20px rgba(255, 255, 0, 0.8);
+        }
+
+        .led-label {
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* WIRES */
+        .wire {
+            position: absolute;
+    
+            border-radius: 2px;
+            z-index: 5;
+        }
+
+        .wire-red { background: #ff0000;  width: 158px; top: 290px; left: -50px;      height: 3px; }
+          .wire-red1 { background: #ff0000;  width: 3px; top: 127px; left: 104px;      height: 165px; }
+            .wire-red2 { background: #ff0000;  width: 3px; top: 265px; left: -50px;      height: 25px; }
+        .wire-green { background: #00ff00; width: 24px; top: 80px; left: 8px;      height: 3px;}
+        .wire-blue { background: #0080ff; width: 74px; top: 90px; left: -33px;      height: 3px;}
+        .wire-yellow { background: #ffff00; width: 24px; top: 95px; left: 0px;      height: 3px;}
+        .wire-black { background: #000000;  width: 134px; top: 280px; left: -68px;      height: 3px; }
+        .wire-black1 { background: #000000;  width: 3px; top: 270px; left: 63px;      height: 12px; }
+        .wire-black2 { background: #000000;  width: 3px; top: 123px; left: 92px;      height: 150px; transform: rotate(1deg); }
+        .wire-black3 { background: #000000;  width: 3px; top: 268px; left: -68px;      height: 15px; }
+        .wire-black4 { background: #000000;  width: 3px; top: 141px; left: 175px;      height: 132px; transform: rotate(1.5deg); }
+         .wire-green1 { background: #00ff00; width: 3px; top: 80px; left: 8px;      height: 25px;}
+        .wire-blue1 { background: #0080ff; width: 3px; top: 90px; left: -33px;      height: 16px;}
+        .wire-yellow1 { background: #ffff00; width: 3px; top: 95px; left: 0px;      height: 10px;}
+           .wire-green2 { background: #00ff00; width: 3px; top: 80px; left: 29px;      height: 95px;}
+        .wire-blue2 { background: #0080ff; width: 3px; top: 90px; left: -33px;      height: 16px;}
+        .wire-yellow2 { background: #ffff00; width: 3px; top: 95px; left: 20px;      height: 65px;}
+           .wire-green3 { background: #00ff00; width: 55px; top: 172px; left: 30px;      height: 3px;}
+        .wire-blue3 { background: #0080ff; width: 3px; top: 90px; left: 39px;      height: 145px;}
+        .wire-yellow3 { background: #ffff00; width: 55px; top: 157px; left: 22px;      height: 3px;}
+           .wire-green4 { background: #00ff00; width: 3px; top: 125px; left: 82px;      height: 50px;}
+        .wire-blue4 { background: #0080ff; width: 135px; top: 233px; left: 38px;      height: 3px;}
+        .wire-yellow4 { background: #ffff00; width: 3px; top: 110px; left: 72px;      height: 50px;}
+        /* BLUETOOTH CONNECTION PANEL */
+        .bluetooth-panel {
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid #000075;
+            border-radius: 10px;
+            padding: 15px;
+            position: fixed;
+            top: 50%;
+            right: 20px;
+            transform: translateY(-50%);
+            width: 250px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            z-index: 100;
+        }
+
+        .connection-status {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .status-indicator {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #dc3545;
+            margin: 0 auto 10px;
+            transition: all 0.3s ease;
+        }
+
+        .status-indicator.connected {
+            background: #28a745;
+            box-shadow: 0 0 15px rgba(40, 167, 69, 0.6);
+        }
+
+        .bluetooth-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .bt-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .bt-connect {
+            background: #28a745;
+            color: white;
+        }
+
+        .bt-disconnect {
+            background: #dc3545;
+            color: white;
+        }
+
+        .led-control-section {
+            margin-top: 20px;
+            border-top: 1px solid #ddd;
+            padding-top: 15px;
+        }
+
+        .led-control-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            padding: 5px;
+            border-radius: 5px;
+            background: #f8f9fa;
+        }
+
+        .led-name {
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .toggle-btn {
+            padding: 4px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            transition: all 0.2s ease;
+        }
+
+        .toggle-btn.off {
+            background: #6c757d;
+            color: white;
+        }
+
+        .toggle-btn.on {
+            background: #28a745;
+            color: white;
+        }
+
+        /* COMMAND LOG */
+        .command-log {
+            background: #000;
+            color: #00ff00;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            height: 120px;
+            overflow-y: auto;
+            margin-top: 15px;
+        }
+
+        .log-entry {
+            margin-bottom: 2px;
+        }
+
+        /* MOBILE RESPONSIVENESS */
+        @media (max-width: 1024px) {
+            .circuit-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .bluetooth-panel {
+                position: relative;
+                margin: 20px auto;
+                transform: none;
+                top: auto;
+                right: auto;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .left-panel {
+                width: 100%;
+            }
+        }
+        .resistor{
+            position: absolute;
+
+            left:146px;
+            top: 149px;
+        }
+        /* Tab buttons */
+        .tab-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .tab-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .tab-btn.active {
+            background: #ffcc00;
+            color: #000075;
+            border-color: #ffcc00;
+        }
+
+        .tab-content {
+            display: none;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .tab-content pre {
+            color: white;
+            font-size: 14px;
+            line-height: 1.6;
+            overflow-x: auto;
+        }
+
+
+
+.modal-content {
+    background: #000075;
+    color: white;
+    margin: 5vh auto;
+    padding: 30px;
+    width: 90%;
+    max-width: 1000px;
+    border-radius: 20px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+}
+
+.close {
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    font-size: 32px;
+    cursor: pointer;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.flex-container-40-60,
+.flex-container-30-70 {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    background: rgba(255,255,255,0.1);
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+}
+
+.flex-video-40 iframe {
+    width: 100%;
+    height: 250px;
+    border-radius: 10px;
+}
+
+.flex-image-30 img {
+    width: 150px;
+    border-radius: 10px;
+}
+
+#infoFloatingBtn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #000075, #0000ff);
+    color: white;
+    border: 4px solid white;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+}
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="logo">
+                  <img src="/static/image/logo.png" width="80px" height="80px" alt="">
+            <span>Arduino Bluetooth LED Boshqaruv</span>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <div class="main-container">
+        <!-- LEFT PANEL -->
+        <div class="left-panel">
+            <div class="control-group">
+                <h3>Boshqaruv</h3>
+                <button class="btn btn-success" onclick="connectBluetooth()">
+                    Bluetooth Ulash
+                </button>
+                <button class="btn btn-danger" onclick="disconnectBluetooth()">
+                    Uzish
+                </button>
+                <button class="btn btn-primary" onclick="togglePower()">
+                    Arduino Quvvat
+                </button>
+                <button class="btn btn-info" onclick="runDemo()">
+                    Demo Ko'rsatish
+                </button>
+            </div>
+  <div class="control-group">
+                <h3>📊 Ma'lumotlar</h3>
+                <button class="btn btn-primary" id="schemaBtn">
+                    💡 Sxema
+                </button>
+                <button class="btn btn-primary" id="codeBtn">
+                    💻 Kod
+                </button>
+                <button class="btn btn-primary" id="componentsBtn">
+                    🔌 Qurilmalar
+                </button>
+
+            </div>
+            <div class="control-group">
+                <h3>LED Boshqaruv</h3>
+                <button class="btn btn-success" onclick="toggleLED('red')">
+                    Qizil LED
+                </button>
+           
+            </div>
+
+            <div class="control-group">
+                <h3>Tizim Holati</h3>
+                <div class="status-row" style="display: flex; justify-content: space-between; margin: 8px 0;">
+                    <span>Arduino:</span>
+                    <div class="status-led" id="arduinoStatus" style="width: 12px; height: 12px; border-radius: 50%; background: #dc3545;"></div>
+                </div>
+                <div class="status-row" style="display: flex; justify-content: space-between; margin: 8px 0;">
+                    <span>Bluetooth:</span>
+                    <div class="status-led" id="bluetoothStatus" style="width: 12px; height: 12px; border-radius: 50%; background: #dc3545;"></div>
+                </div>
+            </div>
+        </div>
+<!-- MODAL 1: Sxema qayerda ishlatiladi -->
+<div class="modal" id="schemaModal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>💡 Sxema qayerda ishlatiladi</h2>
+
+    <!-- ====== 1-qism: Bluetooth sxemasi va ishlash mantig‘i ====== -->
+    <div class="flex-container-40-60">
+      <div class="flex-video-40">
+        <iframe 
+     src="https://www.youtube.com/embed/aQcJ4uHdQEA?si=1EkDx9vtegNX7oKU"
+        title="Bluetooth sxemasi"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen>
+        </iframe>
+      </div>
+
+      <div class="flex-text-60">
+        <strong>1. Bluetooth orqali LED boshqaruv sxemasi</strong>
+        <p>
+          Ushbu qismda <b>Arduino UNO</b> va <b>HC-05 Bluetooth moduli</b> ulanishi ko‘rsatilgan. 
+          Telefon Bluetooth orqali “1” yoki “0” komandasi yuboradi, Arduino esa bu ma’lumotni 
+          qabul qilib <b>LEDni yoqadi yoki o‘chiradi</b>.
+        </p>
+        
+      </div>
+    </div>
+
+    
+
+    <!-- ====== 3-qism: Qurilmalar va natija ====== -->
+    <div class="flex-container-40-60">
+      <div class="flex-video-40">
+        <iframe 
+          src="https://www.youtube.com/embed/z524YqJvyak?si=64OEzoQrABs9jNZh"
+          title="Bluetooth qurilmalar"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen>
+        </iframe>
+      </div>
+
+      <div class="flex-text-60">
+        <strong>2.Amaliy ko‘rinish</strong>
+       <p>
+          <b>Sxema elementlari:</b><br>
+          • HC-05 TX → Arduino RX (0-pin)<br>
+          • HC-05 RX → Arduino TX (1-pin)<br>
+          • HC-05 VCC → 5V<br>
+          • HC-05 GND → GND<br>
+          • LED → 220Ω qarshilik orqali D3 pin
+        </p>
+      </div>
+    </div>
+
+  </div>
+</div>
+<!-- 💻 MODAL 2: Kod -->
+<div class="modal" id="codeModal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>💻 Kod</h2>
+<div class="tab-buttons">
+  <button class="tab-btn active" data-tab="mblock">mBlock Kodi</button>
+  <button class="tab-btn" data-tab="arduino">Arduino Kodi</button>
+</div>
+
+<div class="tab-content active" id="mblock">
+  <pre><img src="/static/image/arduino bluetooth car.jpg" width="100px" height="200px" alt="mBlock Code" style="width:80%;height:auto;"></pre>
+</div>
+
+<div class="tab-content" id="arduino">
+
+
+      <pre>
+char data = 0;
+int led = 3;
+
+void setup() {
+  pinMode(led, OUTPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  if (Serial.available()) {
+    data = Serial.read();
+    if (data == '1') {
+      digitalWrite(led, HIGH);
+    } else if (data == '0') {
+      digitalWrite(led, LOW);
+    }
+  }
+}
+      </pre>
+    </div>
+  </div>
+</div>
+
+<!-- 🔌 MODAL 3: Qurilmalar -->
+<div class="modal" id="componentsModal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>🔌 Ishlatilgan Qurilmalar</h2>
+
+    <div class="flex-container-30-70">
+      <div class="flex-image-30">
+        <img src="/static/image/arduino1.png" alt="Arduino UNO">
+      </div>
+      <div class="flex-text-70">
+        <strong>Arduino UNO</strong>
+        <p>Asosiy boshqaruvchi mikrokontroller. LED va Bluetooth modullarni boshqaradi.</p>
+      </div>
+    </div>
+
+    <div class="flex-container-30-70">
+      <div class="flex-image-30">
+        <img src="/static/image/bluetooth-hc-05-removebg-preview.png" width="0px" height="200px" alt="HC-05 Bluetooth">
+      </div>
+      <div class="flex-text-70">
+        <strong>HC-05 Bluetooth Moduli</strong>
+        <p>Telefon bilan simsiz aloqa o‘rnatadi. Buyruqlarni Arduino'ga uzatadi.</p>
+      </div>
+    </div>
+
+    <div class="flex-container-30-70">
+      <div class="flex-image-30">
+        <img src="/static/image/led-removebg-preview.png" alt="LED">
+      </div>
+      <div class="flex-text-70">
+        <strong>LED</strong>
+        <p>Signalni ko‘rsatish uchun ishlatiladi. “1” yuborilganda yonadi, “0” yuborilganda o‘chadi.</p>
+      </div>
+    </div>
+
+    <div class="flex-container-30-70">
+      <div class="flex-image-30">
+        <img src="/static/image/resistor.png" alt="Resistor">
+      </div>
+      <div class="flex-text-70">
+        <strong>220Ω Qarshilik</strong>
+        <p>LEDni himoya qiladi va elektr toki miqdorini cheklaydi.</p>
+      </div>
+    </div>
+
+    <div class="flex-container-30-70">
+      <div class="flex-image-30">
+        <img src="/static/image/breadboard-removebg-preview.png" alt="Breadboard">
+      </div>
+      <div class="flex-text-70">
+        <strong>Breadboard</strong>
+        <p>Sxemani lehimlarsiz yig‘ish uchun ishlatiladi. Sinov va tajriba uchun qulay.</p>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal" id="infoModal">
+        <div class="modal-content">
+            <span class="close" title="Yopish">&times;</span>
+            <h2>📚 Qo'shimcha Ma'lumot</h2>
+            <div class="video-full">
+                <video controls>
+                    <source src="/media/2.mp4" type="video/mp4">
+                    Brauzeringiz video formatni qo'llab-quvvatlamaydi.
+                </video>
+            </div>
+        </div>
+    </div>
+    <button id="infoFloatingBtn"><span>📚</span><span>Ma'lumot</span></button>
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+            <div class="title-header">Arduino Bluetooth LED Boshqaruv Tizimi</div>
+            
+            <div class="circuit-container">
+                <!-- ARDUINO SECTION -->
+                <div class="arduino-section">
+                    <img src="/static/image/arduino1 - Copy.png" width="300px" height="300px" alt="">
+                </div>
+
+                <!-- BREADBOARD SECTION -->
+                <div class="breadboard-section">
+                    <div class="breadboard" id="breadboard">
+                        <img src="/static/image/breadboard-removebg-preview.png" width="350px" height="350px" alt="">
+                    </div>
+                    
+                    <div class="bluetooth-module" id="bluetoothModule">
+                        <img src="/static/image/bluetooth-hc-05-removebg-preview.png" width="150px" height="200px" alt="">
+                        <div class="bluetooth-status" id="bluetoothIndicator"></div>
+                    </div>
+
+                    <div class="led-section">
+                        <div class="led led-red" id="ledRed">
+                            <div class="led-label">D3</div>
+                        </div>
+                       
+                    </div>
+                    <div class="resistor">
+                                     <img src="/static/image/resistor_2.png" width="50px" height="60px" alt="">
+                    </div>
+                    <!-- Connection wires -->
+                    <div class="wire wire-red" ></div>
+                    <div class="wire wire-red1" ></div>
+                    <div class="wire wire-red2" ></div>
+                    <div class="wire wire-green" ></div>
+                    <div class="wire wire-blue" ></div>
+                    <div class="wire wire-yellow"></div>
+                    <div class="wire wire-black" ></div>
+                    <div class="wire wire-black1" ></div>
+                    <div class="wire wire-black2" ></div>
+                    <div class="wire wire-black3" ></div>
+                    <div class="wire wire-black4" ></div>
+                    <div class="wire wire-green1" ></div>
+                    <div class="wire wire-blue1" ></div>
+                    <div class="wire wire-yellow1"></div>
+                    <div class="wire wire-green2" ></div>
+                    <div class="wire wire-blue2" ></div>
+                    <div class="wire wire-yellow2"></div>
+                    <div class="wire wire-green3" ></div>
+                    <div class="wire wire-blue3" ></div>
+                    <div class="wire wire-yellow3"></div>
+                    <div class="wire wire-green4" ></div>
+                    <div class="wire wire-blue4" ></div>
+                    <div class="wire wire-yellow4"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BLUETOOTH CONTROL PANEL -->
+    <div class="bluetooth-panel">
+        <div class="connection-status">
+            <div class="status-indicator" id="connectionStatus"></div>
+            <div id="statusText">Ulanmagan</div>
+        </div>
+        
+        <div class="bluetooth-controls">
+            <button class="bt-btn bt-connect" onclick="connectBluetooth()">
+                Ulash
+            </button>
+            <button class="bt-btn bt-disconnect" onclick="disconnectBluetooth()">
+                Uzish
+            </button>
+        </div>
+
+        <div class="led-control-section">
+            <h4 style="text-align: center; margin-bottom: 10px;">LED Boshqaruv</h4>
+            <div class="led-control-row">
+                <span class="led-name" style="color: #ff0000;">Qizil</span>
+                <button class="toggle-btn off" id="redBtn" onclick="toggleLED('red')">OFF</button>
+            </div>
+          
+        </div>
+
+        <div class="command-log" id="commandLog">
+            <div class="log-entry">Arduino Bluetooth LED Boshqaruv</div>
+            <div class="log-entry">Bluetooth ulanishini kutmoqda...</div>
+        </div>
+    </div>
+
+    <script>
+        // System State Variables
+        let bluetoothConnected = false;
+        let arduinoPowered = false;
+        let bluetoothDevice = null;
+        let bluetoothServer = null;
+        let bluetoothService = null;
+        let bluetoothCharacteristic = null;
+        let realBluetoothMode = false;
+        
+        let ledStates = {
+            red: false,
+            green: false,
+            blue: false,
+            yellow: false
+        };
+
+        // DOM Elements
+        const elements = {
+            bluetoothIndicator: document.getElementById('bluetoothIndicator'),
+            connectionStatus: document.getElementById('connectionStatus'),
+            statusText: document.getElementById('statusText'),
+            commandLog: document.getElementById('commandLog'),
+            arduinoStatus: document.getElementById('arduinoStatus'),
+            bluetoothStatus: document.getElementById('bluetoothStatus'),
+            arduinoBoard: document.getElementById('arduinoBoard'),
+            leds: {
+                red: document.getElementById('ledRed'),
+                green: document.getElementById('ledGreen'),
+                blue: document.getElementById('ledBlue'),
+                yellow: document.getElementById('ledYellow')
+            },
+            buttons: {
+                red: document.getElementById('redBtn'),
+                green: document.getElementById('greenBtn'),
+                blue: document.getElementById('blueBtn'),
+                yellow: document.getElementById('yellowBtn')
+            }
+        };
+
+        // Initialize breadboard holes
+        function initializeBreadboard() {
+            const breadboard = document.getElementById('breadboard');
+            for (let i = 0; i < 200; i++) {
+                const hole = document.createElement('div');
+                hole.className = 'breadboard-hole';
+                breadboard.appendChild(hole);
+            }
+        }
+
+        // Log commands
+        function logCommand(message) {
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log-entry';
+            logEntry.textContent = `${new Date().toLocaleTimeString()}: ${message}`;
+            elements.commandLog.appendChild(logEntry);
+            elements.commandLog.scrollTop = elements.commandLog.scrollHeight;
+        }
+
+        // Update status indicators
+        function updateStatus() {
+            // Bluetooth status
+            elements.bluetoothIndicator.classList.toggle('connected', bluetoothConnected);
+            elements.connectionStatus.classList.toggle('connected', bluetoothConnected);
+            elements.bluetoothStatus.style.background = bluetoothConnected ? '#28a745' : '#dc3545';
+            
+            // Show connection mode in status text
+            if (bluetoothConnected) {
+                elements.statusText.textContent = realBluetoothMode ? 'Haqiqiy ulanish' : 'Simulyatsiya';
+                if (realBluetoothMode) {
+                    elements.bluetoothStatus.style.boxShadow = '0 0 10px rgba(40, 167, 69, 0.8)';
+                }
+            } else {
+                elements.statusText.textContent = 'Ulanmagan';
+                elements.bluetoothStatus.style.boxShadow = 'none';
+            }
+            
+            // Arduino status
+            elements.arduinoStatus.style.background = arduinoPowered ? '#28a745' : '#dc3545';
+            
+            // Board glow effect when powered
+            if (arduinoPowered) {
+                elements.arduinoBoard.style.boxShadow = '0 0 20px rgba(0, 96, 128, 0.6)';
+            } else {
+                elements.arduinoBoard.style.boxShadow = '3px 3px 10px rgba(0,0,0,0.3)';
+            }
+        }
+
+        // Bluetooth connection
+        async function connectBluetooth() {
+            if (!arduinoPowered) {
+                logCommand('Xatolik: Arduino yoqilmagan!');
+                alert('Avval Arduino-ni yoqing!');
+                return;
+            }
+
+            // Check if Web Bluetooth is supported
+            if (!navigator.bluetooth) {
+                logCommand('Web Bluetooth qo\'llab-quvvatlanmaydi');
+                // Fallback to simulation mode
+                connectBluetoothSimulation();
+                return;
+            }
+
+            try {
+                logCommand('Bluetooth qurilmani qidirmoqda...');
+                
+                // Request Bluetooth device with HC-05 or generic serial service
+                bluetoothDevice = await navigator.bluetooth.requestDevice({
+                    filters: [
+                        { name: 'HC-05' },
+                        { name: 'HC-06' },
+                        { namePrefix: 'HC-' }
+                    ],
+                    optionalServices: [
+                        '0000ffe0-0000-1000-8000-00805f9b34fb', // HC-05 service
+                        '00001101-0000-1000-8000-00805f9b34fb'  // Serial Port Profile
+                    ]
+                });
+
+                logCommand(`Ulangan qurilma: ${bluetoothDevice.name}`);
+                
+                // Connect to GATT server
+                bluetoothServer = await bluetoothDevice.gatt.connect();
+                logCommand('GATT server-ga ulanmoqda...');
+
+                // Get service
+                try {
+                    bluetoothService = await bluetoothServer.getPrimaryService('0000ffe0-0000-1000-8000-00805f9b34fb');
+                } catch (e) {
+                    bluetoothService = await bluetoothServer.getPrimaryService('00001101-0000-1000-8000-00805f9b34fb');
+                }
+
+                // Get characteristic
+                try {
+                    bluetoothCharacteristic = await bluetoothService.getCharacteristic('0000ffe1-0000-1000-8000-00805f9b34fb');
+                } catch (e) {
+                    const characteristics = await bluetoothService.getCharacteristics();
+                    bluetoothCharacteristic = characteristics[0];
+                }
+
+                bluetoothConnected = true;
+                realBluetoothMode = true;
+                updateStatus();
+            
+            // Arduino status
+            elements.bluetoothStatus.style.background = bluetoothConnected ? '#28a745' : '#dc3545';
+            if (bluetoothConnected && realBluetoothMode) {
+                elements.bluetoothStatus.style.boxShadow = '0 0 10px rgba(40, 167, 69, 0.8)';
+            } else {
+                elements.bluetoothStatus.style.boxShadow = 'none';
+            }
+            
+            // Show connection mode in status text
+            if (bluetoothConnected) {
+                elements.statusText.textContent = realBluetoothMode ? 'Haqiqiy ulanish' : 'Simulyatsiya';
+            } else {
+                elements.statusText.textContent = 'Ulanmagan';
+            }
+                logCommand('Haqiqiy Bluetooth muvaffaqiyatli ulandi!');
+                
+                // Listen for disconnection
+                bluetoothDevice.addEventListener('gattserverdisconnected', onBluetoothDisconnected);
+                
+            } catch (error) {
+                logCommand(`Bluetooth ulanish xatoligi: ${error.message}`);
+                console.error('Bluetooth error:', error);
+                
+                // Fallback to simulation
+                logCommand('Simulyatsiya rejimiga o\'tish...');
+                connectBluetoothSimulation();
+            }
+        }
+// === Modal boshqaruv funksiyalari ===
+function openModal(id) {
+  document.getElementById(id).style.display = "block";
+  document.body.style.overflow = "hidden";
+}
+
+function closeModal(id) {
+  document.getElementById(id).style.display = "none";
+  document.body.style.overflow = "auto";
+}
+
+// === Tugmalar ===
+document.getElementById("schemaBtn").addEventListener("click", () => openModal("schemaModal"));
+document.getElementById("codeBtn").addEventListener("click", () => openModal("codeModal"));
+document.getElementById("componentsBtn").addEventListener("click", () => openModal("componentsModal"));
+
+// === Yopish ===
+document.querySelectorAll(".close").forEach(btn => {
+  btn.addEventListener("click", function() {
+    this.closest(".modal").style.display = "none";
+    document.body.style.overflow = "auto";
+  });
+});
+
+// === Modal tashqarisiga bosilganda yopish ===
+window.addEventListener("click", function(e) {
+  document.querySelectorAll(".modal").forEach(modal => {
+    if (e.target === modal) {
+      modal.style.display = "none";
+      document.body.style.overflow = "auto";
+    }
+  });
+});
+        // Fallback simulation connection
+        function connectBluetoothSimulation() {
+            bluetoothConnected = true;
+            realBluetoothMode = false;
+            updateStatus();
+            logCommand('Bluetooth simulyatsiyasi ulandi (haqiqiy qurilma topilmadi)');
+            
+            setTimeout(() => {
+                logCommand('Arduino bilan aloqa o\'rnatildi (simulyatsiya)');
+            }, 1000);
+        }
+
+        // Handle disconnection
+        function onBluetoothDisconnected(event) {
+            logCommand('Bluetooth qurilma uzildi');
+            bluetoothConnected = false;
+            bluetoothDevice = null;
+            bluetoothServer = null;
+            bluetoothService = null;
+            bluetoothCharacteristic = null;
+            realBluetoothMode = false;
+            updateStatus();
+            
+            // Turn off all LEDs when disconnected
+            Object.keys(ledStates).forEach(color => {
+                if (ledStates[color]) {
+                    toggleLED(color);
+                }
+            });
+        }
+
+        function disconnectBluetooth() {
+            if (bluetoothDevice && bluetoothDevice.gatt.connected) {
+                bluetoothDevice.gatt.disconnect();
+            } else {
+                // For simulation mode
+                bluetoothConnected = false;
+                realBluetoothMode = false;
+                updateStatus();
+                logCommand('Bluetooth uzildi');
+                
+                // Turn off all LEDs when disconnected
+                Object.keys(ledStates).forEach(color => {
+                    if (ledStates[color]) {
+                        toggleLED(color);
+                    }
+                });
+            }
+        }
+document.addEventListener('DOMContentLoaded', function () {
+  // --- Modallarni ochish/yopish ---
+  function openModal(id){ var m=document.getElementById(id); if(m) m.style.display='block'; }
+  function closeModal(el){ var m=el.closest('.modal'); if(m) m.style.display='none'; }
+
+  // (X) yopish
+  document.querySelectorAll('.modal .close').forEach(function(x){
+    x.addEventListener('click', function(){ closeModal(x); });
+  });
+  // Foniga bosilganda yopish
+  window.addEventListener('click', function(e){
+    document.querySelectorAll('.modal').forEach(function(m){
+      if (e.target === m) m.style.display = 'none';
+    });
+  });
+
+  // --- Tugmalar (ID lar shunday bo‘lsin) ---
+  var schemaBtn = document.getElementById('schemaBtn');
+  if (schemaBtn) schemaBtn.addEventListener('click', function(){ openModal('schemaModal'); });
+
+  var codeBtn = document.getElementById('codeBtn');
+  if (codeBtn) codeBtn.addEventListener('click', function(){ openModal('codeModal'); });
+
+  var componentsBtn = document.getElementById('componentsBtn');
+  if (componentsBtn) componentsBtn.addEventListener('click', function(){ openModal('componentsModal'); });
+
+  var infoBtn = document.getElementById('infoFloatingBtn');
+  if (infoBtn) infoBtn.addEventListener('click', function(){ openModal('infoModal'); });
+
+  // --- Kod modalidagi tablar: faqat #codeModal ichida ishlaydi ---
+  var codeModal = document.getElementById('codeModal');
+  if (codeModal) {
+    codeModal.querySelectorAll('.tab-btn').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var targetId = btn.dataset.tab;           // "mblock" yoki "arduino"
+        // Tugmalardan active ni olib tashla
+        codeModal.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
+        btn.classList.add('active');
+        // Kontentni almashtir
+        codeModal.querySelectorAll('.tab-content').forEach(function(pane){
+          pane.classList.toggle('active', pane.id === targetId);
+        });
+      });
+    });
+  }
+});
+        // Power control
+        function togglePower() {
+            arduinoPowered = !arduinoPowered;
+            updateStatus();
+            
+            if (arduinoPowered) {
+                logCommand('Arduino yoqildi');
+            } else {
+                logCommand('Arduino o\'chirildi');
+                // Disconnect bluetooth and turn off LEDs when powered off
+                if (bluetoothConnected) {
+                    disconnectBluetooth();
+                }
+            }
+        }
+
+        // LED Control with real Bluetooth support
+        async function toggleLED(color) {
+            if (!bluetoothConnected) {
+                logCommand(`Xatolik: Bluetooth ulanmagan! ${color} LED boshqarib bo'lmadi`);
+                return;
+            }
+
+            ledStates[color] = !ledStates[color];
+            const isOn = ledStates[color];
+            
+            // Update LED visual
+            elements.leds[color].classList.toggle('on', isOn);
+            
+            // Update button
+            elements.buttons[color].classList.toggle('on', isOn);
+            elements.buttons[color].classList.toggle('off', !isOn);
+            elements.buttons[color].textContent = isOn ? 'ON' : 'OFF';
+            
+            // Create command
+            const command = isOn ? `${color.toUpperCase()}_ON` : `${color.toUpperCase()}_OFF`;
+            
+            // Send command via real Bluetooth or simulation
+            if (realBluetoothMode && bluetoothCharacteristic) {
+                try {
+                    const encoder = new TextEncoder();
+                    const data = encoder.encode(command + '\n');
+                    await bluetoothCharacteristic.writeValue(data);
+                    logCommand(`Haqiqiy Bluetooth orqali yuborildi: ${command}`);
+                } catch (error) {
+                    logCommand(`Bluetooth xatoligi: ${error.message}`);
+                    console.error('Bluetooth write error:', error);
+                }
+            } else {
+                // Simulation mode
+                logCommand(`Simulyatsiya: ${command}`);
+                // Simulate Arduino response
+                setTimeout(() => {
+                    logCommand(`Arduino javobi: ${color} LED ${isOn ? 'yoqildi' : 'o\'chirildi'}`);
+                }, 300);
+            }
+        }
+
+        // Demo function
+        function runDemo() {
+            if (!bluetoothConnected) {
+                logCommand('Demo uchun Bluetooth ulanishi kerak');
+                return;
+            }
+
+            logCommand('Demo boshlanmoqda...');
+            
+            const colors = ['red', 'green', 'blue', 'yellow'];
+            let index = 0;
+
+            const demoInterval = setInterval(() => {
+                // Turn off previous LED
+                if (index > 0) {
+                    const prevColor = colors[index - 1];
+                    if (ledStates[prevColor]) {
+                        toggleLED(prevColor);
+                    }
+                }
+
+                // Turn on current LED
+                const currentColor = colors[index];
+                if (!ledStates[currentColor]) {
+                    toggleLED(currentColor);
+                }
+
+                index++;
+
+                // End demo
+                if (index >= colors.length) {
+                    setTimeout(() => {
+                        // Turn off last LED
+                        if (ledStates[colors[colors.length - 1]]) {
+                            toggleLED(colors[colors.length - 1]);
+                        }
+                        logCommand('Demo tugadi');
+                    }, 1000);
+                    clearInterval(demoInterval);
+                }
+            }, 800);
+        }
+
+        // Simulate receiving Bluetooth commands (for demonstration)
+        function simulateBluetoothCommand(command) {
+            if (!bluetoothConnected) return;
+            
+            logCommand(`Qabul qilindi: ${command}`);
+            
+            switch(command.toUpperCase()) {
+                case 'RED_ON':
+                    if (!ledStates.red) toggleLED('red');
+                    break;
+                case 'RED_OFF':
+                    if (ledStates.red) toggleLED('red');
+                    break;
+                case 'GREEN_ON':
+                    if (!ledStates.green) toggleLED('green');
+                    break;
+                case 'GREEN_OFF':
+                    if (ledStates.green) toggleLED('green');
+                    break;
+                case 'BLUE_ON':
+                    if (!ledStates.blue) toggleLED('blue');
+                    break;
+                case 'BLUE_OFF':
+                    if (ledStates.blue) toggleLED('blue');
+                    break;
+                case 'YELLOW_ON':
+                    if (!ledStates.yellow) toggleLED('yellow');
+                    break;
+                case 'YELLOW_OFF':
+                    if (ledStates.yellow) toggleLED('yellow');
+                    break;
+                case 'ALL_ON':
+                    Object.keys(ledStates).forEach(color => {
+                        if (!ledStates[color]) toggleLED(color);
+                    });
+                    break;
+                case 'ALL_OFF':
+                    Object.keys(ledStates).forEach(color => {
+                        if (ledStates[color]) toggleLED(color);
+                    });
+                    break;
+            }
+        }
+
+        // Initialize the application
+        window.addEventListener('load', () => {
+            initializeBreadboard();
+            updateStatus();
+            
+            // Check Web Bluetooth support
+            if (navigator.bluetooth) {
+                logCommand('Web Bluetooth qo\'llab-quvvatlanadi. Haqiqiy qurilmalarni ulash mumkin!');
+                logCommand('DIQQAT: HTTPS va Chrome/Edge brauzeri talab qilinadi.');
+            } else {
+                logCommand('Web Bluetooth qo\'llab-quvvatlanmaydi. Faqat simulyatsiya rejimi.');
+            }
+            
+            logCommand('Tizim tayyor. Arduino-ni yoqing va Bluetooth-ni ulang.');
+            
+            // Add keyboard shortcuts for testing
+            document.addEventListener('keydown', (e) => {
+                switch(e.key) {
+                    case '1': if (bluetoothConnected) toggleLED('red'); break;
+                    case '2': if (bluetoothConnected) toggleLED('green'); break;
+                    case '3': if (bluetoothConnected) toggleLED('blue'); break;
+                    case '4': if (bluetoothConnected) toggleLED('yellow'); break;
+                    case 'p': togglePower(); break;
+                    case 'c': connectBluetooth(); break;
+                    case 'd': disconnectBluetooth(); break;
+                    case 't': runDemo(); break;
+                }
+            });
+        });
+
+        // Add some interactive features
+        document.addEventListener('click', (e) => {
+            // Click on Arduino board to toggle power
+            if (e.target.closest('#arduinoBoard')) {
+                togglePower();
+            }
+            
+            // Click on Bluetooth module to connect/disconnect
+            if (e.target.closest('#bluetoothModule')) {
+                if (bluetoothConnected) {
+                    disconnectBluetooth();
+                } else {
+                    connectBluetooth();
+                }
+            }
+        });
+
+        // Simulate mobile app commands (for testing)
+        function sendMobileCommand(command) {
+            logCommand(`Mobil ilovadan: ${command}`);
+            simulateBluetoothCommand(command);
+        }
+
+        // Add some sample mobile commands for testing
+        setTimeout(() => {
+            if (bluetoothConnected) {
+                logCommand('Mobil ilova ulanishi simulyatsiyasi...');
+            }
+        }, 2000);
+    </script>
+</body>
+</html>

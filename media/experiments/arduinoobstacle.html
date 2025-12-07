@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arduino Obstacle Avoiding Robot</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5e6d3;
+            min-height: 100vh;
+            padding: 1%;
+            overflow-x: auto;
+        }
+
+        /* HEADER */
+        .header {
+            display: flex;
+            align-items: center;
+            background: #000075;
+            color: white;
+            padding: 0.5% 2%;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            width: 100%;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1%;
+            font-size: 1.2vw;
+            font-weight: bold;
+        }
+
+        .logo img {
+            border-radius: 50%;
+            width: 3vw;
+            height: 3vw;
+            min-width: 30px;
+            min-height: 30px;
+        }
+
+        /* MAIN LAYOUT */
+        .main-container {
+            display: flex;
+            margin-top: 2%;
+            gap: 2%;
+        }
+
+        /* LEFT PANEL */
+        .left-panel {
+            width: 20%;
+            min-width: 200px;
+            background: white;
+            padding: 1.5%;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            height: fit-content;
+            position: relative;
+            z-index: 1;
+        }
+
+        .control-group {
+            margin-bottom: 5%;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 5%;
+        }
+
+        .control-group h3 {
+            margin-bottom: 3%;
+            color: #333;
+            font-size: 1.1vw;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 2%;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 2%;
+            font-size: 0.9vw;
+            border-radius: 5px;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn-success { 
+            background: #28a745; 
+            color: white; 
+        }
+        .btn-danger { 
+            background: #dc3545; 
+            color: white; 
+        }
+        .btn-primary { 
+            background: #000075; 
+            color: white; 
+        }
+        .btn-info { 
+            background: #17a2b8; 
+            color: white; 
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            flex: 1;
+            padding: 2%;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .title-header {
+            background: #000075;
+            color: white;
+            padding: 1% 2%;
+            border-radius: 20px;
+            font-size: 1.3vw;
+            font-weight: bold;
+            margin: 0 auto 3%;
+            text-align: center;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        /* CIRCUIT BOARD */
+        .circuit-board {
+            width: 100%;
+            background: #f5e6d3;
+            border: 3px solid #8B4513;
+            border-radius: 10px;
+            position: relative;
+            margin: 0 auto;
+            padding-bottom: 75%; /* 4:3 aspect ratio */
+            overflow: hidden;
+        }
+
+        .circuit-content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* COMPONENTS */
+        .component {
+            position: absolute;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8vw;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+.left-panel{width:280px;max-width:95%;background:#fff;border-radius:14px;padding:16px;box-shadow:0 6px 16px rgba(0,0,0,.08)}
+  .left-panel h3{margin:0 0 12px;font-size:16px;color:#333}
+  .btn{display:block;width:100%;padding:10px 12px;margin:8px 0;border:0;border-radius:10px;cursor:pointer;transition:.25s;text-align:left;font-weight:600}
+  .btn-primary{background:#000075;color:#fff}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 14px rgba(0,0,0,.1)}
+  .flex-container-40-60{display:flex;gap:20px;align-items:flex-start;background:rgba(255,255,255,.1);padding:20px;border-radius:15px;margin-bottom:20px}
+  .flex-text-60{flex:1}
+  .flex-text-60 p{font-size:16px;line-height:1.8}
+  .flex-container-30-70{display:flex;gap:20px;align-items:flex-start;background:rgba(255,255,255,.1);padding:20px;border-radius:15px;margin-bottom:20px}
+  .flex-image-30{flex:0 0 30%}
+  .flex-image-30 img{width:100%;border-radius:10px}
+  .flex-text-70{flex:0 0 70%}
+  .flex-text-70 strong{color:#ffcc00;font-size:18px;display:block;margin-bottom:10px}
+  .modal{display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.8);backdrop-filter:blur(5px);overflow-y:auto}
+  .modal-content{background:#000075;color:#fff;margin:5vh auto;padding:30px;width:90%;max-width:1000px;border-radius:20px;box-shadow:0 15px 40px rgba(0,0,0,.5);position:relative;animation:slideDown .4s ease}
+  @keyframes slideDown{from{transform:translateY(-50px);opacity:0}to{transform:translateY(0);opacity:1}}
+  .close{position:absolute;right:20px;top:15px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:bold;cursor:pointer;color:#fff;transition:.3s;border-radius:50%;background:rgba(255,255,255,.1)}
+  .close:hover{background:rgba(255,204,0,.3);color:#ffcc00;transform:rotate(90deg)}
+  .modal-content h2{font-size:28px;margin-bottom:25px;padding-bottom:15px;border-bottom:2px solid rgba(255,255,255,.3);padding-right:50px}
+  .tab-buttons{display:flex;gap:8px;margin:12px 0 16px}
+  .tab-btn{flex:1;background:rgba(255,255,255,.12);color:#fff;border:0;border-radius:10px 10px 0 0;padding:10px;cursor:pointer;font-weight:600;transition:.2s}
+  .tab-btn:hover{background:rgba(255,255,255,.2)}
+  .tab-btn.active{background:rgba(255,255,255,.28)}
+  .tab-content{display:none}
+  .tab-content.active{display:block}
+  pre{background:rgba(0,0,0,.35);padding:12px;border-radius:10px;overflow:auto;white-space:pre-wrap;word-break:break-word;color:#fff;font-size:13.5px;line-height:1.55}
+  #infoFloatingBtn{position:fixed;bottom:30px;right:30px;width:120px;height:120px;border-radius:50%;background:linear-gradient(135deg,#000075,#0000ff);color:#fff;border:4px solid #fff;cursor:pointer;font-size:16px;font-weight:bold;box-shadow:0 8px 20px rgba(0,0,0,.4);z-index:1500;transition:.3s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px}
+  #infoFloatingBtn:hover{transform:scale(1.1);box-shadow:0 12px 30px rgba(0,0,255,.6)}
+  #infoFloatingBtn span:first-child{font-size:36px}
+  .video-full{width:100%;border-radius:15px;background:#000}
+  .video-full video{width:100%;height:auto;border-radius:15px;max-height:70vh}
+  @media (max-width:1024px){.flex-container-40-60,.flex-container-30-70{flex-direction:column}.flex-image-30,.flex-text-70{flex:0 0 100%}}
+  @media (max-width:768px){.modal-content{width:96%;padding:20px 15px}#infoFloatingBtn{width:90px;height:90px;font-size:14px;bottom:20px;right:20px}#infoFloatingBtn span:first-child{font-size:28px}}
+        .component img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        /* ARDUINO UNO */
+        .arduino {
+            width: 15%;
+            height: 20%;
+            top: 42%;
+            left: 42.5%;
+        }
+
+        /* ULTRASONIC SENSOR */
+        .ultrasonic {
+            width: 7.5%;
+            height: 5%;
+            top: 8.3%;
+            left: 46.25%;
+        }
+
+        .sensor-eyes {
+            position: absolute;
+            top: 6.7%;
+            left: 43.75%;
+            display: flex;
+            gap: 5%;
+            width: 12.5%;
+        }
+
+        .sensor-eye {
+            width: 2.5%;
+            height: 3.3%;
+            background: #333;
+            border-radius: 50%;
+            border: 2px solid #666;
+            position: relative;
+        }
+
+        .sensor-eye.active::after {
+            content: '';
+            position: absolute;
+            width: 12.5vw;
+            height: 0.25%;
+            background: rgba(255, 0, 0, 0.6);
+            left: 100%;
+            top: 45%;
+            animation: sensorBeam 2s ease-in-out infinite;
+        }
+
+        @keyframes sensorBeam {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        /* MOTORS */
+        .motor {
+            width: 5%;
+            height: 8.3%;
+            font-size: 0.7vw;
+            text-align: center;
+        }
+
+        .motor.left {
+            top: 76.7%;
+            left: 15%;
+        }
+
+        .motor.right {
+            top: 76.7%;
+            right: 15%;
+        }
+
+        .motor.spinning {
+            animation: motorSpin 0.5s linear infinite;
+        }
+
+        @keyframes motorSpin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* WHEELS */
+        .wheel {
+            width: 3.75%;
+            height: 10%;
+            background: #333;
+            border: 3px solid #666;
+            border-radius: 15px;
+            position: absolute;
+        }
+
+        .wheel.left {
+            top: 75.8%;
+            left: 10%;
+        }
+
+        .wheel.right {
+            top: 75.8%;
+            right: 10%;
+        }
+
+        .wheel.spinning {
+            animation: wheelRotate 0.3s linear infinite;
+        }
+
+        @keyframes wheelRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* BATTERY */
+        .battery {
+            width: 7.5%;
+            height: 6.7%;
+            top: 25%;
+            left: 12.5%;
+        }
+
+        .battery2 {
+            width: 7.5%;
+            height: 6.7%;
+            top: 25%;
+            right: 12.5%;
+        }
+
+        /* MOTOR DRIVER */
+        .motor-driver {
+            width: 10%;
+            height: 8.3%;
+            top: 61.7%;
+            left: 45%;
+            text-align: center;
+        }
+
+        /* WIRES */
+        .wire {
+            position: absolute;
+            z-index: 5;
+        }
+
+        .wire.horizontal {
+            height: 0.5%;
+            min-height: 2px;
+        }
+
+        .wire.vertical {
+            width: 0.375%;
+            min-width: 2px;
+        }
+
+        .wire.black { background: #000; }
+        .wire.red { background: #FF0000; }
+        .wire.blue { background: #0066FF; }
+        .wire.green { background: #00FF00; }
+        .wire.yellow { background: #FFFF00; }
+        .wire.purple { background: #800080; }
+        .wire.orange { background: #FFA500; }
+
+        /* Wire connections - RESPONSIVE */
+        .wire1 { top: 27.5%; left: 20%; width: 22.5%; } /* Battery to Arduino */
+        .wire2 { top: 27.5%; right: 20%; width: 22.5%; } /* Battery2 to Arduino */
+        .wire3 { top: 10.8%; left: 48.75%; height: 31.7%; } /* Sensor to Arduino */
+        .wire4 { top: 53.3%; left: 47.5%; height: 9.2%; } /* Arduino to Motor Driver */
+        .wire5 { top: 70%; left: 25%; width: 20%; } /* Motor Driver to Left Motor */
+        .wire6 { top: 70%; left: 55%; width: 20%; } /* Motor Driver to Right Motor */
+
+        /* STATUS INDICATORS */
+        .status-display {
+            position: absolute;
+            top: 2.5%;
+            right: 2.5%;
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 1.5%;
+            border-radius: 12px;
+            min-width: 20%;
+            z-index: 100;
+        }
+
+        .status-display h4 {
+            font-size: 1vw;
+            margin-bottom: 2%;
+        }
+
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 2% 0;
+            font-size: 0.9vw;
+        }
+
+        .status-led {
+            width: 0.8vw;
+            height: 0.8vw;
+            min-width: 10px;
+            min-height: 10px;
+            border-radius: 50%;
+            background: #dc3545;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+        }
+
+        .status-led.on {
+            background: #28a745;
+            box-shadow: 0 0 10px rgba(40, 167, 69, 0.8);
+        }
+
+        /* ROBOT MOVEMENT ARENA */
+        .robot-arena {
+            width: 50%;
+            height: 50%;
+            background: #e8e8e8;
+            border: 2px solid #333;
+            border-radius: 10px;
+            position: absolute;
+            top: 8.3%;
+            right: 6.25%;
+            overflow: hidden;
+        }
+
+        .robot-avatar {
+            width: 10%;
+            height: 13.3%;
+            background: #000075;
+            border-radius: 50%;
+            position: absolute;
+            top: 43.3%;
+            left: 45%;
+            transition: all 1s ease;
+        }
+
+        .robot-avatar::before {
+            content: '';
+            width: 25%;
+            height: 25%;
+            background: #FF0000;
+            border-radius: 50%;
+            position: absolute;
+            top: 12.5%;
+            left: 37.5%;
+        }
+
+        .obstacle {
+            width: 15%;
+            height: 20%;
+            background: #8B4513;
+            border-radius: 10px;
+            position: absolute;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+        }
+
+        .obstacle1 {
+            top: 16.7%;
+            left: 25%;
+        }
+
+        .obstacle2 {
+            top: 60%;
+            right: 20%;
+        }
+
+        .obstacle3 {
+            bottom: 16.7%;
+            left: 37.5%;
+        }
+
+        /* ANIMATIONS */
+        @keyframes robotMove {
+            0% { transform: translateX(0) translateY(0); }
+            25% { transform: translateX(12.5%) translateY(-6.7%); }
+            50% { transform: translateX(20%) translateY(13.3%); }
+            75% { transform: translateX(7.5%) translateY(20%); }
+            100% { transform: translateX(0) translateY(0); }
+        }
+
+        .robot-avatar.moving {
+            animation: robotMove 8s ease-in-out infinite;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .left-panel {
+                width: 100%;
+                min-width: unset;
+            }
+
+            .logo {
+                font-size: 2vw;
+            }
+
+            .logo img {
+                width: 5vw;
+                height: 5vw;
+            }
+
+            .control-group h3 {
+                font-size: 2vw;
+            }
+
+            .btn {
+                font-size: 1.8vw;
+                padding: 3%;
+            }
+
+            .status-row {
+                font-size: 1.8vw;
+            }
+
+            .status-led {
+                width: 1.5vw;
+                height: 1.5vw;
+                min-width: 12px;
+                min-height: 12px;
+            }
+
+            .title-header {
+                font-size: 2.5vw;
+            }
+
+            .component {
+                font-size: 1.5vw;
+            }
+
+            .status-display h4 {
+                font-size: 2vw;
+            }
+
+            .robot-arena {
+                width: 60%;
+                height: 40%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .circuit-board {
+                padding-bottom: 100%; /* Square on mobile */
+            }
+
+            .logo {
+                font-size: 3.5vw;
+            }
+
+            .logo img {
+                width: 8vw;
+                height: 8vw;
+            }
+
+            .control-group h3 {
+                font-size: 3.5vw;
+            }
+
+            .btn {
+                font-size: 3vw;
+            }
+
+            .status-row {
+                font-size: 3vw;
+            }
+
+            .status-led {
+                width: 3vw;
+                height: 3vw;
+                min-width: 15px;
+                min-height: 15px;
+            }
+
+            .title-header {
+                font-size: 4vw;
+            }
+
+            .component {
+                font-size: 2.5vw;
+            }
+
+            .status-display {
+                min-width: 30%;
+            }
+
+            .status-display h4 {
+                font-size: 3vw;
+            }
+
+            .robot-arena {
+                width: 80%;
+                height: 35%;
+            }
+        }
+
+        a {
+            text-decoration: none;
+            color: white;
+        }
+                   .card {
+    display: flex;
+    gap: 15px;
+    background: #000075;
+    color: white;
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    align-items: center;
+}
+
+.card img {
+    width: 150px;
+    border-radius: 10px;
+}
+
+.card .text h3 {
+    margin-bottom: 8px;
+    color: white;
+}
+
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="logo">
+              <a href="/"><img src="/static/image/logo.png" width="80px" height="80px" alt=""></a>
+          
+            <span>Arduino Obstacle Avoiding Robot</span>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <div class="main-container">
+        <!-- LEFT PANEL -->
+        <div class="left-panel">
+            <div class="control-group">
+                <h3>Boshqaruv</h3>
+                <button class="btn btn-success" onclick="startRobot()">
+                    Robotni ishga tushirish
+                </button>
+                <button class="btn btn-danger" onclick="stopRobot()">
+                    Robotni to'xtatish
+                </button>
+                <button class="btn btn-primary" onclick="togglePower()">
+                    Quvvat
+                </button>
+                <button class="btn btn-info" onclick="testSensor()">
+                    Sensor sinovi
+                </button>
+            </div>
+<aside class="left-panel">
+  <h3>Ma'lumotlar</h3>
+  <button class="btn btn-primary" id="schemaBtn">💡 Sxema qayerda ishlatiladi</button>
+  <button class="btn btn-primary" id="codeBtn">💻 Kod</button>
+  <button class="btn btn-primary" id="componentsBtn">🔌 Qurilmalar</button>
+</aside>
+            <div class="control-group">
+                <h3>Robot holati</h3>
+                <div class="status-row">
+                    <span>Quvvat:</span>
+                    <div class="status-led" id="powerLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Sensor:</span>
+                    <div class="status-led" id="sensorLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Chap motor:</span>
+                    <div class="status-led" id="leftMotorLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>O'ng motor:</span>
+                    <div class="status-led" id="rightMotorLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Harakat:</span>
+                    <div class="status-led" id="movingLed"></div>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <h3>Sozlamalar</h3>
+                <button class="btn btn-primary" onclick="adjustSensitivity()">
+                    Sensor sezgirligi
+                </button>
+                <button class="btn btn-primary" onclick="setSpeed()">
+                    Motor tezligi
+                </button>
+                <button class="btn btn-danger" onclick="resetRobot()">
+                    Qayta ishga tushirish
+                </button>
+            </div>
+        </div>
+<div class="modal" id="schemaModal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>💡 Sxema qayerda ishlatiladi (RGB LED)</h2>
+    <div class="flex-container-40-60">
+         <div class="flex-video-40">
+                <iframe 
+                    src="https://www.youtube.com/embed/4CFO0MiSlM8?si=jbSsSWKIdteR_srt" 
+                    title="YouTube video player" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+      <div class="flex-text-60">
+        <strong>Ishlash prinsipi:</strong>
+        <p>Ultrasonik sensor to‘siqgacha bo‘lgan masofani o‘lchaydi.
+
+Agar to‘siq 15 sm dan yaqin bo‘lsa — Arduino oldinga yurishni to‘xtatadi.
+
+Mashina to‘siqning chap va o‘ng tomonidagi masofani tekshiradi.
+
+Qaysi tomonda masofa katta bo‘lsa, o‘sha yo‘nalishda buriladi.
+
+To‘siq yo‘qolgach, mashina yana oldinga harakatlanadi.</p>
+      </div>
+    </div>
+    <div class="flex-container-40-60">
+         <div class="flex-video-40">
+                <iframe 
+                    src="https://www.youtube.com/embed/v97VBkiN7e8?si=LmVy0bMbV93V0qH4" 
+                    title="YouTube video player" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+      <div class="flex-text-60">
+        <strong>Qo‘llanilishlar</strong>
+<p>Avtonom transport vositalarini o‘rganish
+
+Sun’iy intellekt asosidagi harakat modellarini sinovdan o‘tkazish
+
+Robototexnika va avtomatika o‘quv loyihalari
+
+IoT va sensorli tizimlar asosidagi amaliy mashg‘ulotlar</p>
+      </div>
+    </div>
+    <div class="flex-container-40-60">
+         <div class="flex-video-40">
+                <iframe 
+                    src="https://www.youtube.com/embed/BhrrNtihIe8?si=ehldQVEx7VGejo4_" 
+                    title="YouTube video player" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+      <div class="flex-text-60">
+        <strong>Afzalliklar</strong>
+ <p>Mustaqil qaror qabul qilish imkoniyati
+
+Sensor va motor boshqaruvni amalda o‘rganish
+
+Kengaytiriluvchi (Bluetooth, WiFi, kamera qo‘shish mumkin)
+
+Arduino asosida dasturlashni oson o‘rganish</p>
+   
+    </div>
+    </div>
+  </div>
+</div>
+<!-- ✅ 2) Kod (mBlock ↔ Arduino) -->
+<div class="modal" id="codeModal">
+  <div class="modal-content">
+    <span class="close" title="Yopish">&times;</span>
+    <h2>💻 Kod</h2>
+
+    <div class="tab-buttons">
+      <button class="tab-btn active" data-tab="mblock">mBlock Kodi</button>
+      <button class="tab-btn" data-tab="arduino">Arduino Kodi</button>
+    </div>
+
+    <!-- mBlock (rasm/link—o'zingiz qo'ying) -->
+    <div class="tab-content active" id="mblock">
+      <pre>
+<img src="/static/image/obstacle.png" alt="mBlock – Obstacle Avoiding Car" style="width:80%;height:auto">
+      </pre>
+    </div>
+
+    <!-- Arduino kodi: HC-SR04 + Servo (ixtiyoriy) + L298N -->
+    <div class="tab-content" id="arduino">
+<pre>
+// Obstacle Avoiding Car – Arduino UNO + HC-SR04 + L298N + (ixtiyoriy) SG90
+// Ulanish:
+// L298N: ENA->D5 (PWM), IN1->D8, IN2->D9; ENB->D6 (PWM), IN3->D10, IN4->D11
+// HC-SR04: TRIG->D2, ECHO->D3
+// Servo (ixtiyoriy): SIG->D4  (sensorni burish uchun)
+// VIN (motor) -> 2x18650 (7.4–8.4V) / 6xAA; 5V (logika) -> L298N 5V (jumperga qarab)
+// GND(Arduino) ~ GND(L298N) ~ GND(HC-SR04) umumiy!
+
+#include &lt;Servo.h&gt;
+
+const int ENA=5, IN1=8, IN2=9;
+const int ENB=6, IN3=10, IN4=11;
+
+const int TRIG=2, ECHO=3;
+const int SERVO_PIN=4;   // istasangiz ishlatmang
+
+Servo head;
+int baseSpeed = 170;     // 0..255
+
+// --- Motor boshqaruvlari ---
+void drive(int L, int R){ // -255..255
+  L = constrain(L, -255, 255);
+  R = constrain(R, -255, 255);
+
+  // chap (ENA/IN1/IN2)
+  if (L >= 0){ digitalWrite(IN1,HIGH); digitalWrite(IN2,LOW);  analogWrite(ENA,L); }
+  else       { digitalWrite(IN1,LOW);  digitalWrite(IN2,HIGH); analogWrite(ENA,-L); }
+
+  // o'ng (ENB/IN3/IN4)
+  if (R >= 0){ digitalWrite(IN3,HIGH); digitalWrite(IN4,LOW);  analogWrite(ENB,R); }
+  else       { digitalWrite(IN3,LOW);  digitalWrite(IN4,HIGH); analogWrite(ENB,-R); }
+}
+
+void stopMotor(){ analogWrite(ENA,0); analogWrite(ENB,0); digitalWrite(IN1,LOW); digitalWrite(IN2,LOW); digitalWrite(IN3,LOW); digitalWrite(IN4,LOW); }
+
+// --- Masofa ---
+long distanceCM(){
+  digitalWrite(TRIG, LOW); delayMicroseconds(2);
+  digitalWrite(TRIG, HIGH); delayMicroseconds(10);
+  digitalWrite(TRIG, LOW);
+  long d = pulseIn(ECHO, HIGH, 25000); // ≈4m timeout
+  return d ? (d/58) : 400; // cm
+}
+
+void setup(){
+  pinMode(IN1,OUTPUT); pinMode(IN2,OUTPUT);
+  pinMode(IN3,OUTPUT); pinMode(IN4,OUTPUT);
+  pinMode(ENA,OUTPUT); pinMode(ENB,OUTPUT);
+  pinMode(TRIG,OUTPUT); pinMode(ECHO,INPUT);
+  head.attach(SERVO_PIN); head.write(90);  // oldinga qarab
+  stopMotor();
+}
+
+long lookAt(int ang){ head.write(ang); delay(220); // servo joyiga keladi
+  // o'qishni biroz stabillashtiramiz
+  long s=0; for(int i=0;i<5;i++){ s+=distanceCM(); delay(20);} return s/5;
+}
+
+void loop(){
+ 
+  drive(baseSpeed, baseSpeed);
+  long d = distanceCM();
+
+  if (d < 20){         
+    stopMotor(); delay(100);
+
+
+    long left  = lookAt(150);
+    long right = lookAt(30);
+    head.write(90);
+
+
+    if (left > right){
+      drive(-120, 120);  // chapga burilish
+      delay(350);
+    }else{
+      drive(120, -120);  // o‘ngga burilish
+      delay(350);
+    }
+    stopMotor(); delay(80);
+  }
+}
+</pre>
+    </div>
+  </div>
+</div>
+
+<!-- ✅ 3) Qurilmalar -->
+<div class="modal" id="componentsModal">
+  <div class="modal-content">
+    <span class="close" title="Yopish">&times;</span>
+    <h2>🔌 Ishlatilgan Qurilmalar</h2>
+
+    <div class="flex-container-30-70">
+      <div class="flex-image-30"><img src="/static/image/arduino1 - Copy.png" alt="Arduino UNO"></div>
+      <div class="flex-text-70">
+        <strong>Arduino UNO</strong>
+        <p>Asosiy mikrokontroller. HC-SR04 o‘qish, servo va L298N uchun PWM/Digital chiqishlar.</p>
+      </div>
+    </div>
+
+    <div class="flex-container-30-70">
+      <div class="flex-image-30"><img src="/static/image/hcsr04.png" alt="HC-SR04"></div>
+      <div class="flex-text-70">
+        <strong>HC-SR04 ultratovush sensori</strong>
+        <p>Masofa o‘lchash (≈2–400 cm). TRIG/ECHO 5V logika, 5V quvvat, GND umumiy.</p>
+      </div>
+    </div>
+
+    <div class="flex-container-30-70">
+      <div class="flex-image-30"><img src="/static/image/l298n.png" alt="L298N"></div>
+      <div class="flex-text-70">
+        <strong>L298N motor drayver</strong>
+        <p>2 ta DC motorni ikki yo‘nalishda va PWM orqali tezlik bilan boshqaradi. VIN (motor) va 5V (logika)ni to‘g‘ri ulang.</p>
+      </div>
+    </div>
+
+    <div class="flex-container-30-70">
+      <div class="flex-image-30"><img src="/static/image/sg90.png" alt="SG90 Servo"></div>
+      <div class="flex-text-70">
+        <strong>SG90 / MG90S servo (ixtiyoriy)</strong>
+        <p>Sensorni burib, chap/o‘ngni skanerdan o‘tkazish uchun. 5V quvvat, signal D4.</p>
+      </div>
+    </div>
+
+    <div class="flex-container-30-70">
+      <div class="flex-image-30"><img src="/static/image/ttmotor.png" alt="TT DC motors"></div>
+      <div class="flex-text-70">
+        <strong>TT/130 DC motorlar (2 ×)</strong>
+        <p>G‘ildiraklar harakati. Tishli reduktorli versiya tavsiya etiladi.</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="modal" id="infoModal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>📚 Qo'shimcha Ma'lumot</h2>
+    <div class="video-full">
+      <video controls>
+        <source src="/media/2.mp4" type="video/mp4">
+        Brauzeringiz video formatni qo'llab-quvvatlamaydi.
+      </video>
+    </div>
+  </div>
+</div>
+
+<button id="infoFloatingBtn"><span>📚</span><span>Ma'lumot</span></button>
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+          
+            
+            <div class="circuit-board">
+               <img src="/static/image/obstacle-removebg-preview (1).png" width="95%" height="auto " alt="">
+            </div>
+
+          
+            <!-- Status Display -->
+            <div class="status-display">
+                <h4>Sistem holati</h4>
+                <div class="status-row">
+                    <span>Masofa:</span>
+                    <span id="distanceReading">-- cm</span>
+                </div>
+                <div class="status-row">
+                    <span>Yo'nalish:</span>
+                    <span id="direction">To'xtagan</span>
+                </div>
+                <div class="status-row">
+                    <span>Tezlik:</span>
+                    <span id="speed">0%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // System State
+        let powerOn = false;
+        let robotRunning = false;
+        let obstacleDetected = false;
+        let currentDirection = 'stopped';
+        let motorSpeed = 75;
+        let sensorRange = 20;
+
+        // DOM Elements
+        const elements = {
+            powerLed: document.getElementById('powerLed'),
+            sensorLed: document.getElementById('sensorLed'),
+            leftMotorLed: document.getElementById('leftMotorLed'),
+            rightMotorLed: document.getElementById('rightMotorLed'),
+            movingLed: document.getElementById('movingLed'),
+            leftEye: document.getElementById('leftEye'),
+            rightEye: document.getElementById('rightEye'),
+            leftMotor: document.getElementById('leftMotor'),
+            rightMotor: document.getElementById('rightMotor'),
+            leftWheel: document.getElementById('leftWheel'),
+            rightWheel: document.getElementById('rightWheel'),
+            robotAvatar: document.getElementById('robotAvatar'),
+            distanceReading: document.getElementById('distanceReading'),
+            direction: document.getElementById('direction'),
+            speedDisplay: document.getElementById('speed')
+        };
+
+        // Update Status Display
+        function updateStatus() {
+            elements.powerLed.classList.toggle('on', powerOn);
+            elements.sensorLed.classList.toggle('on', powerOn && robotRunning);
+            elements.leftMotorLed.classList.toggle('on', powerOn && robotRunning);
+            elements.rightMotorLed.classList.toggle('on', powerOn && robotRunning);
+            elements.movingLed.classList.toggle('on', robotRunning && currentDirection !== 'stopped');
+            
+            elements.direction.textContent = getDirectionText();
+            elements.speedDisplay.textContent = robotRunning ? `${motorSpeed}%` : '0%';
+        }
+
+        function getDirectionText() {
+            switch(currentDirection) {
+                case 'forward': return 'Oldinga';
+                case 'backward': return 'Orqaga';
+                case 'left': return 'Chapga';
+                case 'right': return 'O\'ngga';
+                default: return 'To\'xtagan';
+            }
+        }
+
+        // Power Control
+        function togglePower() {
+            powerOn = !powerOn;
+            
+            if (!powerOn) {
+                stopRobot();
+            }
+            
+            updateStatus();
+        }
+
+        // Robot Control
+        function startRobot() {
+            if (!powerOn) {
+                alert('Avval quvvatni yoqing!');
+                return;
+            }
+            
+            robotRunning = true;
+            startSensorScanning();
+            startRobotMovement();
+            updateStatus();
+        }
+
+        function stopRobot() {
+            robotRunning = false;
+            currentDirection = 'stopped';
+            stopMotorAnimations();
+            elements.robotAvatar.classList.remove('moving');
+            elements.distanceReading.textContent = '-- cm';
+            updateStatus();
+        }
+
+        // Sensor Functions
+        function startSensorScanning() {
+            if (!robotRunning) return;
+            
+            elements.leftEye.classList.add('active');
+            elements.rightEye.classList.add('active');
+            
+            // Simulate distance readings
+            setInterval(() => {
+                if (robotRunning) {
+                    const distance = Math.random() * 100 + 10;
+                    elements.distanceReading.textContent = Math.round(distance) + ' cm';
+                    
+                    if (distance < sensorRange) {
+                        obstacleDetected = true;
+                        avoidObstacle();
+                    } else {
+                        obstacleDetected = false;
+                        moveForward();
+                    }
+                }
+            }, 1000);
+        }
+
+        function testSensor() {
+            if (!powerOn) {
+                alert('Avval quvvatni yoqing!');
+                return;
+            }
+            
+            elements.leftEye.classList.add('active');
+            elements.rightEye.classList.add('active');
+            elements.sensorLed.classList.add('on');
+            
+            let distance = 50;
+            const testInterval = setInterval(() => {
+                distance -= 5;
+                elements.distanceReading.textContent = distance + ' cm';
+                
+                if (distance <= 0) {
+                    clearInterval(testInterval);
+                    elements.leftEye.classList.remove('active');
+                    elements.rightEye.classList.remove('active');
+                    elements.sensorLed.classList.remove('on');
+                    elements.distanceReading.textContent = '-- cm';
+                }
+            }, 200);
+        }
+
+        // Movement Functions
+        function moveForward() {
+            currentDirection = 'forward';
+            startMotorAnimations();
+            updateStatus();
+        }
+
+        function avoidObstacle() {
+            // Random turn direction
+            currentDirection = Math.random() > 0.5 ? 'left' : 'right';
+            
+            setTimeout(() => {
+                if (robotRunning && !obstacleDetected) {
+                    moveForward();
+                }
+            }, 2000);
+            
+            updateStatus();
+        }
+
+        function startMotorAnimations() {
+            elements.leftMotor.classList.add('spinning');
+            elements.rightMotor.classList.add('spinning');
+            elements.leftWheel.classList.add('spinning');
+            elements.rightWheel.classList.add('spinning');
+        }
+
+        function stopMotorAnimations() {
+            elements.leftMotor.classList.remove('spinning');
+            elements.rightMotor.classList.remove('spinning');
+            elements.leftWheel.classList.remove('spinning');
+            elements.rightWheel.classList.remove('spinning');
+        }
+
+        function startRobotMovement() {
+            elements.robotAvatar.classList.add('moving');
+        }
+
+        // Settings
+        function adjustSensitivity() {
+            if (!powerOn) {
+                alert('Avval quvvatni yoqing!');
+                return;
+            }
+            
+            const newRange = prompt('Sensor masofasini kiriting (5-50 cm):', sensorRange);
+            if (newRange && newRange >= 5 && newRange <= 50) {
+                sensorRange = parseInt(newRange);
+                alert(`Sensor masofasi ${sensorRange} cm ga sozlandi`);
+            }
+        }
+
+        function setSpeed() {
+            if (!powerOn) {
+                alert('Avval quvvatni yoqing!');
+                return;
+            }
+            
+            const newSpeed = prompt('Motor tezligini kiriting (10-100%):', motorSpeed);
+            if (newSpeed && newSpeed >= 10 && newSpeed <= 100) {
+                motorSpeed = parseInt(newSpeed);
+                alert(`Motor tezligi ${motorSpeed}% ga sozlandi`);
+                updateStatus();
+            }
+        }
+
+        function resetRobot() {
+            stopRobot();
+            powerOn = false;
+            sensorRange = 20;
+            motorSpeed = 75;
+            elements.leftEye.classList.remove('active');
+            elements.rightEye.classList.remove('active');
+            updateStatus();
+            alert('Robot qayta ishga tushirildi!');
+        }
+function openModal(id){ const m=document.getElementById(id); if(m) m.style.display='block'; }
+  function closeModal(el){ const m=el.closest('.modal'); if(m) m.style.display='none'; }
+
+  document.addEventListener('click', (e)=>{ if(e.target.matches('.modal .close')) closeModal(e.target); });
+  window.addEventListener('click', (e)=>{ document.querySelectorAll('.modal').forEach(m=>{ if(e.target===m) m.style.display='none'; }); });
+
+  // buttons
+  document.getElementById('schemaBtn')?.addEventListener('click', ()=>openModal('schemaModal'));
+  document.getElementById('codeBtn')?.addEventListener('click',   ()=>openModal('codeModal'));
+  document.getElementById('componentsBtn')?.addEventListener('click', ()=>openModal('componentsModal'));
+  document.getElementById('infoFloatingBtn')?.addEventListener('click', ()=>openModal('infoModal'));
+
+  // tabs
+  (function(){
+    const codeModal=document.getElementById('codeModal');
+    if(!codeModal) return;
+    codeModal.querySelectorAll('.tab-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const t=btn.dataset.tab;
+        codeModal.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        codeModal.querySelectorAll('.tab-content').forEach(p=>p.classList.toggle('active', p.id===t));
+      });
+    });
+  })();
+        // Initialize
+        updateStatus();
+    </script>
+</body>
+</html>

@@ -1,0 +1,1410 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Distance Sensing Circuit Using Arduino</title>
+    <style>
+        /* First file styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #e6f3ff;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: auto;
+        }
+
+        /* HEADER */
+        .header {
+            display: flex;
+            align-items: center;
+            background:#000075;
+            color: white;
+            padding: 10px 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+           
+            width: 100%;
+            height: 200px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .logo-icon img {
+            border-radius: 50%;
+            border: 2px solid white;
+            width: 40px;
+            height: 40px;
+        }
+
+        /* MAIN LAYOUT */
+        .main-container {
+            display: flex;
+            margin-top: 20px;
+            gap: 20px;
+        }
+
+        /* LEFT PANEL */
+        .left-panel {
+            width: 300px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            height: fit-content;
+            position: relative;
+            z-index: 1;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 15px;
+        }
+
+        .control-group h3 {
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 8px;
+            font-size: 14px;
+            border-radius: 5px;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn-success { 
+            background: #28a745; 
+            color: white; 
+        }
+        .btn-danger { 
+            background: #dc3545; 
+            color: white; 
+        }
+        .btn-primary { 
+            background: #000075; 
+            color: white; 
+        }
+        .btn-info { 
+            background:#000075 ; 
+            color: white; 
+        }
+
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 8px 0;
+            font-size: 13px;
+        }
+
+        .status-led {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #dc3545;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+        }
+
+        .status-led.on {
+            background: #28a745;
+            box-shadow: 0 0 10px rgba(40, 167, 69, 0.8);
+        }
+
+        /* Second file styles */
+        .title-header {
+            background: linear-gradient(45deg, #8b5cf6, #a855f7);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 20px;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+            position: relative;
+        }
+
+        .circuit-board {
+            position: relative;
+            width: 600px;
+            height: 350px;
+            background: white;
+            border: 3px solid #333;
+            margin-bottom: 30px;
+        }
+
+        /* Arduino UNO */
+        .arduino {
+            position: absolute;
+            left: 30px;
+            top: 80px;
+            width: 100px;
+            height: 160px;
+            background: #2563eb;
+            border-radius: 5px;
+            border: 2px solid #1d4ed8;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .arduino::before {
+            content: '';
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            right: 8px;
+            height: 15px;
+            background: #1e40af;
+            border-radius: 2px;
+        }
+
+        .arduino-pins {
+            position: absolute;
+            bottom: 5px;
+            left: 5px;
+            right: 5px;
+            height: 20px;
+            background: #1e40af;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+        }
+
+        .pin {
+            width: 3px;
+            height: 10px;
+            background: #fbbf24;
+            border-radius: 1px;
+        }
+
+        .arduino-label {
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-weight: bold;
+            color: #333;
+            font-size: 14px;
+        }
+
+        /* HC-SR04 Sensor */
+        .hc-sr04 {
+            position: absolute;
+            right: 60px;
+            top: 40px;
+            width: 170px;
+            height: 100px;
+            
+            border-radius: 5px;
+            
+        }
+        .hc-sr04 img{
+            width: 100%;
+            height: 100%;
+        }
+        .sensor-eyes {
+            position: absolute;
+            top: 8px;
+            left: 12px;
+            right: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sensor-eye {
+            width: 18px;
+            height: 18px;
+            background: #1f2937;
+            border-radius: 50%;
+            border: 2px solid #374151;
+            position: relative;
+        }
+
+        .sensor-eye::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            background: #6b7280;
+            border-radius: 50%;
+        }
+
+        .hc-sr04-label {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-weight: bold;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .sensor-pins {
+            position: absolute;
+            bottom: 5px;
+            left: 10px;
+            right: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .sensor-pin {
+            width: 8px;
+            height: 12px;
+            background: #fbbf24;
+            border-radius: 1px;
+        }
+
+        /* Buzzer */
+        .buzzer {
+            position: absolute;
+            right: 80px;
+            bottom: 60px;
+            width: 45px;
+            height: 45px;
+            background: #1f2937;
+            border-radius: 50%;
+            border: 2px solid #374151;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        
+
+        .buzzer.active {
+            background: #ef4444;
+            animation: buzz-shake 0.1s infinite;
+        }
+
+        .buzzer.active::before {
+            background: #dc2626;
+        }
+
+        .buzzer-label {
+            position: absolute;
+            bottom: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 11px;
+            font-weight: bold;
+            color: #333;
+            white-space: nowrap;
+        }
+
+        @keyframes buzz-shake {
+            0%, 100% { transform: rotate(-1deg) scale(1); }
+            25% { transform: rotate(1deg) scale(1.02); }
+            50% { transform: rotate(-1deg) scale(1); }
+            75% { transform: rotate(1deg) scale(1.02); }
+        }
+
+        /* Connection Wires - exactly like in image */
+        .wire {
+            position: absolute;
+            z-index: 10;
+        }
+
+        /* Red wire - VCC */
+        .wire-red {
+            width: 3px;
+            height: 50px;
+            background: #ef4444;
+            right: 155px;
+            top: 120px;
+           
+        }
+
+        /* Black wire - GND */
+        .wire-black {
+            width: 3px;
+            height: 60px;
+            background: #1f2937;
+            right: 135px;
+            top: 120px;
+            
+        }
+         .wire-red2 {
+            width: 3px;
+            height: 130px;
+            background: #ef4444;
+            right: 282px;
+            top: 40px;
+           
+        }
+
+        /* Black wire - GND */
+        .wire-black2 {
+            width: 3px;
+            height: 150px;
+            background: #1f2937;
+            right: 292px;
+            top: 30px;
+            
+        }
+         .wire-red3 {
+            width: 203px;
+            height: 3px;
+            background: #ef4444;
+            left: 110px;
+            top: 38px;
+           
+        }
+
+        /* Black wire - GND */
+        .wire-black3 {
+            width: 203.5px;
+            height: 3px;
+            background: #1f2937;
+            left: 100px;
+            top: 29px;
+            
+        }
+         .wire-red4 {
+            width: 3px;
+            height: 155px;
+            background: #ef4444;
+            left: 110px;
+            top: 40px;
+           
+        }
+
+        /* Black wire - GND */
+        .wire-black4 {
+            width: 3px;
+            height: 175px;
+            background: #1f2937;
+            left: 100px;
+            top: 30px;
+            
+        }
+         .wire-red1 {
+            width: 130px;
+            height: 3px;
+            background: #ef4444;
+            right: 155px;
+            top: 168px;
+           
+        }
+
+        /* Black wire - GND */
+        .wire-black1 {
+            width: 160px;
+            height: 3px;
+            background: #1f2937;
+            right: 135px;
+            top: 180px;
+            
+        }
+          .wire-red5 {
+            width: 35px;
+            height: 3px;
+            background: #ef4444;
+            left: 110px;
+            top: 194px;
+           
+        }
+
+        /* Black wire - GND */
+        .wire-black5 {
+            width: 45px;
+            height: 3px;
+            background: #1f2937;
+            left: 100px;
+            top: 204px;
+            
+        }
+        /* Blue wire - Trig */
+        .wire-blue {
+            width: 3px;
+            height: 95px;
+            background: #3b82f6;
+                  right: 148px;
+            top: 120px;
+            transform: rotate(0deg);
+        }
+
+        /* Purple wire - Echo */
+        .wire-purple {
+            width: 4px;
+            height: 100px;
+            background: #8b5cf6;
+            right: 141px;
+            top: 120px;
+            transform: rotate(0deg);
+        }
+        .wire-blue1 {
+            width: 165px;
+            height: 3px;
+            background: #3b82f6;
+                  right: 148px;
+            top: 215px;
+            transform: rotate(0deg);
+        }
+
+        /* Purple wire - Echo */
+        .wire-purple1 {
+            width: 172px;
+            height: 4px;
+            background: #8b5cf6;
+            right: 141px;
+            top: 220px;
+            transform: rotate(0deg);
+        }
+
+        /* Buzzer wires */
+        .buzzer-wire-1 {
+            width: 3px;
+            height: 70px;
+            background: black;
+            right: 155px;
+            bottom: 25px;
+            transform: rotate(54deg);
+        }
+
+        .buzzer-wire-2 {
+            width: 3px;
+            height: 40px;
+            background: red;
+             right: 127px;
+            bottom: 25px;
+            transform: rotate(54deg);
+        }
+          .buzzer-wire2 {
+            width: 3px;
+            height: 125px;
+            background: black;
+            right: 182px;
+            bottom: 38px;
+           
+        }
+
+        .buzzer-wire3 {
+            width: 157px;
+            height: 3px;
+            background: red;
+             right: 142px;
+            bottom: 33px;
+            
+        }
+         .buzzer-wire4 {
+            width: 15px;
+            height: 3px;
+            background: red;
+            right: 296px;
+            bottom: 105px;
+            
+        }
+          .buzzer-wire5 {
+            width: 3px;
+            height: 70px;
+            background: red;
+            right: 296px;
+            bottom: 35px;
+           
+        }
+        /* Sound Wave Animation */
+        .sound-waves {
+            position: absolute;
+            right: 20px;
+            bottom: 80px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .sound-waves.active {
+            opacity: 1;
+        }
+
+        .wave {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #10b981;
+            border-radius: 50%;
+            position: absolute;
+            animation: wave-expand 1s infinite;
+        }
+
+        .wave:nth-child(2) {
+            animation-delay: 0.3s;
+        }
+
+        .wave:nth-child(3) {
+            animation-delay: 0.6s;
+        }
+
+        @keyframes wave-expand {
+            0% {
+                transform: scale(0);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(2.5);
+                opacity: 0;
+            }
+        }
+
+        /* Green checkmark like in image */
+        .check-circle {
+            position: absolute;
+            bottom: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 60px;
+            background: #10b981;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .checkmark {
+            color: white;
+            font-size: 30px;
+            font-weight: bold;
+        }
+
+        /* Car and Wall Demo - exactly like image */
+        .demo-section {
+            width: 500px;
+            height: 120px;
+            margin-top: 40px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .wall-section {
+            position: absolute;
+            left: 400px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .wall-label {
+            font-weight: bold;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .wall-barrier {
+            width: 15px;
+            height: 250px;
+            background: linear-gradient(45deg, #dc2626, #b91c1c);
+            border-radius: 3px;
+            border: 2px solid #991b1b;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .car-track {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 400px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 1px;
+        }
+
+        .car {
+            width: 80px;
+            height: 45px;
+            background: #4b5563;
+            border-radius: 6px;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            right: 50px;
+        }
+
+        .car::before {
+            content: '';
+            position: absolute;
+            top: 6px;
+            left: 10px;
+            right: 10px;
+            bottom: 6px;
+            background: #6b7280;
+            border-radius: 3px;
+        }
+
+        .car::after {
+            content: '';
+            position: absolute;
+            left: 6px;
+            top: 12px;
+            bottom: 12px;
+            width: 6px;
+            background: #374151;
+            border-radius: 1px;
+        }
+
+        .car.danger {
+            animation: car-shake 0.2s infinite;
+            background: #dc2626 !important;
+        }
+
+        .car.danger::before {
+            background: #ef4444;
+        }
+
+        @keyframes car-shake {
+            0%, 100% { transform: translateY(-50%) translateX(0); }
+            25% { transform: translateY(-50%) translateX(-2px); }
+            75% { transform: translateY(-50%) translateX(2px); }
+        }
+
+        .car-headlights {
+            position: absolute;
+            left: 2px;
+            top: 15px;
+            bottom: 15px;
+            width: 3px;
+            background: #fbbf24;
+            border-radius: 1px;
+        }
+
+        .parking-label {
+            position: absolute;
+            bottom: -25px;
+            right: 60px;
+            font-weight: bold;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .distance-waves {
+            position: absolute;
+            right: 130px;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .distance-waves.active {
+            opacity: 1;
+        }
+
+        .distance-line {
+            width: 40px;
+            height: 2px;
+            background: #10b981;
+            margin: 3px 0;
+            border-radius: 1px;
+            animation: pulse-line 1s infinite;
+        }
+
+        .distance-line:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .distance-line:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes pulse-line {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        /* Control Panel */
+        .controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .distance-display {
+            background: #1f2937;
+            color: #10b981;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 18px;
+            font-weight: bold;
+            border: 2px solid #374151;
+            min-width: 180px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .distance-display.danger {
+            color: #ef4444;
+            border-color: #ef4444;
+            animation: blink-red 0.5s infinite;
+        }
+
+        @keyframes blink-red {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.7; }
+        }
+
+        .slider-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .slider {
+            width: 250px;
+            height: 8px;
+            border-radius: 4px;
+            background: #d1d5db;
+            outline: none;
+      
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .slider::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Attribution */
+        .attribution {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #374151;
+            font-size: 14px;
+        }
+
+        .logo {
+            width: 30px;
+            height: 30px;
+            background: #3b82f6;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .auto-text {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            color: #666;
+        }
+        body.danger-bg {
+    animation: dangerFlash 0.5s infinite;
+}
+
+@keyframes dangerFlash {
+    0%, 100% { background-color: #ffe5e5; }
+    50% { background-color: #ffcccc; }
+}
+/* MODAL umumiy style */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(0,0,0,0.6);
+    backdrop-filter: blur(3px);
+}
+
+/* MODAL ichki qismi */
+.modal-content {
+    background: #000075;
+    color: white;
+    margin: 5% auto;
+    padding: 20px;
+    width: 50%;
+    max-width: 700px;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+    animation: slideDown 0.4s ease;
+    position: relative;
+}
+
+/* Close tugmasi */
+.close {
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    color: white;
+    transition: color 0.3s;
+}
+.close:hover {
+    color: #ffcc00;
+}
+
+/* Sarlavha */
+.modal-content h2 {
+    font-size: 1.5em;
+    margin-bottom: 15px;
+    border-bottom: 2px solid rgba(255,255,255,0.2);
+    padding-bottom: 8px;
+}
+
+/* CARD dizayni */
+.card {
+    background: rgba(255,255,255,0.08);
+    padding: 10px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    overflow: hidden;
+    transition: background 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+.card:hover {
+    background: rgba(255,255,255,0.15);
+}
+
+/* CARD ichidagi rasm */
+.card img {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    border-radius: 8px;
+    background: white;
+    padding: 5px;
+}
+
+/* CARD matn qismi */
+.card .text {
+    flex: 1;
+}
+.card h3 {
+    margin: 0;
+    font-size: 1.1rem;
+}
+.card p {
+    margin: 5px 0 0;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+/* Tab tugmalar */
+.tab-buttons {
+    display: flex;
+    margin-bottom: 10px;
+}
+.tab-buttons button {
+    flex: 1;
+    background: rgba(255,255,255,0.1);
+    color: white;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    border-radius: 5px 5px 0 0;
+    transition: background 0.3s;
+}
+.tab-buttons button.active {
+    background: rgba(255,255,255,0.3);
+}
+.tab-buttons button:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+/* Kod bo‘lagi */
+.tab-content {
+    display: none;
+}
+.tab-content.active {
+    display: block;
+}
+pre {
+    background: rgba(0,0,0,0.4);
+    padding: 12px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-size: 0.9rem;
+}
+
+/* Animatsiya */
+@keyframes slideDown {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+.main-content{
+     width: 100%;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            height: fit-content;
+            position: relative;
+            z-index: 1;
+}
+    </style>
+</head>
+<body>
+    <!-- Integrated Header -->
+    <div class="header">
+        <div class="logo">
+                  <a href="/"><img src="/static/image/logo.png" width="80px" height="80px" alt=""></a>
+         </div>
+           <p></p>
+            <span style="margin-left: 50px;">Masofa sensor tizimi</span>
+    </div>
+
+    <!-- Main Container with Left Panel and Content -->
+    <div class="main-container">
+        <!-- Left Panel -->
+        <div class="left-panel">
+            <div class="control-group">
+                <h3>Boshqaruv</h3>
+                <button class="btn btn-success" onclick="startSimulation()" id="startBtn">
+                    Start
+                </button>
+                <button class="btn btn-danger" onclick="stopSimulation()" id="stopBtn">
+                     Stop
+                </button>
+                <button class="btn btn-primary" onclick="togglePower()">
+                     Quvvat
+                </button>
+                <button class="btn btn-info" onclick="runTest()">
+                     Test
+                </button>
+            </div>
+
+            <div class="control-group">
+                <h3>Ma'lumotlar</h3>
+                <button class="btn btn-primary" id="schemaBtn">
+                    💻 Sxema qayerda ishlatiladi
+                </button>
+                <button class="btn btn-primary" id="codeBtn">
+                    💻 Kod
+                </button>
+                <button class="btn btn-primary" id="componentsBtn">
+                    🔌 Qurilmalar
+                </button>
+            </div>
+
+            <div class="control-group">
+                <h3>Qurilma holati</h3>
+                <div class="status-row">
+                    <span>Quvvat:</span>
+                    <div class="status-led" id="powerLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Sensor:</span>
+                    <div class="status-led" id="sensorLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Buzzer:</span>
+                    <div class="status-led" id="buzzerLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Xavf:</span>
+                    <div class="status-led" id="dangerLed"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <div class="title-header">Arduino yordamida masofani aniqlash sxemasi</div>
+            
+            <div class="circuit-board">
+                <!-- Arduino UNO -->
+                <img src="/static/image/arduino1.png" style="margin-left: 90px; margin-top: 50px;" width="250px" height="250px" alt="">
+                
+                <!-- HC-SR04 Sensor -->
+                <img src="/static/image/ultrasonic.png" class="hc-sr04"  width="200px" height="150px" alt="">
+                
+                <!-- Buzzer -->
+                <div class="buzzer" id="buzzer">
+                    <img src="/static/image/buzzer.png" width="100px" height="100px" alt="">
+                </div>
+                
+                <!-- Wires -->
+                <div class="wire wire-red"></div>
+                <div class="wire wire-black"></div>
+                <div class="wire wire-red1"></div>
+                <div class="wire wire-black1"></div>
+                <div class="wire wire-red2"></div>
+                <div class="wire wire-black2"></div>
+                <div class="wire wire-red3"></div>
+                <div class="wire wire-black3"></div>
+                <div class="wire wire-red4"></div>
+                <div class="wire wire-black4"></div>
+                <div class="wire wire-red5"></div>
+                <div class="wire wire-black5"></div>
+                <div class="wire wire-blue"></div>
+                <div class="wire wire-purple"></div>
+                <div class="wire wire-blue1"></div>
+                <div class="wire wire-purple1"></div>
+                <div class="wire buzzer-wire-1"></div>
+                <div class="wire buzzer-wire-2"></div>
+                <div class="wire buzzer-wire2"></div>
+                <div class="wire buzzer-wire3"></div>
+                <div class="wire buzzer-wire4"></div>
+                <div class="wire buzzer-wire5"></div>
+                
+                <!-- Sound waves -->
+                <div class="sound-waves" id="soundWaves">
+                    <div class="wave"></div>
+                    <div class="wave"></div>    
+                    <div class="wave"></div>
+                </div>
+                
+                <!-- Green checkmark -->
+                <div class="check-circle">
+                    <div class="checkmark">✓</div>
+                </div>
+            </div>
+            
+            <!-- Demo Section -->
+            <div class="demo-section">
+                <div class="wall-section">
+                    <span class="wall-label">Devor</span>
+                    <div class="wall-barrier"></div>
+                </div>
+                
+                <div class="car-track"></div>
+                
+                <div>
+                    <img class="car" id="car" src="/static/image/car.png" width="100px" height="80px" alt="">
+                </div>
+                
+                <div class="distance-waves" id="distanceWaves">
+                    <div class="distance-line"></div>
+                    <div class="distance-line"></div>
+                    <div class="distance-line"></div>
+                </div>
+            </div>
+            
+            <!-- Controls -->
+            <div class="controls">
+                <div class="distance-display" id="distanceDisplay">Masofa: 50 sm</div>
+                
+                <div class="slider-container">
+                    <label for="distanceSlider"><strong>Masofani sozlash</strong></label>
+                    <input type="range" id="distanceSlider" class="slider" min="5" max="100" value="50">
+                    <span id="sliderValue">50 sm</span>
+                </div>
+                
+                <button id="autoMove" onclick="startAutoMovement()" style="
+                    background: linear-gradient(45deg, #10b981, #059669);
+                    color: white;
+                    border: none;
+                    padding: 12px 24px;
+                    border-radius: 8px;
+                    font-weight: bold;
+                    cursor: pointer;
+                    font-size: 14px;
+                    box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+                    transition: all 0.3s ease;
+                " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                    🚗 Avto Demo
+                </button>
+            </div>  
+            <div id="warningText" style="font-weight:bold; color:red; margin-top:10px;"></div>
+        </div>
+    </div>
+    
+    <!-- Attribution -->
+    <div class="attribution">
+        <div class="logo">M</div>
+        <span>@Milliy muhandislik</span>
+    </div>
+    
+    <div class="auto-text">▶ Automatic Still Guide in Community tab!</div>
+
+    <script>
+        // System State Variables for the distance sensor
+        let powerOn = false;
+        let sensorActive = false;
+        let buzzerActive = false;
+        let dangerState = false;
+
+        // DOM Elements for status LEDs
+        const powerLed = document.getElementById('powerLed');
+        const sensorLed = document.getElementById('sensorLed');
+        const buzzerLed = document.getElementById('buzzerLed');
+        const dangerLed = document.getElementById('dangerLed');
+
+        // Toggle power function
+        function togglePower() {
+            powerOn = !powerOn;
+            updateStatus();
+            if(!powerOn) {
+                stopSimulation();
+            }
+        }
+
+        // Update status LEDs
+        function updateStatus() {
+            powerLed.classList.toggle('on', powerOn);
+            sensorLed.classList.toggle('on', sensorActive);
+            buzzerLed.classList.toggle('on', buzzerActive);
+            dangerLed.classList.toggle('on', dangerState);
+        }
+
+        // Start simulation
+        function startSimulation() {
+            if(!powerOn) return;
+            sensorActive = true;
+            updateStatus();
+            // Add actual simulation start logic here
+        }
+
+        // Stop simulation
+        function stopSimulation() {
+            sensorActive = false;
+            buzzerActive = false;
+            dangerState = false;
+            updateStatus();
+            // Add actual simulation stop logic here
+        }
+
+        // Run test
+        function runTest() {
+            if(!powerOn) return;
+            startAutoMovement();
+        }
+
+        // Original distance sensor code
+        const distanceSlider = document.getElementById('distanceSlider');
+        const distanceDisplay = document.getElementById('distanceDisplay');
+        const sliderValue = document.getElementById('sliderValue');
+        const buzzer = document.getElementById('buzzer');
+        const soundWaves = document.getElementById('soundWaves');
+        const distanceWaves = document.getElementById('distanceWaves');
+        const car = document.getElementById('car');
+        const warningText = document.getElementById('warningText');
+
+        let audioContext = null;
+        let oscillator = null;
+        let isMoving = false;
+        let currentDistance = 50;
+        let targetDistance = 50;
+
+        function initAudio() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playBuzzerSound() {
+            if (audioContext && audioContext.state === 'running') {
+                if (oscillator) {
+                    oscillator.stop();
+                }
+                
+                oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                // Higher frequency for danger
+                oscillator.frequency.setValueAtTime(1200, audioContext.currentTime);
+                oscillator.type = 'square';
+                gainNode.gain.setValueAtTime(0.08, audioContext.currentTime);
+                
+                oscillator.start();
+                
+                setTimeout(() => {
+                    if (oscillator) {
+                        try {
+                            oscillator.stop();
+                        } catch(e) {}
+                        oscillator = null;
+                    }
+                }, 150);
+            }
+        }
+
+        function stopBuzzerSound() {
+            if (oscillator) {
+                try {
+                    oscillator.stop();
+                } catch(e) {}
+                oscillator = null;
+            }
+        }
+
+        function moveCarToPosition(distance) {
+            const maxDistance = 400;
+            const minDistance = 60;
+            
+            const carPosition = minDistance + (distance / 100) * (maxDistance - minDistance);
+            car.style.right = carPosition + 'px';
+            
+            distanceWaves.style.right = (carPosition + 90) + 'px';
+        }
+
+        function updateSystem() {
+            targetDistance = parseInt(distanceSlider.value);
+            
+            if (Math.abs(currentDistance - targetDistance) > 1) {
+                const step = (targetDistance - currentDistance) * 0.1;
+                currentDistance += step;
+                moveCarToPosition(currentDistance);
+            } else {
+                currentDistance = targetDistance;
+                moveCarToPosition(currentDistance);
+            }
+            
+            const distance = Math.round(currentDistance);
+            
+            distanceDisplay.textContent = `Distance: ${distance} cm`;
+            sliderValue.textContent = `${distance} cm`;
+            distanceSlider.value = distance;
+            
+            const isDangerous = distance < 20;
+            const isVeryClose = distance < 15;
+            
+            if (isDangerous) {
+                buzzerActive = true;
+                dangerState = true;
+                buzzer.classList.add('active');
+                soundWaves.classList.add('active');
+                distanceWaves.classList.add('active');
+                distanceDisplay.classList.add('danger');
+                car.classList.add('danger');
+                
+                if (isVeryClose) {
+                    playBuzzerSound();
+                    setTimeout(playBuzzerSound, 200);
+                    warningText.textContent = "XAVF: Juda yaqin masofa!";
+                } else {
+                    playBuzzerSound();
+                    warningText.textContent = "Ogohlantirish: Masofa juda kam!";
+                }
+            } else {
+                buzzerActive = false;
+                dangerState = false;
+                buzzer.classList.remove('active');
+                soundWaves.classList.remove('active');
+                distanceWaves.classList.remove('active');
+                distanceDisplay.classList.remove('danger');
+                car.classList.remove('danger');
+                warningText.textContent = "";
+                stopBuzzerSound();
+            }
+            
+            updateStatus();
+        }
+
+        function startAutoMovement() {
+            if (isMoving) return;
+            isMoving = true;
+            
+            const button = document.getElementById('autoMove');
+            button.textContent = 'Moving...';
+            button.disabled = true;
+            
+            distanceSlider.value = 100;
+            targetDistance = 100;
+            currentDistance = 100;
+            
+            const moveInterval = setInterval(() => {
+                if (targetDistance > 10) {
+                    targetDistance -= 2;
+                    distanceSlider.value = targetDistance;
+                } else {
+                    clearInterval(moveInterval);
+                    setTimeout(() => {
+                        const returnInterval = setInterval(() => {
+                            if (targetDistance < 80) {
+                                targetDistance += 3;
+                                distanceSlider.value = targetDistance;
+                            } else {
+                                clearInterval(returnInterval);
+                                isMoving = false;
+                                button.textContent = 'Avto Demo';
+                                button.disabled = false;
+                            }
+                        }, 80);
+                    }, 2000);
+                }
+            }, 100);
+        }
+
+        // Event listeners
+        distanceSlider.addEventListener('input', () => {
+            targetDistance = parseInt(distanceSlider.value);
+        });
+
+        // Initialize audio on first user interaction
+        document.addEventListener('click', initAudio, { once: true });
+        document.addEventListener('touchstart', initAudio, { once: true });
+
+        // Main animation loop
+        setInterval(updateSystem, 50);
+
+        // Initial setup
+        moveCarToPosition(50);
+        updateSystem();
+    </script>
+</body>
+</html>

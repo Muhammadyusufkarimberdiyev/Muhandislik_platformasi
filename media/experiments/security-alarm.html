@@ -1,0 +1,2394 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PIR Sensor Xavfsizlik Signalizatsiyasi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: auto;
+        }
+
+/* MODAL TUZATISH - Responsive va to'g'ri ko'rinish */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    overflow-y: auto;
+    padding: 20px 0;
+}
+
+.modal-content {
+    background: #000075;
+    color: white;
+    margin: 10vh auto 5vh;
+    padding: 30px;
+    width: 90%;
+    max-width: 800px;
+    border-radius: 20px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+    position: relative;
+    animation: slideDown 0.4s ease;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+/* Scroll bar stilizatsiyasi */
+.modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.close {
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    font-size: 32px;
+    font-weight: bold;
+    cursor: pointer;
+    color: white;
+    transition: all 0.3s;
+    z-index: 2010;
+    line-height: 1;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.close:hover {
+    background: rgba(255, 204, 0, 0.3);
+    color: #ffcc00;
+    transform: rotate(90deg);
+}
+
+.modal-content h2 {
+    font-size: 28px;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+    padding-right: 50px;
+}
+
+.card {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    transition: all 0.3s;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    z-index: 1;
+}
+
+.card:hover {
+    background: rgba(255, 255, 255, 0.18);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.card video {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    background: #000;
+    position: relative;
+    z-index: 2;
+}
+
+.card p {
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 10px 0 0;
+    position: relative;
+    z-index: 2;
+}
+
+.card strong {
+    color: #ffcc00;
+    font-size: 18px;
+}
+
+/* Tab buttons */
+.tab-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 2;
+}
+
+.tab-buttons button {
+    flex: 1;
+    min-width: 150px;
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s;
+    position: relative;
+    z-index: 2;
+}
+
+.tab-buttons button:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+}
+
+.tab-buttons button.active {
+    background: rgba(255, 204, 0, 0.4);
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(255, 204, 0, 0.3);
+}
+
+.tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease;
+    position: relative;
+    z-index: 2;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.tab-content pre {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    border-radius: 12px;
+    overflow-x: auto;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #00ff00;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    z-index: 2;
+}
+
+.tab-content pre::-webkit-scrollbar {
+    height: 8px;
+}
+
+.tab-content pre::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.tab-content pre::-webkit-scrollbar-thumb {
+    background: rgba(0, 255, 0, 0.3);
+    border-radius: 10px;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+/* Flex Layout: 40% Video + 60% Text */
+.flex-container-40-60 {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+}
+
+.flex-video-40 {
+    flex: 0 0 40%;
+}
+
+.flex-video-40 iframe {
+    width: 100%;
+    height: 250px;
+    border-radius: 10px;
+}
+
+.flex-text-60 {
+    flex: 0 0 60%;
+}
+
+.flex-text-60 p {
+    font-size: 16px;
+    line-height: 1.8;
+}
+
+/* Flex Layout: 30% Image + 70% Text */
+.flex-container-30-70 {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+}
+
+.flex-image-30 {
+    flex: 0 0 30%;
+}
+
+.flex-image-30 img {
+    width: 100%;
+    border-radius: 10px;
+}
+
+.flex-text-70 {
+    flex: 0 0 70%;
+}
+
+.flex-text-70 strong {
+    color: #ffcc00;
+    font-size: 18px;
+    display: block;
+    margin-bottom: 10px;
+}
+
+/* 100% Video */
+.video-full video {
+    width: 100%;
+    border-radius: 15px;
+}
+
+/* Dumaloq tugma */
+#infoFloatingBtn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #000075, #0000ff);
+    color: white;
+    border: 4px solid white;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    z-index: 1500;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+#infoFloatingBtn:hover {
+    transform: scale(1.1);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .flex-container-40-60,
+    .flex-container-30-70 {
+        flex-direction: column;
+    }
+    
+    .flex-video-40, .flex-text-60,
+    .flex-image-30, .flex-text-70 {
+        flex: 0 0 100%;
+    }
+}
+/* Tablet responsive */
+@media (max-width: 1024px) {
+    .modal {
+        padding: 15px 0;
+    }
+    
+    .modal-content {
+        width: 95%;
+        padding: 25px;
+        max-height: 75vh;
+        margin: 8vh auto 5vh;
+    }
+    
+    .modal-content h2 {
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+    
+    .card {
+        padding: 15px;
+    }
+    
+    .card p {
+        font-size: 15px;
+    }
+    
+    .tab-buttons button {
+        font-size: 15px;
+        padding: 10px 15px;
+    }
+}
+
+/* Mobile responsive */ 
+@media (max-width: 768px) {
+    .modal {
+        padding: 10px 0;
+    }
+    
+    .modal-content {
+        width: 96%;
+        padding: 20px 15px;
+        margin: 5vh auto 3vh;
+        max-height: 85vh;
+        border-radius: 15px;
+    }
+    
+    .close {
+        right: 10px;
+        top: 10px;
+        font-size: 28px;
+        width: 35px;
+        height: 35px;
+    }
+    
+    .modal-content h2 {
+        font-size: 20px;
+        margin-bottom: 15px;
+        padding-bottom: 12px;
+        padding-right: 45px;
+    }
+    
+    .card {
+        padding: 12px;
+        margin-bottom: 15px;
+        border-radius: 12px;
+    }
+    
+    .card video {
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+    
+    .card p {
+        font-size: 14px;
+        line-height: 1.5;
+    }
+    
+    .card strong {
+        font-size: 16px;
+    }
+    
+    .tab-buttons {
+        gap: 8px;
+        margin-bottom: 15px;
+    }
+    
+    .tab-buttons button {
+        min-width: 120px;
+        font-size: 14px;
+        padding: 10px 12px;
+        border-radius: 8px;
+    }
+    
+    .tab-content pre {
+        padding: 15px;
+        font-size: 12px;
+        line-height: 1.5;
+        border-radius: 10px;
+    }
+}
+
+
+/* Small mobile */
+@media (max-width: 480px) {
+    .modal {
+        padding: 5px 0;
+    }
+    
+    .modal-content {
+        width: 98%;
+        padding: 15px 12px;
+        margin: 3vh auto 2vh;
+        max-height: 90vh;
+        border-radius: 12px;
+    }
+    
+    .close {
+        right: 8px;
+        top: 8px;
+        font-size: 24px;
+        width: 30px;
+        height: 30px;
+    }
+    
+    .modal-content h2 {
+        font-size: 18px;
+        margin-bottom: 12px;
+        padding-bottom: 10px;
+        padding-right: 40px;
+    }
+    
+    .card {
+        padding: 10px;
+        margin-bottom: 12px;
+        border-radius: 10px;
+    }
+    
+    .card p {
+        font-size: 13px;
+    }
+    
+    .card strong {
+        font-size: 15px;
+    }
+    
+    .tab-buttons {
+        flex-direction: column;
+        gap: 6px;
+    }
+    
+    .tab-buttons button {
+        width: 100%;
+        min-width: 100%;
+        font-size: 13px;
+        padding: 10px;
+    }
+    
+    .tab-content pre {
+        padding: 12px;
+        font-size: 11px;
+        line-height: 1.4;
+    }
+}
+
+/* Very small mobile */
+@media (max-width: 360px) {
+    .modal-content {
+        padding: 12px 10px;
+        margin: 2vh auto 1vh;
+    }
+    
+    .modal-content h2 {
+        font-size: 16px;
+    }
+    
+    .card {
+        padding: 8px;
+    }
+    
+    .card p {
+        font-size: 12px;
+    }
+    
+    .tab-buttons button {
+        font-size: 12px;
+        padding: 8px;
+    }
+    
+    .tab-content pre {
+        padding: 10px;
+        font-size: 10px;
+    }
+}
+
+/* Landscape mode fixes */
+@media (max-width: 1024px) and (orientation: landscape) {
+    .modal-content {
+        max-height: 80vh;
+        margin: 5vh auto 3vh;
+    }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .tab-buttons button {
+        min-height: 44px;
+    }
+    
+    .close {
+        min-width: 44px;
+        min-height: 44px;
+    }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    .modal-content {
+        border: 3px solid white;
+    }
+    
+    .card {
+        border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .modal-content,
+    .card,
+    .tab-buttons button,
+    .close {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+/* Print styles */
+@media print {
+    .modal {
+        display: none !important;
+    }
+}
+
+/* Scroll bar stilizatsiyasi */
+.modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.close {
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    font-size: 32px;
+    font-weight: bold;
+    cursor: pointer;
+    color: white;
+    transition: all 0.3s;
+    z-index: 10;
+    line-height: 1;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.close:hover {
+    background: rgba(255, 204, 0, 0.3);
+    color: #ffcc00;
+    transform: rotate(90deg);
+}
+
+.modal-content h2 {
+    font-size: 28px;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+    padding-right: 50px;
+}
+
+.card {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    transition: all 0.3s;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.card:hover {
+    background: rgba(255, 255, 255, 0.18);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.card video {
+    width: 100%;
+    max-width: 70%;
+    height: auto;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    background: #000;
+}
+
+.card p {
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 10px 0 0;
+}
+
+
+.card strong {
+    color: #ffcc00;
+    font-size: 18px;
+}
+
+/* Tab buttons */
+.tab-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.tab-buttons button {
+    flex: 1;
+    min-width: 150px;
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.tab-buttons button:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+}
+
+.tab-buttons button.active {
+    background: rgba(255, 204, 0, 0.4);
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(255, 204, 0, 0.3);
+}
+
+.tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.tab-content pre {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    border-radius: 12px;
+    overflow-x: auto;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #00ff00;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tab-content pre::-webkit-scrollbar {
+    height: 8px;
+}
+
+.tab-content pre::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.tab-content pre::-webkit-scrollbar-thumb {
+    background: rgba(0, 255, 0, 0.3);
+    border-radius: 10px;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Tablet responsive */
+@media (max-width: 1024px) {
+    .modal {
+        padding: 15px 0;
+    }
+    
+    .modal-content {
+        width: 95%;
+        padding: 25px;
+        max-height: 80vh;
+    }
+    
+    .modal-content h2 {
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+    
+    .card {
+        padding: 15px;
+    }
+    
+    .card p {
+        font-size: 15px;
+    }
+    
+    .tab-buttons button {
+        font-size: 15px;
+        padding: 10px 15px;
+    }
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .modal {
+        padding: 10px 0;
+    }
+    
+    .modal-content {
+        width: 96%;
+        padding: 20px 15px;
+        margin: 2vh auto;
+        max-height: 90vh;
+        border-radius: 15px;
+    }
+    
+    .close {
+        right: 10px;
+        top: 10px;
+        font-size: 28px;
+        width: 35px;
+        height: 35px;
+    }
+    
+    .modal-content h2 {
+        font-size: 20px;
+        margin-bottom: 15px;
+        padding-bottom: 12px;
+        padding-right: 45px;
+    }
+    
+    .card {
+        padding: 12px;
+        margin-bottom: 15px;
+        border-radius: 12px;
+    }
+    
+    .card video {
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+    
+    .card p {
+        font-size: 14px;
+        line-height: 1.5;
+    }
+    
+    .card strong {
+        font-size: 16px;
+    }
+    
+    .tab-buttons {
+        gap: 8px;
+        margin-bottom: 15px;
+    }
+    
+    .tab-buttons button {
+        min-width: 120px;
+        font-size: 14px;
+        padding: 10px 12px;
+        border-radius: 8px;
+    }
+    
+    .tab-content pre {
+        padding: 15px;
+        font-size: 12px;
+        line-height: 1.5;
+        border-radius: 10px;
+    }
+}
+
+
+/* Small mobile */
+@media (max-width: 480px) {
+    .modal {
+        padding: 5px 0;
+    }
+    
+    .modal-content {
+        width: 98%;
+        padding: 15px 12px;
+        margin: 1vh auto;
+        max-height: 92vh;
+        border-radius: 12px;
+    }
+    
+    .close {
+        right: 8px;
+        top: 8px;
+        font-size: 24px;
+        width: 30px;
+        height: 30px;
+    }
+    
+    .modal-content h2 {
+        font-size: 18px;
+        margin-bottom: 12px;
+        padding-bottom: 10px;
+        padding-right: 40px;
+    }
+    
+    .card {
+        padding: 10px;
+        margin-bottom: 12px;
+        border-radius: 10px;
+    }
+    
+    .card p {
+        font-size: 13px;
+    }
+    
+    .card strong {
+        font-size: 15px;
+    }
+    
+    .tab-buttons {
+        flex-direction: column;
+        gap: 6px;
+    }
+    
+    .tab-buttons button {
+        width: 100%;
+        min-width: 100%;
+        font-size: 13px;
+        padding: 10px;
+    }
+    
+    .tab-content pre {
+        padding: 12px;
+        font-size: 11px;
+        line-height: 1.4;
+    }
+}
+
+/* Very small mobile */
+@media (max-width: 360px) {
+    .modal-content {
+        padding: 12px 10px;
+    }
+    
+    .modal-content h2 {
+        font-size: 16px;
+    }
+    
+    .card {
+        padding: 8px;
+    }
+    
+    .card p {
+        font-size: 12px;
+    }
+    
+    .tab-buttons button {
+        font-size: 12px;
+        padding: 8px;
+    }
+    
+    .tab-content pre {
+        padding: 10px;
+        font-size: 10px;
+    }
+}
+
+/* Landscape mode fixes */
+@media (max-width: 1024px) and (orientation: landscape) {
+    .modal-content {
+        max-height: 85vh;
+        margin: 2vh auto;
+    }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .tab-buttons button {
+        min-height: 44px;
+    }
+    
+    .close {
+        min-width: 44px;
+        min-height: 44px;
+    }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    .modal-content {
+        border: 3px solid white;
+    }
+    
+    .card {
+        border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .modal-content,
+    .card,
+    .tab-buttons button,
+    .close {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+/* Print styles */
+@media print {
+    .modal {
+        display: none !important;
+    }
+}
+        /* HEADER */
+        .header {
+            display: flex;
+            align-items: center;
+            background: #000075;
+            color: white;
+            padding: 15px 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            width: 100%;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .logo-icon {
+            background: #e74c3c;
+            color: white;
+            padding: 10px;
+            border-radius: 50%;
+            font-size: 24px;
+        }
+
+        /* MAIN LAYOUT */
+        .main-container {
+            display: flex;
+            gap: 20px;
+        }
+
+        /* LEFT PANEL */
+        .left-panel {
+            width: 280px;
+            background: rgba(255,255,255,0.95);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            height: fit-content;
+            backdrop-filter: blur(10px);
+        }
+
+        .control-group {
+            margin-bottom: 25px;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 20px;
+        }
+
+        .control-group h3 {
+            margin-bottom: 15px;
+            color: #000075;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 12px 15px;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 10px;
+            font-size: 14px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            text-align: left;
+            font-weight: 600;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+
+        .btn-success { 
+            background: linear-gradient(45deg, #27ae60, #2ecc71);
+            color: white; 
+        }
+        .btn-danger { 
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            color: white; 
+        }
+        .btn-primary { 
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            color: white; 
+        }
+        .btn-warning { 
+            background: linear-gradient(45deg, #f39c12, #e67e22);
+            color: white; 
+        }
+        .btn-info { 
+            background: linear-gradient(45deg, #1abc9c, #16a085);
+            color: white; 
+        }
+
+        /* Status indicators */
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 0;
+            padding: 8px 12px;
+            background: rgba(236, 240, 241, 0.7);
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .status-led {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #e74c3c;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        .status-led.on {
+            background: #27ae60;
+            box-shadow: 0 0 15px rgba(39, 174, 96, 0.8);
+        }
+
+        .status-led.on::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            background: #2ecc71;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            50% { opacity: 0.7; transform: translate(-50%, -50%) scale(1.2); }
+            100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            flex: 1;
+            background: rgba(255,255,255,0.95);
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            backdrop-filter: blur(10px);
+            overflow: hidden;
+        }
+
+        .title-header {
+            background: linear-gradient(45deg, #2c3e50, #34495e);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .circuit-container {
+            padding: 30px;
+            min-height: 600px;
+            position: relative;
+            background: #f8f9fa;
+        }
+
+        /* PIR SENSOR */
+        .pir-sensor {
+            position: absolute;
+            top: 8.33%;
+            left: 49%;
+            transform: translateX(-50%);
+            width: 12%;
+            height: 15%;
+            background: transparent;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .pir-sensor img {
+            width: 250px;
+            height: 250px;
+            object-fit: contain;
+        }
+
+        .pir-sensor.active {
+            transform: translateX(-50%) scale(1.1);
+            filter: drop-shadow(0 0 25px rgba(231, 76, 60, 0.6));
+        }
+
+        .pir-dome {
+            width: 40px;
+            height: 30px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            margin-bottom: 5px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pir-sensor.active .pir-dome {
+            animation: pirDetection 0.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes pirDetection {
+            0% { box-shadow: inset 0 0 10px rgba(231, 76, 60, 0.5); }
+            100% { box-shadow: inset 0 0 20px rgba(231, 76, 60, 0.8); }
+        }
+
+        /* TRANSISTOR */
+        .transistor {
+            position: absolute;
+            top: 40%;
+            right: 37.5%;
+            width: 6%;
+            height: 12%;
+            color: white;
+            font-size: 8px;
+            font-weight: bold;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .transistor img {
+            width: 80px;
+            height: 150px;
+            object-fit: contain;
+        }
+
+        .transistor.active {
+            filter: drop-shadow(0 0 15px rgba(39, 174, 96, 0.6));
+        }
+
+        /* BUZZER */
+        .buzzer {
+            position: absolute;
+            top: 41.67%;
+            left: 35.7%;
+            width: 8%;
+            height: 7%;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            
+        }
+
+        .buzzer img {
+            width: 100px;
+            height: 100px;
+            object-fit: contain;
+        }
+
+        .buzzer.active {
+            animation: buzzerAlert 0.3s ease-in-out infinite alternate;
+            filter: drop-shadow(0 0 25px rgba(231, 76, 60, 0.8));
+        }
+
+        @keyframes buzzerAlert {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.1); }
+        }
+
+        /* DIODE */
+        .diode {
+            position: absolute;
+            top: 24.17%;
+            left: 37%;
+            width: 4%;
+            height: 3%;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 8px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .diode img {
+            width: 100px;
+            height: 100px;
+            object-fit: contain;
+        }
+
+        .diode.active {
+            filter: drop-shadow(0 0 15px rgba(243, 156, 18, 0.8));
+        }
+
+        /* BATTERY */
+        .battery {
+            position: absolute;
+            bottom: 9.33%;
+            left: 51%;
+            transform: translateX(-50%);
+            width: 12%;
+            height: 20%;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .battery img {
+            width: 250px;
+            height: 250px;
+            object-fit: contain;
+        }
+
+        .battery-top {
+            width: 20px;
+            height: 10px;
+            background: #34495e;
+            border-radius: 3px 3px 0 0;
+            margin-bottom: 5px;
+        }
+
+        /* WIRES */
+        .wire {
+            position: absolute;
+            z-index: 5;
+            transition: all 0.3s ease;
+        }
+
+        .wire-red {
+            background: #e74c3c;
+        }
+        .wire-black {
+            background: #2c3e50;
+        }
+        .wire-green {
+            background: #27ae60;
+        }
+        .wire-blue {
+            background: #3498db;
+        }
+
+        .wire.active {
+            box-shadow: 0 0 8px currentColor;
+            animation: wireFlow 1s linear infinite;
+        }
+
+        @keyframes wireFlow {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; }
+            100% { opacity: 0.7; }
+        }
+
+        /* INTRUDER ANIMATION */
+        .intruder {
+            position: absolute;
+            top: 1.67%;
+            left: -100px;
+            font-size: 48px;
+            z-index: 10;
+            opacity: 0;
+            transition: all 0.5s ease;
+        }
+
+        .intruder.detected {
+            opacity: 1;
+            animation: intruderMove 3s ease-in-out;
+        }
+
+        @keyframes intruderMove {
+            0% { left: -100px; }
+            50% { left: 200px; }
+            100% { left: 600px; opacity: 0; }
+        }
+
+        /* ALERT MESSAGE */
+        .alert-message {
+            position: absolute;
+            top: 3.33%;
+            right: 1.67%;
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 16px;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        .alert-message.show {
+            opacity: 1;
+            transform: translateY(0);
+            animation: alertPulse 1s ease-in-out infinite alternate;
+        }
+
+        @keyframes alertPulse {
+            0% { box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3); }
+            100% { box-shadow: 0 8px 25px rgba(231, 76, 60, 0.6); }
+        }
+
+        /* RESPONSIVE DESIGN */
+        @media (min-width: 1750px) and (max-width: 4600px){
+            .transistor img{
+                width: 250px;
+                height: 250px;
+                margin-top: 90px;
+                margin-right: 5px;
+            }
+            .battery {
+                margin-bottom: -120px;
+                  width: 350px;
+                height: 350px;
+            }
+        }
+        @media (max-width: 1024px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .left-panel {
+                width: 100%;
+                margin-bottom: 20px;
+            }
+            
+            /* Planshetda rasmlarni kichraytiramiz */
+            .pir-sensor img {
+                width: 180px;
+                height: 180px;
+            }
+            
+            .transistor img {
+                width: 60px;
+                height: 110px;
+            }
+            
+            .buzzer img {
+                width: 110px;
+                height: 110px;
+            }
+            
+            .diode img {
+                width: 75px;
+                height: 75px;
+            }
+            
+            .battery img {
+                width: 180px;
+                height: 180px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .circuit-container {
+                padding: 15px;
+            }
+            
+            /* Telefonda rasmlarni yanada kichraytiramiz */
+            .pir-sensor img {
+                width: 120px;
+                height: 120px;
+            }
+            
+            .transistor img {
+                width: 45px;
+                height: 85px;
+            }
+            
+            .buzzer img {
+                width: 80px;
+                height: 80px;
+            }
+            
+            .diode img {
+                width: 50px;
+                height: 50px;
+            }
+            
+            .battery img {
+                width: 120px;
+                height: 120px;
+            }
+        }
+          @media (max-width: 480px) {
+            .pir-sensor{
+                top: 85px;
+                width: 40px;
+                height: 40px;
+            }
+          
+            .battery{
+                bottom: 115px;
+            }
+          }
+        /* MODAL STYLES */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: linear-gradient(145deg, #2c3e50, #34495e);
+            color: white;
+            margin: 5% auto;
+            padding: 30px;
+            width: 80%;
+            max-width: 800px;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            animation: modalSlide 0.4s ease;
+            position: relative;
+        }
+
+        @keyframes modalSlide {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .close {
+            position: absolute;
+            right: 25px;
+            top: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #ecf0f1;
+            transition: color 0.3s;
+        }
+
+        .close:hover {
+            color: #e74c3c;
+        }
+
+        .modal h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid rgba(255,255,255,0.3);
+            padding-bottom: 10px;
+        }
+
+        .component-card {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: background 0.3s;
+        }
+
+        .component-card:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .component-placeholder {
+            width: 80px;
+            height: 80px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        .tab-buttons {
+            display: flex;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            padding: 12px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            border-radius: 8px 8px 0 0;
+            transition: background 0.3s;
+        }
+
+        .tab-btn.active {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+        #wire14{
+            width: 19.33%; height: 0.5%; top: 36.67%; left: 38.33%;
+        }
+        #wire4{
+            width: 0.25%; height: 5%; top: 36.67%; left: 38.33%;
+        }
+        pre {
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        #wire13{
+            width: 0.25%; height: 23.33%; top: 18%; left: 54.2%; transform: rotate(-60deg);
+        }
+        #wire17{
+            width: 0.25%; height: 13.33%; top: 25%; right: 38.7%;
+        }
+        #wire12{
+width: 0.25%; height: 3.17%; top: 21.33%; left: 49.21%;
+        }
+        #wire14{
+            width: 19.33%; height: 0.5%; top: 36.67%; left: 38.33%;
+        }
+        #wire10{
+            width: 8.33%; height: 0.5%; top: 33%; left: 37.1%; transform: rotate(-80deg);
+        }
+        @media (min-width: 1605px) and (max-width: 4800px) {
+              #wire13{
+            width: 0.25%; height: 55.33%; top: 5.5%; left: 54.5%; transform: rotate(-70deg);
+            
+        }
+          #wire17{
+            width: 0.25%; height: 13.33%; top: 25%; right: 39.2%;
+        }
+        #wire12{
+            width: 0.25%; height: 3.17%; top: 21.33%; left: 49.21%;
+        }
+ #wire14{
+            width: 20.33%; height: 0.5%; top: 36.67%; left: 38.33%;
+        }
+        #wire10{
+            width: 3.33%; height: 0.5%; top: 
+            33%; left: 38.58%; transform: rotate(-80deg);
+        }
+        }
+        @media (min-width: 1605px) and (max-width: 2800px) {
+              #wire13{
+            width: 0.25%; height: 39%; top: 10.5%; left: 54.5%; transform: rotate(-70deg);
+            
+        }
+          #wire17{
+            width: 0.25%; height: 13.33%; top: 25%; right: 38.8%;
+        }
+        #wire12{
+            width: 0.25%; height: 3.17%; top: 21.33%; left: 49.21%;
+        }
+
+        #wire10{
+            width: 5%; height: 0.5%; top: 
+            33%; left: 38%; transform: rotate(-80deg);
+        }
+        }
+          @media (min-width: 4305px) and (max-width: 4800px) {
+              #wire13{
+            width: 0.25%; height: 72%; top: -5%; left: 54.3%; transform: rotate(-80deg);
+            
+        }
+          #wire17{
+            width: 0.25%; height: 13.33%; top: 25%; right: 39.5%;
+        }
+        #wire12{
+            width: 0.25%; height: 3.17%; top: 21.33%; left: 49.21%;
+        }
+
+        #wire10{
+            width: 2.5%; height: 0.5%; top: 
+            33%; left: 39%; transform: rotate(-80deg);
+        }
+
+   
+        #wire4{
+            width: 0.25%; height: 5%; top: 36.67%; left: 39.1%;
+        }
+       
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+              <a href="/"><img src="/static/image/logo.png" width="80px" height="80px" alt=""></a>
+            <span>PIR Sensor Xavfsizlik Signalizatsiyasi</span>
+        </div>
+    </header>
+    
+    <div class="main-container">
+        <div class="left-panel">
+            <div class="control-group">
+                <h3>Boshqaruv</h3>
+                <button class="btn btn-success" onclick="powerOn()">
+                    Sistema Yoqish
+                </button>
+                <button class="btn btn-danger" onclick="powerOff()">
+                    Sistema O'chirish
+                </button>
+                <button class="btn btn-primary" onclick="testSystem()">
+                    Sistema Sinovi
+                </button>
+                <button class="btn btn-warning" onclick="simulateIntruder()">
+                    Buzg'unchi Simulyatsiyasi
+                </button>
+                <button class="btn btn-info" onclick="resetSystem()">
+                    Sistema Tiklash
+                </button>
+            </div>
+
+            <div class="control-group">
+                <h3>Holat Monitoringi</h3>
+                <div class="status-row">
+                    <span>Quvvat:</span>
+                    <div class="status-led" id="powerLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>PIR Sensor:</span>
+                    <div class="status-led" id="pirLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Transistor:</span>
+                    <div class="status-led" id="transistorLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Buzzer:</span>
+                    <div class="status-led" id="buzzerLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Diode:</span>
+                    <div class="status-led" id="diodeLed"></div>
+                </div>
+            </div>
+
+  <div class="control-group">
+    <h3>Ma'lumotlar</h3>
+    <button class="btn btn-primary" id="schemaBtn">💡 Sxema qayerda ishlatiladi</button>
+    <button class="btn btn-primary" id="codeBtn">💻 Kod</button>
+    <button class="btn btn-primary" id="componentsBtn">🔌 Qurilmalar</button>
+</div>
+
+        </div>
+<!-- ✅ 1) Sxema qayerda ishlatiladi (DC Motor / L298N) -->
+    <div class="modal" id="schemaModal">
+        <div class="modal-content">
+            <span class="close" title="Yopish">&times;</span>
+            <h2>💡 Sxema qayerda ishlatiladi </h2>
+
+            <div class="flex-container-40-60">
+                <div class="flex-video-40">
+                    <!-- 1-video (xohlasangiz almashtiring) -->
+                    <iframe src="https://www.youtube.com/embed/ab4z8HViSVA?si=IZW1R2uEKdj4BM4T" title="DC Motor Control with L298N"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen></iframe>
+                </div>
+                <div class="flex-text-60">
+                    <strong>Tajriba haqida ma’lumot</strong>
+                   <p>Ushbu tajribada biz oddiy va samarali harakat aniqlovchi signalizatsiya tizimi yaratamiz. Tizim PIR sensori orqali atrofdagi harakatni sezadi va tranzistor yordamida buzzerga kuch berib ovozli signal chiqaradi. Tajriba orqali o‘quvchi:
+
+Elektron sxemalarda sensor, tranzistor, diode, buzzer kabi elementlarning vazifasini tushunadi
+
+Tranzistorni elektron kalit sifatida ishlatishni o‘rganadi
+
+Real hayotdagi signalizatsiya, xavfsizlik va deteksiya tizimlarining qanday ishlashini tushunadi
+
+Soddalashtirilgan, ammo amaliy harakat aniqlovchi qurilma yasashni o‘zlashtiradi
+
+Bu tajriba uy signalizatsiyasi, harakatni aniqlash, robototexnika, xavfsizlik tizimlari va IoT loyihalariga kirish uchun juda mos.</p>
+                </div>
+            </div>
+
+            <div class="flex-container-40-60">
+                <div class="flex-video-40">
+                    <!-- 2-video (ixtiyoriy) -->
+                    <iframe src="https://www.youtube.com/embed/TGtZ0ynhHwY?si=RxqXkbLM_i3BGC1a" title="PWM Speed Control"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen></iframe>
+                </div>
+                <div class="flex-text-60">
+                    <strong>🔄 Ishlash prinsipi</strong>
+                    <p>1️⃣ PIR sensor harakatni aniqlaydi
+
+PIR (Passive Infrared) sensor atrofdagi infraqizil (issiklik) o‘zgarishini kuzatadi.
+Agar kimdir yaqinlashsa yoki harakat qilsa:
+
+➡ OUT pini 5V ga ko‘tariladi (HIGH holat)
+
+Agar hech kim bo‘lmasa:
+
+➡ OUT 0V bo‘ladi (LOW holat)
+
+Bu signal sxemaning boshqaruv qismi hisoblanadi.</p>
+                </div>
+            </div>
+              <div class="flex-container-40-60">
+                <div class="flex-video-40">
+                    <!-- 2-video (ixtiyoriy) -->
+                    <iframe src="https://www.youtube.com/embed/JwXZ3i_l9DY?si=FQZR3drnb3N77Yed" title="PWM Speed Control"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen></iframe>
+                </div>
+                <div class="flex-text-60">
+                    <strong>Qo'shimcha Tajribalar va Yakuniy Natija</strong>
+               <p>Tizim quyidagicha ishlaydi:
+
+✔ Harakat bo‘lsa → signal yoqiladi (buzzer chaladi)
+✔ Harakat bo‘lmasa → tizim imon (jim) turadi
+
+Bu tajriba real hayotdagi barcha signalizatsiya tizimlarining aynan shu asosiy ishlash prinsipi bo‘yicha ishlashini ko‘rsatadi.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+<!-- ✅ Qurilmalar Modali: BC547 Sensor Signalizatsiya tajribasi uchun -->
+<div class="modal" id="componentsModal">
+  <div class="modal-content">
+    <span class="close" title="Yopish">&times;</span>
+    <h2>🔌 Ishlatilgan Qurilmalar</h2>
+
+    <!-- BC547 Transistor -->
+    <div class="flex-container-30-70">
+      <div class="flex-image-30">
+       <img src="/static/image/bc547 - Copy.png" width="80px" height="120px" alt="BC547 Transistor">
+      </div>
+      <div class="flex-text-70">
+        <strong>BC547 NPN Tranzistor</strong>
+        <p>Buzzer yoki LED kabi yuklamalarni boshqaradi. Sensor signali tranzistor bazasiga beriladi va u kuchaytirilgan chiqish bilan buzzerga tok uzatadi.</p>
+      </div>
+    </div>
+
+    <!-- Capacitor -->
+    <div class="flex-container-30-70">
+      <div class="flex-image-30">
+       <img src="/static/image/pir.png" width="80px" height="100px" alt="Capacitor">
+      </div>
+      <div class="flex-text-70">
+        <strong>Pir Sensor</strong>
+        <p>PIR sensor — bu infratovush (issiq) nurlanishni sezuvchi sensor bo‘lib, odamlar yoki hayvonlarning harakatini aniqlash uchun ishlatiladi.
+U asosan:
+
+Xavfsizlik tizimlari
+
+Avtomatik chiroqlar
+
+Robotlar
+
+Smart Home tizimlari
+
+da qo‘llanadi.</p>
+      </div>
+    </div>
+
+   
+
+    <!-- 220 Ohm Resistor -->
+    <div class="flex-container-30-70">
+      <div class="flex-image-30">
+       <img src="/static/image/buzzer.png" width="70px" height="60px" alt="Resistor 220Ω">
+      </div>
+      <div class="flex-text-70">
+        <strong>Buzzer</strong>
+        <p>Buzzer — tovush chiqaruvchi kichik elektron qurilma.
+Ikkita turi bor:
+
+Passive Buzzer — tovush yaratish uchun Arduino signal (frequency) kerak.
+
+Active Buzzer — o‘zining ichida generator bor, faqat 5V bersang ovoz chiqaradi..</p>
+      </div>
+    </div>
+
+    <!-- 10K Ohm Resistor -->
+    <div class="flex-container-30-70">
+      <div class="flex-image-30">
+       <img src="/static/image/1n-removebg-preview.png" width="70px" height="60px" alt="Resistor 10K">
+      </div>
+      <div class="flex-text-70">
+        <strong>Diode</strong>
+        <p>Diod — elektr tokini bir yo'nalishda o‘tkazadigan, boshqa yo‘nalishda esa to‘sib qo‘yadigan elektron element.
+
+📌 Ya’ni, bir tomonga o‘tadi → correct
+📌 Teskari tomonga o‘tmaydi → bloklaydi
+
+Shuning uchun u bir yo‘nalishli klapan (valf) ga o‘xshaydi.</p>
+      </div>
+    </div>
+
+    <!-- 1K Ohm Resistor -->
+    
+
+    <!-- Battery -->
+    <div class="flex-container-30-70">
+      <div class="flex-image-30">
+       <img src="/static/image/battery - touch.png" width="150px" height="50px" alt="3.7V Battery">
+      </div>
+      <div class="flex-text-70">
+        <strong>9v Batareya</strong>
+        <p>Butun sxemani quvvatlantiradi. Tranzistor, sensor va buzzer uchun barqaror kuchlanish manbai bo‘lib xizmat qiladi.</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+    <!-- ✅ 4) Qo'shimcha info (ixtiyoriy) + suzuvchi tugma -->
+    <div class="modal" id="infoModal">
+        <div class="modal-content">
+            <span class="close" title="Yopish">&times;</span>
+            <h2>📚 Qo'shimcha Ma'lumot</h2>
+            <div class="video-full">
+                <video controls>
+                    <source src="/media/2.mp4" type="video/mp4">
+                    Brauzeringiz video formatni qo'llab-quvvatlamaydi.
+                </video>
+            </div>
+        </div>
+    </div>
+
+    <button id="infoFloatingBtn"><span>📚</span><span>Ma'lumot</span></button>
+
+        <div class="main-content">
+            <div class="circuit-container">
+                <div class="alert-message" id="alertMessage">
+                    XAVFSIZLIK BUZILDI!
+                </div>
+
+                <div class="intruder" id="intruder">🦹‍♂️</div>
+
+                <div class="pir-sensor" id="pirSensor" onclick="triggerSensor()">
+                    
+                   <img src="/static/image/pir.png" alt="">
+                </div>
+
+                <div class="diode" id="diode">
+                   <img src="/static/image/1n-removebg-preview.png" alt="">
+                </div>
+
+                <div class="transistor" id="transistor">
+                    
+                   <img src="/static/image/bc547.png" alt="">
+                </div>
+
+                <div class="buzzer" id="buzzer" onclick="testBuzzer()">
+                   <img src="/static/image/buzzer2.png" alt="">
+                
+                </div>
+
+                <div class="battery" id="battery">
+                    <img src="/static/image/battery - touch.png" alt="">
+                    
+                </div>
+
+                <!-- Simlar - foizlarda -->
+                <div class="wire wire-red" id="wire1" style="width: 0.25%; height: 4.17%; top: 21.33%; left: 48.25%;"></div>
+                <div class="wire wire-black" id="wire2" style="width: 19.33%; height: 0.5%; top: 36.67%; left: 38.33%;"></div>
+                <div class="wire wire-black" id="wire3" style="width: 14%; height: 0.5%; top: 25%; right: 35.8%;"></div>
+                <div class="wire wire-black" id="wire4" ></div>
+                <div class="wire wire-red" id="wire5" style="width: 0.42%; height: 33.33%; bottom: 41.67%; left: 29.17%;"></div>
+                <div class="wire wire-red" id="wire6" style="width: 0.42%; height: 4.17%; bottom: 37.5%; right: 47.08%;"></div>
+                <div class="wire wire-red" id="wire7" style="width: 8.33%; height: 0.5%; top: 25%; left: 29.17%;"></div>
+                <div class="wire wire-red" id="wire8" style="width: 23.3%; height: 0.5%; bottom: 41.67%; right: 47.1%;"></div>
+                <div class="wire wire-red" id="wire9" style="width: 8.33%; height: 0.5%; top: 25%; left: 40%;"></div>
+                <div class="wire wire-red" id="wire10" ></div>
+                <div class="wire wire-black" id="wire11" style="width: 0.25%; height: 4.17%; top: 21.33%; left: 50.08%;"></div>
+                <div class="wire wire-red" id="wire12" ></div>
+                <div class="wire wire-red" id="wire13" ></div>
+                <div class="wire wire-black" id="wire14" ></div>
+                <div class="wire wire-black" id="wire15" style="width: 15.83%; height: 0.5%; bottom: 40%; right: 35.83%;"></div>
+                <div class="wire wire-black" id="wire16" style="width: 0.25%; height: 35%; top: 25%; right: 35.83%;"></div>
+                <div class="wire wire-black" id="wire17" ></div>
+                <div class="wire wire-black" id="wire18" style="width: 0.25%; height: 2.17%; bottom: 38.33%; left: 48.2%;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="componentsModal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('componentsModal')">&times;</span>
+            <h2>Ishlatilgan Komponentlar</h2>
+
+            <div class="component-card">
+                <div class="component-placeholder">GARAJ</div>
+                <div>
+                    <h3>Garaj va Omborlar</h3>
+                    <p>Avtomobil garajlari va omborlarda o'g'rilik oldini olish uchun ishlatiladi.</p>
+                </div>
+            </div>
+
+            <div class="component-card">
+                <div class="component-placeholder">KECHA</div>
+                <div>
+                    <h3>Kechki Xavfsizlik</h3>
+                    <p>Tunda uyning atrofida harakatlanuvchi odamlarni aniqlash va ogohlantirish.</p>
+                </div>
+            </div>
+
+            <div class="component-card">
+                <div class="component-placeholder">ZAVOD</div>
+                <div>
+                    <h3>Sanoat Xavfsizligi</h3>
+                    <p>Zavodlar va fabrikalarning muhim qismlariga ruxsatsiz kirish oldini olish.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let audioContext;
+        let buzzerSound = null;
+        let systemPowered = false;
+        let sensorActive = false;
+        let buzzerActive = false;
+        let alertActive = false;
+// Modalni ochish
+function openModal(id) {
+    document.getElementById(id).style.display = "block";
+}
+
+// Tugmalarni ulash
+document.getElementById("schemaBtn").addEventListener("click", () => openModal("schemaModal"));
+document.getElementById("codeBtn").addEventListener("click", () => openModal("codeModal"));
+document.getElementById("componentsBtn").addEventListener("click", () => openModal("componentsModal"));
+document.getElementById("infoFloatingBtn").addEventListener("click", () => openModal("infoModal"));
+
+// Yopish tugmalari
+document.querySelectorAll(".close").forEach(btn => {
+    btn.addEventListener("click", function() {
+        this.closest(".modal").style.display = "none";
+    });
+});
+
+// Tab switching (Kod uchun)
+document.querySelectorAll(".tab-btn").forEach(button => {
+    button.addEventListener("click", function() {
+        const tab = this.dataset.tab;
+        document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+        this.classList.add("active");
+        document.querySelectorAll(".tab-content").forEach(content => {
+            content.classList.remove("active");
+            if (content.id === tab) content.classList.add("active");
+        });
+    });
+});
+        function initAudio() {
+            try {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            } catch (e) {
+                console.log('Audio not supported');
+            }
+        }
+
+        function createBuzzerSound() {
+            if (!audioContext) return;
+            
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+            oscillator.type = 'square';
+            
+            gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.5);
+            
+            return oscillator;
+        }
+
+        function powerOn() {
+            if (!audioContext) initAudio();
+            
+            systemPowered = true;
+            updateLEDs();
+            
+            document.getElementById('battery').style.boxShadow = '0 0 20px rgba(39, 174, 96, 0.8)';
+            activateWires();
+            
+            showNotification('Sistema yoqildi!', 'success');
+        }
+
+        function powerOff() {
+            systemPowered = false;
+            sensorActive = false;
+            buzzerActive = false;
+            alertActive = false;
+            
+            updateLEDs();
+            deactivateAllComponents();
+            deactivateWires();
+            hideAlert();
+            
+            document.getElementById('battery').style.boxShadow = '';
+            showNotification('Sistema o\'chirildi!', 'danger');
+        }
+
+        function testSystem() {
+            if (!systemPowered) {
+                showNotification('Avval sistemani yoqing!', 'warning');
+                return;
+            }
+            
+            showNotification('Sistema sinovdan o\'tmoqda...', 'info');
+            
+            setTimeout(() => {
+                triggerSensor();
+                setTimeout(() => {
+                    deactivateSensor();
+                    showNotification('Sistema sinovi muvaffaqiyatli!', 'success');
+                }, 2000);
+            }, 1000);
+        }
+
+        function simulateIntruder() {
+            if (!systemPowered) {
+                showNotification('Avval sistemani yoqing!', 'warning');
+                return;
+            }
+            
+            const intruder = document.getElementById('intruder');
+            intruder.classList.add('detected');
+            
+            setTimeout(() => {
+                triggerSensor();
+            }, 1000);
+            
+            setTimeout(() => {
+                intruder.classList.remove('detected');
+                setTimeout(() => deactivateSensor(), 1000);
+            }, 4000);
+        }
+
+        function resetSystem() {
+            powerOff();
+            setTimeout(() => {
+                showNotification('Sistema qayta tiklandi', 'info');
+            }, 500);
+        }
+
+        function triggerSensor() {
+            if (!systemPowered) return;
+            
+            sensorActive = true;
+            
+            document.getElementById('pirSensor').classList.add('active');
+            
+            setTimeout(() => {
+                document.getElementById('transistor').classList.add('active');
+                document.getElementById('diode').classList.add('active');
+                
+                setTimeout(() => {
+                    activateBuzzer();
+                    showAlert();
+                }, 300);
+            }, 200);
+            
+            updateLEDs();
+            activateWires();
+        }
+
+        function deactivateSensor() {
+            sensorActive = false;
+            deactivateAllComponents();
+            hideAlert();
+            updateLEDs();
+        }
+
+        function activateBuzzer() {
+            buzzerActive = true;
+            document.getElementById('buzzer').classList.add('active');
+            
+            if (audioContext) {
+                createBuzzerSound();
+                
+                const soundInterval = setInterval(() => {
+                    if (buzzerActive) {
+                        createBuzzerSound();
+                    } else {
+                        clearInterval(soundInterval);
+                    }
+                }, 500);
+            }
+            
+            updateLEDs();
+        }
+
+        function testBuzzer() {
+            if (!systemPowered) {
+                showNotification('Avval sistemani yoqing!', 'warning');
+                return;
+            }
+            
+            activateBuzzer();
+            setTimeout(() => {
+                buzzerActive = false;
+                document.getElementById('buzzer').classList.remove('active');
+                updateLEDs();
+            }, 1000);
+        }
+
+        function showAlert() {
+            alertActive = true;
+            document.getElementById('alertMessage').classList.add('show');
+        }
+
+        function hideAlert() {
+            alertActive = false;
+            document.getElementById('alertMessage').classList.remove('show');
+        }
+
+        function activateWires() {
+            const wires = document.querySelectorAll('.wire');
+            wires.forEach(wire => wire.classList.add('active'));
+        }
+
+        function deactivateWires() {
+            const wires = document.querySelectorAll('.wire');
+            wires.forEach(wire => wire.classList.remove('active'));
+        }
+
+        function deactivateAllComponents() {
+            buzzerActive = false;
+            document.getElementById('pirSensor').classList.remove('active');
+            document.getElementById('transistor').classList.remove('active');
+            document.getElementById('buzzer').classList.remove('active');
+            document.getElementById('diode').classList.remove('active');
+        }
+
+        function updateLEDs() {
+            document.getElementById('powerLed').classList.toggle('on', systemPowered);
+            document.getElementById('pirLed').classList.toggle('on', sensorActive);
+            document.getElementById('transistorLed').classList.toggle('on', sensorActive);
+            document.getElementById('buzzerLed').classList.toggle('on', buzzerActive);
+            document.getElementById('diodeLed').classList.toggle('on', sensorActive);
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 100px;
+                right: 20px;
+                background: ${type === 'success' ? '#27ae60' : type === 'danger' ? '#e74c3c' : type === 'warning' ? '#f39c12' : '#3498db'};
+                color: white;
+                padding: 15px 25px;
+                border-radius: 10px;
+                font-weight: bold;
+                z-index: 3000;
+                opacity: 0;
+                transform: translateX(100px);
+                transition: all 0.3s ease;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.opacity = '1';
+                notification.style.transform = 'translateX(0)';
+            }, 100);
+            
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transform = 'translateX(100px)';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+        function showComponents() {
+            document.getElementById('componentsModal').style.display = 'block';
+        }
+
+        function showCode() {
+            showNotification('Kod modali hozircha mavjud emas', 'info');
+        }
+
+        function showApplications() {
+            showNotification('Qo\'llanishlar modali hozircha mavjud emas', 'info');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+        }
+
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                showNotification('PIR Sensor Xavfsizlik Tizimi tayyor!', 'info');
+            }, 1000);
+            
+            document.getElementById('pirSensor').addEventListener('click', function() {
+                if (systemPowered && !sensorActive) {
+                    triggerSensor();
+                    setTimeout(deactivateSensor, 3000);
+                }
+            });
+            
+            document.addEventListener('keydown', function(e) {
+                switch(e.key.toLowerCase()) {
+                    case 'p': powerOn(); break;
+                    case 'o': powerOff(); break;
+                    case 't': testSystem(); break;
+                    case 's': simulateIntruder(); break;
+                    case 'r': resetSystem(); break;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

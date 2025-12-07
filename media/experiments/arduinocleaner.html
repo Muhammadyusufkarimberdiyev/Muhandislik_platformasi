@@ -1,0 +1,1272 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vacuum Cleaner Robot - Arduino Tajribasi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #e6f3ff;
+            min-height: 100vh;
+            padding: 1%;
+            overflow-x: auto;
+        }
+
+        /* HEADER */
+        .header {
+            display: flex;
+            align-items: center;
+            background: #000075;
+            color: white;
+            padding: 0.5% 2%;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            width: 100%;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1%;
+            font-size: 1.2vw;
+            font-weight: bold;
+        }
+
+        .logo-icon img {
+            border-radius: 50%;
+            border: 2px solid white;
+            width: 3vw;
+            height: 3vw;
+            min-width: 30px;
+            min-height: 30px;
+        }
+
+        /* MAIN LAYOUT */
+        .main-container {
+            display: flex;
+            margin-top: 2%;
+            gap: 2%;
+        }
+
+        /* LEFT PANEL */
+        .left-panel {
+            width: 20%;
+            min-width: 200px;
+            background: white;
+            padding: 1.5%;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            height: fit-content;
+            position: relative;
+            z-index: 1;
+        }
+
+        .control-group {
+            margin-bottom: 5%;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 5%;
+        }
+
+        .control-group h3 {
+            margin-bottom: 3%;
+            color: #333;
+            font-size: 1.1vw;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 2%;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 2%;
+            font-size: 0.9vw;
+            border-radius: 5px;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn-success { 
+            background: #28a745; 
+            color: white; 
+        }
+        .btn-danger { 
+            background: #dc3545; 
+            color: white; 
+        }
+        .btn-primary { 
+            background: #000075; 
+            color: white; 
+        }
+        .btn-info { 
+            background: #000075; 
+            color: white; 
+        }
+
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 2% 0;
+            font-size: 0.9vw;
+        }
+
+        .status-led {
+            width: 0.8vw;
+            height: 0.8vw;
+            min-width: 10px;
+            min-height: 10px;
+            border-radius: 50%;
+            background: #dc3545;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+        }
+
+        .status-led.on {
+            background: #28a745;
+            box-shadow: 0 0 10px rgba(40, 167, 69, 0.8);
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            flex: 1;
+            padding: 2%;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+.left-panel{width:280px;max-width:95%;background:#fff;border-radius:14px;padding:16px;box-shadow:0 6px 16px rgba(0,0,0,.08)}
+  .left-panel h3{margin:0 0 12px;font-size:16px;color:#333}
+  .btn{display:block;width:100%;padding:10px 12px;margin:8px 0;border:0;border-radius:10px;cursor:pointer;transition:.25s;text-align:left;font-weight:600}
+  .btn-primary{background:#000075;color:#fff}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 14px rgba(0,0,0,.1)}
+  .flex-container-40-60{display:flex;gap:20px;align-items:flex-start;background:rgba(255,255,255,.1);padding:20px;border-radius:15px;margin-bottom:20px}
+  .flex-text-60{flex:1}
+  .flex-text-60 p{font-size:16px;line-height:1.8}
+  .flex-container-30-70{display:flex;gap:20px;align-items:flex-start;background:rgba(255,255,255,.1);padding:20px;border-radius:15px;margin-bottom:20px}
+  .flex-image-30{flex:0 0 30%}
+  .flex-image-30 img{width:100%;border-radius:10px}
+  .flex-text-70{flex:0 0 70%}
+  .flex-text-70 strong{color:#ffcc00;font-size:18px;display:block;margin-bottom:10px}
+  .modal{display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.8);backdrop-filter:blur(5px);overflow-y:auto}
+  .modal-content{background:#000075;color:#fff;margin:5vh auto;padding:30px;width:90%;max-width:1000px;border-radius:20px;box-shadow:0 15px 40px rgba(0,0,0,.5);position:relative;animation:slideDown .4s ease}
+  @keyframes slideDown{from{transform:translateY(-50px);opacity:0}to{transform:translateY(0);opacity:1}}
+  .close{position:absolute;right:20px;top:15px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:bold;cursor:pointer;color:#fff;transition:.3s;border-radius:50%;background:rgba(255,255,255,.1)}
+  .close:hover{background:rgba(255,204,0,.3);color:#ffcc00;transform:rotate(90deg)}
+  .modal-content h2{font-size:28px;margin-bottom:25px;padding-bottom:15px;border-bottom:2px solid rgba(255,255,255,.3);padding-right:50px}
+  .tab-buttons{display:flex;gap:8px;margin:12px 0 16px}
+  .tab-btn{flex:1;background:rgba(255,255,255,.12);color:#fff;border:0;border-radius:10px 10px 0 0;padding:10px;cursor:pointer;font-weight:600;transition:.2s}
+  .tab-btn:hover{background:rgba(255,255,255,.2)}
+  .tab-btn.active{background:rgba(255,255,255,.28)}
+  .tab-content{display:none}
+  .tab-content.active{display:block}
+  pre{background:rgba(0,0,0,.35);padding:12px;border-radius:10px;overflow:auto;white-space:pre-wrap;word-break:break-word;color:#fff;font-size:13.5px;line-height:1.55}
+  #infoFloatingBtn{position:fixed;bottom:30px;right:30px;width:120px;height:120px;border-radius:50%;background:linear-gradient(135deg,#000075,#0000ff);color:#fff;border:4px solid #fff;cursor:pointer;font-size:16px;font-weight:bold;box-shadow:0 8px 20px rgba(0,0,0,.4);z-index:1500;transition:.3s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px}
+  #infoFloatingBtn:hover{transform:scale(1.1);box-shadow:0 12px 30px rgba(0,0,255,.6)}
+  #infoFloatingBtn span:first-child{font-size:36px}
+  .video-full{width:100%;border-radius:15px;background:#000}
+  .video-full video{width:100%;height:auto;border-radius:15px;max-height:70vh}
+  @media (max-width:1024px){.flex-container-40-60,.flex-container-30-70{flex-direction:column}.flex-image-30,.flex-text-70{flex:0 0 100%}}
+  @media (max-width:768px){.modal-content{width:96%;padding:20px 15px}#infoFloatingBtn{width:90px;height:90px;font-size:14px;bottom:20px;right:20px}#infoFloatingBtn span:first-child{font-size:28px}}
+        .title-header {
+            background: #000075;
+            color: white;
+            padding: 1% 2%;
+            border-radius: 20px;
+            font-size: 1.3vw;
+            font-weight: bold;
+            margin: 0 auto 3%;
+            text-align: center;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        /* CIRCUIT DISPLAY */
+        .circuit-container {
+            display: flex;
+            justify-content: center;
+            gap: 3%;
+            margin-top: 3%;
+            flex-wrap: wrap;
+        }
+
+        .circuit-board {
+            background: #f8f9fa;
+            border: 4px solid #000075;
+            border-radius: 20px;
+            width: 100%;
+            position: relative;
+            box-shadow: 0 0 25px rgba(0, 0, 117, 0.3);
+            overflow: hidden;
+            padding-bottom: 75%; /* 4:3 aspect ratio */
+        }
+
+        .circuit-content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .circuit-header {
+            background: #000075;
+            color: white;
+            padding: 0.5% 2%;
+            border-radius: 15px;
+            font-size: 1vw;
+            font-weight: bold;
+            position: absolute;
+            top: -1.5%;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 3px 10px rgba(0, 0, 117, 0.3);
+            white-space: nowrap;
+            z-index: 20;
+        }
+
+        /* ARDUINO UNO */
+        .arduino-uno {
+            position: absolute;
+            top: 33%;
+            left: 37.5%;
+            width: 37.5%;
+            height: 50%;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.8vw;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .arduino-uno img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .arduino-uno:hover {
+            transform: scale(1.05);
+        }
+
+        /* MOTOR SHIELD L298 */
+        .motor-shield {
+            position: absolute;
+            top: 20%;
+            left: 6.25%;
+            width: 12.5%;
+            height: 10%;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.7vw;
+            font-weight: bold;
+        }
+
+        /* DC MOTORS */
+        .dc-motor {
+            width: 6.25%;
+            height: 11.7%;
+            border-radius: 8px;
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.6vw;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .dc-motor img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .dc-motor.rotating {
+            animation: motorRotate 1s linear infinite;
+        }
+
+        @keyframes motorRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .motor-1 { top: 8.3%; left: 2.5%; }
+        .motor-2 { top: 8.3%; left: 12.5%; }
+        .motor-3 { top: 50%; left: 2.5%; }
+        .motor-4 { top: 50%; left: 12.5%; }
+        .motor-5 { top: 33.3%; left: 2.5%; }
+
+        /* ULTRASONIC SENSOR */
+        .ultrasonic-sensor {
+            position: absolute;
+            top: 13.3%;
+            right: 18.75%;
+            width: 10%;
+            height: 6.7%;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.7vw;
+            font-weight: bold;
+        }
+
+        .ultrasonic-sensor img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .ultrasonic-sensor::before {
+            content: '';
+            position: absolute;
+            left: -1.25%;
+            top: 37.5%;
+            width: 1.25%;
+            height: 25%;
+            background: #333;
+            border-radius: 50%;
+        }
+
+        .ultrasonic-sensor::after {
+            content: '';
+            position: absolute;
+            right: -1.25%;
+            top: 37.5%;
+            width: 1.25%;
+            height: 25%;
+            background: #333;
+            border-radius: 50%;
+        }
+
+        /* SERVO MOTOR */
+        .servo-motor {
+            position: absolute;
+            top: 25%;
+            right: 6.25%;
+            width: 7.5%;
+            height: 8.3%;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.7vw;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .servo-motor img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .servo-motor.rotating {
+            animation: servoRotate 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes servoRotate {
+            0% { transform: rotate(-45deg); }
+            100% { transform: rotate(45deg); }
+        }
+
+        /* BATTERY */
+        .battery {
+            position: absolute;
+            bottom: 16.7%;
+            left: 37.5%;
+            width: 12.5%;
+            height: 8.3%;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.7vw;
+            font-weight: bold;
+        }
+
+        .battery img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .battery::before {
+            content: '';
+            position: absolute;
+            right: -1%;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 1%;
+            height: 40%;
+            background: #34495e;
+            border-radius: 0 4px 4px 0;
+        }
+
+        /* WIRES */
+        .wire {
+            position: absolute;
+            background: #333;
+            z-index: 5;
+        }
+
+        .wire.red { background: #e74c3c; }
+        .wire.black { background: #2c3e50; }
+        .wire.green { background: #27ae60; }
+        .wire.blue { background: #3498db; }
+        .wire.yellow { background: #f1c40f; }
+
+        /* Horizontal wires */
+        .wire-h {
+            height: 0.5%;
+            min-height: 2px;
+        }
+
+        /* Vertical wires */
+        .wire-v {
+            width: 0.375%;
+            min-width: 2px;
+        }
+
+        /* Wire positioning - RESPONSIVE */
+        .wire-1 { top: 26.7%; left: 18.75%; width: 18.75%; height: 0.5%; }
+        .wire-2 { top: 26.7%; right: 28.75%; width: 12.5%; height: 0.5%; }
+        .wire-3 { top: 40%; left: 18.75%; width: 18.75%; height: 0.5%; }
+        .wire-4 { top: 40%; right: 13.75%; width: 10%; height: 0.5%; }
+        .wire-5 { top: 53.3%; left: 37.5%; width: 15%; height: 0.5%; }
+        
+        .wire-v1 { top: 26.7%; left: 37.5%; width: 0.375%; height: 13.3%; }
+        .wire-v2 { top: 26.7%; right: 18.75%; width: 0.375%; height: 13.3%; }
+        .wire-v3 { top: 46.7%; left: 43.75%; width: 0.375%; height: 11.7%; }
+
+        /* ANIMATION EFFECTS */
+        .power-indicator {
+            position: absolute;
+            top: 1.7%;
+            right: 1.25%;
+            width: 1.875%;
+            height: 2.5%;
+            border-radius: 50%;
+            background: #dc3545;
+            transition: all 0.3s ease;
+            z-index: 25;
+        }
+
+        .power-indicator.on {
+            background: #28a745;
+            box-shadow: 0 0 15px rgba(40, 167, 69, 0.8);
+            animation: powerPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes powerPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* SENSOR WAVE EFFECT */
+        .sensor-wave {
+            position: absolute;
+            top: 13.3%;
+            right: 5%;
+            width: 25%;
+            height: 16.7%;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+
+        .sensor-wave.active {
+            opacity: 0.6;
+            animation: waveEffect 1.5s ease-out infinite;
+        }
+
+        @keyframes waveEffect {
+            0% {
+                transform: scale(0.1);
+                opacity: 0.8;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 0;
+            }
+        }
+
+        .sensor-wave::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 3px solid #27ae60;
+            border-radius: 50%;
+            animation: inherit;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .left-panel {
+                width: 100%;
+                min-width: unset;
+            }
+
+            .logo {
+                font-size: 2vw;
+            }
+
+            .control-group h3 {
+                font-size: 2vw;
+            }
+
+            .btn {
+                font-size: 1.8vw;
+                padding: 3%;
+            }
+
+            .status-row {
+                font-size: 1.8vw;
+            }
+
+            .status-led {
+                width: 1.5vw;
+                height: 1.5vw;
+                min-width: 12px;
+                min-height: 12px;
+            }
+
+            .title-header {
+                font-size: 2.5vw;
+            }
+
+            .circuit-header {
+                font-size: 1.8vw;
+            }
+
+            .arduino-uno {
+                font-size: 1.5vw;
+            }
+
+            .dc-motor,
+            .ultrasonic-sensor,
+            .servo-motor,
+            .battery {
+                font-size: 1.3vw;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .circuit-board {
+                padding-bottom: 100%; /* Square on mobile */
+            }
+
+            .logo {
+                font-size: 3.5vw;
+            }
+
+            .logo-icon img {
+                width: 6vw;
+                height: 6vw;
+            }
+
+            .control-group h3 {
+                font-size: 3.5vw;
+            }
+
+            .btn {
+                font-size: 3vw;
+            }
+
+            .status-row {
+                font-size: 3vw;
+            }
+
+            .status-led {
+                width: 3vw;
+                height: 3vw;
+                min-width: 15px;
+                min-height: 15px;
+            }
+
+            .title-header {
+                font-size: 4vw;
+            }
+
+            .circuit-header {
+                font-size: 3vw;
+            }
+
+            .arduino-uno {
+                font-size: 2.5vw;
+            }
+
+            .dc-motor,
+            .ultrasonic-sensor,
+            .servo-motor,
+            .battery {
+                font-size: 2vw;
+            }
+        }
+
+        a {
+            text-decoration: none;
+            color: white;
+        }
+        
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="logo">
+                 <a href="/"><img src="/static/image/logo.png" width="80px" height="80px" alt=""></a>
+          
+            <span>Vacuum Cleaner Robot - Arduino Tajribasi</span>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <div class="main-container">
+        <!-- LEFT PANEL -->
+        <div class="left-panel">
+            <div class="control-group">
+                <h3>Boshqaruv</h3>
+                <button class="btn btn-success" onclick="startRobot()" id="startBtn">
+                    Robot Start
+                </button>
+                <button class="btn btn-danger" onclick="stopRobot()" id="stopBtn">
+                    Robot Stop
+                </button>
+                <button class="btn btn-primary" onclick="togglePower()">
+                    Quvvat
+                </button>
+                <button class="btn btn-info" onclick="runTest()">
+                    Test
+                </button>
+            </div>
+<aside class="left-panel">
+  <h3>Ma'lumotlar</h3>
+  <button class="btn btn-primary" id="schemaBtn">💡 Sxema qayerda ishlatiladi</button>
+  <button class="btn btn-primary" id="codeBtn">💻 Kod</button>
+  <button class="btn btn-primary" id="componentsBtn">🔌 Qurilmalar</button>
+</aside>
+           
+
+            <div class="control-group">
+                <h3>Qurilma holati</h3>
+                <div class="status-row">
+                    <span>Quvvat:</span>
+                    <div class="status-led" id="powerLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Ultrasonic:</span>
+                    <div class="status-led" id="ultrasonicLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Motorlar:</span>
+                    <div class="status-led" id="motorsLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Servo:</span>
+                    <div class="status-led" id="servoLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Robot holati:</span>
+                    <div class="status-led" id="robotLed"></div>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <h3>Sozlamalar</h3>
+                <button class="btn btn-info" onclick="calibrateSensor()">
+                    Sensor sozlash
+                </button>
+                <button class="btn btn-info" onclick="adjustSpeed()">
+                    Tezlik sozlash
+                </button>
+            </div>
+        </div>
+<div class="modal" id="schemaModal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>💡 Sxema qayerda ishlatiladi (RGB LED)</h2>
+    <div class="flex-container-40-60">
+         <div class="flex-video-40">
+                <iframe 
+                    src="https://www.youtube.com/embed/UU7VVbEZulw?si=kqzGujN-ZOTtNX-5" 
+                    title="YouTube video player" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+      <div class="flex-text-60">
+        <strong>⚡ Ulanish sxemasi (qisqacha)
+
+</strong>
+<p>Arduino → L298N:
+IN1–D2, IN2–D3, IN3–D4, IN4–D7, ENA–D5, ENB–D6
+
+Ultrasonic sensor: Trig–D9, Echo–D10
+
+Fan (DC) → Relay orqali D8 pin
+
+IR sensor: OUT–A0
+
+Quvvat: 12V batareya orqali barcha modullar</p>
+      </div>
+    </div>
+    <div class="flex-container-40-60">
+         <div class="flex-video-40">
+                <iframe 
+                    src="https://www.youtube.com/embed/-zaXYhPKqM0?si=bccvMuvGPMnNLW2F" 
+                    title="YouTube video player" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+      <div class="flex-text-60">
+<strong>
+Quvvat manbai va qo'shimcha imkoniyatlar
+</strong>
+<p>
+
+12V Li-ion (3×18650)
+
+Ish vaqti: ~1–2 soat
+
+Zaryadlash: TP4056 modul orqali
+
+Bluetooth (HC-05) — masofadan boshqarish
+
+MPU6050 — muvozanat va yo‘nalish sensori
+
+ESP32 + kamera — aqlli versiya (AI bilan)
+</p>
+      </div>
+    </div>
+    <div class="flex-container-40-60">
+         <div class="flex-video-40">
+                <iframe 
+                    src="https://www.youtube.com/embed/hHIIWpZcYNs?si=sF4IlWKu0RHPHD7N"" 
+                    title="YouTube video player" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+      <div class="flex-text-60">
+<strong>
+Ishlash prinsipi
+</strong>
+<p>
+Arduino ultrasonic sensor yordamida to‘siqlarni o‘lchaydi.
+
+Masofa 15 sm dan kichik bo‘lsa — yo‘nalishni o‘zgartiradi.
+
+Masofa katta bo‘lsa — oldinga yuradi.
+
+Relay orqali fan yoqilib, chang so‘riladi.
+
+IR sensor robotni chetdan tushib ketishdan himoya qiladi.
+</p>
+    </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- 2) Kod (mBlock ↔ Arduino) -->
+<div class="modal" id="codeModal">
+  <div class="modal-content">
+    <span class="close" title="Yopish">&times;</span>
+    <h2>💻 Kod</h2>
+
+    <div class="tab-buttons">
+      <button class="tab-btn active" data-tab="mblock">mBlock Kodi</button>
+      <button class="tab-btn" data-tab="arduino">Arduino Kodi</button>
+    </div>
+
+    <div class="tab-content active" id="mblock">
+      <pre><img src="/static/image/obstacle.png" alt="mBlock – Vacuum Cleaner robot" style="width:80%;height:auto"></pre>
+    </div>
+
+    <div class="tab-content" id="arduino">
+<pre>
+// Obstacle-avoiding Vacuum Robot (HC-SR04 + Servo scan + L298N)
+// Pinlar:
+#define TRIG 9
+#define ECHO 8
+#define SERVO_PIN 10      // ixtiyoriy (yo'q bo'lsa, CENTER_ANGLE 90 ga fiks qilib ishlang)
+#define ENA 3             // PWM chap motor
+#define IN1 4
+#define IN2 5
+#define IN3 6
+#define IN4 7
+#define ENB 11            // PWM o'ng motor
+// Ixtiyoriy: fan/so'ruvchi motorni relay orqali yoqish
+#define FAN_RELAY 12      // HIGH=ON (o'zingizga moslang)
+
+#include <Servo.h>
+Servo head;
+
+long measureCM(){
+  digitalWrite(TRIG, LOW); delayMicroseconds(2);
+  digitalWrite(TRIG, HIGH); delayMicroseconds(10);
+  digitalWrite(TRIG, LOW);
+  long dur = pulseIn(ECHO, HIGH, 25000); // ~4m
+  if(dur==0) return 500;
+  return dur/58;
+}
+
+void motors(int ls, int rs){ // -255..255
+  ls = constrain(ls, -255, 255);
+  rs = constrain(rs, -255, 255);
+  // chap
+  if(ls >= 0){ digitalWrite(IN1,HIGH); digitalWrite(IN2,LOW);  analogWrite(ENA, ls); }
+  else       { digitalWrite(IN1,LOW);  digitalWrite(IN2,HIGH); analogWrite(ENA, -ls); }
+  // o'ng
+  if(rs >= 0){ digitalWrite(IN3,HIGH); digitalWrite(IN4,LOW);  analogWrite(ENB, rs); }
+  else       { digitalWrite(IN3,LOW);  digitalWrite(IN4,HIGH); analogWrite(ENB, -rs); }
+}
+
+void stopMotors(){ analogWrite(ENA,0); analogWrite(ENB,0); digitalWrite(IN1,LOW); digitalWrite(IN2,LOW); digitalWrite(IN3,LOW); digitalWrite(IN4,LOW); }
+
+int scanBestDir(){
+  // servo bo'lsa: 30°–150° oralig'ida skan, eng uzoq yo'nalishni qaytaradi
+  int bestAngle = 90, bestDist = -1;
+  for(int a=30;a<=150;a+=30){
+    head.write(a); delay(150);
+    int d = measureCM();
+    if(d>bestDist){ bestDist=d; bestAngle=a; }
+  }
+  head.write(90);
+  return bestAngle;
+}
+
+void setup(){
+  pinMode(TRIG, OUTPUT); pinMode(ECHO, INPUT);
+  pinMode(ENA, OUTPUT); pinMode(IN1, OUTPUT); pinMode(IN2, OUTPUT);
+  pinMode(ENB, OUTPUT); pinMode(IN3, OUTPUT); pinMode(IN4, OUTPUT);
+  pinMode(FAN_RELAY, OUTPUT); digitalWrite(FAN_RELAY, HIGH); // fan ON
+  head.attach(SERVO_PIN); head.write(90);
+  delay(400);
+}
+
+void loop(){
+  int d = measureCM();
+  if(d > 25){ // yo'l ochiq
+    motors(180, 180);
+  }else{      // to'siq
+    stopMotors();
+    int a = scanBestDir();      // servo mavjud bo'lmasa: a= (random(0,2)?45:135);
+    if(a < 90){ // chap
+      motors(-160,160); delay(350);
+    }else{      // o'ng
+      motors(160,-160); delay(350);
+    }
+  }
+  delay(20);
+}
+</pre>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="componentsModal">
+  <div class="modal-content">
+    <span class="close" title="Yopish">&times;</span>
+    <h2>🔌 Ishlatilgan Qurilmalar</h2>
+
+    <div class="flex-container-30-70">
+      <div class="flex-image-30"><img src="/static/image/arduino_uno.png" alt="Arduino UNO"></div>
+      <div class="flex-text-70">
+        <strong>Arduino UNO (ATmega328P)</strong>
+        <p>HC-SR04 o‘qish, servo boshqaruvi, L298N orqali ikki DC motor PWM va yo‘nalish.</p>
+      </div>
+    </div>
+
+    <div class="flex-container-30-70">
+      <div class="flex-image-30"><img src="/static/image/hc-sr04.png" alt="HC-SR04"></div>
+      <div class="flex-text-70">
+        <strong>HC-SR04 ultratovush sensor</strong>
+        <p>2–400 cm masofani o‘lchaydi. Trig/Echo pinlari orqali to‘siqni aniqlash.</p>
+      </div>
+    </div>
+
+    <div class="flex-container-30-70">
+      <div class="flex-image-30"><img src="/static/image/servo_sg90.png" alt="SG90 Servo"></div>
+      <div class="flex-text-70">
+        <strong>SG90 (ixtiyoriy)</strong>
+        <p>Sonarni chap-o‘ngga aylantirib, yo‘nalish bo‘yicha skan qilish imkonini beradi.</p>
+      </div>
+    </div>
+
+    <div class="flex-container-30-70">
+      <div class="flex-image-30"><img src="/static/image/l298n.png" alt="L298N"></div>
+      <div class="flex-text-70">
+        <strong>L298N motor drayver</strong>
+        <p>2 ta DC motor: ENA/ENB (PWM), IN1…IN4 (yo‘nalish). VIN motor quvvati, 5V logika. GND umumiy bo‘lsin.</p>
+      </div>
+    </div>
+
+    <div class="flex-container-30-70">
+      <div class="flex-image-30"><img src="/static/image/ttmotor.png" alt="TT Motor"></div>
+      <div class="flex-text-70">
+        <strong>2× DC TT motor + g‘ildirak</strong>
+        <p>Harakat uchun. 6–12 V diapazonda ishlaydi (modeliga qarab).</p>
+      </div>
+    </div>
+
+    <div class="flex-container-30-70">
+      <div class="flex-image-30"><img src="/static/image/relay.png" alt="Relay/Fan"></div>
+      <div class="flex-text-70">
+        <strong>Fan motor + relay (ixtiyoriy)</strong>
+        <p>Changyutish/fan uchun 5V relay yoki MOSFET bilan alohida yoqib-o‘chirish.</p>
+      </div>
+    </div>
+
+    <div class="flex-container-30-70">
+      <div class="flex-image-30"><img src="/static/image/18650pack.png" alt="Battery"></div>
+      <div class="flex-text-70">
+        <strong>Quvvat manbai</strong>
+        <p>2×18650 yoki 6×AA motorlar uchun; Arduino’ni USB/step-down’dan quvvatlang; GND’ni umumiy qiling.</p>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="modal" id="infoModal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>📚 Qo'shimcha Ma'lumot</h2>
+    <div class="video-full">
+      <video controls>
+        <source src="/media/2.mp4" type="video/mp4">
+        Brauzeringiz video formatni qo'llab-quvvatlamaydi.
+      </video>
+    </div>
+  </div>
+</div>
+
+<button id="infoFloatingBtn"><span>📚</span><span>Ma'lumot</span></button>
+        <!-- MAIN CONTENT -->
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+            
+            
+            <div class="circuit-container">
+                <div class="circuit-board">
+                    <div class="circuit-content">
+                        <img src="/static/image/cleaner-removebg-preview (1).png" width="100%" height="auto" alt="">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // System State Variables
+        let powerOn = false;
+        let robotRunning = false;
+        let ultrasonicActive = false;
+        let motorsActive = false;
+        let servoActive = false;
+
+        // DOM Elements
+        const elements = {
+            powerLed: document.getElementById('powerLed'),
+            ultrasonicLed: document.getElementById('ultrasonicLed'),
+            motorsLed: document.getElementById('motorsLed'),
+            servoLed: document.getElementById('servoLed'),
+            robotLed: document.getElementById('robotLed'),
+            powerIndicator: document.getElementById('powerIndicator'),
+            arduino: document.getElementById('arduino'),
+            ultrasonic: document.getElementById('ultrasonic'),
+            servo: document.getElementById('servo'),
+            sensorWave: document.getElementById('sensorWave'),
+            motors: [
+                document.getElementById('motor1'),
+                document.getElementById('motor2'),
+                document.getElementById('motor3'),
+                document.getElementById('motor4'),
+                document.getElementById('motor5')
+            ]
+        };
+
+        // Update Status LEDs
+        function updateStatus() {
+            elements.powerLed.classList.toggle('on', powerOn);
+            elements.ultrasonicLed.classList.toggle('on', ultrasonicActive);
+            elements.motorsLed.classList.toggle('on', motorsActive);
+            elements.servoLed.classList.toggle('on', servoActive);
+            elements.robotLed.classList.toggle('on', robotRunning);
+            elements.powerIndicator.classList.toggle('on', powerOn);
+        }
+
+        // Power Control
+        function togglePower() {
+            powerOn = !powerOn;
+            
+            if (!powerOn) {
+                stopAllSystems();
+            }
+            
+            updateStatus();
+        }
+
+        // Robot Controls
+        function startRobot() {
+            if (!powerOn) {
+                alert('Avval quvvatni yoqing!');
+                return;
+            }
+            
+            robotRunning = true;
+            motorsActive = true;
+            ultrasonicActive = true;
+            
+            elements.motors.forEach(motor => {
+                motor.classList.add('rotating');
+            });
+            
+            activateUltrasonic();
+            
+            updateStatus();
+        }
+
+        function stopRobot() {
+            robotRunning = false;
+            motorsActive = false;
+            ultrasonicActive = false;
+            servoActive = false;
+            
+            elements.motors.forEach(motor => {
+                motor.classList.remove('rotating');
+            });
+            elements.servo.classList.remove('rotating');
+            elements.sensorWave.classList.remove('active');
+            
+            updateStatus();
+        }
+
+        function stopAllSystems() {
+            stopRobot();
+        }
+
+        // Movement Controls
+        function moveForward() {
+            if (!powerOn) {
+                alert('Avval quvvatni yoqing!');
+                return;
+            }
+            
+            motorsActive = true;
+            elements.motors.forEach((motor, index) => {
+                if (index < 4) {
+                    motor.classList.add('rotating');
+                }
+            });
+            
+            setTimeout(() => {
+                elements.motors.forEach(motor => {
+                    if (!robotRunning) motor.classList.remove('rotating');
+                });
+            }, 2000);
+            
+            updateStatus();
+        }
+
+        function moveBackward() {
+            if (!powerOn) {
+                alert('Avval quvvatni yoqing!');
+                return;
+            }
+            
+            motorsActive = true;
+            elements.motors.forEach((motor, index) => {
+                if (index < 4) {
+                    motor.classList.add('rotating');
+                }
+            });
+            
+            setTimeout(() => {
+                elements.motors.forEach(motor => {
+                    if (!robotRunning) motor.classList.remove('rotating');
+                });
+            }, 2000);
+            
+            updateStatus();
+        }
+
+        function turnLeft() {
+            if (!powerOn) {
+                alert('Avval quvvatni yoqing!');
+                return;
+            }
+            
+            motorsActive = true;
+            elements.motors[1].classList.add('rotating');
+            elements.motors[3].classList.add('rotating');
+            
+            setTimeout(() => {
+                elements.motors.forEach(motor => {
+                    if (!robotRunning) motor.classList.remove('rotating');
+                });
+            }, 1500);
+            
+            updateStatus();
+        }
+
+        function turnRight() {
+            if (!powerOn) {
+                alert('Avval quvvatni yoqing!');
+                return;
+            }
+            
+            motorsActive = true;
+            elements.motors[0].classList.add('rotating');
+            elements.motors[2].classList.add('rotating');
+            
+            setTimeout(() => {
+                elements.motors.forEach(motor => {
+                    if (!robotRunning) motor.classList.remove('rotating');
+                });
+            }, 1500);
+            
+            updateStatus();
+        }
+
+        // Sensor Controls
+        function activateUltrasonic() {
+            if (!powerOn) {
+                alert('Avval quvvatni yoqing!');
+                return;
+            }
+            
+            ultrasonicActive = true;
+            elements.sensorWave.classList.add('active');
+            
+            setTimeout(() => {
+                if (!robotRunning) {
+                    elements.sensorWave.classList.remove('active');
+                    ultrasonicActive = false;
+                }
+            }, 3000);
+            
+            updateStatus();
+        }
+
+        function activateServo() {
+            if (!powerOn) {
+                alert('Avval quvvatni yoqing!');
+                return;
+            }
+            
+            servoActive = true;
+            elements.servo.classList.add('rotating');
+            
+            setTimeout(() => {
+                if (!robotRunning) {
+                    elements.servo.classList.remove('rotating');
+                    servoActive = false;
+                }
+            }, 5000);
+            
+            updateStatus();
+        }
+
+        // Additional Functions
+        function runTest() {
+            if (!powerOn) {
+                alert('Avval quvvatni yoqing!');
+                return;
+            }
+            
+            alert('Test rejimi: Barcha komponentlar tekshirilmoqda...');
+            
+            activateUltrasonic();
+            setTimeout(() => activateServo(), 1000);
+            setTimeout(() => moveForward(), 2000);
+            setTimeout(() => turnLeft(), 4000);
+            setTimeout(() => turnRight(), 6000);
+        }
+
+        function calibrateSensor() {
+            if (!powerOn) {
+                alert('Avval quvvatni yoqing!');
+                return;
+            }
+            alert('Ultrasonic sensor kalibratsiya qilindi!');
+            activateUltrasonic();
+        }
+
+        function adjustSpeed() {
+            if (!powerOn) {
+                alert('Avval quvvatni yoqing!');
+                return;
+            }
+            alert('Motor tezligi sozlandi!');
+        }
+
+        function showArduinoInfo() {
+            if (powerOn) {
+                alert('Arduino Uno ATMega 328P - 16MHz, 32KB Flash, 2KB SRAM');
+            }
+        }
+function openModal(id){ const m=document.getElementById(id); if(m) m.style.display='block'; }
+  function closeModal(el){ const m=el.closest('.modal'); if(m) m.style.display='none'; }
+
+  document.addEventListener('click', (e)=>{ if(e.target.matches('.modal .close')) closeModal(e.target); });
+  window.addEventListener('click', (e)=>{ document.querySelectorAll('.modal').forEach(m=>{ if(e.target===m) m.style.display='none'; }); });
+
+  // buttons
+  document.getElementById('schemaBtn')?.addEventListener('click', ()=>openModal('schemaModal'));
+  document.getElementById('codeBtn')?.addEventListener('click',   ()=>openModal('codeModal'));
+  document.getElementById('componentsBtn')?.addEventListener('click', ()=>openModal('componentsModal'));
+  document.getElementById('infoFloatingBtn')?.addEventListener('click', ()=>openModal('infoModal'));
+
+  // tabs
+  (function(){
+    const codeModal=document.getElementById('codeModal');
+    if(!codeModal) return;
+    codeModal.querySelectorAll('.tab-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const t=btn.dataset.tab;
+        codeModal.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        codeModal.querySelectorAll('.tab-content').forEach(p=>p.classList.toggle('active', p.id===t));
+      });
+    });
+  })();
+        // Initialize the system
+        updateStatus();
+    </script>
+</body>
+</html>

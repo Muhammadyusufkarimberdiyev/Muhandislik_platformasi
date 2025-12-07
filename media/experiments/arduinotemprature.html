@@ -1,0 +1,2326 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Issiqxona Temperatura Boshqaruvi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+/* MODAL TUZATISH - Responsive va to'g'ri ko'rinish */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    overflow-y: auto;
+    padding: 20px 0;
+}
+
+.modal-content {
+    background: #000075;
+    color: white;
+    margin: 10vh auto 5vh;
+    padding: 30px;
+    width: 90%;
+    max-width: 800px;
+    border-radius: 20px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+    position: relative;
+    animation: slideDown 0.4s ease;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+/* Scroll bar stilizatsiyasi */
+.modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.close {
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    font-size: 32px;
+    font-weight: bold;
+    cursor: pointer;
+    color: white;
+    transition: all 0.3s;
+    z-index: 2010;
+    line-height: 1;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.close:hover {
+    background: rgba(255, 204, 0, 0.3);
+    color: #ffcc00;
+    transform: rotate(90deg);
+}
+
+.modal-content h2 {
+    font-size: 28px;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+    padding-right: 50px;
+}
+
+.card {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    transition: all 0.3s;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    z-index: 1;
+}
+
+.card:hover {
+    background: rgba(255, 255, 255, 0.18);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.card video {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    background: #000;
+    position: relative;
+    z-index: 2;
+}
+
+.card p {
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 10px 0 0;
+    position: relative;
+    z-index: 2;
+}
+
+.card strong {
+    color: #ffcc00;
+    font-size: 18px;
+}
+
+/* Tab buttons */
+.tab-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 2;
+}
+
+.tab-buttons button {
+    flex: 1;
+    min-width: 150px;
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s;
+    position: relative;
+    z-index: 2;
+}
+
+.tab-buttons button:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+}
+
+.tab-buttons button.active {
+    background: rgba(255, 204, 0, 0.4);
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(255, 204, 0, 0.3);
+}
+
+.tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease;
+    position: relative;
+    z-index: 2;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.tab-content pre {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    border-radius: 12px;
+    overflow-x: auto;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #00ff00;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    z-index: 2;
+}
+
+.tab-content pre::-webkit-scrollbar {
+    height: 8px;
+}
+
+.tab-content pre::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.tab-content pre::-webkit-scrollbar-thumb {
+    background: rgba(0, 255, 0, 0.3);
+    border-radius: 10px;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+/* Flex Layout: 40% Video + 60% Text */
+.flex-container-40-60 {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+}
+
+.flex-video-40 {
+    flex: 0 0 40%;
+}
+
+.flex-video-40 iframe {
+    width: 100%;
+    height: 250px;
+    border-radius: 10px;
+}
+
+.flex-text-60 {
+    flex: 0 0 60%;
+}
+
+.flex-text-60 p {
+    font-size: 16px;
+    line-height: 1.8;
+}
+
+/* Flex Layout: 30% Image + 70% Text */
+.flex-container-30-70 {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+}
+
+.flex-image-30 {
+    flex: 0 0 30%;
+}
+
+.flex-image-30 img {
+    width: 100%;
+    border-radius: 10px;
+}
+
+.flex-text-70 {
+    flex: 0 0 70%;
+}
+
+.flex-text-70 strong {
+    color: #ffcc00;
+    font-size: 18px;
+    display: block;
+    margin-bottom: 10px;
+}
+
+/* 100% Video */
+.video-full video {
+    width: 100%;
+    border-radius: 15px;
+}
+
+/* Dumaloq tugma */
+#infoFloatingBtn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #000075, #0000ff);
+    color: white;
+    border: 4px solid white;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    z-index: 1500;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+#infoFloatingBtn:hover {
+    transform: scale(1.1);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .flex-container-40-60,
+    .flex-container-30-70 {
+        flex-direction: column;
+    }
+    
+    .flex-video-40, .flex-text-60,
+    .flex-image-30, .flex-text-70 {
+        flex: 0 0 100%;
+    }
+}
+/* Tablet responsive */
+@media (max-width: 1024px) {
+    .modal {
+        padding: 15px 0;
+    }
+    
+    .modal-content {
+        width: 95%;
+        padding: 25px;
+        max-height: 75vh;
+        margin: 8vh auto 5vh;
+    }
+    
+    .modal-content h2 {
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+    
+    .card {
+        padding: 15px;
+    }
+    
+    .card p {
+        font-size: 15px;
+    }
+    
+    .tab-buttons button {
+        font-size: 15px;
+        padding: 10px 15px;
+    }
+}
+
+/* Mobile responsive */ 
+@media (max-width: 768px) {
+    .modal {
+        padding: 10px 0;
+    }
+    
+    .modal-content {
+        width: 96%;
+        padding: 20px 15px;
+        margin: 5vh auto 3vh;
+        max-height: 85vh;
+        border-radius: 15px;
+    }
+    
+    .close {
+        right: 10px;
+        top: 10px;
+        font-size: 28px;
+        width: 35px;
+        height: 35px;
+    }
+    
+    .modal-content h2 {
+        font-size: 20px;
+        margin-bottom: 15px;
+        padding-bottom: 12px;
+        padding-right: 45px;
+    }
+    
+    .card {
+        padding: 12px;
+        margin-bottom: 15px;
+        border-radius: 12px;
+    }
+    
+    .card video {
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+    
+    .card p {
+        font-size: 14px;
+        line-height: 1.5;
+    }
+    
+    .card strong {
+        font-size: 16px;
+    }
+    
+    .tab-buttons {
+        gap: 8px;
+        margin-bottom: 15px;
+    }
+    
+    .tab-buttons button {
+        min-width: 120px;
+        font-size: 14px;
+        padding: 10px 12px;
+        border-radius: 8px;
+    }
+    
+    .tab-content pre {
+        padding: 15px;
+        font-size: 12px;
+        line-height: 1.5;
+        border-radius: 10px;
+    }
+}
+
+
+/* Small mobile */
+@media (max-width: 480px) {
+    .modal {
+        padding: 5px 0;
+    }
+    
+    .modal-content {
+        width: 98%;
+        padding: 15px 12px;
+        margin: 3vh auto 2vh;
+        max-height: 90vh;
+        border-radius: 12px;
+    }
+    
+    .close {
+        right: 8px;
+        top: 8px;
+        font-size: 24px;
+        width: 30px;
+        height: 30px;
+    }
+    
+    .modal-content h2 {
+        font-size: 18px;
+        margin-bottom: 12px;
+        padding-bottom: 10px;
+        padding-right: 40px;
+    }
+    
+    .card {
+        padding: 10px;
+        margin-bottom: 12px;
+        border-radius: 10px;
+    }
+    
+    .card p {
+        font-size: 13px;
+    }
+    
+    .card strong {
+        font-size: 15px;
+    }
+    
+    .tab-buttons {
+        flex-direction: column;
+        gap: 6px;
+    }
+    
+    .tab-buttons button {
+        width: 100%;
+        min-width: 100%;
+        font-size: 13px;
+        padding: 10px;
+    }
+    
+    .tab-content pre {
+        padding: 12px;
+        font-size: 11px;
+        line-height: 1.4;
+    }
+}
+
+/* Very small mobile */
+@media (max-width: 360px) {
+    .modal-content {
+        padding: 12px 10px;
+        margin: 2vh auto 1vh;
+    }
+    
+    .modal-content h2 {
+        font-size: 16px;
+    }
+    
+    .card {
+        padding: 8px;
+    }
+    
+    .card p {
+        font-size: 12px;
+    }
+    
+    .tab-buttons button {
+        font-size: 12px;
+        padding: 8px;
+    }
+    
+    .tab-content pre {
+        padding: 10px;
+        font-size: 10px;
+    }
+}
+
+/* Landscape mode fixes */
+@media (max-width: 1024px) and (orientation: landscape) {
+    .modal-content {
+        max-height: 80vh;
+        margin: 5vh auto 3vh;
+    }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .tab-buttons button {
+        min-height: 44px;
+    }
+    
+    .close {
+        min-width: 44px;
+        min-height: 44px;
+    }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    .modal-content {
+        border: 3px solid white;
+    }
+    
+    .card {
+        border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .modal-content,
+    .card,
+    .tab-buttons button,
+    .close {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+/* Print styles */
+@media print {
+    .modal {
+        display: none !important;
+    }
+}
+
+/* Scroll bar stilizatsiyasi */
+.modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.close {
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    font-size: 32px;
+    font-weight: bold;
+    cursor: pointer;
+    color: white;
+    transition: all 0.3s;
+    z-index: 10;
+    line-height: 1;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.close:hover {
+    background: rgba(255, 204, 0, 0.3);
+    color: #ffcc00;
+    transform: rotate(90deg);
+}
+
+.modal-content h2 {
+    font-size: 28px;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+    padding-right: 50px;
+}
+
+.card {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    transition: all 0.3s;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.card:hover {
+    background: rgba(255, 255, 255, 0.18);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.card video {
+    width: 100%;
+    max-width: 70%;
+    height: auto;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    background: #000;
+}
+
+.card p {
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 10px 0 0;
+}
+
+
+.card strong {
+    color: #ffcc00;
+    font-size: 18px;
+}
+
+/* Tab buttons */
+.tab-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.tab-buttons button {
+    flex: 1;
+    min-width: 150px;
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.tab-buttons button:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+}
+
+.tab-buttons button.active {
+    background: rgba(255, 204, 0, 0.4);
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(255, 204, 0, 0.3);
+}
+
+.tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.tab-content pre {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    border-radius: 12px;
+    overflow-x: auto;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #00ff00;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tab-content pre::-webkit-scrollbar {
+    height: 8px;
+}
+
+.tab-content pre::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.tab-content pre::-webkit-scrollbar-thumb {
+    background: rgba(0, 255, 0, 0.3);
+    border-radius: 10px;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Tablet responsive */
+@media (max-width: 1024px) {
+    .modal {
+        padding: 15px 0;
+    }
+    
+    .modal-content {
+        width: 95%;
+        padding: 25px;
+        max-height: 80vh;
+    }
+    
+    .modal-content h2 {
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+    
+    .card {
+        padding: 15px;
+    }
+    
+    .card p {
+        font-size: 15px;
+    }
+    
+    .tab-buttons button {
+        font-size: 15px;
+        padding: 10px 15px;
+    }
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .modal {
+        padding: 10px 0;
+    }
+    
+    .modal-content {
+        width: 96%;
+        padding: 20px 15px;
+        margin: 2vh auto;
+        max-height: 90vh;
+        border-radius: 15px;
+    }
+    
+    .close {
+        right: 10px;
+        top: 10px;
+        font-size: 28px;
+        width: 35px;
+        height: 35px;
+    }
+    
+    .modal-content h2 {
+        font-size: 20px;
+        margin-bottom: 15px;
+        padding-bottom: 12px;
+        padding-right: 45px;
+    }
+    
+    .card {
+        padding: 12px;
+        margin-bottom: 15px;
+        border-radius: 12px;
+    }
+    
+    .card video {
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+    
+    .card p {
+        font-size: 14px;
+        line-height: 1.5;
+    }
+    
+    .card strong {
+        font-size: 16px;
+    }
+    
+    .tab-buttons {
+        gap: 8px;
+        margin-bottom: 15px;
+    }
+    
+    .tab-buttons button {
+        min-width: 120px;
+        font-size: 14px;
+        padding: 10px 12px;
+        border-radius: 8px;
+    }
+    
+    .tab-content pre {
+        padding: 15px;
+        font-size: 12px;
+        line-height: 1.5;
+        border-radius: 10px;
+    }
+}
+
+
+/* Small mobile */
+@media (max-width: 480px) {
+    .modal {
+        padding: 5px 0;
+    }
+    
+    .modal-content {
+        width: 98%;
+        padding: 15px 12px;
+        margin: 1vh auto;
+        max-height: 92vh;
+        border-radius: 12px;
+    }
+    
+    .close {
+        right: 8px;
+        top: 8px;
+        font-size: 24px;
+        width: 30px;
+        height: 30px;
+    }
+    
+    .modal-content h2 {
+        font-size: 18px;
+        margin-bottom: 12px;
+        padding-bottom: 10px;
+        padding-right: 40px;
+    }
+    
+    .card {
+        padding: 10px;
+        margin-bottom: 12px;
+        border-radius: 10px;
+    }
+    
+    .card p {
+        font-size: 13px;
+    }
+    
+    .card strong {
+        font-size: 15px;
+    }
+    
+    .tab-buttons {
+        flex-direction: column;
+        gap: 6px;
+    }
+    
+    .tab-buttons button {
+        width: 100%;
+        min-width: 100%;
+        font-size: 13px;
+        padding: 10px;
+    }
+    
+    .tab-content pre {
+        padding: 12px;
+        font-size: 11px;
+        line-height: 1.4;
+    }
+}
+
+/* Very small mobile */
+@media (max-width: 360px) {
+    .modal-content {
+        padding: 12px 10px;
+    }
+    
+    .modal-content h2 {
+        font-size: 16px;
+    }
+    
+    .card {
+        padding: 8px;
+    }
+    
+    .card p {
+        font-size: 12px;
+    }
+    
+    .tab-buttons button {
+        font-size: 12px;
+        padding: 8px;
+    }
+    
+    .tab-content pre {
+        padding: 10px;
+        font-size: 10px;
+    }
+}
+
+/* Landscape mode fixes */
+@media (max-width: 1024px) and (orientation: landscape) {
+    .modal-content {
+        max-height: 85vh;
+        margin: 2vh auto;
+    }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .tab-buttons button {
+        min-height: 44px;
+    }
+    
+    .close {
+        min-width: 44px;
+        min-height: 44px;
+    }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    .modal-content {
+        border: 3px solid white;
+    }
+    
+    .card {
+        border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .modal-content,
+    .card,
+    .tab-buttons button,
+    .close {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+/* Print styles */
+@media print {
+    .modal {
+        display: none !important;
+    }
+}
+        body {
+            font-family: Arial, sans-serif;
+            background: #e6f3ff;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: auto;
+        }
+
+        /* HEADER */
+        .header {
+            display: flex;
+            align-items: center;
+            background: #000075;
+            color: white;
+            padding: 10px 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            width: 100%;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: #fff;
+            border-radius: 50%;
+            border: 2px solid white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        /* MAIN LAYOUT */
+        .main-container {
+            display: flex;
+            margin-top: 20px;
+            gap: 20px;
+        }
+
+        /* LEFT PANEL */
+        .left-panel {
+            width: 250px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            height: fit-content;
+            position: relative;
+            z-index: 1;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 15px;
+        }
+
+        .control-group h3 {
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 8px;
+            font-size: 14px;
+            border-radius: 5px;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn-success { 
+            background: #28a745; 
+            color: white; 
+        }
+        .btn-danger { 
+            background: #dc3545; 
+            color: white; 
+        }
+        .btn-primary { 
+            background: #000075; 
+            color: white; 
+        }
+        .btn-info { 
+            background: #000075; 
+            color: white; 
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .title-header {
+            background: #000075;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0 auto 30px;
+            text-align: center;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        /* GREENHOUSE CONTAINER */
+        .greenhouse-container {
+            display: flex;
+            gap: 30px;
+            margin-top: 10px;
+            justify-content: space-between;
+        }
+
+        /* CONTROL CIRCUIT SECTION */
+        .control-section {
+            width: 750px;
+            height: 500px;
+            border: 4px solid #000075;
+            border-radius: 20px;
+            padding: 20px;
+            background: white;
+            box-shadow: 0 0 25px blue;
+            position: relative;
+        }
+
+        .control-header {
+            background: #000075;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 15px;
+            font-size: 14px;
+            font-weight: bold;
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 3px 10px rgba(0, 0, 117, 0.3);
+            display: flex;
+        }
+
+        /* ARDUINO */
+        .arduino {
+            width: 300px;
+            height: 300px;
+      
+            border-radius: 8px;
+                margin: 20px auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+            position: absolute;
+            top: 100px;
+        }
+        .bc{
+            position: absolute;
+            left: 350px;
+            
+        }
+
+         .resistor{
+            position: absolute;
+            left: 355px;
+            top: 250px;
+        }
+        .buttons{
+            position: absolute;
+            top: 400px;
+            right: 350px;
+        }
+        .dht11 {
+              margin: 4% auto;
+            color: white;
+            width: 200px;
+            height: 150px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+            position: absolute;
+            top: 150px;
+            left: 461px;
+        }
+        .wire{
+            position: absolute;
+            z-index: 10;
+            border-radius: 2px;
+        }
+
+        .wire-red{
+            background-color: red;
+            width: 40px; height: 3px;
+            top: 285px; left: 460px;
+        }
+        .wire-black{
+             background-color: black;
+            width: 20px; height: 3px;
+            top: 288px; left: 460px;
+        }
+        .wire-orange{
+             background-color: orange;
+            width: 66px; height: 3px;
+            top: 283px; left: 460px;
+        }
+         .wire-red1{
+            background-color: red;
+            width: 3px; height: 248px;
+            top: 285px; left: 498px;
+        }
+        .wire-black1{
+             background-color: black;
+            width: 3px; height: 80px;
+            top: 288px; left: 467px;
+            transform: rotate(15deg);
+
+        }
+        .wire-orange1{
+             background-color: orange;
+            width: 3px; height: 85px;
+            top: 283px; left: 523px;
+        }
+        .relay {
+              margin: 20px auto;
+            color: white;
+            width: 100px;
+            height: 90px;
+            border-radius: 4px;
+
+            font-size: 10px;
+            font-weight: bold;
+            margin: 0 auto;
+        }
+
+          .wire-red2{
+            background-color: red;
+            width: 3px; height: 50px;
+            top: 533px; left: 498px;
+        }
+        .wire-black2{
+             background-color: black;
+            width: 3px; height: 45px;
+            top:533px; left: 507px;
+    
+        }
+          .wire-black8{
+             background-color: black;
+            width: 375px; height: 3px;
+            top:575px; left: 507px;
+    
+        }
+          .wire-black9{
+             background-color: black;
+            width: 3px; height: 95px;
+            top:483px; left: 878.5px;
+    
+        }
+         .wire-black10{
+             background-color: black;
+            width: 3px; height: 147px;
+            top:430px; left: 700px;
+    
+        }
+           .wire-black11{
+                  background-color: black;
+            width: 3px; height: 147px;
+            top:430px; left: 760px; 
+        }
+      
+        .wire-green{
+             background-color: green;
+            width: 3px; height: 58px;
+            top:533px; left: 552px;
+            transform: rotate(-5deg);
+        }
+         .wire-orange2{
+             background-color: orange;
+            width: 3px; height: 78px;
+            top:522px; left: 583px;
+            transform: rotate(-43deg);
+        }
+        .wire-blue{
+             background-color: blue;
+            width: 3px; height: 35px;
+            top:533px; left: 541px;
+    
+        }
+          .wire-blue1{
+             background-color: blue;
+            width: 310px; height: 3px;
+            top:565px; left: 541px;
+    
+        }
+          .wire-blue2{
+             background-color: blue;
+            width: 3px; height: 85px;
+            top:483px; left: 848px;
+    
+        }
+        .wire-pink{
+             background-color: pink;
+            width: 3px; height: 15px;
+            top:533px; left: 575px;
+    
+        }
+          .wire-pink1{
+             background-color: pink;
+            width: 175px; height: 3px;
+            top:545px; left: 575px;
+    
+        }
+          .wire-pink2{
+             background-color: pink;
+            width: 3px; height: 75px;
+            top:473px; left: 748px;
+    
+        }
+         .wire-skyblue{
+            background-color: skyblue;
+            width: 3px; height: 10px;
+            top:533px; left: 585px;
+    
+        }
+          .wire-skyblue1{
+             background-color: skyblue;
+            width: 101px; height: 3px;
+            top:540px; left: 585px;
+    
+        }
+          .wire-skyblue2{
+             background-color: skyblue;
+            width: 3px; height: 75px;
+            top:468px; left: 683px;
+    
+        }
+           .wire-aqua{
+             background-color: aqua;
+            width: 3px; height: 25px;
+            top:533px; left: 567px;
+    
+        }
+          .wire-aqua1{
+             background-color: aqua;
+            width: 100px; height: 3px;
+            top:555px; left: 567px;
+    
+        }
+          .wire-aqua2{
+             background-color: aqua;
+            width: 3px; height: 35px;
+            top:555px; left: 665px;
+    
+        }
+          .wire-black3{
+             background-color: black;
+            width: 3px; height: 95px;
+            top:533px; left: 515px;
+    
+        }
+        .wire-black4{
+             background-color: black;
+            width: 164px; height: 3px;
+            top:625px; left: 515px;
+    
+        }
+        .wire-black5{
+             background-color: black;
+            width: 3px; height: 10px;
+            top:617px; left: 567px;
+    
+        }
+        .wire-black6{
+             background-color: black;
+            width: 3px; height: 10px;
+            top:617px; left: 621px;
+    
+        }
+         .wire-black7{
+             background-color: black;
+            width: 3px; height: 10px;
+            top:617px; left: 676px;
+    
+        }
+        .wire-red3{
+              background-color: red;
+            width: 370px; height: 3px;
+            top: 581px; left: 498px;
+        }
+           .wire-red4{
+            background-color: red;
+            width: 3px; height: 100px;
+            top: 483px; left: 863px;
+        }
+        /* GREENHOUSE SECTION */
+        .greenhouse-section {
+            width: 400px;
+            height: 500px;
+            border: 4px solid #8B4513;
+            border-radius: 20px 20px 10px 10px;
+            background: linear-gradient(to bottom, #87CEEB 0%, #98FB98 40%, #90EE90 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .greenhouse-roof {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            background: linear-gradient(145deg, rgba(255,255,255,0.8), rgba(200,200,200,0.6));
+            border-radius: 16px 16px 0 0;
+            border-bottom: 2px solid #8B4513;
+        }
+
+        .temperature-display {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.8);
+            color: #00ff00;
+            padding: 10px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .humidity-display {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.8);
+            color: #00BFFF;
+            padding: 10px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .servo{
+         margin-top: 13px; 
+        }
+        /* PLANTS */
+        .plant {
+            position: absolute;
+            font-size: 30px;
+            transition: all 0.5s ease;
+        }
+
+        .plant1 { bottom: 20px; left: 50px; }
+        .plant2 { bottom: 20px; left: 120px; }
+        .plant3 { bottom: 20px; left: 190px; }
+        .plant4 { bottom: 20px; right: 50px; }
+
+        .plant.growing {
+            transform: scale(1.2);
+            filter: brightness(1.2);
+        }
+
+        /* FAN SYSTEM */
+        .fan-system {
+            position: absolute;
+            top: 80px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+        }
+
+        .fan {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(45deg, #666, #999);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .fan.spinning {
+            animation: spin 0.5s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* VAPORIZER SYSTEM */
+        .vaporizer-system {
+            position: absolute;
+            bottom: 80px;
+            left: 20px;
+            width: 50px;
+            height: 80px;
+        }
+
+        .vaporizer {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(145deg, #FF4081, #E91E63);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        .steam {
+            width: 30px;
+            height: 30px;
+            background: rgba(255,255,255,0.6);
+            border-radius: 50%;
+            position: absolute;
+            opacity: 0;
+            animation: steamRise 2s ease-out infinite;
+        }
+
+        .steam.active {
+            opacity: 1;
+        }
+
+        @keyframes steamRise {
+            0% {
+                bottom: 10px;
+                opacity: 0.8;
+                transform: scale(0.5);
+            }
+            50% {
+                opacity: 0.4;
+                transform: scale(1);
+            }
+            100% {
+                bottom: 100px;
+                opacity: 0;
+                transform: scale(1.5);
+            }
+        }
+
+        /* STATUS LEDS */
+        .status-display {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            min-width: 220px;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            z-index: 100;
+        }
+
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 8px 0;
+            font-size: 13px;
+        }
+
+        .status-led {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #dc3545;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+        }
+
+        .status-led.on {
+            background: #28a745;
+            box-shadow: 0 0 10px rgba(40, 167, 69, 0.8);
+        }
+
+        /* TEMPERATURE SETTINGS */
+        .temp-settings {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .temp-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        .temp-control label {
+            min-width: 80px;
+            font-size: 12px;
+        }
+
+        .temp-control input {
+            width: 60px;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .greenhouse-container {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    @media (min-width: 1624px) {
+        .dht11{
+            left: 450px;
+        }
+        .servo{
+            position: absolute;
+           
+        }
+        .bc{
+            position: absolute;
+            top: 37%;
+        }
+    }
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .left-panel {
+                width: 100%;
+            }
+            
+            .greenhouse-section {
+                width: 100%;
+                max-width: 350px;
+            }
+        }
+           a{
+            text-decoration: none;
+            color: white;
+        }
+        
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="logo">
+                  <a href="/"><img src="/static/image/logo.png" width="80px" height="80px" alt=""></a>  
+            <span>Issiqxona Temperatura Boshqaruvi</span>
+        </div>
+    </header>
+<!-- ✅ 1) Sxema qayerda ishlatiladi (DC Motor / L298N) -->
+    <div class="modal" id="schemaModal">
+        <div class="modal-content">
+            <span class="close" title="Yopish">&times;</span>
+            <h2>💡 Sxema qayerda ishlatiladi </h2>
+
+            <div class="flex-container-40-60">
+                <div class="flex-video-40">
+                    <!-- 1-video (xohlasangiz almashtiring) -->
+                    <iframe src="https://www.youtube.com/embed/Esl6FLbZq7o?si=ZFwKVby8mHRo4u6l" title="DC Motor Control with L298N"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen></iframe>
+                </div>
+                <div class="flex-text-60">
+                    <strong>Tajriba Maqsadi</strong>
+                   <p>Maqsad:
+
+Atrof-muhitdagi harorat va namlikni o‘lchab, o‘simliklarni avtomatik sug‘orish yoki ventilyatorni ishga tushirish tizimini yaratish.</p>
+                </div>
+            </div>
+
+            <div class="flex-container-40-60">
+                <div class="flex-video-40">
+                    <!-- 2-video (ixtiyoriy) -->
+                    <iframe src="https://www.youtube.com/embed/XAXSr27P0ug?si=QuDM4USDFq2gSH9y" title="PWM Speed Control"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen></iframe>
+                </div>
+                <div class="flex-text-60">
+                    <strong>🔄 Ishlash prinsipi</strong>
+                    <p>DHT11 sensor atrofdagi harorat va namlikni o‘lchaydi.
+
+Arduino bu ma’lumotlarni tahlil qilib:
+
+Namlik 50% dan past bo‘lsa — servo suv klapanini ochadi va nasos (PUMP_PIN) yoqiladi.
+
+Namlik 50% dan yuqori bo‘lsa — sug‘orish o‘chiriladi.
+
+Harorat 30°C dan yuqori bo‘lsa — ventilyator (FAN_PIN) ishga tushadi.
+
+Tugmalar yordamida siz tizimni qo‘lda boshqarishingiz ham mumkin.
+
+Natijalar Serial Monitor yoki interfeys (o‘ng tomondagi “Ma’lumot” oynasi) orqali ko‘rsatiladi.</p>
+                </div>
+            </div>
+              <div class="flex-container-40-60">
+                <div class="flex-video-40">
+                    <!-- 2-video (ixtiyoriy) -->
+                    <iframe src="https://www.youtube.com/embed/PTJ9sAk2c2I?si=a2yBT1JcdXFRnT7e" title="PWM Speed Control"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen></iframe>
+                </div>
+                <div class="flex-text-60">
+                    <strong>Qo‘shimcha tajriba g‘oyalari</strong>
+               <p>LCD yoki OLED displeyda real vaqt ma’lumotlarini ko‘rsatish.
+
+Bluetooth yoki Wi-Fi (ESP8266) orqali mobil ilovadan boshqarish.
+
+Namlik sensori (soil moisture sensor) qo‘shish orqali yanada aniqlik oshirish.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+  <div class="modal" id="codeModal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>💻 Kod</h2>
+
+        <div class="tab-buttons">
+            <button class="tab-btn active" data-tab="mblock">mBlock Kodi</button>
+            <button class="tab-btn" data-tab="arduino">Arduino Kodi</button>
+        </div>
+
+        <div class="tab-content active" id="mblock">
+            <pre><img src="/static/image/tempraturedht11.jpg" alt="mBlock Code" style="width: 80%; height: auto;"></pre>
+        </div>
+
+        <div class="tab-content" id="arduino">
+            <pre>
+#include Servo.h>
+#include "DHT.h"
+
+#define DHTPIN 2
+#define DHTTYPE DHT11
+#define PUMP_PIN 10
+#define FAN_PIN 11
+#define BUTTON_WATER 4
+#define BUTTON_STOP 5
+#define BUTTON_INFO 6
+
+Servo servo;
+DHT dht(DHTPIN, DHTTYPE);
+
+bool watering = false;
+
+void setup() {
+  Serial.begin(9600);
+  dht.begin();
+  servo.attach(9);
+  pinMode(PUMP_PIN, OUTPUT);
+  pinMode(FAN_PIN, OUTPUT);
+  pinMode(BUTTON_WATER, INPUT_PULLUP);
+  pinMode(BUTTON_STOP, INPUT_PULLUP);
+  pinMode(BUTTON_INFO, INPUT_PULLUP);
+  servo.write(0);
+}
+
+void loop() {
+  float humidity = dht.readHumidity();
+  float temperature = dht.readTemperature();
+
+  // Namlik 50% dan past bo‘lsa — sug‘orishni yoqadi
+  if (humidity < 50) {
+    digitalWrite(PUMP_PIN, HIGH);
+    servo.write(90);
+    watering = true;
+  } 
+  // Namlik ortiq bo‘lsa — sug‘orishni o‘chiradi
+  else {
+    digitalWrite(PUMP_PIN, LOW);
+    servo.write(0);
+    watering = false;
+  }
+
+  // Harorat 30°C dan yuqori bo‘lsa — fan yoqiladi
+  if (temperature > 30) {
+    digitalWrite(FAN_PIN, HIGH);
+  } else {
+    digitalWrite(FAN_PIN, LOW);
+  }
+
+  // Qo‘lda boshqarish tugmalari
+  if (digitalRead(BUTTON_WATER) == LOW) {
+    digitalWrite(PUMP_PIN, HIGH);
+    servo.write(90);
+    watering = true;
+  }
+
+  if (digitalRead(BUTTON_STOP) == LOW) {
+    digitalWrite(PUMP_PIN, LOW);
+    servo.write(0);
+    watering = false;
+  }
+
+  // Monitor uchun ma’lumot
+  Serial.print("Harorat: ");
+  Serial.print(temperature);
+  Serial.print("°C  |  Namlik: ");
+  Serial.print(humidity);
+  Serial.println("%");
+
+  delay(1000);
+}
+
+            </pre>
+        </div>
+    </div>
+</div>
+
+ <!-- ✅ Qurilmalar Modali: Arduino Control tajribasi uchun -->
+<div class="modal" id="componentsModal">
+  <div class="modal-content">
+    <span class="close" title="Yopish">&times;</span>
+    <h2>🔌 Ishlatilgan Qurilmalar</h2>
+
+    <!-- Arduino UNO -->
+    <div class="flex-container-30-70">
+      <div class="flex-image-30">
+        <img src="/static/image/arduino1 - Copy.png" alt="Arduino UNO">
+      </div>
+      <div class="flex-text-70">
+        <strong>Arduino UNO</strong>
+        <p>Asosiy boshqaruvchi mikrokontroller. U barcha sensorlar, servo motor va tugmalarni boshqaradi hamda DHT11 dan o‘qilgan ma’lumotlarni tahlil qiladi.</p>
+      </div>
+    </div>
+
+    <!-- Servo Motor -->
+    <div class="flex-container-30-70">
+      <div class="flex-image-30">
+        <img src="/static/image/servo.m - Copy.png" alt="Servo Motor">
+      </div>
+      <div class="flex-text-70">
+        <strong>Servo Motor (SG90)</strong>
+        <p>Klapan yoki mexanik qismlarni burish uchun ishlatiladi. Arduino’dan PWM signali orqali burchak 0°–180° oralig‘ida boshqariladi.</p>
+      </div>
+    </div>
+
+    <!-- DHT11 Sensor -->
+    <div class="flex-container-30-70">
+      <div class="flex-image-30">
+        <img src="/static/image/DHT11.jpg-removebg-preview.png" alt="DHT11 Sensor">
+      </div>
+      <div class="flex-text-70">
+        <strong>DHT11 Harorat va Namlik Datchigi</strong>
+        <p>Atrof-muhitning harorati (°C) va namligini (%) o‘lchaydi. Ma’lumotlar Arduino orqali o‘qilib, ekranda yoki dasturda ko‘rsatiladi.</p>
+      </div>
+    </div>
+
+    <!-- Transistorlar -->
+    <div class="flex-container-30-70">
+      <div class="flex-image-30">
+        <img src="/static/image/bc547 - Copy.png" alt="BC547 Transistor">
+      </div>
+      <div class="flex-text-70">
+        <strong>BC547 NPN Transistor (2 dona)</strong>
+        <p>Nasos yoki ventilyator kabi tashqi qurilmalarni boshqarish uchun ishlatiladi. Arduino chiqish signali kuchini oshiradi.</p>
+      </div>
+    </div>
+
+    <!-- Rezistorlar -->
+    <div class="flex-container-30-70">
+      <div class="flex-image-30">
+        <img src="/static/image/resistor1.png" alt="Resistor">
+      </div>
+      <div class="flex-text-70">
+        <strong>10kΩ Rezistorlar</strong>
+        <p>Tugmalar va tranzistorlar signallarini stabil saqlash uchun ishlatiladi, elektr oqimini chegaralaydi va xavfsiz ulanishni ta’minlaydi.</p>
+      </div>
+    </div>
+
+    <!-- Tugmalar -->
+    <div class="flex-container-30-70">
+      <div class="flex-image-30">
+        <img src="/static/image/pushbutton.png" alt="Push Button">
+      </div>
+      <div class="flex-text-70">
+        <strong>3 dona Tugma (Push Button)</strong>
+        <p>Foydalanuvchi tomonidan qo‘lda tizimni yoqish, o‘chirish yoki “Ma’lumot” ekranini ko‘rsatish uchun ishlatiladi.</p>
+      </div>
+    </div>
+
+    <!-- Qo‘shimcha element -->
+    <div class="flex-container-30-70">
+      <div class="flex-image-30">
+        <img src="/static/image/hep.png" alt="Qo'shimcha element">
+      </div>
+      <div class="flex-text-70">
+        <strong>Qo‘shimcha ulanish va indikatorlar</strong>
+        <p>Ko‘rsatkich (LED yoki indikator) yordamida tizimning ish holatini (aktiv yoki passiv) bildiradi.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+    <!-- ✅ 4) Qo'shimcha info (ixtiyoriy) + suzuvchi tugma -->
+    <div class="modal" id="infoModal">
+        <div class="modal-content">
+            <span class="close" title="Yopish">&times;</span>
+            <h2>📚 Qo'shimcha Ma'lumot</h2>
+            <div class="video-full">
+                <video controls>
+                    <source src="/media/2.mp4" type="video/mp4">
+                    Brauzeringiz video formatni qo'llab-quvvatlamaydi.
+                </video>
+            </div>
+        </div>
+    </div>
+
+    <button id="infoFloatingBtn"><span>📚</span><span>Ma'lumot</span></button>
+
+    <!-- MAIN CONTAINER -->
+    <div class="main-container">
+        <!-- LEFT PANEL -->
+        <div class="left-panel">
+            <div class="control-group">
+                <h3>Boshqaruv</h3>
+                <button class="btn btn-success" onclick="startSystem()" id="startBtn">
+                    Start
+                </button>
+                <button class="btn btn-danger" onclick="stopSystem()" id="stopBtn">
+                    Stop
+                </button>
+                <button class="btn btn-primary" onclick="togglePower()">
+                    Quvvat
+                </button>
+                <button class="btn btn-info" onclick="runTest()">
+                    Test
+                </button> 
+            </div>
+<div class="control-group">
+    <h3>Ma'lumotlar</h3>
+    <button class="btn btn-primary" id="schemaBtn">💡 Sxema qayerda ishlatiladi</button>
+    <button class="btn btn-primary" id="codeBtn">💻 Kod</button>
+    <button class="btn btn-primary" id="componentsBtn">🔌 Qurilmalar</button>
+</div>
+
+            <div class="control-group">
+                <h3>Temperatura sozlamalari</h3>
+                <div class="temp-settings">
+                    <div class="temp-control">
+                        <label>Min:</label>
+                        <input type="number" id="minTemp" value="20" min="10" max="50">
+                        <span>°C</span>
+                    </div>
+                    <div class="temp-control">
+                        <label>Max:</label>
+                        <input type="number" id="maxTemp" value="30" min="15" max="60">
+                        <span>°C</span>
+                    </div>
+                    <div class="temp-control">
+                        <label>Namlik:</label>
+                        <input type="number" id="targetHumidity" value="65" min="30" max="90">
+                        <span>%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <h3>Tizim holati</h3>
+                <div class="status-row">
+                    <span>Quvvat:</span>
+                    <div class="status-led" id="powerLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>DHT11:</span>
+                    <div class="status-led" id="sensorLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Ventilyator:</span>
+                    <div class="status-led" id="fanLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Bug'latgich:</span>
+                    <div class="status-led" id="vaporizerLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>O'simlik holati:</span>
+                    <div class="status-led" id="plantLed"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+         
+            
+            <div class="greenhouse-container">
+                <!-- CONTROL SECTION -->
+                <div class="control-section">
+                    <div class="control-header">Arduino Control</div>
+                    <div class="servo">
+                        <img src="/static/image/servo.m - Copy.png" width="160px" height="160px" alt="">
+                    <img src="/static/image/hep.png" style="position: absolute; top: 12%; left: 5%;" width="90px" height="100px" alt="">
+                    </div>
+                    
+                    <!-- Arduino -->
+                    <div class="arduino-uno" >
+                        
+                        <img  class="arduino" id="arduino" src="/static/image/arduino1 - Copy.png " width="100%" height="100%" alt="">
+                    </div>
+                    <div class="bc">
+                              <img src="/static/image/bc547 - Copy.png" width="60px" height="80px" alt="">
+                        <img src="/static/image/bc547 - Copy.png" width="60px" height="80px" alt="">
+                    </div>
+                    <div class="resistor">
+                         <img src="/static/image/resistor1.png" width="50px" height="50px" alt="">
+                        <img src="/static/image/resistor1.png" style="position: absolute; left: 65px;" width="50px" height="50px" alt="">
+                    </div>
+                       
+                    <!-- DHT11 Sensor -->
+                    
+                        <img  class="dht11" src="/static/image/DHT11.jpg-removebg-preview.png" width="100px" height="100px" alt="">            
+                        <div class="buttons">
+                                 <img src="/static/image/pushbutton.png" width="50px" height="50px" alt="">
+                        <img src="/static/image/pushbutton.png" width="50px" height="50px" alt="">
+                        <img src="/static/image/pushbutton.png" width="50px" height="50px" alt="">
+                        </div>
+                   
+                </div>
+                <div class="wire wire-red"></div>
+                <div class="wire wire-black"></div>
+                <div class="wire wire-red2"></div>
+                <div class="wire wire-black2"></div>
+                <div class="wire wire-red3"></div>
+                <div class="wire wire-red4"></div>
+                <div class="wire wire-black3"></div>
+                <div class="wire wire-black4"></div>
+                <div class="wire wire-black5"></div>
+                <div class="wire wire-black6"></div>
+                <div class="wire wire-black7"></div>
+                <div class="wire wire-black8"></div>
+                <div class="wire wire-black9"></div>
+                <div class="wire wire-black10"></div>
+                <div class="wire wire-black11"></div> 
+                <div class="wire wire-blue"></div>
+                <div class="wire wire-green"></div>
+                <div class="wire wire-blue1"></div>
+                <div class="wire wire-blue2"></div>
+                <div class="wire wire-purple"></div>
+                <div class="wire wire-pink"></div>
+                <div class="wire wire-orange2"></div>
+                <div class="wire wire-orange1"></div>
+                <div class="wire wire-orange"></div>
+                <div class="wire wire-red1"></div>
+                <div class="wire wire-black1"></div>
+                <div class="wire wire-aqua"></div>
+                <div class="wire wire-aqua1"></div>
+                <div class="wire wire-aqua2"></div>
+                <div class="wire wire-pink1"></div>
+                <div class="wire wire-pink2"></div>
+                <div class="wire wire-skyblue"></div>
+                <div class="wire wire-skyblue1"></div>
+                <div class="wire wire-skyblue2"></div>
+              
+                <!-- GREENHOUSE SECTION -->
+                <div class="greenhouse-section" id="greenhouse">
+                    <div class="greenhouse-roof"></div>
+                    
+                    <!-- Displays -->
+                    <div class="temperature-display" id="tempDisplay">25°C</div>
+                    <div class="humidity-display" id="humidityDisplay">60%</div>
+
+                    <!-- Fan System -->
+                    <div class="fan-system">
+                        <div class="fan" id="fan">🌀</div>
+                    </div>
+
+                    <!-- Vaporizer System -->
+                    <div class="vaporizer-system">
+                        <div class="vaporizer" id="vaporizer">💧</div>
+                        <div class="steam" id="steam"></div>
+                    </div>
+
+                    <!-- Plants -->
+                    <div class="plant plant1" id="plant1">🌱</div>
+                    <div class="plant plant2" id="plant2">🌿</div>
+                    <div class="plant plant3" id="plant3">🌾</div>
+                    <div class="plant plant4" id="plant4">🌺</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // System State
+        let systemActive = false;
+        let powerOn = false;
+        let currentTemp = 25;
+        let currentHumidity = 60;
+        let fanActive = false;
+        let vaporizerActive = false;
+        let simulationInterval;
+// Modalni ochish
+function openModal(id) {
+    document.getElementById(id).style.display = "block";
+}
+
+// Tugmalarni ulash
+document.getElementById("schemaBtn").addEventListener("click", () => openModal("schemaModal"));
+document.getElementById("codeBtn").addEventListener("click", () => openModal("codeModal"));
+document.getElementById("componentsBtn").addEventListener("click", () => openModal("componentsModal"));
+document.getElementById("infoFloatingBtn").addEventListener("click", () => openModal("infoModal"));
+
+// Yopish tugmalari
+document.querySelectorAll(".close").forEach(btn => {
+    btn.addEventListener("click", function() {
+        this.closest(".modal").style.display = "none";
+    });
+});
+
+// Tab switching (Kod uchun)
+document.querySelectorAll(".tab-btn").forEach(button => {
+    button.addEventListener("click", function() {
+        const tab = this.dataset.tab;
+        document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+        this.classList.add("active");
+        document.querySelectorAll(".tab-content").forEach(content => {
+            content.classList.remove("active");
+            if (content.id === tab) content.classList.add("active");
+        });
+    });
+});
+        // DOM Elements
+        const elements = {
+            powerLed: document.getElementById('powerLed'),
+            sensorLed: document.getElementById('sensorLed'),
+            fanLed: document.getElementById('fanLed'),
+            vaporizerLed: document.getElementById('vaporizerLed'),
+            plantLed: document.getElementById('plantLed'),
+            tempDisplay: document.getElementById('tempDisplay'),
+            humidityDisplay: document.getElementById('humidityDisplay'),
+            fan: document.getElementById('fan'),
+            vaporizer: document.getElementById('vaporizer'),
+            steam: document.getElementById('steam'),
+            fanRelay: document.getElementById('fanRelay'),
+            vaporizerRelay: document.getElementById('vaporizerRelay'),
+            arduino: document.getElementById('arduino'),
+            dht11: document.getElementById('dht11'),
+            plants: document.querySelectorAll('.plant')
+        };
+
+        // Update Status LEDs
+        function updateStatus() {
+            elements.powerLed.classList.toggle('on', powerOn);
+            elements.sensorLed.classList.toggle('on', systemActive);
+            elements.fanLed.classList.toggle('on', fanActive);
+            elements.vaporizerLed.classList.toggle('on', vaporizerActive);
+            
+            // Plant status based on optimal conditions
+            const tempOk = currentTemp >= 20 && currentTemp <= 30;
+            const humidityOk = currentHumidity >= 50 && currentHumidity <= 80;
+            const plantsHealthy = tempOk && humidityOk;
+            elements.plantLed.classList.toggle('on', plantsHealthy);
+            
+            // Update plant appearance
+            elements.plants.forEach(plant => {
+                plant.classList.toggle('growing', plantsHealthy);
+            });
+        }
+
+        // Power Control
+        function togglePower() {
+            powerOn = !powerOn;
+            
+            if (!powerOn) {
+                stopSystem();
+            } else {
+                elements.arduino.style.boxShadow = '0 0 15px rgba(0, 128, 128, 0.8)';
+            }
+            
+            updateStatus();
+        }
+
+        // System Control
+        function startSystem() {
+            if (!powerOn) {
+                alert('Avval quvvatni yoqing!');
+                return;
+            }
+            
+            systemActive = true;
+            simulationInterval = setInterval(simulateEnvironment, 2000);
+            updateStatus();
+        }
+
+        function stopSystem() {
+            systemActive = false;
+            fanActive = false;
+            vaporizerActive = false;
+            
+            if (simulationInterval) {
+                clearInterval(simulationInterval);
+            }
+            
+            // Reset visual effects
+            elements.fan.classList.remove('spinning');
+            elements.steam.classList.remove('active');
+            elements.fanRelay.classList.remove('active');
+            elements.vaporizerRelay.classList.remove('active');
+            elements.arduino.style.boxShadow = 'none';
+            
+            updateStatus();
+        }
+
+        // Environment Simulation
+        function simulateEnvironment() {
+            if (!systemActive) return;
+
+            // Get target values
+            const minTemp = parseInt(document.getElementById('minTemp').value);
+            const maxTemp = parseInt(document.getElementById('maxTemp').value);
+            const targetHumidity = parseInt(document.getElementById('targetHumidity').value);
+
+            // Simulate natural temperature/humidity changes
+            currentTemp += (Math.random() - 0.5) * 2;
+            currentHumidity += (Math.random() - 0.5) * 4;
+
+            // Control systems based on conditions
+            controlFan(currentTemp, minTemp, maxTemp);
+            controlVaporizer(currentHumidity, targetHumidity);
+
+            // Update displays
+            elements.tempDisplay.textContent = Math.round(currentTemp) + '°C';
+            elements.humidityDisplay.textContent = Math.round(currentHumidity) + '%';
+
+            updateStatus();
+        }
+
+        // Fan Control
+        function controlFan(temp, min, max) {
+            if (temp > max) {
+                if (!fanActive) {
+                    fanActive = true;
+                    elements.fan.classList.add('spinning');
+                    elements.fanRelay.classList.add('active');
+                }
+                // Cool down
+                currentTemp -= 0.5;
+            } else if (temp < min + 2) {
+                if (fanActive) {
+                    fanActive = false;
+                    elements.fan.classList.remove('spinning');
+                    elements.fanRelay.classList.remove('active');
+                }
+            }
+        }
+
+        // Vaporizer Control
+        function controlVaporizer(humidity, target) {
+            if (humidity < target - 5) {
+                if (!vaporizerActive) {
+                    vaporizerActive = true;
+                    elements.steam.classList.add('active');
+                    elements.vaporizerRelay.classList.add('active');
+                }
+                // Increase humidity
+                currentHumidity += 0.8;
+            } else if (humidity > target + 2) {
+                if (vaporizerActive) {
+                    vaporizerActive = false;
+                    elements.steam.classList.remove('active');
+                    elements.vaporizerRelay.classList.remove('active');
+                }
+            }
+        }
+
+        // Test Function
+        function runTest() {
+            if (!powerOn) {
+                alert('Avval quvvatni yoqing!');
+                return;
+            }
+
+            // Simulate extreme conditions
+            currentTemp = 35; // High temperature
+            currentHumidity = 45; // Low humidity
+            
+            startSystem();
+            
+            setTimeout(() => {
+                alert('Test yakunlandi! Tizim normal holatga qaytarildi.');
+                currentTemp = 25;
+                currentHumidity = 60;
+            }, 10000);
+        }
+
+        // Initialize system
+        updateStatus();
+    </script>
+</body>
+</html>

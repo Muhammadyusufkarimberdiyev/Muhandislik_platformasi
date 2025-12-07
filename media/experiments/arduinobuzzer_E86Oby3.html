@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arduino Buzzer Tajribasi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #e6f3ff;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: auto;
+        }
+
+        /* HEADER */
+        .header {
+            display: flex;
+            align-items: center;
+            background: #000075;
+            color: white;
+            padding: 10px 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            width: 100%;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: #fff;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        /* MAIN LAYOUT */
+        .main-container {
+            display: flex;
+            margin-top: 20px;
+            gap: 20px;
+        }
+
+        /* LEFT PANEL */
+        .left-panel {
+            width: 250px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            height: fit-content;
+            position: relative;
+            z-index: 1;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 15px;
+        }
+
+        .control-group h3 {
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 8px;
+            font-size: 14px;
+            border-radius: 5px;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn-success { 
+            background: #28a745; 
+            color: white; 
+        }
+        .btn-danger { 
+            background: #dc3545; 
+            color: white; 
+        }
+        .btn-primary { 
+            background: #000075; 
+            color: white; 
+        }
+        .btn-info { 
+            background: #000075; 
+            color: white; 
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .title-header {
+            background: #000075;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0 auto 30px;
+            text-align: center;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        /* CIRCUIT COMPONENTS */
+        .circuit-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 50px;
+            margin: 40px 0;
+            min-height: 400px;
+            position: relative;
+        }
+
+        .breadboard {
+          
+
+            border-radius: 8px;
+            position: relative;
+        
+        }
+
+        .breadboard::before {
+            content: '';
+            position: absolute;
+            width: 90%;
+            height: 2px;
+            background: #666;
+            top: 50%;
+            left: 5%;
+            transform: translateY(-50%);
+        }
+
+        .arduino {
+       
+            border-radius: 8px;
+            position: relative;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .buzzer {
+      
+            border-radius: 50%;
+            position: absolute;
+            top: 80px;
+            left: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+       
+        }
+
+        .buzzer::after {
+            content: '';
+            width: 20px;
+            height: 20px;
+            background: #fff;
+            border-radius: 50%;
+        }
+
+        .buzzer.active {
+            animation: buzzing 0.1s infinite alternate;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.8);
+        }
+
+        @keyframes buzzing {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.05); }
+        }
+
+        /* WIRES */
+        .wire {
+            position: absolute;
+            z-index: 5;
+        }
+
+        .wire-red {
+            width: 305px;
+            height: 3px;
+            background: #ff0000;
+            top: 90px;
+            right: 320px;
+            transform: rotate(0deg);
+        }
+
+        .wire-black {
+            width: 350px;
+            height: 3px;
+            background: #000;
+                top: 80px;
+            right: 290px;
+            transform: rotate(0deg);
+        }
+         .wire-red1 {
+            width: 3px;
+            height: 85px;
+            background: #ff0000;
+            top: 90px;
+            right: 320px;
+            transform: rotate(0deg);
+        }
+
+        .wire-black1 {
+            width: 3px;
+            height: 73px;
+            background: #000;
+                top: 80px;
+            right: 290px;
+            transform: rotate(0deg);
+        }
+             .wire-red2 {
+            width: 3px;
+            height: 20px;
+            background: #ff0000;
+            top: 90px;
+            right: 622px;
+            transform: rotate(0deg);
+        }
+
+        .wire-black2 {
+            width: 3px;
+            height: 30px;
+            background: #000;
+                top: 80px;
+            right: 640px;
+            transform: rotate(0deg);
+        }
+             .wire-red3 {
+            width: 75px;
+            height: 3px;
+            background: #ff0000;
+            top: 172px;
+            right: 245px;
+            transform: rotate(0deg);
+        }
+
+        .wire-black3 {
+            width: 65px;
+            height: 3px;
+            background: #000;
+                top: 150px;
+            right: 225px;
+            transform: rotate(0deg);
+        }
+        /* STATUS DISPLAY */
+        .status-display {
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            margin: 20px 0;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 8px 0;
+            font-size: 13px;
+        }
+
+        .status-led {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #dc3545;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+        }
+
+        .status-led.on {
+            background: #28a745;
+            box-shadow: 0 0 10px rgba(40, 167, 69, 0.8);
+        }
+
+        /* MODAL STYLES */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            backdrop-filter: blur(3px);
+        }
+
+        .modal-content {
+            background: #000075;
+            color: white;
+            margin: 5% auto;
+            padding: 20px;
+            width: 50%;
+            max-width: 700px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+            animation: slideDown 0.4s ease;
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+            transition: color 0.3s;
+        }
+
+        .close:hover {
+            color: #ffcc00;
+        }
+
+        .modal-content h2 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            border-bottom: 2px solid rgba(255,255,255,0.2);
+            padding-bottom: 8px;
+        }
+
+        .tab-buttons {
+            display: flex;
+            margin-bottom: 10px;
+        }
+
+        .tab-buttons button {
+            flex: 1;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            border-radius: 5px 5px 0 0;
+            transition: background 0.3s;
+        }
+
+        .tab-buttons button.active {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .tab-buttons button:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        pre {
+            background: rgba(0,0,0,0.4);
+            padding: 12px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 0.9rem;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* RESPONSIVE DESIGN */
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .left-panel {
+                width: 100%;
+            }
+            
+            .circuit-container {
+                flex-direction: column;
+                gap: 30px;
+            }
+            
+            .modal-content {
+                width: 90%;
+                margin: 20% auto;
+            }
+        }
+        /* ================== BASE ================== */
+* { box-sizing: border-box; }
+body { margin: 0; padding: 20px; background: #eef5ff; color: #222; font-family: Arial, sans-serif; }
+
+/* ================== BUTTONS ================== */
+.btn{
+  display:block; width:100%; padding:10px 12px; margin:8px 0;
+  border:0; border-radius:10px; cursor:pointer; transition:.25s;
+  text-align:left; font-weight:600;
+}
+.btn-primary{ background:#000075; color:#fff; }
+.btn-primary:hover{ transform:translateY(-2px); box-shadow:0 6px 14px rgba(0,0,0,.1); }
+.btn-secondary{ background:#f3f6ff; }
+
+/* ================== FLEX LAYOUTS ================== */
+/* 40% Video + 60% Text */
+.flex-container-40-60 {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 20px;
+  border-radius: 15px;
+  margin-bottom: 20px;
+}
+.flex-video-40 { flex: 0 0 40%; }
+.flex-video-40 iframe {
+  width: 100%;
+  height: 250px;
+  border-radius: 10px;
+}
+.flex-text-60 { flex: 0 0 60%; }
+.flex-text-60 p { font-size: 16px; line-height: 1.8; }
+
+/* 30% Image + 70% Text */
+.flex-container-30-70 {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 20px;
+  border-radius: 15px;
+  margin-bottom: 20px;
+}
+.flex-image-30 { flex: 0 0 30%; }
+.flex-image-30 img { width: 100%; border-radius: 10px; }
+.flex-text-70 { flex: 0 0 70%; }
+.flex-text-70 strong {
+  color: #ffcc00;
+  font-size: 18px;
+  display: block;
+  margin-bottom: 10px;
+}
+
+/* 100% Video (video tag) */
+.video-full { width: 100%; border-radius: 15px; background: #000; }
+.video-full video {
+  width: 100%;
+  height: auto;
+  border-radius: 15px;
+  max-height: 70vh;
+}
+
+/* ================== FLOATING INFO BUTTON ================== */
+#infoFloatingBtn {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #000075, #0000ff);
+  color: white;
+  border: 4px solid white;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+  z-index: 1500;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+#infoFloatingBtn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 12px 30px rgba(0, 0, 255, 0.6);
+}
+#infoFloatingBtn span:first-child { font-size: 36px; }
+
+/* ================== MODAL ================== */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 2000;
+  left: 0; top: 0; width: 100%; height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(5px);
+  overflow-y: auto;
+}
+.modal-content {
+  background: #000075;
+  color: white;
+  margin: 5vh auto;
+  padding: 30px;
+  width: 90%;
+  max-width: 1000px;
+  border-radius: 20px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+  position: relative;
+  animation: slideDown 0.4s ease;
+}
+@keyframes slideDown {
+  from { transform: translateY(-50px); opacity: 0; }
+  to   { transform: translateY(0);     opacity: 1; }
+}
+
+/* Close (X) */
+.close{
+  position:absolute; right:20px; top:15px; width:40px; height:40px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:32px; font-weight:bold; cursor:pointer; color:#fff;
+  transition:all .3s; border-radius:50%; background:rgba(255,255,255,.1);
+}
+.close:hover{ background: rgba(255, 204, 0, 0.3); color:#ffcc00; transform: rotate(90deg); }
+
+/* Modal title */
+.modal-content h2{
+  font-size:28px; margin-bottom:25px; padding-bottom:15px;
+  border-bottom:2px solid rgba(255,255,255,.3); padding-right:50px;
+}
+
+/* ================== TABS (Kod modal uchun) ================== */
+.tab-buttons{
+  display:flex; gap:8px; margin:12px 0 16px 0;
+}
+.tab-btn{
+  flex:1; background:rgba(255,255,255,.12); color:#fff;
+  border:0; border-radius:10px 10px 0 0; padding:10px;
+  cursor:pointer; font-weight:600; transition:.2s;
+}
+.tab-btn:hover{ background:rgba(255,255,255,.2); }
+.tab-btn.active{ background:rgba(255,255,255,.28); }
+.tab-content{ display:none; }
+.tab-content.active{ display:block; }
+
+/* Code block */
+pre{
+  background: rgba(0,0,0,.35);
+  padding: 12px;
+  border-radius: 10px;
+  overflow: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: #fff;
+  font-size: 13.5px;
+  line-height: 1.55;
+}
+
+/* ================== RESPONSIVE ================== */
+@media (max-width: 1024px) {
+  .flex-container-40-60,
+  .flex-container-30-70 { flex-direction: column; }
+  .flex-video-40, .flex-text-60,
+  .flex-image-30, .flex-text-70 { flex: 0 0 100%; }
+}
+@media (max-width: 768px) {
+  .modal-content { width: 96%; padding: 20px 15px; }
+  #infoFloatingBtn { width: 90px; height: 90px; font-size: 14px; bottom: 20px; right: 20px; }
+  #infoFloatingBtn span:first-child { font-size: 28px; }
+}
+
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="logo">
+                  <img src="/static/image/logo.png" width="80px" height="80px" alt="">
+            <span>Arduino Buzzer Tajribasi</span>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <div class="main-container">
+        <!-- LEFT PANEL -->
+        <div class="left-panel">
+            <div class="control-group">
+                <h3>Boshqaruv</h3>
+                <button class="btn btn-success" onclick="startBuzzer()" id="startBtn">
+                    Boshlash
+                </button>
+                <button class="btn btn-danger" onclick="stopBuzzer()" id="stopBtn">
+                    To'xtatish
+                </button>
+                <button class="btn btn-primary" onclick="testBuzzer()">
+                    Test
+                </button>
+                <button class="btn btn-info" onclick="resetSystem()">
+                    Reset
+                </button>
+            </div>
+
+          <div class="control-group">
+                <h3>📊 Ma'lumotlar</h3>
+     <button class="btn btn-primary" id="schemaBtn">💡 Sxema qayerda ishlatiladi</button>
+<button class="btn btn-primary" id="codeBtn">💻 Kod</button>
+<button class="btn btn-primary" id="componentsBtn">🔌 Qurilmalar</button>
+
+
+            </div>
+            <div class="control-group">
+                <h3>Holat</h3>
+                <div class="status-row">
+                    <span>Arduino:</span>
+                    <div class="status-led on" id="arduinoLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Buzzer:</span>
+                    <div class="status-led" id="buzzerLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Timer:</span>
+                    <div class="status-led" id="timerLed"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+
+            
+            <div class="circuit-container">
+                <!-- Arduino -->
+                <div class="arduino">
+                    Arduino UNO
+                    <img src="/static/image/arduino1 - Copy.png" width="350px" height="350px" alt="">
+                </div>
+
+                <!-- Breadboard -->
+                <div class="breadboard">
+                   <img src="/static/image/breadboard-removebg-preview.png" width="400px" height="400px" alt="">
+                    <div>
+                        <img src="/static/image/buzzer3.png" width="80px" height="80px"  class="buzzer" id="buzzer"  alt="">
+                    </div>
+                    
+                    <!-- Wires -->
+                    <div class="wire wire-red"></div>
+                    <div class="wire wire-black"></div>
+                    <div class="wire wire-red1"></div>
+                    <div class="wire wire-black1"></div>
+                    <div class="wire wire-red2"></div>
+                    <div class="wire wire-black2"></div>
+                    <div class="wire wire-red3"></div>
+                    <div class="wire wire-black3"></div>
+                </div>
+            </div>
+
+            <div class="status-display">
+                <h4>Tajriba holati:</h4>
+                <p id="statusText">Tajriba to'xtatilgan</p>
+                <p id="timerText">Keyingi ovoz: --</p>
+            </div>
+        </div>
+    </div>
+<div class="modal" id="infoModal">
+        <div class="modal-content">
+            <span class="close" title="Yopish">&times;</span>
+            <h2>📚 Qo'shimcha Ma'lumot</h2>
+            <div class="video-full">
+                <video controls>
+                    <source src="/media/2.mp4" type="video/mp4">
+                    Brauzeringiz video formatni qo'llab-quvvatlamaydi.
+                </video>
+            </div>
+        </div>
+    </div>
+    <button id="infoFloatingBtn"><span>📚</span><span>Ma'lumot</span></button>
+   <!-- MODAL 1: Sxema qayerda ishlatiladi -->
+<div class="modal" id="schemaModal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>💡 Sxema qayerda ishlatiladi</h2>
+
+    <!-- Video #1 -->
+    <div class="flex-container-40-60" style="margin-bottom:20px">
+      <div class="flex-video-40">
+        <iframe 
+          src="https://www.youtube.com/embed/gj-H_agfd6U?si=iRkIa4_BSsXy1Lcq"
+          title="Buzzer – qo'llanilish #1"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen></iframe>
+      </div>
+      <div class="flex-text-60">
+        <strong>Buzzer qayerda ishlatiladi? (1)</strong>
+        <p>
+          Ogohlantirish tizimlari (xavfsizlik signalizatsiyasi), eslatma signallari (taymer, budilnik),
+          hamda foydalanuvchi interfeysi “feedback” ovozlari (tugma bosilganda bip) kabi holatlarda keng qo‘llanadi.
+        </p>
+      </div>
+    </div>
+
+    <!-- Video #2 -->
+    <div class="flex-container-40-60" style="margin-bottom:20px">
+      <div class="flex-video-40">
+        <iframe 
+          src="https://www.youtube.com/embed/55RjM-yxxyY?si=_thqXMQ-jLn0a_x2"
+          title="Buzzer – qo'llanilish #2"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen></iframe>
+      </div>
+      <div class="flex-text-60">
+        <strong>Amaliy misollar (2)</strong>
+        <p>
+          Dastlabki tajribalarda passiv/aktiv buzzer bilan oddiy bip, ritm va melodiya
+          chalish; dars va laboratoriya ishlarida sensor hodisalarini ovoz bilan tasdiqlash.
+        </p>
+      </div>
+    </div>
+
+    <!-- Video #3 -->
+    <div class="flex-container-40-60">
+      <div class="flex-video-40">
+        <iframe 
+          src="https://www.youtube.com/embed/1QZaM_qGd6c?si=9auK2PbwJZ5gc5w9"
+          title="Buzzer – qo'llanilish #3"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen></iframe>
+      </div>
+      <div class="flex-text-60">
+        <strong>Ohang va signallar (3)</strong>
+        <p>
+          Passiv buzzer yordamida turli chastotali tovushlar yaratish, hodisaga mos
+          ton/ritm berish (masalan, xatolikda tez-tez bip, normal holatda sekin bip).
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal" id="codeModal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>💻 Kod</h2>
+
+    <div class="tab-buttons">
+      <button class="tab-btn active" data-tab="mblock">mBlock Kodi</button>
+      <button class="tab-btn" data-tab="arduino">Arduino Kodi</button>
+    </div>
+
+    <div class="tab-content active" id="mblock">
+      <pre><img src="/static/image/arduinoled.jpg" alt="mBlock Code" style="width:80%;height:auto;"></pre>
+    </div>
+
+    <div class="tab-content" id="arduino">
+      <pre>
+
+
+const int buzzerPin = 12;
+int lightThreshold = 500;
+
+void setup() {
+  pinMode(buzzerPin, OUTPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  int lightLevel = analogRead(ldrPin);
+  
+  if (lightLevel > lightThreshold) {
+    digitalWrite(buzzerPin, HIGH);
+    delay(500);
+    digitalWrite(buzzerPin, LOW);
+    delay(500);
+  } else {
+    digitalWrite(buzzerPin, LOW);
+  }
+  
+  delay(100);
+}
+      </pre>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL 3: Qurilmalar -->
+<div class="modal" id="componentsModal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>🔌 Ishlatilgan Qurilmalar</h2>
+
+    <div class="flex-container-30-70">
+      <div class="flex-image-30">
+        <img src="/static/image/arduino1 - Copy.png" alt="Arduino UNO">
+      </div>
+      <div class="flex-text-70">
+        <strong>Arduino UNO</strong>
+        <p>Mikrokontroller plata — buzzerga signal berish, ritm va tonlarni boshqarish uchun.</p>
+      </div>
+    </div>
+
+    <div class="flex-container-30-70">
+      <div class="flex-image-30">
+        <img src="/static/image/buzzer3.png" alt="Buzzer">
+      </div>
+      <div class="flex-text-70">
+        <strong>Buzzer (Passiv/Aktiv)</strong>
+        <p>
+          Passiv buzzer tone() bilan ohang chaladi; aktiv buzzer esa faqat HIGH/LOW bilan bip beradi.
+        </p>
+      </div>
+    </div>
+
+    <div class="flex-container-30-70">
+      <div class="flex-image-30">
+        <img src="/static/image/breadboard-removebg-preview.png" alt="Breadboard">
+      </div>
+      <div class="flex-text-70">
+        <strong>Breadboard va jumper simlar</strong>
+        <p>Lehimlashsiz prototiplash va tez ulash uchun.</p>
+      </div>
+    </div>
+
+    <div class="flex-container-30-70">
+      <div class="flex-image-30">
+        <img src="/static/image/resistor.png" alt="Resistor">
+      </div>
+      <div class="flex-text-70">
+        <strong>Qarshilik (ixtiyoriy)</strong>
+        <p>Ba’zi buzzer turlarida signalni yumshatish yoki himoya uchun ishlatilishi mumkin.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <script>
+        let buzzerInterval;
+        let countdownInterval;
+        let isRunning = false;
+        let nextBuzzTime = 0;
+
+        // DOM elements
+        const buzzerElement = document.getElementById('buzzer');
+        const buzzerLed = document.getElementById('buzzerLed');
+        const timerLed = document.getElementById('timerLed');
+        const statusText = document.getElementById('statusText');
+        const timerText = document.getElementById('timerText');
+
+        // ---- Modal helpers ----
+function openModal(id){ const m = document.getElementById(id); if(m) m.style.display='block'; }
+function closeModal(el){ const m = el.closest('.modal'); if(m) m.style.display='none'; }
+
+// (X) yopish tugmalari
+document.addEventListener('click', function(e){
+  if (e.target.matches('.modal .close')) closeModal(e.target);
+});
+
+// Foniga bosilganda yopish
+window.addEventListener('click', function(e){
+  document.querySelectorAll('.modal').forEach(function(m){
+    if (e.target === m) m.style.display = 'none';
+  });
+});
+
+// ---- Chap panel tugmalari -> modallar ----
+// ID lar aniq shu bo'lsin: schemaBtn, codeBtn, componentsBtn
+document.getElementById('schemaBtn')?.addEventListener('click', function(){
+  openModal('schemaModal');
+});
+document.getElementById('codeBtn')?.addEventListener('click', function(){
+  openModal('codeModal');
+});
+document.getElementById('componentsBtn')?.addEventListener('click', function(){
+  openModal('componentsModal');
+});
+
+// Agar "Ma'lumot" dumaloq tugma bo'lsa:
+document.getElementById('infoFloatingBtn')?.addEventListener('click', function(){
+  openModal('infoModal');
+});
+
+// ---- Tabs (Kod modalida: mBlock ↔ Arduino) ----
+document.addEventListener('click', function(e){
+  const btn = e.target.closest('.tab-btn');
+  if (!btn) return;
+  const container = btn.closest('.modal-content'); // shu modal ichida ishlaymiz
+  const tabId = btn.dataset.tab;
+
+  // tugmalar active holati
+  container.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+
+  // kontentlarni almashtirish
+  container.querySelectorAll('.tab-content').forEach(c => {
+    c.classList.toggle('active', c.id === tabId);
+  });
+});
+        function startBuzzer() {
+            if (isRunning) return;
+            
+            isRunning = true;
+            timerLed.classList.add('on');
+            statusText.textContent = 'Tajriba ishlamoqda - Har 5 soniyada buzzer chaladi';
+            
+            // Immediately start first buzz
+            buzzOnce();
+            
+            // Set up 5-second interval
+            buzzerInterval = setInterval(buzzOnce, 5000);
+            
+            // Start countdown timer
+            startCountdown();
+        }
+
+        function stopBuzzer() {
+            if (!isRunning) return;
+            
+            isRunning = false;
+            clearInterval(buzzerInterval);
+            clearInterval(countdownInterval);
+            
+            buzzerElement.classList.remove('active');
+            buzzerLed.classList.remove('on');
+            timerLed.classList.remove('on');
+            
+            statusText.textContent = 'Tajriba to\'xtatilgan';
+            timerText.textContent = 'Keyingi ovoz: --';
+        }
+
+        function buzzOnce() {
+            buzzerElement.classList.add('active');
+            buzzerLed.classList.add('on');
+            
+            // Turn off after 500ms
+            setTimeout(() => {
+                buzzerElement.classList.remove('active');
+                buzzerLed.classList.remove('on');
+            }, 500);
+        }
+
+        function startCountdown() {
+            nextBuzzTime = 5;
+            
+            countdownInterval = setInterval(() => {
+                if (nextBuzzTime > 0) {
+                    timerText.textContent = `Keyingi ovoz: ${nextBuzzTime} soniya`;
+                    nextBuzzTime--;
+                } else {
+                    nextBuzzTime = 5;
+                }
+            }, 1000);
+        }
+
+        function testBuzzer() {
+            buzzOnce();
+            statusText.textContent = 'Test buzzer chaldi';
+        }
+
+        function resetSystem() {
+            stopBuzzer();
+            statusText.textContent = 'Tizim qayta o\'rnatildi';
+        }
+
+        // Modal functions
+        function openModal(id) {
+            document.getElementById(id).style.display = "block";
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = "none";
+        }
+
+        // Event listeners
+        document.getElementById("codeBtn").addEventListener("click", function() {
+            openModal("codeModal");
+        });
+
+        document.getElementById("componentsBtn").addEventListener("click", function() {
+            openModal("componentsModal");
+        });
+
+        document.querySelectorAll(".modal .close").forEach(btn => {
+            btn.addEventListener("click", function() {
+                this.closest(".modal").style.display = "none";
+            });
+        });
+
+        window.addEventListener("click", function(e) {
+            document.querySelectorAll(".modal").forEach(modal => {
+                if (e.target === modal) {
+                    modal.style.display = "none";
+                }
+            });
+        });
+
+        // Tab functionality
+        document.querySelectorAll(".tab-btn").forEach(button => {
+            button.addEventListener("click", function() {
+                const tab = this.dataset.tab;
+
+                document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+                this.classList.add("active");
+
+                document.querySelectorAll(".tab-content").forEach(content => {
+                    content.classList.remove("active");
+                    if (content.id === tab) {
+                        content.classList.add("active");
+                    }
+                });
+            });
+        });
+
+
+        // Web Audio uchun
+let audioCtx = null;
+let oscillator = null;
+
+function playSound() {
+    if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    oscillator = audioCtx.createOscillator();
+    oscillator.type = "square"; // "sine", "triangle" ham bo‘lishi mumkin
+    oscillator.frequency.setValueAtTime(1000, audioCtx.currentTime); // 1000Hz
+    oscillator.connect(audioCtx.destination);
+    oscillator.start();
+
+    // 0.5 soniyadan keyin to‘xtatamiz
+    setTimeout(() => {
+        if (oscillator) {
+            oscillator.stop();
+            oscillator.disconnect();
+            oscillator = null;
+        }
+    }, 500);
+}
+function buzzOnce() {
+    buzzerElement.classList.add('active');
+    buzzerLed.classList.add('on');
+    
+    playSound(); // 🔊 ovoz ham chiqadi
+
+    // 0.5 soniyadan keyin o‘chirish
+    setTimeout(() => {
+        buzzerElement.classList.remove('active');
+        buzzerLed.classList.remove('on');
+    }, 500);
+}
+
+    </script>
+</body>
+</html>

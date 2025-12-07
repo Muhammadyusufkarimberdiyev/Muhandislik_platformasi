@@ -1,0 +1,1991 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arduino Servo Motor Boshqaruvi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+/* MODAL TUZATISH - Responsive va to'g'ri ko'rinish */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    overflow-y: auto;
+    padding: 20px 0;
+}
+
+.modal-content {
+    background: #000075;
+    color: white;
+    margin: 10vh auto 5vh;
+    padding: 30px;
+    width: 90%;
+    max-width: 800px;
+    border-radius: 20px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+    position: relative;
+    animation: slideDown 0.4s ease;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+/* Scroll bar stilizatsiyasi */
+.modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.close {
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    font-size: 32px;
+    font-weight: bold;
+    cursor: pointer;
+    color: white;
+    transition: all 0.3s;
+    z-index: 2010;
+    line-height: 1;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.close:hover {
+    background: rgba(255, 204, 0, 0.3);
+    color: #ffcc00;
+    transform: rotate(90deg);
+}
+
+.modal-content h2 {
+    font-size: 28px;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+    padding-right: 50px;
+}
+
+.card {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    transition: all 0.3s;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    z-index: 1;
+}
+
+.card:hover {
+    background: rgba(255, 255, 255, 0.18);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.card video {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    background: #000;
+    position: relative;
+    z-index: 2;
+}
+
+.card p {
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 10px 0 0;
+    position: relative;
+    z-index: 2;
+}
+
+.card strong {
+    color: #ffcc00;
+    font-size: 18px;
+}
+
+/* Tab buttons */
+.tab-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 2;
+}
+
+.tab-buttons button {
+    flex: 1;
+    min-width: 150px;
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s;
+    position: relative;
+    z-index: 2;
+}
+
+.tab-buttons button:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+}
+
+.tab-buttons button.active {
+    background: rgba(255, 204, 0, 0.4);
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(255, 204, 0, 0.3);
+}
+
+.tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease;
+    position: relative;
+    z-index: 2;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.tab-content pre {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    border-radius: 12px;
+    overflow-x: auto;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #00ff00;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    z-index: 2;
+}
+
+.tab-content pre::-webkit-scrollbar {
+    height: 8px;
+}
+
+.tab-content pre::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.tab-content pre::-webkit-scrollbar-thumb {
+    background: rgba(0, 255, 0, 0.3);
+    border-radius: 10px;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+/* Flex Layout: 40% Video + 60% Text */
+.flex-container-40-60 {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+}
+
+.flex-video-40 {
+    flex: 0 0 40%;
+}
+
+.flex-video-40 iframe {
+    width: 100%;
+    height: 250px;
+    border-radius: 10px;
+}
+
+.flex-text-60 {
+    flex: 0 0 60%;
+}
+
+.flex-text-60 p {
+    font-size: 16px;
+    line-height: 1.8;
+}
+
+/* Flex Layout: 30% Image + 70% Text */
+.flex-container-30-70 {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+}
+
+.flex-image-30 {
+    flex: 0 0 30%;
+}
+
+.flex-image-30 img {
+    width: 100%;
+    border-radius: 10px;
+}
+
+.flex-text-70 {
+    flex: 0 0 70%;
+}
+
+.flex-text-70 strong {
+    color: #ffcc00;
+    font-size: 18px;
+    display: block;
+    margin-bottom: 10px;
+}
+
+/* 100% Video */
+.video-full video {
+    width: 100%;
+    border-radius: 15px;
+}
+
+/* Dumaloq tugma */
+#infoFloatingBtn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #000075, #0000ff);
+    color: white;
+    border: 4px solid white;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    z-index: 1500;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+#infoFloatingBtn:hover {
+    transform: scale(1.1);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .flex-container-40-60,
+    .flex-container-30-70 {
+        flex-direction: column;
+    }
+    
+    .flex-video-40, .flex-text-60,
+    .flex-image-30, .flex-text-70 {
+        flex: 0 0 100%;
+    }
+}
+/* Tablet responsive */
+@media (max-width: 1024px) {
+    .modal {
+        padding: 15px 0;
+    }
+    
+    .modal-content {
+        width: 95%;
+        padding: 25px;
+        max-height: 75vh;
+        margin: 8vh auto 5vh;
+    }
+    
+    .modal-content h2 {
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+    
+    .card {
+        padding: 15px;
+    }
+    
+    .card p {
+        font-size: 15px;
+    }
+    
+    .tab-buttons button {
+        font-size: 15px;
+        padding: 10px 15px;
+    }
+}
+
+/* Mobile responsive */ 
+@media (max-width: 768px) {
+    .modal {
+        padding: 10px 0;
+    }
+    
+    .modal-content {
+        width: 96%;
+        padding: 20px 15px;
+        margin: 5vh auto 3vh;
+        max-height: 85vh;
+        border-radius: 15px;
+    }
+    
+    .close {
+        right: 10px;
+        top: 10px;
+        font-size: 28px;
+        width: 35px;
+        height: 35px;
+    }
+    
+    .modal-content h2 {
+        font-size: 20px;
+        margin-bottom: 15px;
+        padding-bottom: 12px;
+        padding-right: 45px;
+    }
+    
+    .card {
+        padding: 12px;
+        margin-bottom: 15px;
+        border-radius: 12px;
+    }
+    
+    .card video {
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+    
+    .card p {
+        font-size: 14px;
+        line-height: 1.5;
+    }
+    
+    .card strong {
+        font-size: 16px;
+    }
+    
+    .tab-buttons {
+        gap: 8px;
+        margin-bottom: 15px;
+    }
+    
+    .tab-buttons button {
+        min-width: 120px;
+        font-size: 14px;
+        padding: 10px 12px;
+        border-radius: 8px;
+    }
+    
+    .tab-content pre {
+        padding: 15px;
+        font-size: 12px;
+        line-height: 1.5;
+        border-radius: 10px;
+    }
+}
+
+
+/* Small mobile */
+@media (max-width: 480px) {
+    .modal {
+        padding: 5px 0;
+    }
+    
+    .modal-content {
+        width: 98%;
+        padding: 15px 12px;
+        margin: 3vh auto 2vh;
+        max-height: 90vh;
+        border-radius: 12px;
+    }
+    
+    .close {
+        right: 8px;
+        top: 8px;
+        font-size: 24px;
+        width: 30px;
+        height: 30px;
+    }
+    
+    .modal-content h2 {
+        font-size: 18px;
+        margin-bottom: 12px;
+        padding-bottom: 10px;
+        padding-right: 40px;
+    }
+    
+    .card {
+        padding: 10px;
+        margin-bottom: 12px;
+        border-radius: 10px;
+    }
+    
+    .card p {
+        font-size: 13px;
+    }
+    
+    .card strong {
+        font-size: 15px;
+    }
+    
+    .tab-buttons {
+        flex-direction: column;
+        gap: 6px;
+    }
+    
+    .tab-buttons button {
+        width: 100%;
+        min-width: 100%;
+        font-size: 13px;
+        padding: 10px;
+    }
+    
+    .tab-content pre {
+        padding: 12px;
+        font-size: 11px;
+        line-height: 1.4;
+    }
+}
+
+/* Very small mobile */
+@media (max-width: 360px) {
+    .modal-content {
+        padding: 12px 10px;
+        margin: 2vh auto 1vh;
+    }
+    
+    .modal-content h2 {
+        font-size: 16px;
+    }
+    
+    .card {
+        padding: 8px;
+    }
+    
+    .card p {
+        font-size: 12px;
+    }
+    
+    .tab-buttons button {
+        font-size: 12px;
+        padding: 8px;
+    }
+    
+    .tab-content pre {
+        padding: 10px;
+        font-size: 10px;
+    }
+}
+
+/* Landscape mode fixes */
+@media (max-width: 1024px) and (orientation: landscape) {
+    .modal-content {
+        max-height: 80vh;
+        margin: 5vh auto 3vh;
+    }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .tab-buttons button {
+        min-height: 44px;
+    }
+    
+    .close {
+        min-width: 44px;
+        min-height: 44px;
+    }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    .modal-content {
+        border: 3px solid white;
+    }
+    
+    .card {
+        border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .modal-content,
+    .card,
+    .tab-buttons button,
+    .close {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+/* Print styles */
+@media print {
+    .modal {
+        display: none !important;
+    }
+}
+
+/* Scroll bar stilizatsiyasi */
+.modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.close {
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    font-size: 32px;
+    font-weight: bold;
+    cursor: pointer;
+    color: white;
+    transition: all 0.3s;
+    z-index: 10;
+    line-height: 1;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.close:hover {
+    background: rgba(255, 204, 0, 0.3);
+    color: #ffcc00;
+    transform: rotate(90deg);
+}
+
+.modal-content h2 {
+    font-size: 28px;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+    padding-right: 50px;
+}
+
+.card {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    transition: all 0.3s;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.card:hover {
+    background: rgba(255, 255, 255, 0.18);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.card video {
+    width: 100%;
+    max-width: 70%;
+    height: auto;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    background: #000;
+}
+
+.card p {
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 10px 0 0;
+}
+
+
+.card strong {
+    color: #ffcc00;
+    font-size: 18px;
+}
+
+/* Tab buttons */
+.tab-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.tab-buttons button {
+    flex: 1;
+    min-width: 150px;
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.tab-buttons button:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+}
+
+.tab-buttons button.active {
+    background: rgba(255, 204, 0, 0.4);
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(255, 204, 0, 0.3);
+}
+
+.tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.tab-content pre {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    border-radius: 12px;
+    overflow-x: auto;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #00ff00;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tab-content pre::-webkit-scrollbar {
+    height: 8px;
+}
+
+.tab-content pre::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.tab-content pre::-webkit-scrollbar-thumb {
+    background: rgba(0, 255, 0, 0.3);
+    border-radius: 10px;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Tablet responsive */
+@media (max-width: 1024px) {
+    .modal {
+        padding: 15px 0;
+    }
+    
+    .modal-content {
+        width: 95%;
+        padding: 25px;
+        max-height: 80vh;
+    }
+    
+    .modal-content h2 {
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+    
+    .card {
+        padding: 15px;
+    }
+    
+    .card p {
+        font-size: 15px;
+    }
+    
+    .tab-buttons button {
+        font-size: 15px;
+        padding: 10px 15px;
+    }
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .modal {
+        padding: 10px 0;
+    }
+    
+    .modal-content {
+        width: 96%;
+        padding: 20px 15px;
+        margin: 2vh auto;
+        max-height: 90vh;
+        border-radius: 15px;
+    }
+    
+    .close {
+        right: 10px;
+        top: 10px;
+        font-size: 28px;
+        width: 35px;
+        height: 35px;
+    }
+    
+    .modal-content h2 {
+        font-size: 20px;
+        margin-bottom: 15px;
+        padding-bottom: 12px;
+        padding-right: 45px;
+    }
+    
+    .card {
+        padding: 12px;
+        margin-bottom: 15px;
+        border-radius: 12px;
+    }
+    
+    .card video {
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+    
+    .card p {
+        font-size: 14px;
+        line-height: 1.5;
+    }
+    
+    .card strong {
+        font-size: 16px;
+    }
+    
+    .tab-buttons {
+        gap: 8px;
+        margin-bottom: 15px;
+    }
+    
+    .tab-buttons button {
+        min-width: 120px;
+        font-size: 14px;
+        padding: 10px 12px;
+        border-radius: 8px;
+    }
+    
+    .tab-content pre {
+        padding: 15px;
+        font-size: 12px;
+        line-height: 1.5;
+        border-radius: 10px;
+    }
+}
+
+
+/* Small mobile */
+@media (max-width: 480px) {
+    .modal {
+        padding: 5px 0;
+    }
+    
+    .modal-content {
+        width: 98%;
+        padding: 15px 12px;
+        margin: 1vh auto;
+        max-height: 92vh;
+        border-radius: 12px;
+    }
+    
+    .close {
+        right: 8px;
+        top: 8px;
+        font-size: 24px;
+        width: 30px;
+        height: 30px;
+    }
+    
+    .modal-content h2 {
+        font-size: 18px;
+        margin-bottom: 12px;
+        padding-bottom: 10px;
+        padding-right: 40px;
+    }
+    
+    .card {
+        padding: 10px;
+        margin-bottom: 12px;
+        border-radius: 10px;
+    }
+    
+    .card p {
+        font-size: 13px;
+    }
+    
+    .card strong {
+        font-size: 15px;
+    }
+    
+    .tab-buttons {
+        flex-direction: column;
+        gap: 6px;
+    }
+    
+    .tab-buttons button {
+        width: 100%;
+        min-width: 100%;
+        font-size: 13px;
+        padding: 10px;
+    }
+    
+    .tab-content pre {
+        padding: 12px;
+        font-size: 11px;
+        line-height: 1.4;
+    }
+}
+
+/* Very small mobile */
+@media (max-width: 360px) {
+    .modal-content {
+        padding: 12px 10px;
+    }
+    
+    .modal-content h2 {
+        font-size: 16px;
+    }
+    
+    .card {
+        padding: 8px;
+    }
+    
+    .card p {
+        font-size: 12px;
+    }
+    
+    .tab-buttons button {
+        font-size: 12px;
+        padding: 8px;
+    }
+    
+    .tab-content pre {
+        padding: 10px;
+        font-size: 10px;
+    }
+}
+
+/* Landscape mode fixes */
+@media (max-width: 1024px) and (orientation: landscape) {
+    .modal-content {
+        max-height: 85vh;
+        margin: 2vh auto;
+    }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .tab-buttons button {
+        min-height: 44px;
+    }
+    
+    .close {
+        min-width: 44px;
+        min-height: 44px;
+    }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    .modal-content {
+        border: 3px solid white;
+    }
+    
+    .card {
+        border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .modal-content,
+    .card,
+    .tab-buttons button,
+    .close {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+/* Print styles */
+@media print {
+    .modal {
+        display: none !important;
+    }
+}
+        body {
+            font-family: Arial, sans-serif;
+            background: #e6f3ff;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: auto;
+        }
+
+        /* HEADER */
+        .header {
+            display: flex;
+            align-items: center;
+            background: #000075;
+            color: white;
+            padding: 10px 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            width: 100%;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: #fff;
+            border-radius: 50%;
+            border: 2px solid white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000075;
+            font-weight: bold;
+        }
+
+        /* MAIN LAYOUT */
+        .main-container {
+            display: flex;
+            margin-top: 20px;
+            gap: 20px;
+        }
+
+        /* LEFT PANEL */
+        .left-panel {
+            width: 250px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            height: fit-content;
+            position: relative;
+            z-index: 1;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 15px;
+        }
+
+        .control-group h3 {
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 8px;
+            font-size: 14px;
+            border-radius: 5px;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn-success { 
+            background: #28a745; 
+            color: white; 
+        }
+        .btn-danger { 
+            background: #dc3545; 
+            color: white; 
+        }
+        .btn-primary { 
+            background: #000075; 
+            color: white; 
+        }
+        .btn-info { 
+            background: #17a2b8; 
+            color: white; 
+        }
+
+        .slider-container {
+            margin: 10px 0;
+        }
+
+        .slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: #ddd;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #000075;
+            cursor: pointer;
+        }
+
+        .angle-display {
+            background: #000;
+            color: #00ff00;
+            padding: 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+
+        .title-header {
+            background: #000075;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0 auto 30px;
+            text-align: center;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        /* EXPERIMENT AREA - QOTIB TURADI */
+        .experiment-area {
+            position: relative;
+            width: 900px;
+            height: 400px;
+            border: 2px solid blue;
+            border-radius: 20px;
+            margin: 0 auto;
+        }
+
+        /* ARDUINO BOARD - ABSOLUTE POSITIONING */
+        .arduino-board {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            left: 40px;
+            top: 50px;
+        }
+
+        .arduino-label {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            color: #006666;
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .power-led {
+            position: absolute;
+            top: 40px;
+            right: 20px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #dc3545;
+            transition: all 0.3s;
+        }
+
+        .power-led.on {
+            background: #28a745;
+            box-shadow: 0 0 10px rgba(40, 167, 69, 0.8);
+        }
+
+        /* SERVO MOTOR - ABSOLUTE POSITIONING */
+        .servo-motor {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            right: 130px;
+            top: 120px;
+        }
+
+        .servo-arm {
+            position: absolute;
+            top: 70px;
+            left: 55px;
+            transform-origin: center center;
+            transform: translate(-50%, -50%) rotate(0deg);
+            border-radius: 2px;
+            transition: transform 0.5s ease;
+            z-index: 10;
+        }
+
+        /* CONNECTING WIRES - ABSOLUTE POSITIONING */
+        .connection-wire {
+            position: absolute;
+            border-radius: 2px;
+            z-index: 5;
+        }
+
+        .wire-connection-1 {
+            width: 250px;
+            background: #ff0000;
+            top: 311px;
+            left: 217px;
+            height: 3px;
+        }
+
+        .wire-connection-2 {
+            width: 250px;
+            background: black;
+            top: 300px;
+            left: 222px;
+            height: 3px;
+        }
+
+        .wire-connection-3 {
+            width: 280px;
+            background: #ff8800;
+            top: 40px;
+            left: 240px;
+            height: 3px;
+        }
+
+        .wire-connection-4 {
+            width: 3px;
+            height: 122px;
+            background: #ff0000;
+            top: 190px;
+            right: 430px;
+        }
+
+        .wire-connection-5 {
+            width: 3px;
+            height: 107px;
+            background: black;
+            top: 195px;
+            right: 425px;
+        }
+
+        .wire-connection-6 {
+            height: 150px;
+            width: 3px;
+            background: #ff8800;
+            top: 40px;
+            right: 375px;
+        }
+
+        .wire-connection-7 {
+            height: 78px;
+            width: 3px;
+            background: #ff8800;
+            top: 40px;
+            left: 240px;
+        }
+
+        .wire-connection-8 {
+            height: 33px;
+            width: 3px;
+            background: red;
+            bottom: 83px;
+            left: 215px;
+        }
+
+        .wire-connection-9 {
+            height: 20px;
+            width: 3px;
+            background: black;
+            bottom: 95px;
+            left: 222px;
+        }
+
+        .wire-connection-10 {
+            height: 3px;
+            width: 115px;
+            background: #ff8800;
+            top: 187px;
+            right: 262px;
+        }
+
+        .wire-connection-11 {
+            height: 3px;
+            width: 170px;
+            background: red;
+            top: 190px;
+            right: 263px;
+        }
+
+        .wire-connection-12 {
+            height: 3px;
+            width: 163px;
+            background: black;
+            top: 195px;
+            right: 263px;
+        }
+
+        /* STATUS DISPLAY */
+        .status-display {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            min-width: 220px;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            z-index: 100;
+        }
+
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 8px 0;
+            font-size: 13px;
+        }
+
+        .status-led {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #dc3545;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+        }
+
+        .status-led.on {
+            background: #28a745;
+            box-shadow: 0 0 10px rgba(40, 167, 69, 0.8);
+        }
+
+        /* MODAL STYLES */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            backdrop-filter: blur(3px);
+        }
+
+        .modal-content {
+            background: #000075;
+            color: white;
+            margin: 5% auto;
+            padding: 20px;
+            width: 50%;
+            max-width: 700px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+            animation: slideDown 0.4s ease;
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+            transition: color 0.3s;
+        }
+
+        .close:hover {
+            color: #ffcc00;
+        }
+
+        .modal-content h2 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            border-bottom: 2px solid rgba(255,255,255,0.2);
+            padding-bottom: 8px;
+        }
+
+        .tab-buttons {
+            display: flex;
+            margin-bottom: 10px;
+        }
+
+        .tab-buttons button {
+            flex: 1;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            border-radius: 5px 5px 0 0;
+            transition: background 0.3s;
+        }
+
+        .tab-buttons button.active {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        pre {
+            background: rgba(0,0,0,0.4);
+            padding: 12px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 0.9rem;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* RESPONSIVE DESIGN */
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .left-panel {
+                width: 100%;
+            }
+            
+            .modal-content {
+                width: 90%;
+                margin: 20% auto;
+            }
+        }
+        
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="logo">
+                     <a href="/"><img src="/static/image/logo.png" width="80px" height="80px" alt=""></a>
+            <span>Arduino Servo Motor Boshqaruvi</span>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <div class="main-container">
+        <!-- LEFT PANEL -->
+        <div class="left-panel">
+            <div class="control-group">
+                <h3>Servo Boshqaruv</h3>
+                <button class="btn btn-success" onclick="startExperiment()">
+                    Tajribani Boshlash
+                </button>
+                <button class="btn btn-danger" onclick="stopExperiment()">
+                    To'xtatish
+                </button>
+                <button class="btn btn-primary" onclick="togglePower()">
+                    Quvvat
+                </button>
+            </div>
+
+            <div class="control-group">
+                <h3>Servo Burchak</h3>
+                <div class="slider-container">
+                    <input type="range" min="0" max="180" value="90" class="slider" id="angleSlider" oninput="moveServo(this.value)">
+                    <div class="angle-display" id="angleDisplay">90°</div>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <h3>Avtomatik Harakat</h3>
+                <button class="btn btn-info" onclick="sweepMotion()">
+                    Sweep Harakati
+                </button>
+                <button class="btn btn-info" onclick="stepMotion()">
+                    Qadam Harakati
+                </button>
+                <button class="btn btn-primary" onclick="centerPosition()">
+                    Markazga O'rnatish
+                </button>
+            </div>
+<div class="control-group">
+    <h3>Ma'lumotlar</h3>
+    <button class="btn btn-primary" id="schemaBtn">💡 Sxema qayerda ishlatiladi</button>
+    <button class="btn btn-primary" id="codeBtn">💻 Kod</button>
+    <button class="btn btn-primary" id="componentsBtn">🔌 Qurilmalar</button>
+</div>
+
+            <div class="control-group">
+                <h3>Tizim Holati</h3>
+                <div class="status-row">
+                    <span>Arduino:</span>
+                    <div class="status-led" id="arduinoLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Servo:</span>
+                    <div class="status-led" id="servoLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>PWM Signal:</span>
+                    <div class="status-led" id="pwmLed"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+            <div class="title-header">Arduino Servo Motor Boshqaruvi Tajribasi</div>
+            
+            <div class="experiment-area">
+                <!-- ARDUINO BOARD -->
+                <div class="arduino-board">
+                    <div class="arduino-label">Arduino UNO</div>
+                   <img src="/static/image/arduino1 - Copy.png" width="300px" height="300px" alt="">
+                    <div class="power-led" id="powerLed"></div>
+                </div>
+
+                <!-- SERVO MOTOR -->
+                <div class="servo-motor">
+                  <img src="/static/image/servo.m - Copy.png" width="150px" height="150px" alt="">
+                   <img class="servo-arm" id="servoArm" src="/static/image/hep.png" width="50px" height="70px" alt="">
+                </div>
+
+                <!-- CONNECTION WIRES -->
+                <div class="connection-wire wire-connection-1"></div>
+                <div class="connection-wire wire-connection-2"></div>
+                <div class="connection-wire wire-connection-3"></div>
+                <div class="connection-wire wire-connection-4"></div>
+                <div class="connection-wire wire-connection-5"></div>
+                <div class="connection-wire wire-connection-6"></div>
+                <div class="connection-wire wire-connection-7"></div>
+                <div class="connection-wire wire-connection-8"></div>
+                <div class="connection-wire wire-connection-9"></div>
+                <div class="connection-wire wire-connection-10"></div>
+                <div class="connection-wire wire-connection-11"></div>
+                <div class="connection-wire wire-connection-12"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- STATUS DISPLAY -->
+    <div class="status-display">
+        <div class="status-row">
+            <span>Joriy Burchak:</span>
+            <span id="currentAngle">90°</span>
+        </div>
+        <div class="status-row">
+            <span>PWM Qiymati:</span>
+            <span id="pwmValue">1500μs</span>
+        </div>
+        <div class="status-row">
+            <span>Harakat:</span>
+            <span id="motionStatus">To'xtagan</span>
+        </div>
+    </div>
+
+   <!-- ✅ 1) Sxema qayerda ishlatiladi (DC Motor / L298N) -->
+    <div class="modal" id="schemaModal">
+        <div class="modal-content">
+            <span class="close" title="Yopish">&times;</span>
+            <h2>💡 Sxema qayerda ishlatiladi </h2>
+
+            <div class="flex-container-40-60">
+                <div class="flex-video-40">
+                    <!-- 1-video (xohlasangiz almashtiring) -->
+                    <iframe src="https://www.youtube.com/embed/QjX4JKU_I9M?si=YsBh2uahPKYHN1G8" title="DC Motor Control with L298N"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen></iframe>
+                </div>
+                <div class="flex-text-60">
+                    <strong>Tajriba maqsadi</strong>
+                   <p>Maqsad:
+
+Arduino orqali servo motorning burchagini aniq nazorat qilishni o‘rganish (PWM — Pulse Width Modulation signal yordamida).</p>
+                </div>
+            </div>
+
+            <div class="flex-container-40-60">
+                <div class="flex-video-40">
+                    <!-- 2-video (ixtiyoriy) -->
+                    <iframe src="https://www.youtube.com/embed/5bEHd8h_p-k?si=EwBiLSiHPnwUL3_W" title="PWM Speed Control"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen></iframe>
+                </div>
+                <div class="flex-text-60">
+                    <strong>🔄 Ishlash prinsipi</strong>
+                    <p>Arduino D9 pinidan PWM signal yuboradi.
+
+PWM signali to‘lqin uzunligi (pulse width) servo motorning burchagini belgilaydi:
+
+~1 ms → 0°
+
+~1.5 ms → 90°
+
+~2 ms → 180°
+
+Servo motor bu signalga javoban belgilangan burchakka buriladi.</p>
+                </div>
+            </div>
+              <div class="flex-container-40-60">
+                <div class="flex-video-40">
+                    <!-- 2-video (ixtiyoriy) -->
+                    <iframe src="https://www.youtube.com/embed/qJC1nt_eJZs?si=B8zfS5VwhPiTfV_6" title="PWM Speed Control"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen></iframe>
+                </div>
+                <div class="flex-text-60">
+                    <strong>Qo‘shimcha tajriba g‘oyalari</strong>
+               <p>
+                Potensiometr yordamida servo burchagini real vaqt rejimida boshqarish.
+
+Ultrasonik datchik bilan servo motorni masofa asosida harakatlantirish.
+
+2 yoki 3 ta servo motorni sinxron boshqarish.
+               </p>
+                </div>
+            </div>
+        </div>
+    </div>
+  <div class="modal" id="codeModal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>💻 Kod</h2>
+
+        <div class="tab-buttons">
+            <button class="tab-btn active" data-tab="mblock">mBlock Kodi</button>
+            <button class="tab-btn" data-tab="arduino">Arduino Kodi</button>
+        </div>
+
+        <div class="tab-content active" id="mblock">
+            <pre><img src="/static/image/servo.png" alt="mBlock Code" style="width: 80%; height: auto;"></pre>
+        </div>
+
+        <div class="tab-content" id="arduino">
+            <pre>
+#include &lt;Servo.h&gt;
+
+Servo myservo;
+int pos = 0;
+
+void setup() {
+  myservo.attach(9);
+  Serial.begin(9600);
+}
+
+void loop() {
+  // 0 dan 180 gacha
+  for (pos = 0; pos <= 180; pos += 1) {
+    myservo.write(pos);
+    delay(15);
+  }
+  
+  // 180 dan 0 gacha
+  for (pos = 180; pos >= 0; pos -= 1) {
+    myservo.write(pos);
+    delay(15);
+  }
+}
+            </pre>
+        </div>
+    </div>
+</div>
+
+
+    <!-- ✅ 3) Qurilmalar -->
+    <!-- ✅ 3) Qurilmalar -->
+    <div class="modal" id="componentsModal">
+        <div class="modal-content">
+            <span class="close" title="Yopish">&times;</span>
+            <h2>🔌 Ishlatilgan Qurilmalar</h2>
+
+
+            <div class="flex-container-30-70">
+                <div class="flex-image-30"><img src="/static/image/arduino1 - Copy.png" alt="Breadboard"></div>
+                <div class="flex-text-70">
+                    <strong>Arduino UNO</strong>
+                    <p>Arduino mikrokontroller platasidir. U kompyuter orqali berilgan kodni bajaradi va Servo motorni aylantiradi
+
+</p>
+                </div>
+            </div>
+            
+            <div class="flex-container-30-70">
+                <div class="flex-image-30"><img src="/static/image/breadboard-removebg-preview.png alt="Breadboard"></div>
+                <div class="flex-text-70">
+                    <strong>Servo Motor(SG90 yoki MG996R)</strong>
+                        <p>• Ish kuchlanishi: 4.8V - 6V
+            • Burchak: 0° - 180°
+            • Tezlik: 0.1s/60°
+                            Servo motor – aniq 0° dan 180° gacha burchakka harakatlana oladigan motor. Ichida potensiometr va mikrokontroller mavjud.</p>
+           
+                </div>
+            </div>
+            
+  
+    </div>
+
+    <!-- ✅ 4) Qo'shimcha info (ixtiyoriy) + suzuvchi tugma -->
+    <div class="modal" id="infoModal">
+        <div class="modal-content">
+            <span class="close" title="Yopish">&times;</span>
+            <h2>📚 Qo'shimcha Ma'lumot</h2>
+            <div class="video-full">
+                <video controls>
+                    <source src="/media/2.mp4" type="video/mp4">
+                    Brauzeringiz video formatni qo'llab-quvvatlamaydi.
+                </video>
+            </div>
+        </div>
+    </div>
+
+    <button id="infoFloatingBtn"><span>📚</span><span>Ma'lumot</span></button>
+
+ 
+    <script>
+        // System State
+        let powerOn = false;
+        let servoActive = false;
+        let currentAngle = 90;
+        let sweepInterval;
+
+        // DOM Elements
+        const elements = {
+            powerLed: document.querySelector('.power-led'),
+            arduinoLed: document.getElementById('arduinoLed'),
+            servoLed: document.getElementById('servoLed'),
+            pwmLed: document.getElementById('pwmLed'),
+            servoArm: document.getElementById('servoArm'),
+            angleDisplay: document.getElementById('angleDisplay'),
+            currentAngleDisplay: document.getElementById('currentAngle'),
+            pwmValueDisplay: document.getElementById('pwmValue'),
+            motionStatus: document.getElementById('motionStatus')
+        };
+
+        // Update Status
+        function updateStatus() {
+            if (elements.arduinoLed) elements.arduinoLed.classList.toggle('on', powerOn);
+            if (elements.powerLed) elements.powerLed.classList.toggle('on', powerOn);
+            if (elements.servoLed) elements.servoLed.classList.toggle('on', servoActive);
+            if (elements.pwmLed) elements.pwmLed.classList.toggle('on', servoActive);
+        }
+
+        // Power Control
+        function togglePower() {
+            powerOn = !powerOn;
+            if (!powerOn) {
+                servoActive = false;
+                clearInterval(sweepInterval);
+                if (elements.motionStatus) elements.motionStatus.textContent = 'To\'xtagan';
+            }
+            updateStatus();
+        }
+
+        // Start Experiment
+        function startExperiment() {
+            if (!powerOn) {
+                alert('Avval quvvatni yoqing!');
+                return;
+            }
+            
+            servoActive = true;
+            if (elements.motionStatus) elements.motionStatus.textContent = 'Faol';
+            updateStatus();
+        }
+
+        // Stop Experiment
+        function stopExperiment() {
+            servoActive = false;
+            clearInterval(sweepInterval);
+            if (elements.motionStatus) elements.motionStatus.textContent = 'To\'xtagan';
+            updateStatus();
+        }
+
+        // Move Servo
+        function moveServo(angle) {
+            if (!powerOn || !servoActive) {
+                alert('Avval quvvatni va tajribani yoqing!');
+                return;
+            }
+            
+            currentAngle = parseInt(angle);
+            
+            if (elements.servoArm) {
+                elements.servoArm.style.transform = `translate(-50%, -50%) rotate(${currentAngle - 90}deg)`;
+            }
+            
+            if (elements.angleDisplay) elements.angleDisplay.textContent = `${currentAngle}°`;
+            if (elements.currentAngleDisplay) elements.currentAngleDisplay.textContent = `${currentAngle}°`;
+            
+            const pwmValue = 1000 + (currentAngle / 180) * 1000;
+            if (elements.pwmValueDisplay) elements.pwmValueDisplay.textContent = `${Math.round(pwmValue)}μs`;
+        }
+
+        // Sweep Motion
+        function sweepMotion() {
+            if (!powerOn || !servoActive) {
+                alert('Avval quvvatni va tajribani yoqing!');
+                return;
+            }
+            
+            clearInterval(sweepInterval);
+            if (elements.motionStatus) elements.motionStatus.textContent = 'Sweep Harakati';
+            
+            let angle = 0;
+            let direction = 1;
+            
+            sweepInterval = setInterval(() => {
+                angle += direction * 2;
+                
+                if (angle >= 180) {
+                    direction = -1;
+                } else if (angle <= 0) {
+                    direction = 1;
+                }
+                
+                moveServo(angle);
+                const slider = document.getElementById('angleSlider');
+                if (slider) slider.value = angle;
+            }, 50);
+        }
+
+        // Step Motion
+        function stepMotion() {
+            if (!powerOn || !servoActive) {
+                alert('Avval quvvatni va tajribani yoqing!');
+                return;
+            }
+            
+            clearInterval(sweepInterval);
+            if (elements.motionStatus) elements.motionStatus.textContent = 'Qadam Harakati';
+            
+            const positions = [0, 45, 90, 135, 180, 135, 90, 45];
+            let index = 0;
+            
+            sweepInterval = setInterval(() => {
+                moveServo(positions[index]);
+                const slider = document.getElementById('angleSlider');
+                if (slider) slider.value = positions[index];
+                index = (index + 1) % positions.length;
+            }, 1000);
+        }
+
+        // Center Position
+        function centerPosition() {
+            if (!powerOn || !servoActive) {
+                alert('Avval quvvatni va tajribani yoqing!');
+                return;
+            }
+            
+            clearInterval(sweepInterval);
+            if (elements.motionStatus) elements.motionStatus.textContent = 'Markazda';
+            moveServo(90);
+            const slider = document.getElementById('angleSlider');
+            if (slider) slider.value = 90;
+        }
+
+        // Modal Functions
+        function openModal(id) {
+            const modal = document.getElementById(id);
+            if (modal) modal.style.display = "block";
+        }
+
+        // Event Listeners
+        const schemaBtn = document.getElementById("schemaBtn");
+        if (schemaBtn) {
+            schemaBtn.addEventListener("click", function() {
+                openModal("schemaModal");
+            });
+        }
+
+        const codeBtn = document.getElementById("codeBtn");
+        if (codeBtn) {
+            codeBtn.addEventListener("click", function() {
+                openModal("codeModal");
+            });
+        }
+
+        const componentsBtn = document.getElementById("componentsBtn");
+        if (componentsBtn) {
+            componentsBtn.addEventListener("click", function() {
+                openModal("componentsModal");
+            });
+        }
+
+        // Modal close functionality
+        document.querySelectorAll(".modal .close").forEach(btn => {
+            btn.addEventListener("click", function() {
+                const modal = this.closest(".modal");
+                if (modal) modal.style.display = "none";
+            });
+        });
+
+        window.addEventListener("click", function(e) {
+            document.querySelectorAll(".modal").forEach(modal => {
+                if (e.target === modal) {
+                    modal.style.display = "none";
+                }
+            });
+        });
+
+        // Tab functionality
+        document.querySelectorAll(".tab-btn").forEach(button => {
+            button.addEventListener("click", function() {
+                const tab = this.dataset.tab;
+
+                document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+                this.classList.add("active");
+
+                document.querySelectorAll(".tab-content").forEach(content => {
+                    content.classList.remove("active");
+                    if (content.id === tab) {
+                        content.classList.add("active");
+                    }
+                });
+            });
+        });
+// Modalni ochish
+function openModal(id) {
+    document.getElementById(id).style.display = "block";
+}
+
+// Tugmalarni ulash
+document.getElementById("schemaBtn").addEventListener("click", () => openModal("schemaModal"));
+document.getElementById("codeBtn").addEventListener("click", () => openModal("codeModal"));
+document.getElementById("componentsBtn").addEventListener("click", () => openModal("componentsModal"));
+document.getElementById("infoFloatingBtn").addEventListener("click", () => openModal("infoModal"));
+
+// Yopish tugmalari
+document.querySelectorAll(".close").forEach(btn => {
+    btn.addEventListener("click", function() {
+        this.closest(".modal").style.display = "none";
+    });
+});
+
+// Tab switching (Kod uchun)
+document.querySelectorAll(".tab-btn").forEach(button => {
+    button.addEventListener("click", function() {
+        const tab = this.dataset.tab;
+        document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+        this.classList.add("active");
+        document.querySelectorAll(".tab-content").forEach(content => {
+            content.classList.remove("active");
+            if (content.id === tab) content.classList.add("active");
+        });
+    });
+});
+        // Initialize system
+        updateStatus();
+    </script>
+</body>
+</html>

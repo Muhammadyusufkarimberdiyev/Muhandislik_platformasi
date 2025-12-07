@@ -1,0 +1,274 @@
+
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Milliy Muhandislik Platformasi</title>
+  <link rel="stylesheet" href="/static/style_3.css" />
+  <link rel="stylesheet" href="/static/style.css">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+ <header>
+        <nav>
+            <a href="/"><img src="/static/image/logo.png" alt="Logo" /></a>
+            
+           <form class="search-box" action="" method="get">
+  <i class="fa fa-search"></i>
+  <input type="text" name="q" placeholder="Qidiruv..." value="{{ equery|default:'' }}">
+</form>
+
+
+
+            <div class="menu-toggle" id="menuToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+
+            <ul id="navMenu">
+                <a href="/"><li>Asosiy sahifa</li></a>
+         
+            </ul>
+        </nav>
+    </header>
+  <section>
+<style>
+.book-actions{display:flex;gap:.5rem;justify-content:center;margin-top:.75rem}
+.btn{display:inline-block;padding:.55rem .9rem;border-radius:999px;text-decoration:none;font-weight:600}
+.btn-read{background:#000075;color:white;border: #000075;}
+.btn-read:hover{opacity:.9;background:white;color:#000075;border: white;}
+.download-btn{background:linear-gradient(#0b1aa8 );color:white; border: #000075;}
+.download-btn:hover{opacity:.9; }
+h4{
+  color: white;
+}
+
+</style>
+
+    <div class="con">
+        <div class="header">
+            <h1 class="title">Robototexnika</h1>
+            <button class="arduino-btn" onclick="openArduino()">
+                Elektronika
+            </button>
+        </div>
+        <div class="experiments-grid" id="experimentsGrid">
+  {% for e in experiments %}
+    <div class="experiment-card">
+      <div class="robot-image">
+        {% if e.picture %}<img src="{{ e.picture.url }}" alt="{{ e.name }}" style="width:100%;height:70%;object-fit:cover;">{% endif %}
+      </div>
+      <div class="card-title">{{ e.name }}</div>
+      <div class="card-stats">
+        <div class="btn btn-read" ></i><span>Murakkab</span></div>
+        <div class="btn download-btn" ><a href="{{ e.open_url }}" target="_blank"><h4>Tajribani sinab ko'rish</h4></a></div>
+      </div>
+    </div>
+  {% empty %}<p class="no-results">Hech narsa topilmadi.</p>{% endfor %}
+</div>
+
+        </div>
+
+     {% if page and page.has_other_pages %}
+  <div class="pagination">
+    {% if page.has_previous %}<a class="page-prev" href="?q={{ equery }}&page={{ page.previous_page_number }}">⬅</a>{% endif %}
+    {% for num in paginator.page_range %}
+      <a class="page-dot{% if page.number == num %} active{% endif %}" href="?q={{ equery }}&page={{ num }}"></a>
+    {% endfor %}
+    {% if page.has_next %}<a class="page-next" href="?q={{ equery }}&page={{ page.next_page_number }}">➡</a>{% endif %}
+  </div>
+{% endif %}
+
+
+    </div>
+
+
+    
+  </section>
+
+
+ <footer>
+      <div class="footer">
+        <div class="left">
+          <img src="/static/image/muallif.jpg" alt="Muallif logotipi">
+          <p>
+<span style="display: block; text-align: center; font-size: 20px; font-weight: bold;">
+    Muallif : Muhammad Al-Xorazmiy Nomidagi Ixtisoslashtirilgan Maktab Andijon Filiali
+</span>
+
+              <br>Ushbu platforma O'zbekiston Respublikasi Prezidentining <br> 2024-yil 1-apreldagi PF-55-son
+            Farmoniga asosan tashkil etilgan 2025-yilgi Ixtirochilikka qadam tanlovini 1-o'rin <br> sohibi hamda
+            amaliyotgan tadbiq etish uchun Oliy ta'lim <br> va innovatsiyalar vazirligi huzuridagi
+            Ilm-fanni moliyalashtirish va innovatsiyalarni qo'llab-quvvatlash jamg'armasi tomonidan
+            56 mln so'm miqdorida moliyalashtirilgan.
+          </p>
+        </div>
+        <div class="center">
+          <h2>Aloqa uchun</h2>
+          <p>Manzil: Andijon shahar, Qalandarxona mahalla fuqarolar yig'ini,<br> Buxoro ko'chasi, 4 uy</p>
+          <p>Tel: +998 94 212 14 48</p>
+          <p>Gmail: ixm337@piima.uz</p>
+          <ul class="social-icons">
+            <li><a href="https://www.facebook.com/share/1C2cE7VJQR/?mibextid=wwXIfr" target="_blank"><i class="fab fa-facebook-f"></i></a></li>
+            <li><a href="https://www.youtube.com/@Milliy_muhandislik_platformasi" target="_blank"><i class="fab fa-youtube"></i></a></li>
+            <li><a href="https://www.instagram.com/itschool_andijan?igsh=MWdkMzQ4Zmt5MzhxaA==" target="_blank"><i class="fab fa-instagram"></i></a></li>
+            <li><a href="https://t.me/milliy_muhandislik" target="_blank"><i class="fab fa-telegram"></i></a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="bottom">
+        <p>Yaratilgan 2025 MMP | Dizayn va Dasturlash muallifi</p>
+      </div>
+    </footer>
+
+  <script src="/static/index.js"></script>
+
+</body>
+
+    <script>
+        let currentPage = 1;
+        let selectedExperiments = new Set();
+
+        // // Experiment data for different pages
+        // const experimentData = {
+        //     1: [
+        //         {title: "Powerbank sxemasi", level: "Boshlang'ich", lectures: "15 tajriba"},
+        //         {title: "Dc motor", level: "O'rta", lectures: "20 tajriba"}, 
+        //         {title: "Tutun sensori", level: "O'rta", lectures: "18 tajriba"},
+        //         {title: "Zaryadlash sxemasi", level: "Murakkab", lectures: "25 tajriba"},
+        //         {title: "Servo motor", level: "Murakkab", lectures: "30 tajriba"},
+        //         {title: "Eshik qo'ng'irog'i", level: "Murakkab", lectures: "35 tajriba"}
+        //     ],
+        //     2: [
+        //         {title: "IoT Loyihalari", level: "Murakkab", lectures: "22 tajriba"},
+        //         {title: "AI va Robotlar", level: "Murakkab", lectures: "28 tajriba"},
+        //         {title: "Dron Boshqaruvi", level: "O'rta", lectures: "20 tajriba"},
+        //         {title: "3D Chop Etish", level: "O'rta", lectures: "16 tajriba"},
+        //         {title: "Virtual Reality", level: "Murakkab", lectures: "24 tajriba"},
+        //         {title: "Blockchain IoT", level: "Murakkab", lectures: "26 tajriba"}
+        //     ]
+        // };
+          // BURGER MENU FUNCTIONALITY
+        // =========================
+        const menuToggle = document.getElementById('menuToggle');
+        const navMenu = document.getElementById('navMenu');
+
+        menuToggle.addEventListener('click', function() {
+            navMenu.classList.toggle('active');
+            this.classList.toggle('active');
+        });
+
+        // Menyu tashqarisiga bosilganda yopish
+        document.addEventListener('click', function(e) {
+            if (!menuToggle.contains(e.target) && !navMenu.contains(e.target)) {
+                navMenu.classList.remove('active');
+                menuToggle.classList.remove('active');
+            }
+        });
+        function openArduino() {
+            const btn = document.querySelector('.arduino-btn');
+            btn.style.background = '#10b981';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Ochilmoqda...';
+            
+            setTimeout(() => {
+                alert('Arduino dasturlash muhiti ochilmoqda!\n\nBu bo\'limda siz:\n• Arduino IDE bilan tanishasiz\n• Oddiy dasturlar yozasiz\n• Virtual sxemalar bilan ishlaysiz');
+                btn.innerHTML = 'Arduino';
+                btn.style.background = '#2563eb';
+            }, 2000);
+        }
+
+        function selectExperiment(id) {
+            const card = document.querySelectorAll('.experiment-card')[id - 1];
+            
+            if (selectedExperiments.has(id)) {
+                selectedExperiments.delete(id);
+                card.style.borderColor = 'transparent';
+                card.style.background = 'rgba(255, 255, 255, 0.9)';
+            } else {
+                selectedExperiments.add(id);
+                card.style.borderColor = '#10b981';
+                card.style.background = 'rgba(16, 185, 129, 0.1)';
+            }
+
+            // Add loading effect
+            card.classList.add('loading');
+            setTimeout(() => {
+                card.classList.remove('loading');
+            }, 1000);
+        }
+
+        function changePage(pageNum) {
+            if (pageNum === currentPage) return;
+            
+            currentPage = pageNum;
+            
+            // Update pagination dots
+            document.querySelectorAll('.page-dot').forEach((dot, index) => {
+                dot.classList.toggle('active', index + 1 === pageNum);
+            });
+
+            // Update experiments if data exists
+            if (experimentData[pageNum]) {
+                updateExperiments(experimentData[pageNum]);
+            }
+
+            // Add page transition effect
+            const grid = document.getElementById('experimentsGrid');
+            grid.style.opacity = '0.5';
+            grid.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                grid.style.opacity = '1';
+                grid.style.transform = 'translateY(0)';
+            }, 300);
+        }
+
+        function updateExperiments(data) {
+            const cards = document.querySelectorAll('.experiment-card');
+            cards.forEach((card, index) => {
+                if (data[index]) {
+                    const title = card.querySelector('.card-title');
+                    const level = card.querySelector('.stat-item span');
+                    const lectures = card.querySelectorAll('.stat-item span')[1];
+                    
+                    title.textContent = data[index].title;
+                    level.textContent = data[index].level;
+                    lectures.textContent = data[index].lectures;
+                }
+            });
+        }
+
+        function show3DDrawings() {
+            const btn = document.querySelector('.bottom-btn');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Yuklanmoqda...';
+            btn.style.background = '#8b5cf6';
+            
+            setTimeout(() => {
+                alert('3D chizmalar bo\'limi ochilmoqda!\n\nBu yerda siz:\n• 3D modellar yaratishni o\'rganing\n• CAD dasturlari bilan tanishing\n• Virtual chizmalar bilan ishlang');
+                btn.innerHTML = '3d chizmalar';
+                btn.style.background = '#2563eb';
+            }, 2000);
+        }
+
+        // Add some interactive animations
+        document.querySelectorAll('.experiment-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-8px) scale(1.02)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                if (!this.classList.contains('loading')) {
+                    this.style.transform = 'translateY(0) scale(1)';
+                }
+            });
+        });
+
+        // Initialize first page
+        updateExperiments(experimentData[1]);
+    </script>
+
+</html>

@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Fix Demo</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+      
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header>
+        <nav>
+            <img src="./image/logo.png" alt="Logo" />
+            
+            <div class="search-box">
+                <i class="fa fa-search"></i>
+                <input type="text" placeholder="Qidiruv">
+            </div>
+
+            <div class="menu-toggle" id="menuToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+
+            <ul id="navMenu">
+                <a href="/index.html"><li>Asosiy sahifa</li></a>
+                <a href="#we"><li>Biz haqimizda</li></a>
+                <a href="#techno"><li>Texnologiya</li></a>
+                <a href="#partners"><li>Hamkorlarimiz</li></a>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- DEMO CONTENT -->
+    <div class="demo-content">
+        <h1>Mobile va Plansheta uchun to'g'irlangan dizayn</h1>
+        
+        <div class="demo-grid">
+            <div class="demo-card">
+                <i class="fas fa-mobile-alt"></i>
+                <h3>Mobile Responsive</h3>
+                <p>Barcha elementlar mobile ekranda to'g'ri ko'rinadi</p>
+            </div>
+            <div class="demo-card">
+                <i class="fas fa-tablet-alt"></i>
+                <h3>Plansheta Responsive</h3>
+                <p>O'rta ekranlar uchun optimallashtirilgan</p>
+            </div>
+            <div class="demo-card">
+                <i class="fas fa-desktop"></i>
+                <h3>Desktop Ready</h3>
+                <p>Katta ekranlarda ham mukammal ishlaydi</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- STATISTICS SECTION -->
+    <section class="statistics-section">
+        <h2 class="statistics-title">Platformada</h2>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-flask"></i>
+                </div>
+                <div class="stat-number">60+</div>
+                <div class="stat-label">Tajribalar Soni</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-video"></i>
+                </div>
+                <div class="stat-number">300+</div>
+                <div class="stat-label">Videolar Soni</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-book"></i>
+                </div>
+                <div class="stat-number">200+</div>
+                <div class="stat-label">Darsliklar Soni</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TEAM SECTION -->
+    <section class="team-section">
+        <div class="team-container">
+            <h2 class="section-title">Bizning Jamoa</h2>
+            <p class="section-subtitle">
+                Siz bizning Saytimizda ko'plab tajribalarni ko'rishingiz va sinab ko'rishingiz mumkin bo'ladi
+            </p>
+
+            <div class="team-slider">
+                <div class="team-cards" id="teamCards">
+                    <div class="team-card">
+                        <img src="./image/Nodirbek aka.jpg" alt="Nodirbek Ro'ziyev">
+                        <h3>Nodirbek Ro'ziyev</h3>
+                        <p>Loyiha rahbari Fan Mutaxassisi</p>
+                    </div>
+                    <div class="team-card">
+                        <img src="./image/Islombek.jpg" alt="Islombek Karimberdiyev">
+                        <h3>Islombek Karimberdiyev</h3>
+                        <p>Backend Dasturchi</p>
+                    </div>
+                    <div class="team-card">
+                        <img src="./image/Muhammad Ali.jpg" alt="Muhammad Ali">
+                        <h3>Muhammad Ali Karimberdiyev</h3>
+                        <p>Grafik va UI/UX Dizayner</p>
+                    </div>
+                    <div class="team-card">
+                        <img src="./image/Muhammad yusuf.jpg" alt="Muhammad Yusuf">
+                        <h3>Muhammad Yusuf Karimberdiyev</h3>
+                        <p>Full Stack Dasturchi</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="arrows">
+                <button class="arrow left" onclick="moveSlide(-1)">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="arrow right" onclick="moveSlide(1)">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="footer">
+            <div class="left">
+                <img src="./image/muallif.jpg" alt="Muallif logotipi">
+                <p>
+                    Muallif Muhammad Al-Xorazmiy maktabi<br><br>
+                    Ushbu platforma O'zbekiston Respublikasi Prezidentining 2024-yil 1-apreldagi PF-55-son
+                    Farmoniga asosan tashkil etilgan 2025-yilgi Ixtirochilikka qadam tanlovini 1-o'rin sohibi hamda
+                    amaliyotgan tadbiq etish uchun Oliy ta'lim va innovatsiyalar vazirligi huzuridagi
+                    Ilm-fanni moliyalashtirish va innovatsiyalarni qo'llab-quvvatlash jamg'armasi tomonidan
+                    56 mln so'm miqdorida moliyalashtirilgan.
+                </p>
+            </div>
+            <div class="center">
+                <h2>Aloqa uchun</h2>
+                <p>Manzil: Andijon shahar, Qalandarxona mahalla fuqarolar yig'ini, Buxoro ko'chasi, 4 uy</p>
+                <p>Tel: +998 94 212 14 48</p>
+                <p>Gmail: ixm337@piima.uz</p>
+                <ul class="social-icons">
+                    <li><a href="https://www.facebook.com" target="_blank"><i class="fab fa-facebook-f"></i></a></li>
+                    <li><a href="https://www.youtube.com" target="_blank"><i class="fab fa-youtube"></i></a></li>
+                    <li><a href="https://www.instagram.com" target="_blank"><i class="fab fa-instagram"></i></a></li>
+                    <li><a href="https://t.me/milliy_muhandislik" target="_blank"><i class="fab fa-telegram"></i></a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="bottom">
+            <p>Yaratilgan 2025 MMP | Dizayn va Dasturlash muallifi</p>
+        </div>
+    </footer>
+
+    <script>
+        // =========================
+        // BURGER MENU FUNCTIONALITY
+        // =========================
+        const menuToggle = document.getElementById('menuToggle');
+        const navMenu = document.getElementById('navMenu');
+
+        menuToggle.addEventListener('click', function() {
+            navMenu.classList.toggle('active');
+            this.classList.toggle('active');
+        });
+
+        // Menyu tashqarisiga bosilganda yopish
+        document.addEventListener('click', function(e) {
+            if (!menuToggle.contains(e.target) && !navMenu.contains(e.target)) {
+                navMenu.classList.remove('active');
+                menuToggle.classList.remove('active');
+            }
+        });
+
+        // =========================
+        // TEAM SLIDER FUNCTIONALITY
+        // =========================
+        let currentIndex = 0;
+
+        function moveSlide(direction) {
+            const cards = document.getElementById("teamCards");
+            const totalCards = cards.children.length;
+            const cardWidth = getCardWidth();
+            const visibleCards = getVisibleCards();
+
+            currentIndex += direction;
+
+            // Chegaralarni tekshirish
+            if (currentIndex < 0) {
+                currentIndex = 0;
+            }
+            if (currentIndex > totalCards - visibleCards) {
+                currentIndex = Math.max(0, totalCards - visibleCards);
+            }
+
+            cards.style.transform = `translateX(-${currentIndex * cardWidth}px)`;
+        }
+
+        function getCardWidth() {
+            const screenWidth = window.innerWidth;
+            if (screenWidth <= 480) return 240; // 220px + 20px gap
+            if (screenWidth <= 768) return 280; // 260px + 20px gap
+            if (screenWidth <= 1024) return 260; // 240px + 20px gap
+            return 300; // 280px + 20px gap
+        }
+
+        function getVisibleCards() {
+            const screenWidth = window.innerWidth;
+            if (screenWidth <= 768) return 1;
+            if (screenWidth <= 1024) return 2;
+            return 3;
+        }
+
+        // Ekran o'lchami o'zgarganda slider qayta sozlash
+        window.addEventListener('resize', function() {
+            currentIndex = 0;
+            const cards = document.getElementById("teamCards");
+            cards.style.transform = 'translateX(0px)';
+        });
+
+        // =========================
+        // RESPONSIVE SEARCH BOX
+        // =========================
+        function toggleSearch() {
+            const searchBox = document.querySelector('.search-box');
+            const screenWidth = window.innerWidth;
+            
+            if (screenWidth <= 768) {
+                searchBox.style.display = 'none';
+            } else {
+                searchBox.style.display = 'flex';
+            }
+        }
+
+        // Sahifa yuklanganida va o'lcham o'zgarganda chaqirish
+        window.addEventListener('load', toggleSearch);
+        window.addEventListener('resize', toggleSearch);
+
+        // =========================
+        // NAVBAR SCROLL EFFECT
+        // =========================
+        window.addEventListener('scroll', function() {
+            const nav = document.querySelector('header nav');
+            if (window.scrollY > 50) {
+                nav.style.background = 'rgba(0, 0, 117, 0.95)';
+                nav.style.backdropFilter = 'blur(10px)';
+            } else {
+                nav.style.background = '#000075';
+                nav.style.backdropFilter = 'none';
+            }
+        });
+
+        // =========================
+        // SMOOTH SCROLLING
+        // =========================
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                    
+                    // Mobile menyu yopish
+                    navMenu.classList.remove('active');
+                    menuToggle.classList.remove('active');
+                }
+            });
+        });
+
+        // =========================
+        // TOUCH GESTURES (TEAM SLIDER)
+        // =========================
+        let startX = 0;
+        let isDragging = false;
+
+        const teamSlider = document.querySelector('.team-slider');
+
+        teamSlider.addEventListener('touchstart', function(e) {
+            startX = e.touches[0].clientX;
+            isDragging = true;
+        });
+
+        teamSlider.addEventListener('touchend', function(e) {
+            if (!isDragging) return;
+            
+            const endX = e.changedTouches[0].clientX;
+            const diffX = startX - endX;
+            
+            if (Math.abs(diffX) > 50) { // 50px dan ko'p siljiganda
+                if (diffX > 0) {
+                    moveSlide(1); // o'ngga
+                } else {
+                    moveSlide(-1); // chapga
+                }
+            }
+            
+            isDragging = false;
+        });
+
+        // =========================
+        // AUTO-PLAY TEAM SLIDER
+        // =========================
+        function autoSlide() {
+            const totalCards = document.getElementById("teamCards").children.length;
+            const visibleCards = getVisibleCards();
+            
+            if (currentIndex >= totalCards - visibleCards) {
+                currentIndex = -1;
+            }
+            moveSlide(1);
+        }
+
+        // Auto-play har 4 soniyada (ixtiyoriy)
+        // setInterval(autoSlide, 4000);
+
+        // =========================
+        // LOADING ANIMATION
+        // =========================
+        window.addEventListener('load', function() {
+            document.body.style.opacity = '0';
+            document.body.style.transition = 'opacity 0.5s ease';
+            
+            setTimeout(() => {
+                document.body.style.opacity = '1';
+            }, 100);
+        });
+
+        // =========================
+        // PERFORMANCE OPTIMIZATION
+        // =========================
+        // Debounce function for resize events
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Optimized resize handler
+        const optimizedResize = debounce(function() {
+            toggleSearch();
+            currentIndex = 0;
+            const cards = document.getElementById("teamCards");
+            cards.style.transform = 'translateX(0px)';
+        }, 250);
+
+        window.addEventListener('resize', optimizedResize);
+    </script>
+</body>
+</html>

@@ -1,0 +1,1422 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>360° Yong'in Signalizatsiyasi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: white;
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        /* HEADER */
+        .header {
+            display: flex;
+            align-items: center;
+            background: #000075;
+            color: white;
+            padding: 10px 20px;
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            width: 100%;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .logo-icon {
+            background: white;
+            color: #dc3545;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        /* MAIN LAYOUT */
+        .main-container {
+            display: flex;
+            gap: 20px;
+        }
+
+        /* LEFT PANEL */
+        .left-panel {
+            width: 250px;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            height: fit-content;
+            border: 2px solid #e9ecef;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #dee2e6;
+            padding-bottom: 15px;
+        }
+
+        .control-group h3 {
+            margin-bottom: 10px;
+            color: #000075;
+            font-size: 16px;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 8px;
+            font-size: 14px;
+            border-radius: 5px;
+            transition: all 0.3s;
+            text-align: left;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .btn-success { background: #000075; }
+        .btn-danger { background: #000075; }
+        .btn-primary { background: #000075; }
+        .btn-warning { background: #000075; }
+
+        /* MAIN CONTENT */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border: 2px solid #e9ecef;
+        }
+
+        .title-header {
+            background: #000075;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0 auto 30px;
+            text-align: center;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(0, 0, 117, 0.3);
+        }
+
+        .circuit-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 30px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        /* SENSOR ARRAY SECTION */
+        .sensor-array-section {
+            width: 300px;
+            height: 400px;
+            position: relative;
+        }
+
+        .sensor-circle {
+            width: 250px;
+            height: 250px;
+            border: 3px solid #000075;
+            border-radius: 50%;
+            position: relative;
+            margin: 0 auto;
+            background: radial-gradient(circle, #f8f9fa 0%, #e9ecef 100%);
+        }
+
+        .ir-receiver {
+            width: 30px;
+            height: 30px;
+            background: #f8f9fa;
+            border: 2px solid #000075;
+            border-radius: 50%;
+            position: absolute;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #000075;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .ir-receiver:hover {
+            background: #000075;
+            color: white;
+            border-color: #000075;
+            box-shadow: 0 0 15px rgba(0, 0, 117, 0.4);
+        }
+
+        .ir-receiver.active {
+            background: #dc3545;
+            color: white;
+            border-color: #dc3545;
+            box-shadow: 0 0 20px rgba(220, 53, 69, 0.6);
+            animation: sensorPulse 1s ease-in-out infinite;
+        }
+
+        @keyframes sensorPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        /* Position IR receivers around circle */
+        .ir-receiver:nth-child(1) { top: -15px; left: 50%; transform: translateX(-50%); }
+        .ir-receiver:nth-child(2) { top: 20px; right: -15px; }
+        .ir-receiver:nth-child(3) { top: 50%; right: -15px; transform: translateY(-50%); }
+        .ir-receiver:nth-child(4) { bottom: 20px; right: -15px; }
+        .ir-receiver:nth-child(5) { bottom: -15px; left: 50%; transform: translateX(-50%); }
+        .ir-receiver:nth-child(6) { bottom: 20px; left: -15px; }
+        .ir-receiver:nth-child(7) { top: 50%; left: -15px; transform: translateY(-50%); }
+        .ir-receiver:nth-child(8) { top: 20px; left: -15px; }
+
+        /* FIRE EFFECT */
+        .fire-zone {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .fire-animation {
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, 
+                #ff4500 0%, 
+                #ff6500 30%, 
+                #ff8500 60%, 
+                transparent 100%);
+            border-radius: 50%;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            animation: fireFlicker 0.5s ease-in-out infinite alternate;
+        }
+
+        .fire-animation.burning {
+            opacity: 1;
+        }
+
+        @keyframes fireFlicker {
+            0% { transform: scale(0.9) rotate(0deg); filter: hue-rotate(0deg); }
+            100% { transform: scale(1.1) rotate(5deg); filter: hue-rotate(10deg); }
+        }
+
+        /* CONTROL CIRCUIT */
+        .control-circuit-section {
+            flex: 1;
+            min-width: 400px;
+            border: 4px solid #000075;
+            border-radius: 20px;
+            padding: 20px;
+            position: relative;
+            background: white;
+        }
+
+        .circuit-board {
+            background: #f8f9fa;
+            width: 100%;
+            height: 500px;
+            position: relative;
+            border-radius: 15px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+        }
+
+        .control-header {
+            background: #000075;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 15px;
+            font-size: 14px;
+            font-weight: bold;
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 3px 10px rgba(0, 0, 117, 0.3);
+        }
+
+        /* COMPONENTS */
+        .bc547-transistor {
+            width: 40px;
+            height: 60px;
+           
+
+            border-radius: 8px;
+            position: absolute;
+            top: 100px;
+            left: 250px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: #000075;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .bc547-transistor.active {
+            background: #28a745;
+            border-color: #28a745;
+            color: white;
+            box-shadow: 0 0 15px rgba(40, 167, 69, 0.6);
+        }
+
+        .capacitor {
+            width: 30px;
+            height: 50px;
+        
+            border-radius: 4px;
+            position: absolute;
+            top: 100px;
+            left: 100px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+            color: white;
+        }
+
+        .resistor {
+            width: 50px;
+            height: 15px;
+       
+            border-radius: 8px;
+            position: absolute;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .resistor-220 {
+            top: 280px;
+            left: 400px;
+        }
+
+        .resistor-10k {
+            top: 250px;
+            left: 480px;
+        }
+
+        .resistor-1k {
+            top: 320px;
+            left: 250px;
+        }
+
+        .red-led {
+            width: 20px;
+            height: 30px;
+            background: #666;
+            border-radius: 50% 50% 0 0;
+            position: absolute;
+            top: 100px;
+            left: 150px;
+            transition: all 0.3s ease;
+        }
+
+        .red-led.on {
+            background: #ff0000;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.8);
+            animation: ledBlink 0.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes ledBlink {
+            0% { opacity: 1; }
+            100% { opacity: 0.3; }
+        }
+
+        .buzzer {
+            width: 50px;
+            height: 30px;
+     
+            border-radius: 50%;
+            position: absolute;
+            top: 100px;
+            left: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .buzzer.active {
+            background: #ffc107;
+            border-color: #ffb300;
+            color: black;
+            animation: buzzerVibrate 0.1s ease-in-out infinite;
+        }
+
+        @keyframes buzzerVibrate {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-2px); }
+            75% { transform: translateX(2px); }
+        }
+
+        /* POWER SUPPLY */
+        .power-supply {
+            width: 60px;
+            height: 40px;
+            background: #444;
+            border: 2px solid #666;
+            border-radius: 8px;
+            position: absolute;
+            bottom: 100px;
+            right: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: white;
+        }
+
+        /* STATUS DISPLAY */
+        .status-display {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
+            padding: 15px;
+            border-radius: 12px;
+            min-width: 220px;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            z-index: 100;
+            border: 2px solid #000075;
+        }
+
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 8px 0;
+            font-size: 13px;
+        }
+
+        .status-led {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #e9ecef;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.3);
+            border: 1px solid #000075;
+        }
+
+        .status-led.on {
+            background: #28a745;
+            box-shadow: 0 0 10px rgba(40, 167, 69, 0.8);
+        }
+
+        .status-led.alarm {
+            background: #dc3545;
+            box-shadow: 0 0 10px rgba(220, 53, 69, 0.8);
+            animation: ledBlink 0.5s ease-in-out infinite alternate;
+        }
+
+        /* WIRES */
+        .wire {
+            position: absolute;
+            height: 2px;
+            background: #666;
+            z-index: 1;
+        }
+
+        .wire-red { background: #ff0000; }
+        .wire-black { background: #000000; }
+        .wire-blue { background: #0066ff; }
+        .wire-yellow { background: #ffff00; }
+
+        .wire1 { width: 550px; height: 4px; top: 370px; left: 45px; }
+        .wire2 { width: 174px; height: 4px; top: 210px; left: 75px; }
+        .wire3 { width: 115px; height: 4px; top: 285px; left: 270px; }
+        .wire4 { width: 4px; height: 234px; top: 140px; left: 115px; }
+        .wire5 { width: 4px; height: 200px; top: 129px; left: 152px; }
+        .wire6 { width: 4px; height: 234px; top: 140px; left: 45px; }
+        .wire7 { width: 90px; height: 4px; top: 325px; left: 153px; }
+        .wire8 { width: 90px; height: 4px; top: 347px; left: 295px; transform: rotate(30deg); }
+        .wire9 { width: 4px; height: 85px; top: 129px; left: 165px; }
+        .wire10 { width: 4px; height: 74px; top: 140px; left: 75px; }
+        .wire11 { width: 4px; height: 74px; top: 140px; left: 109px; }
+        .wire12 { width: 4px; height: 74px; top: 140px; left: 245px; }
+        .wire13 { width: 4px; height: 119px; top: 140px; left: 289px; }
+        .wire14 { width: 174px; height: 4px; top: 255px; left: 290px; }
+        .wire15 { width: 4px; height: 119px; top: 170px; left: 267px; }
+        .wire16 { width: 4px; height: 123px; top: 258px; right: 37px; }
+        .wire17 { width: 220px; height: 4px; top: 255px; right: 37px; }
+        .wire18 { width: 4px; height: 30px; top: 258px; right: 217px; }
+        .wire19 { width: 120px; height: 4px; top: 285px; right: 218px; }
+        .wire20 { width: 10px; height: 4px; bottom: 115px; right: 38px; }
+        /* MODAL STYLES */  
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+        }
+
+        .modal-content {
+            background: white;
+            color: #333;
+            margin: 5% auto;
+            padding: 20px;
+            width: 80%;
+            max-width: 800px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            position: relative;
+            border: 2px solid #000075;
+        }
+
+        .close {
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #000075;
+        }
+
+        .close:hover {
+            color: #dc3545;
+        }
+
+        .modal-content h2 {
+            color: #000075;
+            margin-bottom: 20px;
+        }
+
+        .component-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #e9ecef;
+        }
+
+        .component-card h3 {
+            color: #000075;
+            margin-bottom: 10px;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .left-panel {
+                width: 100%;
+            }
+            
+            .circuit-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .status-display {
+                position: relative;
+                margin: 20px auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="logo">
+             <a href="/"><img src="/static/image/logo.png" width="80px" height="80px" alt=""></a>
+            <span>360° Yong'in Signalizatsiyasi Simulyatori</span>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <div class="main-container">
+        <!-- LEFT PANEL -->
+        <div class="left-panel">
+            <div class="control-group">
+                <h3>🔧 Boshqaruv</h3>
+                <button class="btn btn-success" onclick="togglePower()">
+                    Tajribani boshlash
+                </button>
+                <button class="btn btn-danger" onclick="triggerAlarm()">
+                    🚨 Signalizatsiya Test
+                </button>
+                <button class="btn btn-warning" onclick="resetAlarm()">
+                    🔄 Reset
+                </button>
+            </div>
+
+            <div class="control-group">
+                <h3>📋 Ma'lumotlar</h3>
+                <button class="btn btn-primary" onclick="openModal('schemaModal')">
+                    📊 Sxema haqida
+                </button>
+                <button class="btn btn-primary" onclick="openModal('codeModal')">
+                    💻 Kod
+                </button>
+                <button class="btn btn-primary" onclick="openModal('componentsModal')">
+                    🔌 Komponentlar
+                </button>
+            </div>
+
+            <div class="control-group">
+                <h3>📈 Holat</h3>
+                <div class="status-row">
+                    <span>Quvvat:</span>
+                    <div class="status-led" id="powerLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Sensorlar:</span>
+                    <div class="status-led" id="sensorLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>LED:</span>
+                    <div class="status-led" id="ledStatusLed"></div>
+                </div> 
+                <div class="status-row">
+                    <span>Buzzer:</span>
+                    <div class="status-led" id="buzzerStatusLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Olov:</span>
+                    <div class="status-led" id="fireLed"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+            <div class="title-header">360° Yong'in Signalizatsiyasi Simulyatori</div>
+            
+            <div class="circuit-container">
+                <!-- SENSOR ARRAY -->
+                <div class="sensor-array-section">
+                    <h3 style="text-align: center; margin-bottom: 20px; color: #000075;">IR Sensorlar</h3>
+                    <div class="sensor-circle">
+                        <div class="ir-receiver" onclick="triggerSensor(1)">IR1</div>
+                        <div class="ir-receiver" onclick="triggerSensor(2)">IR2</div>
+                        <div class="ir-receiver" onclick="triggerSensor(3)">IR3</div>
+                        <div class="ir-receiver" onclick="triggerSensor(4)">IR4</div>
+                        <div class="ir-receiver" onclick="triggerSensor(5)">IR5</div>
+                        <div class="ir-receiver" onclick="triggerSensor(6)">IR6</div>
+                        <div class="ir-receiver" onclick="triggerSensor(7)">IR7</div>
+                        <div class="ir-receiver" onclick="triggerSensor(8)">IR8</div>
+                        
+                        <div class="fire-zone" onclick="toggleFire()">
+                            <div class="fire-animation" id="fireAnimation"></div>
+                        </div>
+                    </div>
+                    <p style="text-align: center; margin-top: 15px; color: #666; font-size: 12px;">
+                        Olov zonasini bosing yoki sensorlarni bosing
+                    </p>
+                </div>
+
+                <!-- CONTROL CIRCUIT -->
+                <div class="control-circuit-section">
+                    <div class="circuit-board">
+                        <div class="control-header">Yong'in signalizatsiyasini boshqarish sxemasi</div>
+
+                        <!-- Power Supply -->
+                       
+
+                        <!-- BC547 Transistor -->
+                        <div class="bc547-transistor" id="transistor">
+                            <img src="/static/image/bc547 - Copy.png" width="80px" height="120px" alt="">
+                      
+                        </div>
+
+                        <!-- Capacitor -->
+                        <div class="capacitor">
+                            <img src="/static/image/capacitor.png" width="80px " height="100px" alt="">
+                            <div>100µF</div>
+                            <div>25V</div>
+                        </div>
+                           <div class="red-led" id="redLed"></div>
+                        <!-- Resistors -->
+                        <div class="resistor resistor-220">
+                            <img src="/static/image/resistor.png" width="70px" height="60px" alt="">
+                            220Ω</div>
+                        <div class="resistor resistor-10k">
+                            
+                             <img src="/static/image/resistor.png" width="70px" height="60px" alt="">
+                            10K</div>
+                        <div class="resistor resistor-1k">
+                             <img src="/static/image/resistor.png" width="70px" height="60px" alt="">
+                            1K</div>
+ <div class="power-supply">3.7V
+                            <img src="/static/image/litium - Copy.png" width="150px" height="50px" alt="">
+                        </div>
+                        <!-- Red LED -->
+                     
+
+                        <!-- Buzzer -->
+                        <div class="buzzer" id="buzzer">
+                            <img src="/static/image/buzzer3.png" width="100px" height="100px" alt="">
+                            🔊</div>
+
+                        <!-- Wires -->
+                        <div class="wire wire-red wire1"></div>
+                        <div class="wire wire-red wire4"></div>
+                        <div class="wire wire-black wire2"></div>
+                        <div class="wire wire-blue wire3"></div>
+                        <div class="wire wire-red wire5"></div>
+                        <div class="wire wire-red wire6"></div>
+                        <div class="wire wire-red wire7"></div>
+                        <div class="wire wire-red wire8"></div>
+                        <div class="wire wire-black wire9"></div>
+                        <div class="wire wire-black wire10"></div>
+                        <div class="wire wire-black wire11"></div>
+                        <div class="wire wire-black wire12"></div>
+                        <div class="wire wire-black wire13"></div>
+                        <div class="wire wire-black wire14"></div>
+                        <div class="wire wire-blue wire15"></div>
+                        <div class="wire wire-black wire16"></div>
+                        <div class="wire wire-black wire17"></div>
+                         <div class="wire wire-black wire18"></div>
+                        <div class="wire wire-black wire19"></div>
+                         <div class="wire wire-black wire20"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- STATUS DISPLAY -->
+    <div class="status-display">
+        <h4 style="color: #000075; margin-bottom: 10px;">🔥 Alarm Status</h4>
+        <div class="status-row">
+            <span>Sistem:</span>
+            <span id="systemStatus">OFFLINE</span>
+        </div>
+        <div class="status-row">
+            <span>Olov holati:</span>
+            <span id="fireStatus">YO'Q</span>
+        </div>
+        <div class="status-row">
+            <span>Faol sensorlar:</span>
+            <span id="activeSensors">0/8</span>
+        </div>
+    </div>
+
+    <!-- MODALS -->
+    <div class="modal" id="schemaModal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('schemaModal')">&times;</span>
+            <h2>🔥 Sxema haqida ma'lumot</h2>
+            
+            <div class="component-card">
+                <h3>Qanday ishlaydi?</h3>
+                <p>Bu 360° yong'in signalizatsiya tizimi infraqizil sensorlar orqali olovni har tomondan aniqlaydi. 8 ta IR sensor doiraviy tartibda joylashgan bo'lib, olov yaqinlashganda signal beradi.</p>
+            </div>
+
+            <div class="component-card">
+                <h3>Qo'llanilish joylari</h3>
+                <ul>
+                    <li>Uylar va ofislarda xavfsizlik uchun</li>
+                    <li>Sanoat binolarida</li>
+                    <li>Ombor va do'konlarda</li>
+                    <li>Avtomobil garaji va parkingda</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="codeModal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('codeModal')">&times;</span>
+            <h2>💻 Arduino Kodi</h2>
+            
+            <pre style="background: #f8f9fa; color: #333; padding: 15px; border-radius: 8px; overflow-x: auto; border: 1px solid #e9ecef;">
+// 360° Fire Alarm System
+#define BUZZER_PIN 9
+#define LED_PIN 13
+#define TRANSISTOR_PIN 8
+
+// IR Sensor pins
+int sensorPins[] = {2, 3, 4, 5, 6, 7, 8, 12};
+bool fireDetected = false;
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(BUZZER_PIN, OUTPUT);
+  pinMode(LED_PIN, OUTPUT);
+  pinMode(TRANSISTOR_PIN, OUTPUT);
+  
+  for(int i = 0; i < 8; i++) {
+    pinMode(sensorPins[i], INPUT);
+  }
+}
+
+void loop() {
+  fireDetected = false;
+  
+  // Check all sensors
+  for(int i = 0; i < 8; i++) {
+    if(digitalRead(sensorPins[i]) == LOW) {
+      fireDetected = true;
+      Serial.print("Fire detected on sensor: ");
+      Serial.println(i+1);
+      break;
+    }
+  }
+  
+  if(fireDetected) {
+    activateAlarm();
+  } else {
+    deactivateAlarm();
+  }
+  
+  delay(100);
+}
+
+void activateAlarm() {
+  digitalWrite(LED_PIN, HIGH);
+  digitalWrite(TRANSISTOR_PIN, HIGH);
+  
+  // Buzzer sound pattern
+  for(int i = 0; i < 3; i++) {
+    digitalWrite(BUZZER_PIN, HIGH);
+    delay(200);
+    digitalWrite(BUZZER_PIN, LOW);
+    delay(100);
+  }
+}
+
+void deactivateAlarm() {
+  digitalWrite(LED_PIN, LOW);
+  digitalWrite(TRANSISTOR_PIN, LOW);
+  digitalWrite(BUZZER_PIN, LOW);
+}
+            </pre> {
+  Serial.begin(9600);
+  pinMode(BUZZER_PIN, OUTPUT);
+  pinMode(LED_PIN, OUTPUT);
+  pinMode(TRANSISTOR_PIN, OUTPUT);
+  
+  for(int i = 0; i < 8; i++) {
+    pinMode(sensorPins[i], INPUT);
+  }
+}
+
+void loop() {
+  fireDetected = false;
+  
+  // Check all sensors
+  for(int i = 0; i < 8; i++) {
+    if(digitalRead(sensorPins[i]) == LOW) {
+      fireDetected = true;
+      Serial.print("Fire detected on sensor: ");
+      Serial.println(i+1);
+      break;
+    }
+  }
+  
+  if(fireDetected) {
+    activateAlarm();
+  } else {
+    deactivateAlarm();
+  }
+  
+  delay(100);
+}
+
+void activateAlarm() {
+  digitalWrite(LED_PIN, HIGH);
+  digitalWrite(TRANSISTOR_PIN, HIGH);
+  
+  // Buzzer sound pattern
+  for(int i = 0; i < 3; i++) {
+    digitalWrite(BUZZER_PIN, HIGH);
+    delay(200);
+    digitalWrite(BUZZER_PIN, LOW);
+    delay(100);
+  }
+}
+
+void deactivateAlarm() {
+  digitalWrite(LED_PIN, LOW);
+  digitalWrite(TRANSISTOR_PIN, LOW);
+  digitalWrite(BUZZER_PIN, LOW);
+}
+            </pre>
+        </div>
+    </div>
+
+    <div class="modal" id="componentsModal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('componentsModal')">&times;</span>
+            <h2>🔌 Komponentlar ro'yxati</h2>
+            
+            <div class="component-card">
+                <h3>IR Receiver Sensorlar (8 dona)</h3>
+                <p>Infraqizil nurlarni qabul qilib, olov mavjudligini aniqlaydi</p>
+            </div>
+
+            <div class="component-card">
+                <h3>BC547 NPN Transistor</h3>
+                <p>Signalni kuchaytirish va buzzer/LED ni boshqarish uchun</p>
+            </div>
+
+            <div class="component-card">
+                <h3>Resistorlar</h3>
+                <p>220Ω - LED uchun, 10K - Base resistor, 1K - Signal resistor</p>
+            </div>
+
+            <div class="component-card">
+                <h3>Kapasitor 100µF 25V</h3>
+                <p>Quvvat berqarorligini ta'minlash uchun</p>
+            </div>
+
+            <div class="component-card">
+                <h3>Qizil LED</h3>
+                <p>Vizual signal berish uchun</p>
+            </div>
+
+            <div class="component-card">
+                <h3>Buzzer</h3>
+                <p>Audio signal berish uchun</p>
+            </div>
+
+            <div class="component-card">
+                <h3>3.7V Batareya</h3>
+                <p>Tizimni quvvat bilan ta'minlash</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // System state variables
+        let powerOn = false;
+        let fireDetected = false;
+        let alarmActive = false;
+        let activeSensorCount = 0;
+
+        // DOM elements
+        const elements = {
+            powerLed: document.getElementById('powerLed'),
+            sensorLed: document.getElementById('sensorLed'),
+            ledStatusLed: document.getElementById('ledStatusLed'),
+            buzzerStatusLed: document.getElementById('buzzerStatusLed'),
+            fireLed: document.getElementById('fireLed'),
+            
+            transistor: document.getElementById('transistor'),
+            redLed: document.getElementById('redLed'),
+            buzzer: document.getElementById('buzzer'),
+            fireAnimation: document.getElementById('fireAnimation'),
+            
+            systemStatus: document.getElementById('systemStatus'),
+            fireStatus: document.getElementById('fireStatus'),
+            activeSensors: document.getElementById('activeSensors')
+        };
+
+        // Audio context for buzzer sound
+        let audioContext = null;
+
+        function initAudio() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playBuzzerSound() {
+            if (!audioContext) return;
+            
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.5);
+        }
+
+        // Update status display
+        function updateStatus() {
+            elements.powerLed.classList.toggle('on', powerOn);
+            elements.sensorLed.classList.toggle('on', activeSensorCount > 0);
+            elements.ledStatusLed.classList.toggle('alarm', alarmActive);
+            elements.buzzerStatusLed.classList.toggle('alarm', alarmActive);
+            elements.fireLed.classList.toggle('alarm', fireDetected);
+            
+            elements.systemStatus.textContent = powerOn ? 'ONLINE' : 'OFFLINE';
+            elements.systemStatus.style.color = powerOn ? '#28a745' : '#dc3545';
+            
+            elements.fireStatus.textContent = fireDetected ? 'ANIQLANGAN!' : 'YO\'Q';
+            elements.fireStatus.style.color = fireDetected ? '#dc3545' : '#28a745';
+            
+            elements.activeSensors.textContent = `${activeSensorCount}/8`;
+            elements.activeSensors.style.color = activeSensorCount > 0 ? '#dc3545' : '#28a745';
+        }
+
+        // Toggle power
+        function togglePower() {
+            powerOn = !powerOn;
+            
+            if (!powerOn) {
+                resetAlarm();
+                fireDetected = false;
+                elements.fireAnimation.classList.remove('burning');
+            }
+            
+            updateStatus();
+            
+            // Initialize audio context on first user interaction
+            if (powerOn) {
+                initAudio();
+            }
+        }
+
+        // Toggle fire effect
+        function toggleFire() {
+            if (!powerOn) {
+                alert('Avval quvvatni yoqing!');
+                return;
+            }
+            
+            fireDetected = !fireDetected;
+            elements.fireAnimation.classList.toggle('burning', fireDetected);
+            
+            if (fireDetected) {
+                activateAllSensors();
+                activateAlarm();
+            } else {
+                deactivateAllSensors();
+                deactivateAlarm();
+            }
+            
+            updateStatus();
+        }
+
+        // Trigger individual sensor
+        function triggerSensor(sensorNum) {
+            if (!powerOn) {
+                alert('Avval quvvatni yoqing!');
+                return;
+            }
+            
+            const sensors = document.querySelectorAll('.ir-receiver');
+            const sensor = sensors[sensorNum - 1];
+            
+            sensor.classList.toggle('active');
+            
+            // Count active sensors
+            activeSensorCount = document.querySelectorAll('.ir-receiver.active').length;
+            
+            if (activeSensorCount > 0) {
+                fireDetected = true;
+                elements.fireAnimation.classList.add('burning');
+                activateAlarm();
+            } else {
+                fireDetected = false;
+                elements.fireAnimation.classList.remove('burning');
+                deactivateAlarm();
+            }
+            
+            updateStatus();
+        }
+
+        // Activate all sensors
+        function activateAllSensors() {
+            const sensors = document.querySelectorAll('.ir-receiver');
+            sensors.forEach(sensor => sensor.classList.add('active'));
+            activeSensorCount = 8;
+        }
+
+        // Deactivate all sensors
+        function deactivateAllSensors() {
+            const sensors = document.querySelectorAll('.ir-receiver');
+            sensors.forEach(sensor => sensor.classList.remove('active'));
+            activeSensorCount = 0;
+        }
+
+        // Activate alarm
+        function activateAlarm() {
+            if (!powerOn) return;
+            
+            alarmActive = true;
+            
+            // Activate circuit components
+            elements.transistor.classList.add('active');
+            elements.redLed.classList.add('on');
+            elements.buzzer.classList.add('active');
+            
+            // Play buzzer sound
+            playBuzzerSound();
+            
+            updateStatus();
+        }
+
+        // Deactivate alarm
+        function deactivateAlarm() {
+            alarmActive = false;
+            
+            // Deactivate circuit components
+            elements.transistor.classList.remove('active');
+            elements.redLed.classList.remove('on');
+            elements.buzzer.classList.remove('active');
+            
+            updateStatus();
+        }
+
+        // Trigger alarm manually
+        function triggerAlarm() {
+            if (!powerOn) {
+                alert('Avval quvvatni yoqing!');
+                return;
+            }
+            
+            // Simulate fire detection
+            fireDetected = true;
+            elements.fireAnimation.classList.add('burning');
+            activateAllSensors();
+            activateAlarm();
+            
+            // Auto reset after 3 seconds
+            setTimeout(() => {
+                if (alarmActive) {
+                    resetAlarm();
+                }
+            }, 3000);
+            
+            updateStatus();
+        }
+
+        // Reset alarm
+        function resetAlarm() {
+            fireDetected = false;
+            alarmActive = false;
+            activeSensorCount = 0;
+            
+            elements.fireAnimation.classList.remove('burning');
+            deactivateAllSensors();
+            deactivateAlarm();
+            
+            updateStatus();
+        }
+
+        // Modal functions
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        window.addEventListener('click', function(event) {
+            document.querySelectorAll('.modal').forEach(modal => {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        });
+
+        // Initialize system
+        updateStatus();
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(event) {
+            switch(event.key.toLowerCase()) {
+                case 'p':
+                    togglePower();
+                    break;
+                case 'f':
+                    if (powerOn) toggleFire();
+                    break;
+                case 't':
+                    if (powerOn) triggerAlarm();
+                    break;
+                case 'r':
+                    resetAlarm();
+                    break;
+            }
+        });
+
+        // Auto demo mode (optional)
+        function startDemo() {
+            if (!powerOn) {
+                togglePower();
+            }
+            
+            let step = 0;
+            const demoInterval = setInterval(() => {
+                switch(step) {
+                    case 0:
+                        triggerSensor(1);
+                        break;
+                    case 1:
+                        triggerSensor(3);
+                        break;
+                    case 2:
+                        triggerSensor(5);
+                        break;
+                    case 3:
+                        toggleFire();
+                        break;
+                    case 4:
+                        resetAlarm();
+                        clearInterval(demoInterval);
+                        break;
+                }
+                step++;
+            }, 2000);
+        }
+
+        // Add demo button to left panel
+        const demoButton = document.createElement('button');
+        demoButton.className = 'btn btn-warning';
+        demoButton.textContent = '🎯 Demo Mode';
+        demoButton.onclick = startDemo;
+        
+        // Add to first control group
+        const firstControlGroup = document.querySelector('.control-group');
+        firstControlGroup.appendChild(demoButton);
+
+        // Keyboard shortcut display
+        const shortcutInfo = document.createElement('div');
+        shortcutInfo.innerHTML = `
+            <h4 style="color: #000075; margin: 15px 0 10px;">⌨️ Klaviatura</h4>
+            <p style="font-size: 12px; color: #666; margin: 5px 0;">P - Quvvat</p>
+            <p style="font-size: 12px; color: #666; margin: 5px 0;">F - Olov</p>
+            <p style="font-size: 12px; color: #666; margin: 5px 0;">T - Test</p>
+            <p style="font-size: 12px; color: #666; margin: 5px 0;">R - Reset</p>
+        `;
+        
+        const lastControlGroup = document.querySelectorAll('.control-group')[2];
+        lastControlGroup.appendChild(shortcutInfo);
+
+        // Temperature display simulation
+        function updateTemperature() {
+            const tempDisplay = document.getElementById('tempDisplay');
+            if (tempDisplay) {
+                let temp = fireDetected ? 
+                    Math.floor(Math.random() * 50) + 80 : // 80-130°C when fire
+                    Math.floor(Math.random() * 20) + 20;  // 20-40°C normal
+                tempDisplay.textContent = temp + '°C';
+                tempDisplay.style.color = temp > 60 ? '#dc3545' : '#28a745';
+            }
+        }
+
+        // Add temperature display to status
+        const statusDisplay = document.querySelector('.status-display');
+        const tempRow = document.createElement('div');
+        tempRow.className = 'status-row';
+        tempRow.innerHTML = `
+            <span>Harorat:</span>
+            <span id="tempDisplay" style="font-weight: bold;">25°C</span>
+        `;
+        statusDisplay.appendChild(tempRow);
+
+        // Update temperature every 2 seconds
+        setInterval(updateTemperature, 2000);
+
+        // Enhanced fire animation
+        function createFireParticles() {
+            if (!fireDetected) return;
+            
+            const fireZone = document.querySelector('.fire-zone');
+            for(let i = 0; i < 3; i++) {
+                const particle = document.createElement('div');
+                particle.style.cssText = `
+                    position: absolute;
+                    width: 4px;
+                    height: 4px;
+                    background: #ff4500;
+                    border-radius: 50%;
+                    pointer-events: none;
+                    animation: fireParticle 1s ease-out forwards;
+                    left: ${Math.random() * 80}px;
+                    top: ${Math.random() * 80}px;
+                `;
+                fireZone.appendChild(particle);
+                
+                setTimeout(() => particle.remove(), 1000);
+            }
+        }
+
+        // Add particle animation CSS
+        const particleStyle = document.createElement('style');
+        particleStyle.textContent = `
+            @keyframes fireParticle {
+                0% {
+                    transform: translateY(0) scale(1);
+                    opacity: 1;
+                }
+                100% {
+                    transform: translateY(-20px) scale(0);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(particleStyle);
+
+        // Create particles when fire is active
+        setInterval(createFireParticles, 300);
+
+        // Sound effects improvement
+        function playAlarmSound() {
+            if (!audioContext || !alarmActive) return;
+            
+            // Create alarm sound pattern
+            const frequencies = [800, 1000, 800, 1000];
+            let index = 0;
+            
+            function playTone() {
+                if (!alarmActive || index >= frequencies.length) {
+                    index = 0;
+                    return;
+                }
+                
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.setValueAtTime(frequencies[index], audioContext.currentTime);
+                gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.3);
+                
+                index++;
+                setTimeout(playTone, 300);
+            }
+            
+            playTone();
+        }
+
+        // Enhanced alarm activation
+        const originalActivateAlarm = activateAlarm;
+        activateAlarm = function() {
+            originalActivateAlarm();
+            playAlarmSound();
+        };
+
+        // Sensor calibration simulation
+        function calibrateSensors() {
+            if (!powerOn) {
+                alert('Avval quvvatni yoqing!');
+                return;
+            }
+            
+            alert('Sensorlar kalibrlandi!\nSezgirlik: Yuqori\nMasofa: 5 metr');
+        }
+
+        // Add calibration button
+        const calibrateBtn = document.createElement('button');
+        calibrateBtn.className = 'btn btn-primary';
+        calibrateBtn.textContent = '⚙️ Kalibratsiya';
+        calibrateBtn.onclick = calibrateSensors;
+        
+        const controlGroups = document.querySelectorAll('.control-group');
+        controlGroups[0].appendChild(calibrateBtn);
+
+        // System information display
+        function showSystemInfo() {
+            alert(`
+🔥 360° Yong'in Signalizatsiya Tizimi
+────────────────────────────────────
+Versiya: 2.1
+Sensorlar: 8 ta IR receiver
+Qamrov: 360° x 5 metr
+Javob vaqti: < 0.5 sekund
+Batareya: 3.7V Li-ion
+Ishlash vaqti: 24/7
+            `);
+        }
+
+        // Add info button
+        const infoBtn = document.createElement('button');
+        infoBtn.className = 'btn btn-primary';
+        infoBtn.textContent = 'ℹ️ Tizim haqida';
+        infoBtn.onclick = showSystemInfo;
+        
+        controlGroups[1].appendChild(infoBtn);
+
+        // Enhanced component interactions
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add hover effects to components
+            const components = document.querySelectorAll('.bc547-transistor, .capacitor, .resistor, .red-led, .buzzer, .power-supply');
+            
+            components.forEach(component => {
+                component.addEventListener('mouseenter', function() {
+                    if (powerOn) {
+                        this.style.transform = 'scale(1.1)';
+                        this.style.zIndex = '20';
+                    }
+                });
+                
+                component.addEventListener('mouseleave', function() {
+                    this.style.transform = 'scale(1)';
+                    this.style.zIndex = 'auto';
+                });
+            });
+        });
+
+        // Final initialization
+        updateStatus();
+        updateTemperature();
+
+        console.log('🔥 360° Fire Alarm Simulator initialized!');
+        console.log('Keyboard shortcuts: P(power), F(fire), T(test), R(reset)');
+    </script>
+</body>
+</html>

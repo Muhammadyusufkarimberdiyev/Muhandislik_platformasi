@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Touch Switch Tajriba Simulyatori</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #e6f3ff;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: auto;
+        }
+
+        /* HEADER */
+        .header {
+            display: flex;
+            align-items: center;
+            background: #000075;
+            color: white;
+            padding: 10px 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            width: 100%;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: #000075;
+            border-radius: 50%;
+            border: 2px solid white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        /* MAIN LAYOUT */
+        .main-container {
+            display: flex;
+            margin-top: 20px;
+            gap: 20px;
+        }
+
+        /* LEFT PANEL */
+        .left-panel {
+            width: 280px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            height: fit-content;
+            position: relative;
+            z-index: 1;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 15px;
+        }
+
+        .control-group h3 {
+            margin-bottom: 10px;
+            color: #000075;
+            font-size: 16px;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 8px;
+            font-size: 14px;
+            border-radius: 5px;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn-success { 
+            background: #28a745; 
+            color: white; 
+        }
+        .btn-danger { 
+            background: #dc3545; 
+            color: white; 
+        }
+        .btn-primary { 
+            background: #000075; 
+            color: white; 
+        }
+        .btn-info { 
+            background: #000075; 
+            color: white; 
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .title-header {
+            background: #000075;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0 auto 30px;
+            text-align: center;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .circuit-container {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .circuit-board {
+            background: #ffffff;
+            border: 4px solid #000075;
+            border-radius: 20px;
+            width: 600px;
+            height: 500px;
+            position: relative;
+            margin: 0 auto;
+            display: flex;
+            box-shadow: 0 0 25px rgba(0, 0, 117, 0.3);
+        }
+
+        .circuit-title {
+            background: #000075;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 15px;
+            font-size: 14px;
+            font-weight: bold;
+            position: absolute;
+            top: -12px;
+            right: 30px;
+            box-shadow: 0 3px 10px rgba(0, 0, 117, 0.3);
+        }
+
+        /* BATTERY */
+        .battery {
+            position: absolute;
+            bottom: 50px;
+            left: 150px;
+            width: 60px;
+            height: 100px;
+            
+            border-radius: 5px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            
+        }
+
+        .battery::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            width: 20px;
+            height: 5px;
+            background: #333;
+            border-radius: 2px;
+        }
+
+        .battery-label {
+            margin-top: 10px;
+            font-size: 10px;
+        }
+
+        /* LED */
+        .led {
+            position: absolute;
+            top: 80px;
+            left: 80px;
+            width: 30px;
+            height: 40px;
+            background: linear-gradient(145deg, #00ff44, #00cc33);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+            color: white;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px rgba(0, 255, 68, 0.3);
+        }
+
+        .led.on {
+            background: linear-gradient(145deg, #00ff44, #00cc33);
+            box-shadow: 0 0 20px rgba(0, 255, 68, 0.8);
+            animation: ledGlow 1s ease-in-out infinite alternate;
+        }
+
+        .led.off {
+            background: linear-gradient(145deg, #444444, #333333);
+            box-shadow: none;
+        }
+
+        @keyframes ledGlow {
+            0% { box-shadow: 0 0 20px rgba(0, 255, 68, 0.8); }
+            100% { box-shadow: 0 0 30px rgba(0, 255, 68, 1); }
+        }
+
+        /* BC547 TRANSISTOR */
+        .transistor {
+            position: absolute;
+            top: 50px;
+            right: 320px;
+            width: 40px;
+            height: 50px;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 9px;
+            font-weight: bold;
+           
+        }
+
+        .transistor-label {
+            background: #000075;
+            color: white;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-size: 8px;
+        }
+
+        /* RESISTORS */
+        .resistor {
+            width: 50px;
+            height: 12px;
+        
+
+            border-radius: 6px;
+            position: absolute;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .resistor.r330-1 {
+            top: 180px;
+            left: 80px;
+        }
+
+        .resistor.r330-2 {
+            top: 113.5px;
+            right: 200px;
+        }
+
+        /* TOUCH SENSOR AREA */
+        .touch-sensor {
+            position: absolute;
+            top: 150px;
+            left: 250px;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 80px;
+            background: linear-gradient(145deg, #f0f0f0, #e0e0e0);
+            border: 3px dashed #000075;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .touch-sensor:hover {
+            background: linear-gradient(145deg, #e0e0f0, #d0d0e0);
+            border-color: #0066ff;
+            box-shadow: 0 0 15px rgba(0, 102, 255, 0.3);
+        }
+
+        .touch-sensor.active {
+            background: linear-gradient(145deg, #ffeeee, #ffdddd);
+            border-color: #ff4444;
+            box-shadow: 0 0 20px rgba(255, 68, 68, 0.5);
+        }
+
+        .touch-icon {
+            font-size: 30px;
+            margin-bottom: 5px;
+        }
+
+        .touch-label {
+            font-size: 12px;
+            font-weight: bold;
+            color: #000075;
+        }
+
+        /* HAND ANIMATION */
+        .hand-demo {
+            position: absolute;
+            top: 200px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 40px;
+            opacity: 0;
+            transition: all 0.4s ease;
+            z-index: 10;
+        }
+
+        .hand-demo.visible {
+            opacity: 1;
+            animation: handTouch 1.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes handTouch {
+            0% { transform: translateX(-50%) translateY(0); }
+            100% { transform: translateX(-50%) translateY(-10px); }
+        }
+
+        /* WIRES */
+        .wire {
+            position: absolute;
+            z-index: 5;
+        }
+
+        .wire-red {
+            width: 83px;
+            height: 3px;
+            background: #ff0000;
+            bottom: 170px;
+            left: 75px;
+        }
+         .wire-red1 {
+            width: 163px;
+            height: 3px;
+            background: #ff0000;
+            top: 129px;
+            left: 75px;
+        }
+         .wire-red2 {
+            width: 3px;
+            height: 193px;
+            background: #ff0000;
+            bottom: 170px;
+            left: 75px;
+        }
+         .wire-red3 {
+              width: 3px;
+            height: 14px;
+            background: #ff0000;
+            top: 118px;
+            left: 237px;
+        }
+         .wire-red4 {
+            width: 3px;
+            height: 13px;
+            background: #ff0000;
+            bottom: 160px;
+            left: 155px;
+        }
+        .wire-black {
+            width: 255px;
+            height: 3px;
+            background: #000000;
+            bottom: 170px;
+            right: 140px;
+        }
+          .wire-black1 {
+            width: 3px;
+            height: 15px;
+            background: #000000;
+            bottom: 158px;
+            left: 195px;
+        }
+
+        .wire-green {
+            width: 4px;
+            height: 70px;
+            background: #00ff00;
+            top: 100px;
+            left: 249px;
+        }
+         .wire-green1 {
+            width: 80px;
+            height: 4px;
+            background: #00ff00;
+            top: 184px;
+            left: 150px;
+        }
+        .wire-blue {
+            width: 3px;
+            height: 205px;
+            background: black;
+            top: 117px;
+            right: 140px;
+        }
+          .wire-blue1 {
+            width: 36px;
+            height: 3px;
+            background: black;
+            top: 117px;
+            right: 140px;
+        }
+  .wire-blue2 {
+            width: 78px;
+            height: 3px;
+            background: black;
+            top: 117px;
+            right: 250px;
+        }
+
+        /* STATUS DISPLAY */
+        .status-display {
+            position: fixed;
+            top: 90px;
+            right: 20px;
+            background: rgba(0, 0, 117, 0.9);
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            min-width: 220px;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            z-index: 100;
+        }
+
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 8px 0;
+            font-size: 13px;
+        }
+
+        .status-led {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #dc3545;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+        }
+
+        .status-led.on {
+            background: #28a745;
+            box-shadow: 0 0 10px rgba(40, 167, 69, 0.8);
+        }
+
+        /* MODAL STYLES */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            backdrop-filter: blur(3px);
+        }
+
+        .modal-content {
+            background: #000075;
+            color: white;
+            margin: 5% auto;
+            padding: 20px;
+            width: 80%;
+            max-width: 700px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+            animation: slideDown 0.4s ease;
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+            transition: color 0.3s;
+        }
+
+        .close:hover {
+            color: #ffcc00;
+        }
+
+        .modal-content h2 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            border-bottom: 2px solid rgba(255,255,255,0.2);
+            padding-bottom: 8px;
+        }
+
+        .card {
+            background: rgba(255,255,255,0.08);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            transition: background 0.3s;
+        }
+
+        .card:hover {
+            background: rgba(255,255,255,0.15);
+        }
+
+        pre {
+            background: rgba(0,0,0,0.4);
+            padding: 12px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        /* RESPONSIVE DESIGN */
+        @media (max-width: 1024px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .left-panel {
+                width: 100%;
+            }
+            
+            .circuit-board {
+                width: 100%;
+                max-width: 500px;
+                height: 400px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .status-display {
+                position: relative;
+                margin: 20px auto;
+                width: fit-content;
+            }
+            
+            .modal-content {
+                width: 95%;
+                margin: 10% auto;
+            }
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="logo">
+                <a href="/"><img src="/static/image/logo.png" width="80px" height="80px" alt=""></a>
+            <span>Touch Switch Tajriba Simulyatori</span>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <div class="main-container">
+        <!-- LEFT PANEL -->
+        <div class="left-panel">
+            <div class="control-group">
+                <h3>🔧 Boshqaruv</h3>
+                <button class="btn btn-success" onclick="startSimulation()">
+                    ▶️ Tajribani boshlash
+                </button>
+                <button class="btn btn-danger" onclick="stopSimulation()">
+                    ⏹️ Tajribani to'xtatish
+                </button>
+                <button class="btn btn-primary" onclick="togglePower()">
+                    🔋 Quvvatni yoqish/o'chirish
+                </button>
+                <button class="btn btn-info" onclick="runTest()">
+                    🧪 Test rejimi
+                </button>
+            </div>
+
+            <div class="control-group">
+                <h3>📚 Ma'lumotlar</h3>
+                <button class="btn btn-primary" onclick="openModal('theoryModal')">
+                    📖 Nazariy ma'lumot
+                </button>
+                <button class="btn btn-primary" onclick="openModal('codeModal')">
+                    💻 Kod namunasi
+                </button>
+                <button class="btn btn-primary" onclick="openModal('componentsModal')">
+                    🔌 Komponentlar
+                </button>
+                <button class="btn btn-primary" onclick="openModal('instructionsModal')">
+                    📋 Qo'llanma
+                </button>
+            </div>
+
+            <div class="control-group">
+                <h3>📊 Holat ko'rsatkichlari</h3>
+                <div class="status-row">
+                    <span>🔋 Quvvat manbai:</span>
+                    <div class="status-led" id="powerLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>💡 LED holati:</span>
+                    <div class="status-led" id="ledLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>👆 Touch sensori:</span>
+                    <div class="status-led" id="touchLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>🔧 Tranzistor:</span>
+                    <div class="status-led" id="transistorLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>⚡ Zanjir holati:</span>
+                    <div class="status-led" id="circuitLed"></div>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <h3>🔊 Ovoz sozlamalari</h3>
+                <button class="btn btn-info" onclick="toggleSound()">
+                    🔊 Ovozni yoqish/o'chirish
+                </button>
+                <div style="margin-top: 10px;">
+                    <label style="font-size: 12px;">Ovoz balandligi:</label>
+                    <input type="range" id="volumeSlider" min="0" max="100" value="50" style="width: 100%;" onchange="setVolume(this.value)">
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+         
+            <div class="circuit-container">
+                <div class="circuit-board">
+                    <div class="circuit-title">BC547 Sensorli almashtirish davri</div>
+                    
+                    <!-- HAND DEMO -->
+                    <div class="hand-demo" id="handDemo">✋</div>
+                    
+                    <!-- BATTERY -->
+                    <div class="battery" id="battery">
+                        <div>9V</div>
+                        <div class="battery-label">Battery</div>
+                        <img src="/static/image/9v3.png" width="190px" height="170px" alt="">
+                    </div>
+                    
+                    <!-- LED -->
+                    <div class="led off" id="led">
+                        <div style="font-size: 8px;">LED</div>
+                    </div>
+                    
+                    <!-- BC547 TRANSISTOR -->
+                    <div class="transistor" id="transistor">
+                        
+                        <img src="/static/image/bc547 - Copy.png" width="50px" height="120px" alt="">
+                        
+                    </div>
+                    
+                    <!-- RESISTORS -->
+                    <div class="resistor r330-1">330Ω
+                        <img src="/static/image/resistor.png" width="80px" height="80px" alt="">
+                    </div>
+                    <div class="resistor r330-2">330Ω
+                          <img src="/static/image/resistor.png" width="80px" height="80px" alt="">
+                    </div>
+                    
+                    <!-- TOUCH SENSOR AREA -->
+                    <div class="touch-sensor" id="touchSensor" 
+                         onmousedown="startTouch()" 
+                         onmouseup="endTouch()"
+                         onmouseleave="endTouch()">
+                        <div class="touch-icon">👆</div>
+                        <div class="touch-label">Bu yerga bosing</div>
+                    </div>
+                    
+                    <!-- WIRES -->
+                    <div class="wire wire-red"></div>
+                    <div class="wire wire-red1"></div>
+                    <div class="wire wire-red2"></div>
+                       <div class="wire wire-red3"></div>
+                    <div class="wire wire-red4"></div>
+                    <div class="wire wire-black"></div>
+                    <div class="wire wire-black1"></div>
+                    <div class="wire wire-green"></div>
+                      <div class="wire wire-green1"></div>
+                    <div class="wire wire-blue"></div>
+                    <div class="wire wire-blue1"></div>
+                    <div class="wire wire-blue2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- STATUS DISPLAY -->
+    <div class="status-display">
+        <div style="font-weight: bold; margin-bottom: 10px; text-align: center;">🔬 Tajriba holati</div>
+        <div class="status-row">
+            <span>Zanjir:</span>
+            <div class="status-led" id="circuitStatus"></div>
+        </div>
+        <div class="status-row">
+            <span>Teginish:</span>
+            <div class="status-led" id="touchStatus"></div>
+        </div>
+        <div class="status-row">
+            <span>LED:</span>
+            <div class="status-led" id="ledStatus"></div>
+        </div>
+    </div>
+
+    <!-- MODALS -->
+    <!-- Theory Modal -->
+    <div class="modal" id="theoryModal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>📖 Touch Switch Nazariyasi</h2>
+            <div class="card">
+                <h3>🔬 Ishlash Prinsipi</h3>
+                <p>Touch switch BC547 NPN tranzistorining base-emitter orasidagi kichik tok orqali ishlaydi. Barmoq sensor joyiga tegsa, teri qarshiligi orqali base ga kichik tok o'tadi va tranzistor ochiladi.</p>
+            </div>
+            <div class="card">
+                <h3>⚡ Elektr Zanjiri</h3>
+                <p>Zanjir 9V batareya, 330Ω qarshilik, BC547 tranzistor va LED dan iborat. Touch sensor tranzistorning base qismiga ulangan.</p>
+            </div>
+            <div class="card">
+                <h3>🎯 Praktik Qo'llanish</h3>
+                <p>Bu printsip zamonaviy smartfonlar, planshetlar va touch screen qurilmalarda ishlatiladi.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Code Modal -->
+    <div class="modal" id="codeModal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>💻 Arduino Kodi</h2>
+            <pre>
+// Touch Switch with BC547 Transistor
+const int touchPin = A0;  // Analog pin for touch sensing
+const int ledPin = 13;    // Digital pin for LED
+int threshold = 512;      // Touch threshold value
+
+void setup() {
+  pinMode(ledPin, OUTPUT);
+  Serial.begin(9600);
+  Serial.println("Touch Switch Ready!");
+}
+
+void loop() {
+  int touchValue = analogRead(touchPin);
+  
+  if (touchValue > threshold) {
+    digitalWrite(ledPin, HIGH);  // LED ON
+    Serial.println("Touch detected - LED ON");
+  } else {
+    digitalWrite(ledPin, LOW);   // LED OFF
+    Serial.println("No touch - LED OFF");
+  }
+  
+  Serial.print("Touch value: ");
+  Serial.println(touchValue);
+  delay(100);
+}
+            </pre>
+        </div>
+    </div>
+
+    <!-- Components Modal -->
+    <div class="modal" id="componentsModal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>🔌 Komponentlar ro'yxati</h2>
+            <div class="card">
+                <h3>🔋 9V Battery</h3>
+                <p>Zanjirga quvvat berish uchun ishlatiladi</p>
+            </div>
+            <div class="card">
+                <h3>🔧 BC547 NPN Transistor</h3>
+                <p>Kuchaytirgich sifatida ishlatiladi, kichik base toki bilan katta collector tokini boshqaradi</p>
+            </div>
+            <div class="card">
+                <h3>💡 LED (Light Emitting Diode)</h3>
+                <p>Zanjir holatini ko'rsatish uchun yorug'lik chiqaradi</p>
+            </div>
+            <div class="card">
+                <h3>🔶 330Ω Resistor (x2)</h3>
+                <p>Tokni cheklash uchun ishlatiladi, LED va tranzistorni himoya qiladi</p>
+            </div>
+            <div class="card">
+                <h3>👆 Touch Sensor</h3>
+                <p>Teginishni aniqlash uchun metal plastinka</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Instructions Modal -->
+    <div class="modal" id="instructionsModal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>📋 Tajriba Qo'llanmasi</h2>
+            <div class="card">
+                <h3>1️⃣ Tayyorgarlik</h3>
+                <p>Barcha komponentlarni tekshiring va zanjir sxemasini o'rganing.</p>
+            </div>
+            <div class="card">
+                <h3>2️⃣ Zanjir Yig'ish</h3>
+                <p>Sxemaga muvofiq barcha komponentlarni ulang. Qutblanishga e'tibor bering!</p>
+            </div>
+            <div class="card">
+                <h3>3️⃣ Sinov</h3>
+                <p>Batareya ulang va touch sensorga barmoq tekazib LED yonishini tekshiring.</p>
+            </div>
+            <div class="card">
+                <h3>4️⃣ Kuzatish</h3>
+                <p>Turli xil teginish usullarini sinab ko'ring va natijalarni qayd eting.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // System state variables
+        let powerOn = false;
+        let touchActive = false;
+        let ledOn = false;
+        let soundEnabled = true;
+        let volume = 0.5;
+
+        // DOM elements
+        const elements = {
+            battery: document.getElementById('battery'),
+            led: document.getElementById('led'),
+            transistor: document.getElementById('transistor'),
+            touchSensor: document.getElementById('touchSensor'),
+            handDemo: document.getElementById('handDemo'),
+            powerLed: document.getElementById('powerLed'),
+            ledLed: document.getElementById('ledLed'),
+            touchLed: document.getElementById('touchLed'),
+            transistorLed: document.getElementById('transistorLed'),
+            circuitLed: document.getElementById('circuitLed'),
+            circuitStatus: document.getElementById('circuitStatus'),
+            touchStatus: document.getElementById('touchStatus'),
+            ledStatus: document.getElementById('ledStatus'),
+        };
+
+        // Audio contexts for sounds
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+        // Sound generation functions
+        function playBeep(frequency = 800, duration = 200) {
+            if (!soundEnabled) return;
+            
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+            oscillator.type = 'sine';
+            
+            gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+            gainNode.gain.linearRampToValueAtTime(volume * 0.3, audioContext.currentTime + 0.01);
+            gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + duration / 1000);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + duration / 1000);
+        }
+
+        function playClickSound() {
+            playBeep(1200, 100);
+        }
+
+        function playActivationSound() {
+            playBeep(800, 200);
+            setTimeout(() => playBeep(1000, 150), 100);
+        }
+
+        function playDeactivationSound() {
+            playBeep(600, 200);
+            setTimeout(() => playBeep(400, 150), 100);
+        }
+
+        function playErrorSound() {
+            playBeep(300, 300);
+            setTimeout(() => playBeep(250, 200), 150);
+        }
+
+        function playSuccessSound() {
+            playBeep(600, 100);
+            setTimeout(() => playBeep(800, 100), 100);
+            setTimeout(() => playBeep(1000, 100), 200);
+        }
+
+        // Update status LEDs
+        function updateStatus() {
+            elements.powerLed.classList.toggle('on', powerOn);
+            elements.ledLed.classList.toggle('on', ledOn);
+            elements.touchLed.classList.toggle('on', touchActive);
+            elements.transistorLed.classList.toggle('on', touchActive && powerOn);
+            elements.circuitLed.classList.toggle('on', powerOn);
+            
+            elements.circuitStatus.classList.toggle('on', powerOn);
+            elements.touchStatus.classList.toggle('on', touchActive);
+            elements.ledStatus.classList.toggle('on', ledOn);
+        }
+
+        // Power control
+        function togglePower() {
+            powerOn = !powerOn;
+            playClickSound();
+            
+            if (!powerOn) {
+                // Turn off everything when power is off
+                ledOn = false;
+                touchActive = false;
+                elements.led.className = 'led off';
+                elements.touchSensor.classList.remove('active');
+                elements.handDemo.classList.remove('visible');
+                playDeactivationSound();
+            } else {
+                playActivationSound();
+            }
+            
+            updateStatus();
+        }
+
+        // Touch control
+        function startTouch() {
+            if (!powerOn) {
+                playErrorSound();
+                alert('⚠️ Avval quvvatni yoqing!');
+                return;
+            }
+            
+            touchActive = true;
+            ledOn = true;
+            
+            elements.touchSensor.classList.add('active');
+            elements.led.className = 'led on';
+            elements.handDemo.classList.add('visible');
+            
+            playBeep(1000, 300);
+            updateStatus();
+        }
+
+        function endTouch() {
+            if (!powerOn) return;
+            
+            touchActive = false;
+            ledOn = false;
+            
+            elements.touchSensor.classList.remove('active');
+            elements.led.className = 'led off';
+            elements.handDemo.classList.remove('visible');
+            
+            playBeep(400, 200);
+            updateStatus();
+        }
+
+        // Simulation controls
+        function startSimulation() {
+            playClickSound();
+            if (!powerOn) {
+                togglePower();
+                setTimeout(() => {
+                    playSuccessSound();
+                    alert('🎉 Tajriba boshlandi! Touch sensor joyiga bosing.');
+                }, 500);
+            } else {
+                playSuccessSound();
+                alert('🎉 Tajriba allaqachon ishlamoqda! Touch sensor joyiga bosing.');
+            }
+        }
+
+        function stopSimulation() {
+            playClickSound();
+            if (powerOn) {
+                togglePower();
+                setTimeout(() => {
+                    playDeactivationSound();
+                    alert('⏹️ Tajriba to\'xtatildi.');
+                }, 200);
+            } else {
+                alert('⚠️ Tajriba allaqachon to\'xtatilgan.');
+            }
+        }
+
+        function runTest() {
+            playClickSound();
+            if (!powerOn) {
+                alert('⚠️ Avval quvvatni yoqing!');
+                playErrorSound();
+                return;
+            }
+            
+            playSuccessSound();
+            alert('🧪 Test rejimi boshlandi!');
+            
+            // Auto test sequence
+            let testStep = 0;
+            const testSequence = setInterval(() => {
+                switch(testStep) {
+                    case 0:
+                        startTouch();
+                        testStep++;
+                        break;
+                    case 1:
+                        endTouch();
+                        testStep++;
+                        break;
+                    case 2:
+                        startTouch();
+                        testStep++;
+                        break;
+                    case 3:
+                        endTouch();
+                        testStep++;
+                        break;
+                    default:
+                        clearInterval(testSequence);
+                        playSuccessSound();
+                        alert('✅ Test muvaffaqiyatli yakunlandi!');
+                        break;
+                }
+            }, 1000);
+        }
+
+        // Sound controls
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            playClickSound();
+            alert(soundEnabled ? '🔊 Ovoz yoqildi' : '🔇 Ovoz o\'chirildi');
+        }
+
+        function setVolume(value) {
+            volume = value / 100;
+            playBeep(800, 100);
+        }
+
+        // Modal functions
+        function openModal(id) {
+            document.getElementById(id).style.display = "block";
+            playClickSound();
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = "none";
+            playClickSound();
+        }
+
+        // Event listeners for modals
+        document.querySelectorAll(".modal .close").forEach(btn => {
+            btn.addEventListener("click", function() {
+                this.closest(".modal").style.display = "none";
+                playClickSound();
+            });
+        });
+
+        window.addEventListener("click", function(e) {
+            document.querySelectorAll(".modal").forEach(modal => {
+                if (e.target === modal) {
+                    modal.style.display = "none";
+                    playClickSound();
+                }
+            });
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            switch(e.key) {
+                case 'p':
+                case 'P':
+                    togglePower();
+                    break;
+                case 's':
+                case 'S':
+                    startSimulation();
+                    break;
+                case 'x':
+                case 'X':
+                    stopSimulation();
+                    break;
+                case 't':
+                case 'T':
+                    runTest();
+                    break;
+                case ' ':
+                    e.preventDefault();
+                    if (powerOn) {
+                        if (touchActive) {
+                            endTouch();
+                        } else {
+                            startTouch();
+                        }
+                    }
+                    break;
+            }
+        });
+
+        // Touch events for mobile
+        elements.touchSensor.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            startTouch();
+        });
+
+        elements.touchSensor.addEventListener('touchend', function(e) {
+            e.preventDefault();
+            endTouch();
+        });
+
+        // Initialize
+        updateStatus();
+        
+        // Welcome message
+        setTimeout(() => {
+            if (soundEnabled) {
+                playSuccessSound();
+            }
+            alert('🎉 Touch Switch Tajriba Simulyatoriga xush kelibsiz!\n\n' +
+                  '📋 Qo\'llanma:\n' +
+                  '• P - Quvvatni yoqish/o\'chirish\n' +
+                  '• S - Simulyatsiyani boshlash\n' +
+                  '• X - Simulyatsiyani to\'xtatish\n' +
+                  '• T - Test rejimi\n' +
+                  '• SPACE - Touch sensor\n\n' +
+                  '🔬 Tajribani boshlash uchun "Tajribani boshlash" tugmasini bosing!');
+        }, 1000);
+
+        // Periodic status check
+        setInterval(() => {
+            updateStatus();
+        }, 1000);
+
+        // Add visual feedback for components
+        function addVisualFeedback() {
+            // Battery animation when power is on
+            if (powerOn) {
+                elements.battery.style.boxShadow = '0 0 15px rgba(255, 68, 68, 0.6)';
+            } else {
+                elements.battery.style.boxShadow = '3px 3px 10px rgba(0,0,0,0.3)';
+            }
+            
+            // Transistor animation when active
+            if (touchActive && powerOn) {
+                elements.transistor.style.boxShadow = '0 0 15px rgba(0, 102, 255, 0.6)';
+            } else {
+                elements.transistor.style.boxShadow = '3px 3px 10px rgba(0,0,0,0.3)';
+            }
+        }
+
+        // Update visual feedback periodically
+        setInterval(addVisualFeedback, 500);
+
+        // Add circuit wire animations
+        function updateWireAnimations() {
+            const wires = document.querySelectorAll('.wire');
+            wires.forEach(wire => {
+                if (powerOn && (touchActive || wire.classList.contains('wire-black'))) {
+                    wire.style.boxShadow = '0 0 5px rgba(255, 255, 0, 0.8)';
+                    wire.style.animation = 'none';
+                    wire.offsetHeight; // Trigger reflow
+                    wire.style.animation = 'wireGlow 1s ease-in-out infinite alternate';
+                } else if (powerOn) {
+                    wire.style.boxShadow = '0 0 3px rgba(255, 255, 0, 0.4)';
+                    wire.style.animation = 'none';
+                } else {
+                    wire.style.boxShadow = 'none';
+                    wire.style.animation = 'none';
+                }
+            });
+        }
+
+        // Add wire glow animation CSS
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes wireGlow {
+                0% { box-shadow: 0 0 5px rgba(255, 255, 0, 0.8); }
+                100% { box-shadow: 0 0 10px rgba(255, 255, 0, 1); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        setInterval(updateWireAnimations, 200);
+
+    </script>
+</body>
+</html>

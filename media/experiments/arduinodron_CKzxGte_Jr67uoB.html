@@ -1,0 +1,1634 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Drone Simulyatsiyasi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: auto;
+        }
+
+        /* HEADER */
+        .header {
+            display: flex;
+            align-items: center;
+            background: #000075;
+            color: white;
+            padding: 10px 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            width: 100%;
+            border-radius: 8px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        /* Flex Layout: 40% Video + 60% Text */
+        .flex-container-40-60 {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .flex-video-40 {
+            flex: 0 0 40%;
+        }
+
+        .flex-video-40 iframe {
+            width: 100%;
+            height: 250px;
+            border-radius: 10px;
+        }
+
+        .flex-text-60 {
+            flex: 0 0 60%;
+        }
+
+        .flex-text-60 p {
+            font-size: 16px;
+            line-height: 1.8;
+        }
+
+        /* Flex Layout: 30% Image + 70% Text */
+        .flex-container-30-70 {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .flex-image-30 {
+            flex: 0 0 30%;
+        }
+
+        .flex-image-30 img {
+            width: 100%;
+            border-radius: 10px;
+        }
+
+        .flex-text-70 {
+            flex: 0 0 70%;
+        }
+
+        .flex-text-70 strong {
+            color: #ffcc00;
+            font-size: 18px;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        /* 100% Video */
+        .video-full video {
+            width: 100%;
+            border-radius: 15px;
+        }
+
+        /* Dumaloq tugma */
+        #infoFloatingBtn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #000075, #0000ff);
+            color: white;
+            border: 4px solid white;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            z-index: 1500;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        #infoFloatingBtn:hover {
+            transform: scale(1.1);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .flex-container-40-60,
+            .flex-container-30-70 {
+                flex-direction: column;
+            }
+            
+            .flex-video-40, .flex-text-60,
+            .flex-image-30, .flex-text-70 {
+                flex: 0 0 100%;
+            }
+        }
+
+        /* ========== MODAL ASOSIY STIL ========== */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background: #000075;
+            color: white;
+            margin: 5vh auto;
+            padding: 30px;
+            width: 90%;
+            max-width: 1000px;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+            position: relative;
+            animation: slideDown 0.4s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Yopish tugmasi */
+        .close {
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            font-size: 32px;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+            transition: all 0.3s;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .close:hover {
+            background: rgba(255, 204, 0, 0.3);
+            color: #ffcc00;
+            transform: rotate(90deg);
+        }
+
+        /* Modal sarlavha */
+        .modal-content h2 {
+            font-size: 28px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+            padding-right: 50px;
+        }
+
+        /* ========== 100% VIDEO ========== */
+        .video-full {
+            width: 100%;
+            border-radius: 15px;
+            background: #000;
+        }
+
+        .video-full video {
+            width: 100%;
+            height: auto;
+            border-radius: 15px;
+            max-height: 70vh;
+        }
+
+        /* Tab buttons */
+        .tab-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .tab-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .tab-btn.active {
+            background: #ffcc00;
+            color: #000075;
+            border-color: #ffcc00;
+        }
+
+        .tab-content {
+            display: none;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .tab-content pre {
+            color: white;
+            font-size: 14px;
+            line-height: 1.6;
+            overflow-x: auto;
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 768px) {
+            .modal-content {
+                width: 96%;
+                padding: 20px 15px;
+            }
+
+            #infoFloatingBtn {
+                width: 90px;
+                height: 90px;
+                font-size: 14px;
+                bottom: 20px;
+                right: 20px;
+            }
+
+            #infoFloatingBtn span:first-child {
+                font-size: 28px;
+            }
+        }
+
+        /* MAIN LAYOUT */
+        .main-container {
+            display: flex;
+            margin-top: 20px;
+            gap: 20px;
+        }
+
+        /* LEFT PANEL */
+        .left-panel {
+            width: 280px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            height: fit-content;
+            position: relative;
+            backdrop-filter: blur(10px);
+        }
+
+        .control-group {
+            margin-bottom: 25px;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 20px;
+        }
+
+        .control-group:last-child {
+            border-bottom: none;
+        }
+
+        .control-group h3 {
+            margin-bottom: 15px;
+            color: #000075;
+            font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 12px 16px;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-success { 
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white; 
+        }
+        .btn-danger { 
+            background: linear-gradient(135deg, #dc3545, #e74c3c);
+            color: white; 
+        }
+        .btn-primary { 
+            background: linear-gradient(135deg, #000075, #4169e1);
+            color: white; 
+        }
+        .btn-info { 
+            background: linear-gradient(135deg, #17a2b8, #20c997);
+            color: white; 
+        }
+
+        /* MAIN CONTENT - Drone Display */
+        .drone-container {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 12px 32px rgba(0,0,0,0.2);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 600px;
+        }
+
+        .title-header {
+            background: linear-gradient(135deg, #000075, #4169e1);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 40px;
+            text-align: center;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+
+        /* DRONE STRUCTURE */
+        .drone {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Arduino Board (Center) */
+        .arduino-board {
+            width: 400px;
+            height: 400px;
+            border-radius: 8px;
+        }
+
+        .arduino-board::before {
+            position: absolute;
+            top: 30%;    
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        /* Sensor Module */
+        .sensor-module {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 25px;
+            border-radius: 4px;
+            border: 1px solid #fff;
+        }
+
+        .sensor-module::before {
+            content: 'SENSOR';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 7px;
+        }
+
+        /* Motor Housing */
+        .motor {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid #fff;
+        }
+
+        .motor-1 { top: 40px; right: 40px; }
+        .motor-2 { top: 40px; left: 40px; }
+        .motor-3 { bottom: 40px; left: 40px; }
+        .motor-4 { bottom: 40px; right: 40px; }
+
+        /* Propellers - YANGI VERSIYA */
+        .propeller {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            pointer-events: none;
+        }
+
+        /* Rasm aylanmasin - z-index past */
+        .propeller img {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Faqat propeller-blade aylansin - z-index yuqori */
+        .propeller-blade {
+            position: absolute;
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            border-radius: 40px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+            opacity: 0.8;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            z-index: 2;
+        }
+
+        .blade-1, .blade-2 {
+            width: 80px;
+            height: 8px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .blade-2 {
+            transform: translate(-50%, -50%) rotate(90deg);
+        }
+
+        /* Faqat .spinning class qo'shilganda blade'lar aylanadi */
+        .propeller.spinning .blade-1 {
+            animation: spinBlade 0.1s linear infinite;
+        }
+
+        .propeller.spinning .blade-2 {
+            animation: spinBlade2 0.1s linear infinite;
+        }
+
+        @keyframes spinBlade {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        @keyframes spinBlade2 {
+            from { transform: translate(-50%, -50%) rotate(90deg); }
+            to { transform: translate(-50%, -50%) rotate(450deg); }
+        }
+
+        /* Status Display */
+        .status-display {
+            margin-top: 150px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            min-width: 300px;
+            backdrop-filter: blur(10px);
+        }
+
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 8px 0;
+            font-size: 14px;
+        }
+
+        .status-led {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #dc3545;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+        }
+
+        .status-led.on {
+            background: #28a745;
+            box-shadow: 0 0 10px rgba(40, 167, 69, 0.8);
+        }
+
+        /* Battery Indicator */
+        .battery-indicator {
+            width: 60px;
+            height: 20px;
+            background: #333;
+            border-radius: 3px;
+            position: relative;
+            border: 1px solid #fff;
+        }
+
+        .battery-level {
+            height: 100%;
+            background: linear-gradient(135deg, #28a745, #20c997);
+            border-radius: 2px;
+            width: 75%;
+            transition: width 0.3s ease;
+        }
+
+        .battery-indicator::after {
+            content: '';
+            position: absolute;
+            right: -4px;
+            top: 6px;
+            width: 3px;
+            height: 8px;
+            background: #fff;
+            border-radius: 0 2px 2px 0;
+        }
+
+        /* Wires */
+        .wire {
+            position: absolute;
+            z-index: 5;
+        }
+
+        .wire-red {
+            width: 3px;
+            height: 360px;
+            background: #ff0000;
+            top: -33px;
+            right: 254px;
+        }
+        .wire-red1 {
+            width: 92px;
+            height: 3px;
+            background: #ff0000;
+            top: 325px;
+            right: 165px;
+        }
+        .wire-red2 {
+            width: 3px;
+            height: 15px;
+            background: #ff0000;
+            top: 310px;
+            right: 165px;
+        }
+        .wire-red3 {
+            width: 3px;
+            height: 25px;
+            background: #ff0000;
+            top: 310px;
+            right: 130px;
+        }
+        .wire-red4 {
+            width: 315px;
+            height: 3px;
+            background: #ff0000;
+            top: 335px;
+            right:-95px;
+        }
+        .wire-black {
+            width: 3px;
+            height: 125px;
+            background: black;
+            top: -33px;
+            right: 228px;
+            transform: rotate(-10deg);
+        }
+        .wire-black1 {
+            width: 3px;
+            height: 30px;
+            background: black;
+            top: 310px;
+            right: 140px;
+        }
+        .wire-black2 {
+            width: 315px;
+            height: 3px;
+            background: black;
+            top: 340px;
+            right:-95px;
+        }
+        .wire-yellow {
+            width: 3px;
+            height: 262px;
+            background: #ffff00;
+            top: 90px;
+            left: 190px;
+        }
+        .wire-yellow1 {
+            width: 3px;
+            height: 372px;
+            background: #ffff00;
+            top: -20px;
+            right: -105px;
+        }
+        .wire-yellow2 {
+            width: 230px;
+            height: 3px;
+            background: #ffff00;
+            top: -20px;
+            right: -105px;
+        }
+        .wire-yellow3 {
+            width: 3px;
+            height: 112px;
+            background: #ffff00;
+            top: -20px;
+            right: 122px;
+        }
+        .wire-blue {
+            width: 60px;
+            height: 2px;
+            background: #0066ff;
+            top: 10px;
+            left:4%;
+            transform: translateX(-50%);
+        }
+        .wire-blue1 {
+            width: 60px;
+            height: 2px;
+            background: #0066ff;
+            top: 27px;
+            left:6%;
+            transform: translateX(-50%);
+        }
+        .wire-blue2 {
+            width: 100px;
+            height: 3px;
+            background: #0066ff;
+            top: 5px;
+            left:3%;
+            transform: translateX(-50%);
+        }
+        .wire-blue6 {
+            width: 3px;
+            height: 488px;
+            background: #0066ff;
+            top: 10px;
+            left:-3.5%;
+            transform: translateX(-50%);
+        }
+        .wire-blue7 {
+            width: 3px;
+            height: 455px;
+            background: #0066ff;
+            top: 27px;
+            left:-1.5%;
+            transform: translateX(-50%);
+        }
+        .wire-blue8 {
+            width: 3px;
+            height: 529px;
+            background: #0066ff;
+            top: 5px;
+            left:-9.5%;
+            transform: translateX(-50%);
+        }
+        .wire-blue9 {
+            width: 35px;
+            height: 2px;
+            background: #0066ff;
+            bottom: -70px;
+            left:-10px;
+            transform: rotate(-40deg);
+        }
+        .wire-blue10 {
+            width: 55px;
+            height: 2px;
+            background: #0066ff;
+            bottom: -80px;
+            left:-20px;
+            transform: rotate(-40deg);
+        }
+        .wire-blue11 {
+            width: 105px;
+            height: 2px;
+            background: #0066ff;
+            bottom: -100px;
+            left:-50px;
+            transform: rotate(-40deg);
+        }
+        .wire-blue3 {
+            width: 60px;
+            height: 2px;
+            background: #0066ff;
+            top: 10px;
+            right:-12%;
+            transform: translateX(-50%);
+        }
+        .wire-blue4 {
+            width: 60px;
+            height: 2px;
+            background: #0066ff;
+            top: 27px;
+            right:-14%;
+            transform: translateX(-50%);
+        }
+        .wire-blue5 {
+            width: 100px;
+            height: 3px;
+            background: #0066ff;
+            top: 5px;
+            right:-30%;
+            transform: translateX(-50%);
+        }
+        .wire-blue12 {
+            width: 3px;
+            height: 358px;
+            background: #0066ff;
+            top: 10px;
+            right:-5%;
+            transform: translateX(-50%);
+        }
+        .wire-blue13 {
+            width: 3px;
+            height: 350px;
+            background: #0066ff;
+            top: 27px;
+            right:-7%;
+            transform: translateX(-50%);
+        }
+        .wire-blue14 {
+            width: 3px;
+            height: 320px;
+            background: #0066ff;
+            top: 5px;
+            right:-18%;
+            transform: translateX(-50%);
+        }
+        .wire-blue15{
+            width: 107px;
+            height: 3px;
+            background: #0066ff;
+            bottom: 20px;
+            right:-20%;
+            transform: translateX(-50%);
+        }
+        .wire-blue16 {
+            width: 91px;
+            height: 3px;
+            background: #0066ff;
+            bottom: 30px;
+            right:-16%;
+            transform: translateX(-50%);
+        }
+        .wire-blue17 {
+            width: 130px;
+            height: 3px;
+            background: #0066ff;
+            bottom: 75px;
+            right:-33%;
+            transform: translateX(-50%);
+        }
+        .wire-blue18{
+            width: 3px;
+            height: 90px;
+            background: #0066ff;
+            bottom: -70px;
+            right:19%;
+            transform: translateX(-50%);
+        }
+        .wire-blue19 {
+            width: 3px;
+            height: 105px;
+            background: #0066ff;
+            bottom: -75px;
+            right:17%;
+            transform: translateX(-50%);
+        }
+        .wire-blue20 {
+            width: 3px;
+            height: 158px;
+            background: #0066ff;
+            bottom: -80px;
+            right:15%;
+            transform: translateX(-50%);
+        }
+        .wire-green {
+            width: 3px;
+            height: 380px;
+            background: green;
+            top: -50px;
+            right: 143px;
+            transform: rotate(-25deg);
+        }
+        .wire-purple {
+            width: 3px;
+            height: 375px;
+            background:purple;
+            top: -50px;
+            right: 129px;
+            transform: rotate(-25deg);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .left-panel {
+                width: 100%;
+            }
+            
+            .drone {
+                width: 300px;
+                height: 300px;
+            }
+            
+            .propeller {
+                width: 60px;
+                height: 60px;
+            }
+            
+            .blade-1, .blade-2 {
+                width: 60px;
+                height: 6px;
+            }
+        }
+
+        a {
+            text-decoration: none;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="logo">
+            <a href="/"><img src="/static/image/logo.png" width="80px" height="80px" alt=""></a>
+            <span> Drone Simulyatsiyasi</span>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <div class="main-container">
+        <!-- LEFT PANEL -->
+        <div class="left-panel">
+            <div class="control-group">
+                <h3>🎮 Boshqaruv</h3>
+                <button class="btn btn-success" onclick="startDrone()" id="startBtn">
+                    🚀 Start
+                </button>
+                <button class="btn btn-danger" onclick="stopDrone()" id="stopBtn">
+                    ⏹️ Stop
+                </button>
+                <button class="btn btn-primary" onclick="togglePower()">
+                    ⚡ Quvvat
+                </button>
+                <button class="btn btn-info" onclick="runTest()">
+                    🔧 Test
+                </button>
+            </div>
+
+            <div class="control-group">
+                <h3>📊 Ma'lumotlar</h3>
+                <button class="btn btn-primary" id="schemaBtn">
+                    💡 Sxema
+                </button>
+                <button class="btn btn-primary" id="codeBtn">
+                    💻 Kod
+                </button>
+                <button class="btn btn-primary" id="componentsBtn">
+                    🔌 Qurilmalar
+                </button>
+
+            </div>
+
+            <div class="control-group">
+                <h3>📋 Qurilma holati</h3>
+                <div class="status-row">
+                    <span>Quvvat:</span>
+                    <div class="status-led" id="powerLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Arduino:</span>
+                    <div class="status-led" id="arduinoLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Motorlar:</span>
+                    <div class="status-led" id="motorsLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Sensor:</span>
+                    <div class="status-led" id="sensorLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Batareya:</span>
+                    <div class="battery-indicator">
+                        <div class="battery-level" id="batteryLevel"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL: SXEMA -->
+        <div class="modal" id="schemaModal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>💡 Sxema qayerda ishlatiladi</h2>
+
+                <div class="flex-container-40-60">
+                    <div class="flex-video-40">
+                        <iframe src="https://www.youtube.com/embed/WGWsH_CD2D0?si=a5KN7UImBONI2az3"
+                            title="YouTube video player"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                    <div class="flex-text-60">
+                        <strong>Arduino Dron Loyihasi</strong>
+                        <p>
+                            Ushbu loyiha <b>Arduino Uno</b>, <b>MPU6050 gyroskop/akselerometr</b> moduli va
+                            <b>ESC + brushless motorlar</b> yordamida barqaror mini dron yasash uchun mo'ljallangan.
+                        </p>
+                        <p>
+                            <b>MPU6050</b> modul dronning holati va og'ishini o'lchaydi, Arduino esa bu ma'lumotlarni
+                            qayta ishlaydi va ESC'lar orqali motor tezligini muvozanatlaydi.
+                            </p>
+                        <p>
+                            Natijada dron parvoz paytida muvozanatni saqlaydi va foydalanuvchi tomonidan
+                            berilgan buyruqlarga javob beradi.
+                        </p>
+                        <ul>
+                            <li>🧭 Barqarorlik: MPU6050 dan olingan real-time ma'lumotlar bilan ta'minlanadi.</li>
+                            <li>⚙️ Harakat boshqaruvi: 4 ta ESC va 4 ta brushless motor yordamida.</li>
+                            <li>🔋 Quvvat manbai: Li-Po batareya orqali.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="flex-container-40-60">
+                    <div class="flex-video-40">
+                        <iframe src="https://www.youtube.com/embed/Sa6EslOHsI0?si=tSl_kZrqV4lDaKlW"
+                            title="YouTube video player"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                    <div class="flex-text-60">
+                        <strong>Arduino Dron Loyihasi</strong>
+                        <p>
+                            Ushbu loyiha <b>Arduino Uno</b>, <b>MPU6050 gyroskop/akselerometr</b> moduli va
+                            <b>ESC + brushless motorlar</b> yordamida barqaror mini dron yasash uchun mo'ljallangan.
+                        </p>
+                        <p>
+                            <b>MPU6050</b> modul dronning holati va og'ishini o'lchaydi, Arduino esa bu ma'lumotlarni
+                            qayta ishlaydi va ESC'lar orqali motor tezligini muvozanatlaydi.
+                        </p>
+                        <p>
+                            Natijada dron parvoz paytida muvozanatni saqlaydi va foydalanuvchi tomonidan
+                            berilgan buyruqlarga javob beradi.
+                        </p>
+                        <ul>
+                            <li>🧭 Barqarorlik: MPU6050 dan olingan real-time ma'lumotlar bilan ta'minlanadi.</li>
+                            <li>⚙️ Harakat boshqaruvi: 4 ta ESC va 4 ta brushless motor yordamida.</li>
+                            <li>🔋 Quvvat manbai: Li-Po batareya orqali.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="flex-container-40-60">
+                    <div class="flex-video-40">
+                        <iframe src="https://www.youtube.com/embed/PgsuwgdB11c?si=MHtVQhPJ9_c2J7Cy"
+                            title="YouTube video player"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                    <div class="flex-text-60">
+                        <strong>Arduino Dron Loyihasi</strong>
+                        <p>
+                            Ushbu loyiha <b>Arduino Uno</b>, <b>MPU6050 gyroskop/akselerometr</b> moduli va
+                            <b>ESC + brushless motorlar</b> yordamida barqaror mini dron yasash uchun mo'ljallangan.
+                        </p>
+                        <p>
+                            <b>MPU6050</b> modul dronning holati va og'ishini o'lchaydi, Arduino esa bu ma'lumotlarni
+                            qayta ishlaydi va ESC'lar orqali motor tezligini muvozanatlaydi.
+                        </p>
+                        <p>
+                            Natijada dron parvoz paytida muvozanatni saqlaydi va foydalanuvchi tomonidan
+                            berilgan buyruqlarga javob beradi.
+                        </p>
+                        <ul>
+                            <li>🧭 Barqarorlik: MPU6050 dan olingan real-time ma'lumotlar bilan ta'minlanadi.</li>
+                            <li>⚙️ Harakat boshqaruvi: 4 ta ESC va 4 ta brushless motor yordamida.</li>
+                            <li>🔋 Quvvat manbai: Li-Po batareya orqali.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL: KOD -->
+        <div class="modal" id="codeModal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>💻 Code</h2>
+
+                <div class="tab-buttons">
+                    <button class="tab-btn active" data-tab="mblock">mBlock Code</button>
+                    <button class="tab-btn" data-tab="arduino">Arduino Code</button>
+                </div>
+
+                <div class="tab-content active" id="mblock">
+                    <pre><img src="lesson2.png" alt="mBlock Code" style="width: 80%; height: auto;"></pre>
+                </div>
+
+                <div class="tab-content" id="arduino">
+                    <pre>
+// Drone Control - Arduino Code
+#include <Servo.h>
+#include <Wire.h>
+#include "MPU6050.h"
+
+MPU6050 mpu;
+
+Servo motor1;
+Servo motor2;
+Servo motor3;
+Servo motor4;
+
+int motorPins[] = {3, 5, 6, 9};
+
+void setup() {
+  Wire.begin();
+  Serial.begin(9600);
+  mpu.initialize();
+
+  // Attach motors
+  motor1.attach(motorPins[0]);
+  motor2.attach(motorPins[1]);
+  motor3.attach(motorPins[2]);
+  motor4.attach(motorPins[3]);
+
+  Serial.println("Drone initialized");
+}
+
+void loop() {
+  int16_t ax, ay, az;
+  int16_t gx, gy, gz;
+
+  mpu.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
+
+  // Simple stabilization logic (example)
+  int motorSpeed = map(ax, -17000, 17000, 1000, 2000);
+
+  motor1.writeMicroseconds(1500 + motorSpeed);
+  motor2.writeMicroseconds(1500 - motorSpeed);
+  motor3.writeMicroseconds(1500 + motorSpeed);
+  motor4.writeMicroseconds(1500 - motorSpeed);
+
+  delay(20);
+}
+                    </pre>
+                </div>
+            </div>
+        </div>
+        <!-- MODAL: QURILMALAR -->
+<div class="modal" id="componentsModal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>🔌 Ishlatilgan Qurilmalar</h2>
+
+    <!-- Arduino UNO -->
+    <div class="flex-container-30-70">
+      <div class="flex-image-30">
+        <img src="/static/image/arduino1 - Copy.png" alt="Arduino UNO">
+      </div>
+      <div class="flex-text-70">
+        <strong>Arduino UNO</strong>
+        <p>
+          <b>Arduino UNO</b> — dronning asosiy boshqaruv moduli bo‘lib, sensorlardan ma’lumotlarni o‘qiydi,
+          ESC’lar orqali motor tezligini boshqaradi va barqaror uchishni ta’minlaydi.
+        </p>
+      </div>
+    </div>
+
+    <!-- MPU6050 -->
+    <div class="flex-container-30-70">
+      <div class="flex-image-30">
+        <img src="/static/image/mpu6050.png" alt="MPU6050 Gyroskop/Akselerometr">
+      </div>
+      <div class="flex-text-70">
+        <strong>MPU6050 (Gyroskop va Akselerometr)</strong>
+        <p>
+          <b>MPU6050</b> — 6 o‘qli sensor bo‘lib, dronning og‘ish burchagi va tezlanishini o‘lchaydi.
+          Ushbu ma’lumotlar dron barqarorligini saqlashda muhim rol o‘ynaydi.
+        </p>
+      </div>
+    </div>
+
+    <!-- ESC -->
+    <div class="flex-container-30-70">
+      <div class="flex-image-30">
+        <img src="/static/image/esc.png" alt="Electronic Speed Controller (ESC)">
+      </div>
+      <div class="flex-text-70">
+        <strong>ESC (Electronic Speed Controller)</strong>
+        <p>
+          <b>ESC</b> — har bir motorning tezligini PWM signallar orqali boshqaruvchi qurilma.
+          Arduino’dan kelgan buyruqlarni motor aylanish tezligiga aylantiradi.
+        </p>
+      </div>
+    </div>
+
+    <!-- Brushless Motors -->
+    <div class="flex-container-30-70">
+      <div class="flex-image-30">
+        <img src="/static/image/motor.png" alt="Brushless Motor">
+      </div>
+      <div class="flex-text-70">
+        <strong>Brushless Motor (BLDC)</strong>
+        <p>
+          Dron harakatini ta’minlovchi asosiy element. 4 ta motor ESC orqali boshqariladi
+          va ularning aylanish yo‘nalishlari barqarorlik uchun muvozanatlangan.
+        </p>
+      </div>
+    </div>
+
+    <!-- Propeller -->
+    <div class="flex-container-30-70">
+      <div class="flex-image-30">
+        <img src="/static/image/propeller.png" alt="Propeller">
+      </div>
+      <div class="flex-text-70">
+        <strong>Propeller (Parraklar)</strong>
+        <p>
+          Har bir motorga ulanadigan parraklar havoni pastga itarib, dronning ko‘tarilishiga yordam beradi.
+          Qarama-qarshi yo‘nalishda aylanadigan propellerlar dronning barqaror uchishini ta’minlaydi.
+        </p>
+      </div>
+    </div>
+
+    <!-- Li-Po Batareya -->
+    <div class="flex-container-30-70">
+      <div class="flex-image-30">
+        <img src="/static/image/lipo.png" alt="Li-Po Battery">
+      </div>
+      <div class="flex-text-70">
+        <strong>Li-Po Batareya</strong>
+        <p>
+          <b>11.1V 2200mAh Li-Po</b> batareya dronga quvvat beradi.
+          U barcha ESC va Arduino’ni ta’minlaydi, uchish vaqtini 15–20 daqiqagacha ta’minlaydi.
+        </p>
+      </div>
+    </div>
+
+    <!-- Power Distribution Board -->
+    <div class="flex-container-30-70">
+      <div class="flex-image-30">
+        <img src="/static/image/pdb.png" alt="Power Distribution Board">
+      </div>
+      <div class="flex-text-70">
+        <strong>Power Distribution Board (PDB)</strong>
+        <p>
+          Batareyadan kelgan quvvatni barcha ESC’lar va Arduino orasida taqsimlab beradi.
+          Tok oqimini barqaror ushlab turadi va xavfsiz ulanishni ta’minlaydi.
+        </p>
+      </div>
+    </div>
+
+    <!-- Breadboard -->
+    <div class="flex-container-30-70">
+      <div class="flex-image-30">
+        <img src="/static/image/breadboard-removebg-preview.png" alt="Breadboard">
+      </div>
+      <div class="flex-text-70">
+        <strong>Breadboard</strong>
+        <p>
+          Lehimlashsiz ulanish uchun mo‘ljallangan sinov platasi.
+          Arduino, sensor va boshqa komponentlarni vaqtincha ulash imkonini beradi.
+        </p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+        <!-- MODAL: QO'SHIMCHA MA'LUMOT -->
+        <div class="modal" id="infoModal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>📚 Qo'shimcha Ma'lumot</h2>
+                
+                <div class="video-full">
+                    <video controls>
+                        <source src="/media/2.mp4" type="video/mp4">
+                        Brauzeringiz video formatni qo'llab-quvvatlamaydi.
+                    </video>
+                </div>
+            </div>
+        </div>
+
+        <!-- DRONE DISPLAY -->
+        <div class="drone-container">
+            <img src="/static/image/Mpu - Copy.png" width="150px" height="150px" alt="">
+                
+            <div class="drone">
+                <!-- Arduino Board (Center) -->
+                <div>
+                    <img class="arduino-board" src="/static/image/arduino1 - Copy.png" alt="">
+                </div>
+
+                <!-- Drone Arms -->
+                <div class="drone-arm arm-1"></div>
+                <div class="drone-arm arm-2"></div>
+                <div class="drone-arm arm-3"></div>
+                <div class="drone-arm arm-4"></div>
+
+                <!-- Motors -->
+                <div class="motor motor-1"></div>
+                <div class="motor motor-2"></div>
+                <div class="motor motor-3"></div>
+                <div class="motor motor-4"></div>
+
+                <!-- Propellers - RASM AYLANMASIN, FAQAT BLADE AYLANSIN -->
+                <div class="propeller" id="prop1">
+                    <img src="/static/image/images-removebg-preview.png" width="100px" height="100px" alt="">
+                    <div class="propeller-blade blade-1"></div>
+                    <div class="propeller-blade blade-2"></div>
+                </div>
+
+                <div class="propeller" id="prop2" >
+                    <img src="/static/image/images-removebg-preview.png" width="100px" height="100px" alt="">
+                    <div class="propeller-blade blade-1"></div>
+                    <div class="propeller-blade blade-2"></div>
+                </div>
+
+                <div class="propeller" id="prop3" >
+                    <img src="/static/image/images-removebg-preview (1).png" width="200px" height="200px" alt="">
+                    <div class="propeller-blade blade-1"></div>
+                    <div class="propeller-blade blade-2"></div>
+                </div>
+
+                <div class="propeller" id="prop4">
+                    <img src="/static/image/images-removebg-preview (1).png" width="200px" height="200px" alt="">
+                    <div class="propeller-blade blade-1"></div>
+                    <div class="propeller-blade blade-2"></div>
+                </div>
+                
+                <!-- Connection Wires - BARCHA SIMLAR -->
+                <div class="wire wire-red"></div>
+                <div class="wire wire-red1"></div>
+                <div class="wire wire-red2"></div>
+                <div class="wire wire-red3"></div>
+                <div class="wire wire-red4"></div>
+                <div class="wire wire-yellow"></div>
+                <div class="wire wire-yellow1"></div>
+                <div class="wire wire-yellow2"></div>
+                <div class="wire wire-yellow3"></div>
+                <div class="wire wire-black"></div>
+                <div class="wire wire-black1"></div>
+                <div class="wire wire-black2"></div>
+                <div class="wire wire-blue"></div>
+                <div class="wire wire-blue1"></div>
+                <div class="wire wire-blue2"></div>
+                <div class="wire wire-blue3"></div>
+                <div class="wire wire-blue4"></div>
+                <div class="wire wire-blue5"></div>
+                <div class="wire wire-blue6"></div>
+                <div class="wire wire-blue7"></div>
+                <div class="wire wire-blue8"></div>
+                <div class="wire wire-blue9"></div>
+                <div class="wire wire-blue10"></div>
+                <div class="wire wire-blue11"></div>
+                <div class="wire wire-blue12"></div>
+                <div class="wire wire-blue13"></div>
+                <div class="wire wire-blue14"></div>
+                <div class="wire wire-blue15"></div>
+                <div class="wire wire-blue16"></div>
+                <div class="wire wire-blue17"></div>
+                <div class="wire wire-blue18"></div>
+                <div class="wire wire-blue19"></div>
+                <div class="wire wire-blue20"></div>
+                <div class="wire wire-green"></div>
+                <div class="wire wire-purple"></div>    
+            </div>
+
+            <!-- Status Display -->
+            <div class="status-display">
+                <div class="status-row">
+                    <span>Uchish holati:</span>
+                    <span id="flightStatus">Yerda</span>
+                </div>
+                <div class="status-row">
+                    <span>Motor tezligi:</span>
+                    <span id="motorSpeed">0 RPM</span>
+                </div>
+                <div class="status-row">
+                    <span>Balandlik:</span>
+                    <span id="altitude">0 m</span>
+                </div>
+                <div class="status-row">
+                    <span>Signal kuchi:</span>
+                    <span id="signalStrength">100%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dumaloq tugma -->
+    <button id="infoFloatingBtn">
+        <span>ℹ️</span>
+        <span>Ma'lumot</span>
+    </button>
+
+    <script>
+        // System state
+        let powerOn = false;
+        let droneFlying = false;
+        let motorSpeed = 0;
+        let batteryLevel = 75;
+
+        // DOM elements
+        const elements = {
+            powerLed: document.getElementById('powerLed'),
+            arduinoLed: document.getElementById('arduinoLed'),
+            motorsLed: document.getElementById('motorsLed'),
+            sensorLed: document.getElementById('sensorLed'),
+            batteryLevel: document.getElementById('batteryLevel'),
+            flightStatus: document.getElementById('flightStatus'),
+            motorSpeed: document.getElementById('motorSpeed'),
+            altitude: document.getElementById('altitude'),
+            signalStrength: document.getElementById('signalStrength'),
+            propellers: [
+                document.getElementById('prop1'),
+                document.getElementById('prop2'),
+                document.getElementById('prop3'),
+                document.getElementById('prop4')
+            ]
+        };
+
+        // ========== MODALNI OCHISH ==========
+        function openModal(id) {
+            const modal = document.getElementById(id);
+            if (modal) {
+                modal.style.display = "block";
+                document.body.style.overflow = "hidden";
+            }
+        }
+
+        function closeModal(id) {
+            const modal = document.getElementById(id);
+            if (modal) {
+                modal.style.display = "none";
+                document.body.style.overflow = "auto";
+            }
+        }
+
+        // ========== TUGMALARNI ULASH ==========
+        document.addEventListener('DOMContentLoaded', function() {
+            // Sxema tugmasi
+            const schemaBtn = document.getElementById("schemaBtn");
+            if (schemaBtn) {
+                schemaBtn.addEventListener("click", () => openModal("schemaModal"));
+            }
+
+            // Kod tugmasi
+            const codeBtn = document.getElementById("codeBtn");
+            if (codeBtn) {
+                codeBtn.addEventListener("click", () => openModal("codeModal"));
+            }
+
+            // Info floating tugmasi
+            const infoFloatingBtn = document.getElementById("infoFloatingBtn");
+            if (infoFloatingBtn) {
+                infoFloatingBtn.addEventListener("click", () => openModal("infoModal"));
+            }
+
+            // Yopish tugmalari
+            document.querySelectorAll(".close").forEach(btn => {
+                btn.addEventListener("click", function() {
+                    this.closest(".modal").style.display = "none";
+                    document.body.style.overflow = "auto";
+                });
+            });
+
+            // Tab switching (Kod uchun)
+            document.querySelectorAll(".tab-btn").forEach(button => {
+                button.addEventListener("click", function() {
+                    const tab = this.dataset.tab;
+                    document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+                    this.classList.add("active");
+                    document.querySelectorAll(".tab-content").forEach(content => {
+                        content.classList.remove("active");
+                        if (content.id === tab) content.classList.add("active");
+                    });
+                });
+            });
+        });
+
+        // ========== TASHQARIGA BOSILGANDA YOPISH ==========
+        window.addEventListener("click", function(e) {
+            document.querySelectorAll(".modal").forEach(modal => {
+                if (e.target === modal) {
+                    modal.style.display = "none";
+                    document.body.style.overflow = "auto";
+                }
+            });
+        });
+
+        // ========== ESC TUGMASINI BOSISH ==========
+        document.addEventListener("keydown", function(e) {
+            if (e.key === "Escape") {
+                document.querySelectorAll(".modal").forEach(modal => {
+                    if (modal.style.display === "block") {
+                        modal.style.display = "none";
+                        document.body.style.overflow = "auto";
+                    }
+                });
+            }
+        });
+
+        function updateStatus() {
+            elements.powerLed.classList.toggle('on', powerOn);
+            elements.arduinoLed.classList.toggle('on', powerOn);
+            elements.motorsLed.classList.toggle('on', droneFlying);
+            elements.sensorLed.classList.toggle('on', powerOn);
+            
+            elements.flightStatus.textContent = droneFlying ? 'Uchmoqda' : 'Yerda';
+            elements.motorSpeed.textContent = `${motorSpeed} RPM`;
+            elements.altitude.textContent = droneFlying ? '5 m' : '0 m';
+            
+            elements.batteryLevel.style.width = `${batteryLevel}%`;
+            if (batteryLevel > 50) {
+                elements.batteryLevel.style.background = 'linear-gradient(135deg, #28a745, #20c997)';
+            } else if (batteryLevel > 20) {
+                elements.batteryLevel.style.background = 'linear-gradient(135deg, #ffc107, #fd7e14)';
+            } else {
+                elements.batteryLevel.style.background = 'linear-gradient(135deg, #dc3545, #e74c3c)';
+            }
+        }
+
+        function togglePower() {
+            powerOn = !powerOn;
+            if (!powerOn) {
+                stopDrone();
+            }
+            updateStatus();
+        }
+
+        function startDrone() {
+            if (!powerOn) {
+                alert('Avval quvvatni yoqing!');
+                return;
+            }
+            
+            droneFlying = true;
+            motorSpeed = 3600;
+            
+            // Start propeller animation
+            elements.propellers.forEach(prop => {
+                if (prop) {
+                    prop.classList.add('spinning');
+                }
+            });
+            
+            // Battery drain simulation
+            const batteryDrain = setInterval(() => {
+                if (!droneFlying) {
+                    clearInterval(batteryDrain);
+                    return;
+                }
+                batteryLevel = Math.max(0, batteryLevel - 1);
+                updateStatus();
+                
+                if (batteryLevel <= 0) {
+                    alert('Batareya tugadi! Dron qo\'nmoqda...');
+                    stopDrone();
+                }
+            }, 2000);
+            
+            updateStatus();
+        }
+
+        function stopDrone() {
+            droneFlying = false;
+            motorSpeed = 0;
+            
+            // Stop propeller animation
+            elements.propellers.forEach(prop => {
+                if (prop) {
+                    prop.classList.remove('spinning');
+                }
+            });
+            
+            updateStatus();
+        }
+
+        function runTest() {
+            if (!powerOn) {
+                alert('Avval quvvatni yoqing!');
+                return;
+            }
+            
+            alert('Test boshlandi...');
+            
+            // Test sequence
+            setTimeout(() => {
+                if (elements.propellers[0]) {
+                    elements.propellers[0].classList.add('spinning');
+                }
+            }, 500);
+            
+            setTimeout(() => {
+                if (elements.propellers[1]) {
+                    elements.propellers[1].classList.add('spinning');
+                }
+            }, 1000);
+            
+            setTimeout(() => {
+                if (elements.propellers[2]) {
+                    elements.propellers[2].classList.add('spinning');
+                }
+            }, 1500);
+            
+            setTimeout(() => {
+                if (elements.propellers[3]) {
+                    elements.propellers[3].classList.add('spinning');
+                }
+            }, 2000);
+            
+            setTimeout(() => {
+                elements.propellers.forEach(prop => {
+                    if (prop) {
+                        prop.classList.remove('spinning');
+                    }
+                });
+                alert('Test yakunlandi!');
+            }, 4000);
+        }
+
+        function showInfo(type) {
+            const info = {
+                components: 'Komponentlar:\n• Arduino UNO R3\n• MPU6050 Gyroscope/Accelerometer\n• 4x Brushless Motor (1000KV)\n• 4x ESC (Electronic Speed Controller) 30A\n• LiPo Battery 11.1V 2200mAh\n• 4x Propellerlar (10x4.5)\n• Simlar va ulagichlar\n• Dron ramkasi (quadcopter frame)\n• Power distribution board',
+                specs: 'Texnik xususiyatlar:\n• Maksimal balandlik: 100m\n• Uchish vaqti: 15-20 daqiqa\n• Maksimal tezlik: 50 km/h\n• Batareya: 11.1V 2200mAh LiPo\n• Og\'irlik: 1.2 kg\n• Kamera: 1080p HD (opsional)\n• Boshqaruv masofasi: 500m\n• Stabilizatsiya: MPU6050 6-DOF\n• Motor tezligi: 1000-8000 RPM\n• ESC protokol: PWM'
+            };
+            
+            alert(info[type]);
+        }
+
+        // Initial status update
+        updateStatus();
+    </script>
+</body>
+</html>

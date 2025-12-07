@@ -1,0 +1,2458 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>360° Yong'in Signalizatsiyasi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: white;
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        /* HEADER */
+        .header {
+            display: flex;
+            align-items: center;
+            background: #000075;
+            color: white;
+            padding: 10px 20px;
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            width: 100%;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .logo-icon {
+            background: white;
+            color: #dc3545;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        /* MAIN LAYOUT */
+        .main-container {
+            display: flex;
+            gap: 20px;
+        }
+
+        /* LEFT PANEL */
+        .left-panel {
+            width: 250px;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            height: fit-content;
+            border: 2px solid #e9ecef;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #dee2e6;
+            padding-bottom: 15px;
+        }
+
+        .control-group h3 {
+            margin-bottom: 10px;
+            color: #000075;
+            font-size: 16px;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 8px;
+            font-size: 14px;
+            border-radius: 5px;
+            transition: all 0.3s;
+            text-align: left;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .btn-success { background: #000075; }
+        .btn-danger { background: #000075; }
+        .btn-primary { background: #000075; }
+        .btn-warning { background: #000075; }
+
+        /* MAIN CONTENT */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border: 2px solid #e9ecef;
+        }
+
+        .title-header {
+            background: #000075;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0 auto 30px;
+            text-align: center;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(0, 0, 117, 0.3);
+        }
+
+        .circuit-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 30px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        /* SENSOR ARRAY SECTION */
+        .sensor-array-section {
+            width: 300px;
+            height: 400px;
+            position: relative;
+        }
+
+        .sensor-circle {
+            width: 250px;
+            height: 250px;
+            border: 3px solid #000075;
+            border-radius: 50%;
+            position: relative;
+            margin: 0 auto;
+            background: radial-gradient(circle, #f8f9fa 0%, #e9ecef 100%);
+        }
+
+        .ir-receiver {
+            width: 30px;
+            height: 30px;
+            background: #f8f9fa;
+            border: 2px solid #000075;
+            border-radius: 50%;
+            position: absolute;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #000075;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .ir-receiver:hover {
+            background: #000075;
+            color: white;
+            border-color: #000075;
+            box-shadow: 0 0 15px rgba(0, 0, 117, 0.4);
+        }
+
+        .ir-receiver.active {
+            background: #dc3545;
+            color: white;
+            border-color: #dc3545;
+            box-shadow: 0 0 20px rgba(220, 53, 69, 0.6);
+            animation: sensorPulse 1s ease-in-out infinite;
+        }
+
+        @keyframes sensorPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        /* Position IR receivers around circle */
+        .ir-receiver:nth-child(1) { top: -15px; left: 50%; transform: translateX(-50%); }
+        .ir-receiver:nth-child(2) { top: 20px; right: -15px; }
+        .ir-receiver:nth-child(3) { top: 50%; right: -15px; transform: translateY(-50%); }
+        .ir-receiver:nth-child(4) { bottom: 20px; right: -15px; }
+        .ir-receiver:nth-child(5) { bottom: -15px; left: 50%; transform: translateX(-50%); }
+        .ir-receiver:nth-child(6) { bottom: 20px; left: -15px; }
+        .ir-receiver:nth-child(7) { top: 50%; left: -15px; transform: translateY(-50%); }
+        .ir-receiver:nth-child(8) { top: 20px; left: -15px; }
+
+        /* FIRE EFFECT */
+        .fire-zone {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .fire-animation {
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, 
+                #ff4500 0%, 
+                #ff6500 30%, 
+                #ff8500 60%, 
+                transparent 100%);
+            border-radius: 50%;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            animation: fireFlicker 0.5s ease-in-out infinite alternate;
+        }
+
+        .fire-animation.burning {
+            opacity: 1;
+        }
+
+        @keyframes fireFlicker {
+            0% { transform: scale(0.9) rotate(0deg); filter: hue-rotate(0deg); }
+            100% { transform: scale(1.1) rotate(5deg); filter: hue-rotate(10deg); }
+        }
+
+        /* CONTROL CIRCUIT */
+        .control-circuit-section {
+            flex: 1;
+            min-width: 400px;
+            border: 4px solid #000075;
+            border-radius: 20px;
+            padding: 20px;
+            position: relative;
+            background: white;
+        }
+
+        .circuit-board {
+            background: #f8f9fa;
+            width: 100%;
+            height: 500px;
+            position: relative;
+            border-radius: 15px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+        }
+
+        .control-header {
+            background: #000075;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 15px;
+            font-size: 14px;
+            font-weight: bold;
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 3px 10px rgba(0, 0, 117, 0.3);
+        }
+
+        /* COMPONENTS */
+        .bc547-transistor {
+            width: 40px;
+            height: 60px;
+           
+
+            border-radius: 8px;
+            position: absolute;
+            top: 100px;
+            left: 250px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: #000075;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .bc547-transistor.active {
+            background: #28a745;
+            border-color: #28a745;
+            color: white;
+            box-shadow: 0 0 15px rgba(40, 167, 69, 0.6);
+        }
+
+        .capacitor {
+            width: 30px;
+            height: 50px;
+        
+            border-radius: 4px;
+            position: absolute;
+            top: 100px;
+            left: 100px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+            color: white;
+        }
+
+        .resistor {
+            width: 50px;
+            height: 15px;
+       
+            border-radius: 8px;
+            position: absolute;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .resistor-220 {
+            top: 280px;
+            left: 400px;
+        }
+
+        .resistor-10k {
+            top: 250px;
+            left: 480px;
+        }
+
+        .resistor-1k {
+            top: 320px;
+            left: 250px;
+        }
+
+        .red-led {
+            width: 20px;
+            height: 30px;
+            background: #666;
+            border-radius: 50% 50% 0 0;
+            position: absolute;
+            top: 100px;
+            left: 150px;
+            transition: all 0.3s ease;
+        }
+
+        .red-led.on {
+            background: #ff0000;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.8);
+            animation: ledBlink 0.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes ledBlink {
+            0% { opacity: 1; }
+            100% { opacity: 0.3; }
+        }
+
+        .buzzer {
+            width: 50px;
+            height: 30px;
+     
+            border-radius: 50%;
+            position: absolute;
+            top: 100px;
+            left: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .buzzer.active {
+            background: #ffc107;
+            border-color: #ffb300;
+            color: black;
+            animation: buzzerVibrate 0.1s ease-in-out infinite;
+        }
+
+        @keyframes buzzerVibrate {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-2px); }
+            75% { transform: translateX(2px); }
+        }
+
+/* MODAL TUZATISH - Responsive va to'g'ri ko'rinish */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    overflow-y: auto;
+    padding: 20px 0;
+}
+
+.modal-content {
+    background: #000075;
+    color: white;
+    margin: 10vh auto 5vh;
+    padding: 30px;
+    width: 90%;
+    max-width: 800px;
+    border-radius: 20px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+    position: relative;
+    animation: slideDown 0.4s ease;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+/* Scroll bar stilizatsiyasi */
+.modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.close {
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    font-size: 32px;
+    font-weight: bold;
+    cursor: pointer;
+    color: white;
+    transition: all 0.3s;
+    z-index: 2010;
+    line-height: 1;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.close:hover {
+    background: rgba(255, 204, 0, 0.3);
+    color: #ffcc00;
+    transform: rotate(90deg);
+}
+
+.modal-content h2 {
+    font-size: 28px;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+    padding-right: 50px;
+}
+
+.card {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    transition: all 0.3s;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    z-index: 1;
+}
+
+.card:hover {
+    background: rgba(255, 255, 255, 0.18);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.card video {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    background: #000;
+    position: relative;
+    z-index: 2;
+}
+
+.card p {
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 10px 0 0;
+    position: relative;
+    z-index: 2;
+}
+
+.card strong {
+    color: #ffcc00;
+    font-size: 18px;
+}
+
+/* Tab buttons */
+.tab-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 2;
+}
+
+.tab-buttons button {
+    flex: 1;
+    min-width: 150px;
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s;
+    position: relative;
+    z-index: 2;
+}
+
+.tab-buttons button:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+}
+
+.tab-buttons button.active {
+    background: rgba(255, 204, 0, 0.4);
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(255, 204, 0, 0.3);
+}
+
+.tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease;
+    position: relative;
+    z-index: 2;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.tab-content pre {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    border-radius: 12px;
+    overflow-x: auto;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #00ff00;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    z-index: 2;
+}
+
+.tab-content pre::-webkit-scrollbar {
+    height: 8px;
+}
+
+.tab-content pre::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.tab-content pre::-webkit-scrollbar-thumb {
+    background: rgba(0, 255, 0, 0.3);
+    border-radius: 10px;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+/* Flex Layout: 40% Video + 60% Text */
+.flex-container-40-60 {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+}
+
+.flex-video-40 {
+    flex: 0 0 40%;
+}
+
+.flex-video-40 iframe {
+    width: 100%;
+    height: 250px;
+    border-radius: 10px;
+}
+
+.flex-text-60 {
+    flex: 0 0 60%;
+}
+
+.flex-text-60 p {
+    font-size: 16px;
+    line-height: 1.8;
+}
+
+/* Flex Layout: 30% Image + 70% Text */
+.flex-container-30-70 {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+}
+
+.flex-image-30 {
+    flex: 0 0 30%;
+}
+
+.flex-image-30 img {
+    width: 100%;
+    border-radius: 10px;
+}
+
+.flex-text-70 {
+    flex: 0 0 70%;
+}
+
+.flex-text-70 strong {
+    color: #ffcc00;
+    font-size: 18px;
+    display: block;
+    margin-bottom: 10px;
+}
+
+/* 100% Video */
+.video-full video {
+    width: 100%;
+    border-radius: 15px;
+}
+
+/* Dumaloq tugma */
+#infoFloatingBtn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #000075, #0000ff);
+    color: white;
+    border: 4px solid white;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    z-index: 1500;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+#infoFloatingBtn:hover {
+    transform: scale(1.1);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .flex-container-40-60,
+    .flex-container-30-70 {
+        flex-direction: column;
+    }
+    
+    .flex-video-40, .flex-text-60,
+    .flex-image-30, .flex-text-70 {
+        flex: 0 0 100%;
+    }
+}
+/* Tablet responsive */
+@media (max-width: 1024px) {
+    .modal {
+        padding: 15px 0;
+    }
+    
+    .modal-content {
+        width: 95%;
+        padding: 25px;
+        max-height: 75vh;
+        margin: 8vh auto 5vh;
+    }
+    
+    .modal-content h2 {
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+    
+    .card {
+        padding: 15px;
+    }
+    
+    .card p {
+        font-size: 15px;
+    }
+    
+    .tab-buttons button {
+        font-size: 15px;
+        padding: 10px 15px;
+    }
+}
+
+/* Mobile responsive */ 
+@media (max-width: 768px) {
+    .modal {
+        padding: 10px 0;
+    }
+    
+    .modal-content {
+        width: 96%;
+        padding: 20px 15px;
+        margin: 5vh auto 3vh;
+        max-height: 85vh;
+        border-radius: 15px;
+    }
+    
+    .close {
+        right: 10px;
+        top: 10px;
+        font-size: 28px;
+        width: 35px;
+        height: 35px;
+    }
+    
+    .modal-content h2 {
+        font-size: 20px;
+        margin-bottom: 15px;
+        padding-bottom: 12px;
+        padding-right: 45px;
+    }
+    
+    .card {
+        padding: 12px;
+        margin-bottom: 15px;
+        border-radius: 12px;
+    }
+    
+    .card video {
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+    
+    .card p {
+        font-size: 14px;
+        line-height: 1.5;
+    }
+    
+    .card strong {
+        font-size: 16px;
+    }
+    
+    .tab-buttons {
+        gap: 8px;
+        margin-bottom: 15px;
+    }
+    
+    .tab-buttons button {
+        min-width: 120px;
+        font-size: 14px;
+        padding: 10px 12px;
+        border-radius: 8px;
+    }
+    
+    .tab-content pre {
+        padding: 15px;
+        font-size: 12px;
+        line-height: 1.5;
+        border-radius: 10px;
+    }
+}
+
+
+/* Small mobile */
+@media (max-width: 480px) {
+    .modal {
+        padding: 5px 0;
+    }
+    
+    .modal-content {
+        width: 98%;
+        padding: 15px 12px;
+        margin: 3vh auto 2vh;
+        max-height: 90vh;
+        border-radius: 12px;
+    }
+    
+    .close {
+        right: 8px;
+        top: 8px;
+        font-size: 24px;
+        width: 30px;
+        height: 30px;
+    }
+    
+    .modal-content h2 {
+        font-size: 18px;
+        margin-bottom: 12px;
+        padding-bottom: 10px;
+        padding-right: 40px;
+    }
+    
+    .card {
+        padding: 10px;
+        margin-bottom: 12px;
+        border-radius: 10px;
+    }
+    
+    .card p {
+        font-size: 13px;
+    }
+    
+    .card strong {
+        font-size: 15px;
+    }
+    
+    .tab-buttons {
+        flex-direction: column;
+        gap: 6px;
+    }
+    
+    .tab-buttons button {
+        width: 100%;
+        min-width: 100%;
+        font-size: 13px;
+        padding: 10px;
+    }
+    
+    .tab-content pre {
+        padding: 12px;
+        font-size: 11px;
+        line-height: 1.4;
+    }
+}
+
+/* Very small mobile */
+@media (max-width: 360px) {
+    .modal-content {
+        padding: 12px 10px;
+        margin: 2vh auto 1vh;
+    }
+    
+    .modal-content h2 {
+        font-size: 16px;
+    }
+    
+    .card {
+        padding: 8px;
+    }
+    
+    .card p {
+        font-size: 12px;
+    }
+    
+    .tab-buttons button {
+        font-size: 12px;
+        padding: 8px;
+    }
+    
+    .tab-content pre {
+        padding: 10px;
+        font-size: 10px;
+    }
+}
+
+/* Landscape mode fixes */
+@media (max-width: 1024px) and (orientation: landscape) {
+    .modal-content {
+        max-height: 80vh;
+        margin: 5vh auto 3vh;
+    }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .tab-buttons button {
+        min-height: 44px;
+    }
+    
+    .close {
+        min-width: 44px;
+        min-height: 44px;
+    }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    .modal-content {
+        border: 3px solid white;
+    }
+    
+    .card {
+        border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .modal-content,
+    .card,
+    .tab-buttons button,
+    .close {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+/* Print styles */
+@media print {
+    .modal {
+        display: none !important;
+    }
+}
+
+/* Scroll bar stilizatsiyasi */
+.modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.close {
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    font-size: 32px;
+    font-weight: bold;
+    cursor: pointer;
+    color: white;
+    transition: all 0.3s;
+    z-index: 10;
+    line-height: 1;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.close:hover {
+    background: rgba(255, 204, 0, 0.3);
+    color: #ffcc00;
+    transform: rotate(90deg);
+}
+
+.modal-content h2 {
+    font-size: 28px;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+    padding-right: 50px;
+}
+
+.card {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    transition: all 0.3s;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.card:hover {
+    background: rgba(255, 255, 255, 0.18);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.card video {
+    width: 100%;
+    max-width: 70%;
+    height: auto;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    background: #000;
+}
+
+.card p {
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 10px 0 0;
+}
+
+
+.card strong {
+    color: #ffcc00;
+    font-size: 18px;
+}
+
+/* Tab buttons */
+.tab-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.tab-buttons button {
+    flex: 1;
+    min-width: 150px;
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.tab-buttons button:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+}
+
+.tab-buttons button.active {
+    background: rgba(255, 204, 0, 0.4);
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(255, 204, 0, 0.3);
+}
+
+.tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.tab-content pre {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    border-radius: 12px;
+    overflow-x: auto;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #00ff00;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tab-content pre::-webkit-scrollbar {
+    height: 8px;
+}
+
+.tab-content pre::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.tab-content pre::-webkit-scrollbar-thumb {
+    background: rgba(0, 255, 0, 0.3);
+    border-radius: 10px;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Tablet responsive */
+@media (max-width: 1024px) {
+    .modal {
+        padding: 15px 0;
+    }
+    
+    .modal-content {
+        width: 95%;
+        padding: 25px;
+        max-height: 80vh;
+    }
+    
+    .modal-content h2 {
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+    
+    .card {
+        padding: 15px;
+    }
+    
+    .card p {
+        font-size: 15px;
+    }
+    
+    .tab-buttons button {
+        font-size: 15px;
+        padding: 10px 15px;
+    }
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .modal {
+        padding: 10px 0;
+    }
+    
+    .modal-content {
+        width: 96%;
+        padding: 20px 15px;
+        margin: 2vh auto;
+        max-height: 90vh;
+        border-radius: 15px;
+    }
+    
+    .close {
+        right: 10px;
+        top: 10px;
+        font-size: 28px;
+        width: 35px;
+        height: 35px;
+    }
+    
+    .modal-content h2 {
+        font-size: 20px;
+        margin-bottom: 15px;
+        padding-bottom: 12px;
+        padding-right: 45px;
+    }
+    
+    .card {
+        padding: 12px;
+        margin-bottom: 15px;
+        border-radius: 12px;
+    }
+    
+    .card video {
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+    
+    .card p {
+        font-size: 14px;
+        line-height: 1.5;
+    }
+    
+    .card strong {
+        font-size: 16px;
+    }
+    
+    .tab-buttons {
+        gap: 8px;
+        margin-bottom: 15px;
+    }
+    
+    .tab-buttons button {
+        min-width: 120px;
+        font-size: 14px;
+        padding: 10px 12px;
+        border-radius: 8px;
+    }
+    
+    .tab-content pre {
+        padding: 15px;
+        font-size: 12px;
+        line-height: 1.5;
+        border-radius: 10px;
+    }
+}
+
+
+/* Small mobile */
+@media (max-width: 480px) {
+    .modal {
+        padding: 5px 0;
+    }
+    
+    .modal-content {
+        width: 98%;
+        padding: 15px 12px;
+        margin: 1vh auto;
+        max-height: 92vh;
+        border-radius: 12px;
+    }
+    
+    .close {
+        right: 8px;
+        top: 8px;
+        font-size: 24px;
+        width: 30px;
+        height: 30px;
+    }
+    
+    .modal-content h2 {
+        font-size: 18px;
+        margin-bottom: 12px;
+        padding-bottom: 10px;
+        padding-right: 40px;
+    }
+    
+    .card {
+        padding: 10px;
+        margin-bottom: 12px;
+        border-radius: 10px;
+    }
+    
+    .card p {
+        font-size: 13px;
+    }
+    
+    .card strong {
+        font-size: 15px;
+    }
+    
+    .tab-buttons {
+        flex-direction: column;
+        gap: 6px;
+    }
+    
+    .tab-buttons button {
+        width: 100%;
+        min-width: 100%;
+        font-size: 13px;
+        padding: 10px;
+    }
+    
+    .tab-content pre {
+        padding: 12px;
+        font-size: 11px;
+        line-height: 1.4;
+    }
+}
+
+/* Very small mobile */
+@media (max-width: 360px) {
+    .modal-content {
+        padding: 12px 10px;
+    }
+    
+    .modal-content h2 {
+        font-size: 16px;
+    }
+    
+    .card {
+        padding: 8px;
+    }
+    
+    .card p {
+        font-size: 12px;
+    }
+    
+    .tab-buttons button {
+        font-size: 12px;
+        padding: 8px;
+    }
+    
+    .tab-content pre {
+        padding: 10px;
+        font-size: 10px;
+    }
+}
+
+/* Landscape mode fixes */
+@media (max-width: 1024px) and (orientation: landscape) {
+    .modal-content {
+        max-height: 85vh;
+        margin: 2vh auto;
+    }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .tab-buttons button {
+        min-height: 44px;
+    }
+    
+    .close {
+        min-width: 44px;
+        min-height: 44px;
+    }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    .modal-content {
+        border: 3px solid white;
+    }
+    
+    .card {
+        border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .modal-content,
+    .card,
+    .tab-buttons button,
+    .close {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+/* Print styles */
+@media print {
+    .modal {
+        display: none !important;
+    }
+}
+
+        /* POWER SUPPLY */
+        .power-supply {
+            width: 60px;
+            height: 40px;
+            background: #444;
+            border: 2px solid #666;
+            border-radius: 8px;
+            position: absolute;
+            bottom: 100px;
+            right: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: white;
+        }
+
+        /* STATUS DISPLAY */
+        .status-display {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
+            padding: 15px;
+            border-radius: 12px;
+            min-width: 220px;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            z-index: 100;
+            border: 2px solid #000075;
+        }
+
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 8px 0;
+            font-size: 13px;
+        }
+
+        .status-led {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #e9ecef;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.3);
+            border: 1px solid #000075;
+        }
+
+        .status-led.on {
+            background: #28a745;
+            box-shadow: 0 0 10px rgba(40, 167, 69, 0.8);
+        }
+
+        .status-led.alarm {
+            background: #dc3545;
+            box-shadow: 0 0 10px rgba(220, 53, 69, 0.8);
+            animation: ledBlink 0.5s ease-in-out infinite alternate;
+        }
+
+        /* WIRES */
+        .wire {
+            position: absolute;
+            height: 2px;
+            background: #666;
+            z-index: 1;
+        }
+
+        .wire-red { background: #ff0000; }
+        .wire-black { background: #000000; }
+        .wire-blue { background: #0066ff; }
+        .wire-yellow { background: #ffff00; }
+
+        .wire1 { width: 550px; height: 4px; top: 370px; left: 45px; }
+        .wire2 { width: 174px; height: 4px; top: 210px; left: 75px; }
+        .wire3 { width: 115px; height: 4px; top: 285px; left: 270px; }
+        .wire4 { width: 4px; height: 234px; top: 140px; left: 115px; }
+        .wire5 { width: 4px; height: 200px; top: 129px; left: 152px; }
+        .wire6 { width: 4px; height: 234px; top: 140px; left: 45px; }
+        .wire7 { width: 90px; height: 4px; top: 325px; left: 153px; }
+        .wire8 { width: 90px; height: 4px; top: 347px; left: 295px; transform: rotate(30deg); }
+        .wire9 { width: 4px; height: 85px; top: 129px; left: 165px; }
+        .wire10 { width: 4px; height: 74px; top: 140px; left: 75px; }
+        .wire11 { width: 4px; height: 74px; top: 140px; left: 109px; }
+        .wire12 { width: 4px; height: 74px; top: 140px; left: 245px; }
+        .wire13 { width: 4px; height: 119px; top: 140px; left: 289px; }
+        .wire14 { width: 174px; height: 4px; top: 255px; left: 290px; }
+        .wire15 { width: 4px; height: 119px; top: 170px; left: 267px; }
+        .wire16 { width: 4px; height: 123px; top: 258px; right: 37px; }
+        .wire17 { width: 220px; height: 4px; top: 255px; right: 37px; }
+        .wire18 { width: 4px; height: 30px; top: 258px; right: 217px; }
+        .wire19 { width: 120px; height: 4px; top: 285px; right: 218px; }
+        .wire20 { width: 10px; height: 4px; bottom: 115px; right: 38px; }
+        /* MODAL STYLES */  
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+        }
+
+        .modal-content {
+            background: white;
+            color: #333;
+            margin: 5% auto;
+            padding: 20px;
+            width: 80%;
+            max-width: 800px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            position: relative;
+            border: 2px solid #000075;
+        }
+
+        .close {
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #000075;
+        }
+
+        .close:hover {
+            color: #dc3545;
+        }
+
+        .modal-content h2 {
+            color: #000075;
+            margin-bottom: 20px;
+        }
+
+        .component-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #e9ecef;
+        }
+
+        .component-card h3 {
+            color: #000075;
+            margin-bottom: 10px;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .left-panel {
+                width: 100%;
+            }
+            
+            .circuit-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .status-display {
+                position: relative;
+                margin: 20px auto;
+            }
+        }
+          @media (min-width: 4001px) and (max-width: 5200px) {
+            .one{
+                position: absolute;
+                right: 81.3%;
+                top: 0.5%;
+            }
+            .power-supply{
+                top: 345px;
+            }
+            .wire20{
+               top: 375px; 
+            }
+}
+        @media (min-width: 3001px) and (max-width: 4000px) {
+            .one{
+                position: absolute;
+                right: 75.5%;
+                top: 0.5%;
+            }
+            .power-supply{
+                top: 345px;
+            }
+            .wire20{
+               top: 375px; 
+            }
+}
+ @media (min-width: 2001px) and (max-width: 3000px) {
+            .one{
+                position: absolute;
+                right: 64.5%;
+                top: 0.5%;
+            }
+            .power-supply{
+                top: 345px;
+            }
+            .wire20{
+               top: 375px; 
+            }
+}
+@media (min-width: 1601px) and (max-width: 2000px) {
+            .one{
+                position: absolute;
+                right: 35.5%;
+                top: 0.5%;
+            }
+            .power-supply{
+                top: 345px;
+            }
+            .wire20{
+               top: 375px; 
+            }
+}
+
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="logo">
+              <a href="/"><img src="/static/image/logo.png" width="80px" height="80px" alt=""></a>
+            <span>360° Yong'in Signalizatsiyasi Simulyatori</span>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <div class="main-container">
+        <!-- LEFT PANEL -->
+        <div class="left-panel">
+            <div class="control-group">
+                <h3>🔧 Boshqaruv</h3>
+                <button class="btn btn-success" onclick="togglePower()">
+                    Tajribani boshlash
+                </button>
+                <button class="btn btn-danger" onclick="triggerAlarm()">
+                    🚨 Signalizatsiya Test
+                </button>
+                <button class="btn btn-warning" onclick="resetAlarm()">
+                    🔄 Reset
+                </button>
+            </div>
+
+    <div class="control-group">
+    <h3>Ma'lumotlar</h3>
+    <button class="btn btn-primary" id="schemaBtn">💡 Sxema qayerda ishlatiladi</button>
+    <button class="btn btn-primary" id="codeBtn">💻 Kod</button>
+    <button class="btn btn-primary" id="componentsBtn">🔌 Qurilmalar</button>
+</div>
+
+
+            <div class="control-group">
+                <h3>📈 Holat</h3>
+                <div class="status-row">
+                    <span>Quvvat:</span>
+                    <div class="status-led" id="powerLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Sensorlar:</span>
+                    <div class="status-led" id="sensorLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>LED:</span>
+                    <div class="status-led" id="ledStatusLed"></div>
+                </div> 
+                <div class="status-row">
+                    <span>Buzzer:</span>
+                    <div class="status-led" id="buzzerStatusLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Olov:</span>
+                    <div class="status-led" id="fireLed"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+            <div class="title-header">360° Yong'in Signalizatsiyasi Simulyatori</div>
+            
+            <div class="circuit-container">
+                <!-- SENSOR ARRAY -->
+                <div class="sensor-array-section">
+                    <h3 style="text-align: center; margin-bottom: 20px; color: #000075;">IR Sensorlar</h3>
+                    <div class="sensor-circle">
+                        <div class="ir-receiver" onclick="triggerSensor(1)">IR1</div>
+                        <div class="ir-receiver" onclick="triggerSensor(2)">IR2</div>
+                        <div class="ir-receiver" onclick="triggerSensor(3)">IR3</div>
+                        <div class="ir-receiver" onclick="triggerSensor(4)">IR4</div>
+                        <div class="ir-receiver" onclick="triggerSensor(5)">IR5</div>
+                        <div class="ir-receiver" onclick="triggerSensor(6)">IR6</div>
+                        <div class="ir-receiver" onclick="triggerSensor(7)">IR7</div>
+                        <div class="ir-receiver" onclick="triggerSensor(8)">IR8</div>
+                        
+                        <div class="fire-zone" onclick="toggleFire()">
+                            <div class="fire-animation" id="fireAnimation"></div>
+                        </div>
+                    </div>
+                    <p style="text-align: center; margin-top: 15px; color: #666; font-size: 12px;">
+                        Olov zonasini bosing yoki sensorlarni bosing
+                    </p>
+                </div>
+
+                <!-- CONTROL CIRCUIT -->
+                <div class="control-circuit-section">
+                    <div class="circuit-board">
+                        <div class="control-header">Yong'in signalizatsiyasini boshqarish sxemasi</div>
+
+                        <!-- Power Supply -->
+                       
+
+                        <!-- BC547 Transistor -->
+                        <div class="bc547-transistor" id="transistor">
+                           <img src="/static/image/bc547 - Copy.png" width="80px" height="120px" alt="">
+                      
+                        </div>
+
+                        <!-- Capacitor -->
+                        <div class="capacitor">
+                           <img src="/static/image/capacitor.png" width="80px " height="100px" alt="">
+                            <div>100µF</div>
+                            <div>25V</div>
+                        </div>
+                           <div class="red-led" id="redLed"></div>
+                        <!-- Resistors -->
+                        <div class="resistor resistor-220">
+                           <img src="/static/image/resistor.png" width="70px" height="60px" alt="">
+                            220Ω</div>
+                        <div class="resistor resistor-10k">
+                            
+                            <img src="/static/image/resistor.png" width="70px" height="60px" alt="">
+                            10K</div>
+                        <div class="resistor resistor-1k">
+                            <img src="/static/image/resistor.png" width="70px" height="60px" alt="">
+                            1K</div>
+                            <div class="one">
+ <div class="power-supply">3.7V
+                           <img src="/static/image/litium - Copy.png" width="150px" height="50px" alt="">
+                            
+                        </div>
+                         <div class="wire wire-black wire16"></div>
+                        <div class="wire wire-black wire17"></div>
+                         <div class="wire wire-black wire18"></div>
+                        <div class="wire wire-black wire19"></div>
+                         <div class="wire wire-black wire20"></div>
+                            </div>
+                       
+                        <!-- Red LED -->
+                     
+
+                        <!-- Buzzer -->
+                        <div class="buzzer" id="buzzer">
+                           <img src="/static/image/buzzer3.png" width="100px" height="100px" alt="">
+                            🔊</div>
+
+                        <!-- Wires -->
+                        <div class="wire wire-red wire1"></div>
+                        <div class="wire wire-red wire4"></div>
+                        <div class="wire wire-black wire2"></div>
+                        <div class="wire wire-blue wire3"></div>
+                        <div class="wire wire-red wire5"></div>
+                        <div class="wire wire-red wire6"></div>
+                        <div class="wire wire-red wire7"></div>
+                        <div class="wire wire-red wire8"></div>
+                        <div class="wire wire-black wire9"></div>
+                        <div class="wire wire-black wire10"></div>
+                        <div class="wire wire-black wire11"></div>
+                        <div class="wire wire-black wire12"></div>
+                        <div class="wire wire-black wire13"></div>
+                        <div class="wire wire-black wire14"></div>
+                        <div class="wire wire-blue wire15"></div>
+                       
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- STATUS DISPLAY -->
+    <div class="status-display">
+        <h4 style="color: #000075; margin-bottom: 10px;">🔥 Alarm Status</h4>
+        <div class="status-row">
+            <span>Sistem:</span>
+            <span id="systemStatus">OFFLINE</span>
+        </div>
+        <div class="status-row">
+            <span>Olov holati:</span>
+            <span id="fireStatus">YO'Q</span>
+        </div>
+        <div class="status-row">
+            <span>Faol sensorlar:</span>
+            <span id="activeSensors">0/8</span>
+        </div>
+    </div>
+
+<!-- ✅ 1) Sxema qayerda ishlatiladi (DC Motor / L298N) -->
+    <div class="modal" id="schemaModal">
+        <div class="modal-content">
+            <span class="close" title="Yopish">&times;</span>
+            <h2>💡 Sxema qayerda ishlatiladi </h2>
+
+            <div class="flex-container-40-60">
+                <div class="flex-video-40">
+                    <!-- 1-video (xohlasangiz almashtiring) -->
+                    <iframe src="https://www.youtube.com/embed/zjdPZIZgFQM?si=mk0aZ0YpU1fgY9iD" title="DC Motor Control with L298N"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen></iframe>
+                </div>
+                <div class="flex-text-60">
+                    <strong>360 gradus Yong'in signalizatsiyasi</strong>
+                   <p>Ushbu tajriba atrofdagi yorug‘lik, harorat yoki tegishli sensor qiymatining o‘zgarishiga qarab buzzer orqali signal chiqaruvchi avtomatik ogohlantirish tizimini yaratadi.
+
+Sxemada sensor sifatida NTC (harorat sensori) yoki LDR (yorug‘lik sensori) ishlatilishi mumkin. Rasmga ko‘ra — u kulrang, ikki oyoqli va odatda NTC termistorga o‘xshaydi.</p>
+                </div>
+            </div>
+
+            <div class="flex-container-40-60">
+                <div class="flex-video-40">
+                    <!-- 2-video (ixtiyoriy) -->
+                    <iframe src="https://www.youtube.com/embed/KxhOKJyh_S0?si=QJIJ-WCm1gCe7t6y" title="PWM Speed Control"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen></iframe>
+                </div>
+                <div class="flex-text-60">
+                    <strong>🔄 Ishlash prinsipi</strong>
+                    <p>Men NodeMcu yordamida IOT asosidagi avtomatik yong'in o'chirish tizimini qanday yaratishni ko'rsataman. Siz buni maktabingizdagi ilmiy loyihada, kollejdagi ilmiy loyihada, fan yarmarkasida ko'rsatishingiz mumkin. Shunday qilib, videoni o'tkazib yubormasdan tomosha qiling.</p>
+                </div>
+            </div>
+              <div class="flex-container-40-60">
+                <div class="flex-video-40">
+                    <!-- 2-video (ixtiyoriy) -->
+                    <iframe src="https://www.youtube.com/embed/APcf0b1xVF4?si=KB5EDZDO3_CBVjTx" title="PWM Speed Control"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen></iframe>
+                </div>
+                <div class="flex-text-60">
+                    <strong>Qo‘shimcha tajriba g‘oyalari</strong>
+               <p>Bugungi videoda men sizga infraqizil sensor yordamida uzoq masofali yong'in signalizatsiya zanjirini qanday yasashni ko'rsataman. Siz ushbu loyihani Fan ko'rgazmasida yoki You School loyihasida namoyish qilishingiz mumkin. Bu juda qiziqarli loyiha. Agar sizda elektronika haqida tasavvur bo'lsa, bu loyihani uyingizda juda osonlikcha amalga oshirishingiz mumkin.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+   <!-- ✅ Qurilmalar Modali: BC547 Sensor Signalizatsiya tajribasi uchun -->
+<div class="modal" id="componentsModal">
+  <div class="modal-content">
+    <span class="close" title="Yopish">&times;</span>
+    <h2>🔌 Ishlatilgan Qurilmalar</h2>
+
+    <!-- BC547 Transistor -->
+    <div class="flex-container-30-70">
+      <div class="flex-image-30">
+       <img src="/static/image/bc547 - Copy.png" width="80px" height="120px" alt="BC547 Transistor">
+      </div>
+      <div class="flex-text-70">
+        <strong>BC547 NPN Tranzistor</strong>
+        <p>Buzzer yoki LED kabi yuklamalarni boshqaradi. Sensor signali tranzistor bazasiga beriladi va u kuchaytirilgan chiqish bilan buzzerga tok uzatadi.</p>
+      </div>
+    </div>
+
+    <!-- Capacitor -->
+    <div class="flex-container-30-70">
+      <div class="flex-image-30">
+       <img src="/static/image/capacitor.png" width="80px" height="100px" alt="Capacitor">
+      </div>
+      <div class="flex-text-70">
+        <strong>100µF 25V Elektrolit Kondensator</strong>
+        <p>Signalni stabilizatsiya qiladi, buzzerning uzluksiz ishlashini ta’minlaydi va tebranishlarni kamaytiradi. Tranzistor bazasi yoki sensor bilan birga kechikish hosil qiladi.</p>
+      </div>
+    </div>
+
+    <!-- LED -->
+    <div class="flex-container-30-70">
+      <div class="flex-image-30">
+        <div style="width:40px; height:40px; background:red; border-radius:50%;"></div>
+      </div>
+      <div class="flex-text-70">
+        <strong>Qizil LED Indikator</strong>
+        <p>Tizim faolligini bildiradi. Signal paydo bo‘lganda yoniq holga keladi.</p>
+      </div>
+    </div>
+
+    <!-- 220 Ohm Resistor -->
+    <div class="flex-container-30-70">
+      <div class="flex-image-30">
+       <img src="/static/image/resistor.png" width="70px" height="60px" alt="Resistor 220Ω">
+      </div>
+      <div class="flex-text-70">
+        <strong>220Ω Rezistor</strong>
+        <p>LED bilan ketma-ket ulanadi va yorug‘lik darajasini xavfsiz saqlash uchun tokni cheklaydi.</p>
+      </div>
+    </div>
+
+    <!-- 10K Ohm Resistor -->
+    <div class="flex-container-30-70">
+      <div class="flex-image-30">
+       <img src="/static/image/resistor.png" width="70px" height="60px" alt="Resistor 10K">
+      </div>
+      <div class="flex-text-70">
+        <strong>10kΩ Rezistor</strong>
+        <p>Sensor bilan bo‘luvchi sifatida ishlaydi va tranzistor bazasiga sezgir boshqaruv kuchlanishini beradi.</p>
+      </div>
+    </div>
+
+    <!-- 1K Ohm Resistor -->
+    <div class="flex-container-30-70">
+      <div class="flex-image-30">
+       <img src="/static/image/resistor.png" width="70px" height="60px" alt="Resistor 1K">
+      </div>
+      <div class="flex-text-70">
+        <strong>1kΩ Rezistor</strong>
+        <p>Tranzistor bazasiga kiruvchi signalni cheklab, uni ortiqcha kuchlanishdan himoya qiladi.</p>
+      </div>
+    </div>
+
+    <!-- Battery -->
+    <div class="flex-container-30-70">
+      <div class="flex-image-30">
+        <img src="/static/image/litium - Copy.png" width="150px" height="50px" alt="3.7V Battery">
+      </div>
+      <div class="flex-text-70">
+        <strong>3.7V Li-ion Batareya</strong>
+        <p>Butun sxemani quvvatlantiradi. Tranzistor, sensor va buzzer uchun barqaror kuchlanish manbai bo‘lib xizmat qiladi.</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+    <!-- ✅ 4) Qo'shimcha info (ixtiyoriy) + suzuvchi tugma -->
+    <div class="modal" id="infoModal">
+        <div class="modal-content">
+            <span class="close" title="Yopish">&times;</span>
+            <h2>📚 Qo'shimcha Ma'lumot</h2>
+            <div class="video-full">
+                <video controls>
+                    <source src="/media/2.mp4" type="video/mp4">
+                    Brauzeringiz video formatni qo'llab-quvvatlamaydi.
+                </video>
+            </div>
+        </div>
+    </div>
+
+    <button id="infoFloatingBtn"><span>📚</span><span>Ma'lumot</span></button>
+
+ 
+
+
+
+    <script>
+        // System state variables
+        let powerOn = false;
+        let fireDetected = false;
+        let alarmActive = false;
+        let activeSensorCount = 0;
+// Modalni ochish
+function openModal(id) {
+    document.getElementById(id).style.display = "block";
+}
+
+// Tugmalarni ulash
+document.getElementById("schemaBtn").addEventListener("click", () => openModal("schemaModal"));
+document.getElementById("codeBtn").addEventListener("click", () => openModal("codeModal"));
+document.getElementById("componentsBtn").addEventListener("click", () => openModal("componentsModal"));
+document.getElementById("infoFloatingBtn").addEventListener("click", () => openModal("infoModal"));
+
+// Yopish tugmalari
+document.querySelectorAll(".close").forEach(btn => {
+    btn.addEventListener("click", function() {
+        this.closest(".modal").style.display = "none";
+    });
+});
+
+// Tab switching (Kod uchun)
+document.querySelectorAll(".tab-btn").forEach(button => {
+    button.addEventListener("click", function() {
+        const tab = this.dataset.tab;
+        document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+        this.classList.add("active");
+        document.querySelectorAll(".tab-content").forEach(content => {
+            content.classList.remove("active");
+            if (content.id === tab) content.classList.add("active");
+        });
+    });
+});
+        // DOM elements
+        const elements = {
+            powerLed: document.getElementById('powerLed'),
+            sensorLed: document.getElementById('sensorLed'),
+            ledStatusLed: document.getElementById('ledStatusLed'),
+            buzzerStatusLed: document.getElementById('buzzerStatusLed'),
+            fireLed: document.getElementById('fireLed'),
+            
+            transistor: document.getElementById('transistor'),
+            redLed: document.getElementById('redLed'),
+            buzzer: document.getElementById('buzzer'),
+            fireAnimation: document.getElementById('fireAnimation'),
+            
+            systemStatus: document.getElementById('systemStatus'),
+            fireStatus: document.getElementById('fireStatus'),
+            activeSensors: document.getElementById('activeSensors')
+        };
+
+        // Audio context for buzzer sound
+        let audioContext = null;
+
+        function initAudio() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playBuzzerSound() {
+            if (!audioContext) return;
+            
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.5);
+        }
+
+        // Update status display
+        function updateStatus() {
+            elements.powerLed.classList.toggle('on', powerOn);
+            elements.sensorLed.classList.toggle('on', activeSensorCount > 0);
+            elements.ledStatusLed.classList.toggle('alarm', alarmActive);
+            elements.buzzerStatusLed.classList.toggle('alarm', alarmActive);
+            elements.fireLed.classList.toggle('alarm', fireDetected);
+            
+            elements.systemStatus.textContent = powerOn ? 'ONLINE' : 'OFFLINE';
+            elements.systemStatus.style.color = powerOn ? '#28a745' : '#dc3545';
+            
+            elements.fireStatus.textContent = fireDetected ? 'ANIQLANGAN!' : 'YO\'Q';
+            elements.fireStatus.style.color = fireDetected ? '#dc3545' : '#28a745';
+            
+            elements.activeSensors.textContent = `${activeSensorCount}/8`;
+            elements.activeSensors.style.color = activeSensorCount > 0 ? '#dc3545' : '#28a745';
+        }
+
+        // Toggle power
+        function togglePower() {
+            powerOn = !powerOn;
+            
+            if (!powerOn) {
+                resetAlarm();
+                fireDetected = false;
+                elements.fireAnimation.classList.remove('burning');
+            }
+            
+            updateStatus();
+            
+            // Initialize audio context on first user interaction
+            if (powerOn) {
+                initAudio();
+            }
+        }
+
+        // Toggle fire effect
+        function toggleFire() {
+            if (!powerOn) {
+                alert('Avval quvvatni yoqing!');
+                return;
+            }
+            
+            fireDetected = !fireDetected;
+            elements.fireAnimation.classList.toggle('burning', fireDetected);
+            
+            if (fireDetected) {
+                activateAllSensors();
+                activateAlarm();
+            } else {
+                deactivateAllSensors();
+                deactivateAlarm();
+            }
+            
+            updateStatus();
+        }
+
+        // Trigger individual sensor
+        function triggerSensor(sensorNum) {
+            if (!powerOn) {
+                alert('Avval quvvatni yoqing!');
+                return;
+            }
+            
+            const sensors = document.querySelectorAll('.ir-receiver');
+            const sensor = sensors[sensorNum - 1];
+            
+            sensor.classList.toggle('active');
+            
+            // Count active sensors
+            activeSensorCount = document.querySelectorAll('.ir-receiver.active').length;
+            
+            if (activeSensorCount > 0) {
+                fireDetected = true;
+                elements.fireAnimation.classList.add('burning');
+                activateAlarm();
+            } else {
+                fireDetected = false;
+                elements.fireAnimation.classList.remove('burning');
+                deactivateAlarm();
+            }
+            
+            updateStatus();
+        }
+
+        // Activate all sensors
+        function activateAllSensors() {
+            const sensors = document.querySelectorAll('.ir-receiver');
+            sensors.forEach(sensor => sensor.classList.add('active'));
+            activeSensorCount = 8;
+        }
+
+        // Deactivate all sensors
+        function deactivateAllSensors() {
+            const sensors = document.querySelectorAll('.ir-receiver');
+            sensors.forEach(sensor => sensor.classList.remove('active'));
+            activeSensorCount = 0;
+        }
+
+        // Activate alarm
+        function activateAlarm() {
+            if (!powerOn) return;
+            
+            alarmActive = true;
+            
+            // Activate circuit components
+            elements.transistor.classList.add('active');
+            elements.redLed.classList.add('on');
+            elements.buzzer.classList.add('active');
+            
+            // Play buzzer sound
+            playBuzzerSound();
+            
+            updateStatus();
+        }
+
+        // Deactivate alarm
+        function deactivateAlarm() {
+            alarmActive = false;
+            
+            // Deactivate circuit components
+            elements.transistor.classList.remove('active');
+            elements.redLed.classList.remove('on');
+            elements.buzzer.classList.remove('active');
+            
+            updateStatus();
+        }
+
+        // Trigger alarm manually
+        function triggerAlarm() {
+            if (!powerOn) {
+                alert('Avval quvvatni yoqing!');
+                return;
+            }
+            
+            // Simulate fire detection
+            fireDetected = true;
+            elements.fireAnimation.classList.add('burning');
+            activateAllSensors();
+            activateAlarm();
+            
+            // Auto reset after 3 seconds
+            setTimeout(() => {
+                if (alarmActive) {
+                    resetAlarm();
+                }
+            }, 3000);
+            
+            updateStatus();
+        }
+
+        // Reset alarm
+        function resetAlarm() {
+            fireDetected = false;
+            alarmActive = false;
+            activeSensorCount = 0;
+            
+            elements.fireAnimation.classList.remove('burning');
+            deactivateAllSensors();
+            deactivateAlarm();
+            
+            updateStatus();
+        }
+
+        // Modal functions
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        window.addEventListener('click', function(event) {
+            document.querySelectorAll('.modal').forEach(modal => {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        });
+
+        // Initialize system
+        updateStatus();
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(event) {
+            switch(event.key.toLowerCase()) {
+                case 'p':
+                    togglePower();
+                    break;
+                case 'f':
+                    if (powerOn) toggleFire();
+                    break;
+                case 't':
+                    if (powerOn) triggerAlarm();
+                    break;
+                case 'r':
+                    resetAlarm();
+                    break;
+            }
+        });
+
+        // Auto demo mode (optional)
+        function startDemo() {
+            if (!powerOn) {
+                togglePower();
+            }
+            
+            let step = 0;
+            const demoInterval = setInterval(() => {
+                switch(step) {
+                    case 0:
+                        triggerSensor(1);
+                        break;
+                    case 1:
+                        triggerSensor(3);
+                        break;
+                    case 2:
+                        triggerSensor(5);
+                        break;
+                    case 3:
+                        toggleFire();
+                        break;
+                    case 4:
+                        resetAlarm();
+                        clearInterval(demoInterval);
+                        break;
+                }
+                step++;
+            }, 2000);
+        }
+
+        // Add demo button to left panel
+        const demoButton = document.createElement('button');
+        demoButton.className = 'btn btn-warning';
+        demoButton.textContent = '🎯 Demo Mode';
+        demoButton.onclick = startDemo;
+        
+        // Add to first control group
+        const firstControlGroup = document.querySelector('.control-group');
+        firstControlGroup.appendChild(demoButton);
+
+        // Keyboard shortcut display
+        const shortcutInfo = document.createElement('div');
+        shortcutInfo.innerHTML = `
+            <h4 style="color: #000075; margin: 15px 0 10px;">⌨️ Klaviatura</h4>
+            <p style="font-size: 12px; color: #666; margin: 5px 0;">P - Quvvat</p>
+            <p style="font-size: 12px; color: #666; margin: 5px 0;">F - Olov</p>
+            <p style="font-size: 12px; color: #666; margin: 5px 0;">T - Test</p>
+            <p style="font-size: 12px; color: #666; margin: 5px 0;">R - Reset</p>
+        `;
+        
+        const lastControlGroup = document.querySelectorAll('.control-group')[2];
+        lastControlGroup.appendChild(shortcutInfo);
+
+        // Temperature display simulation
+        function updateTemperature() {
+            const tempDisplay = document.getElementById('tempDisplay');
+            if (tempDisplay) {
+                let temp = fireDetected ? 
+                    Math.floor(Math.random() * 50) + 80 : // 80-130°C when fire
+                    Math.floor(Math.random() * 20) + 20;  // 20-40°C normal
+                tempDisplay.textContent = temp + '°C';
+                tempDisplay.style.color = temp > 60 ? '#dc3545' : '#28a745';
+            }
+        }
+
+        // Add temperature display to status
+        const statusDisplay = document.querySelector('.status-display');
+        const tempRow = document.createElement('div');
+        tempRow.className = 'status-row';
+        tempRow.innerHTML = `
+            <span>Harorat:</span>
+            <span id="tempDisplay" style="font-weight: bold;">25°C</span>
+        `;
+        statusDisplay.appendChild(tempRow);
+
+        // Update temperature every 2 seconds
+        setInterval(updateTemperature, 2000);
+
+        // Enhanced fire animation
+        function createFireParticles() {
+            if (!fireDetected) return;
+            
+            const fireZone = document.querySelector('.fire-zone');
+            for(let i = 0; i < 3; i++) {
+                const particle = document.createElement('div');
+                particle.style.cssText = `
+                    position: absolute;
+                    width: 4px;
+                    height: 4px;
+                    background: #ff4500;
+                    border-radius: 50%;
+                    pointer-events: none;
+                    animation: fireParticle 1s ease-out forwards;
+                    left: ${Math.random() * 80}px;
+                    top: ${Math.random() * 80}px;
+                `;
+                fireZone.appendChild(particle);
+                
+                setTimeout(() => particle.remove(), 1000);
+            }
+        }
+
+        // Add particle animation CSS
+        const particleStyle = document.createElement('style');
+        particleStyle.textContent = `
+            @keyframes fireParticle {
+                0% {
+                    transform: translateY(0) scale(1);
+                    opacity: 1;
+                }
+                100% {
+                    transform: translateY(-20px) scale(0);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(particleStyle);
+
+        // Create particles when fire is active
+        setInterval(createFireParticles, 300);
+
+        // Sound effects improvement
+        function playAlarmSound() {
+            if (!audioContext || !alarmActive) return;
+            
+            // Create alarm sound pattern
+            const frequencies = [800, 1000, 800, 1000];
+            let index = 0;
+            
+            function playTone() {
+                if (!alarmActive || index >= frequencies.length) {
+                    index = 0;
+                    return;
+                }
+                
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.setValueAtTime(frequencies[index], audioContext.currentTime);
+                gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.3);
+                
+                index++;
+                setTimeout(playTone, 300);
+            }
+            
+            playTone();
+        }
+
+        // Enhanced alarm activation
+        const originalActivateAlarm = activateAlarm;
+        activateAlarm = function() {
+            originalActivateAlarm();
+            playAlarmSound();
+        };
+
+        // Sensor calibration simulation
+        function calibrateSensors() {
+            if (!powerOn) {
+                alert('Avval quvvatni yoqing!');
+                return;
+            }
+            
+            alert('Sensorlar kalibrlandi!\nSezgirlik: Yuqori\nMasofa: 5 metr');
+        }
+
+        // Add calibration button
+        const calibrateBtn = document.createElement('button');
+        calibrateBtn.className = 'btn btn-primary';
+        calibrateBtn.textContent = '⚙️ Kalibratsiya';
+        calibrateBtn.onclick = calibrateSensors;
+        
+        const controlGroups = document.querySelectorAll('.control-group');
+        controlGroups[0].appendChild(calibrateBtn);
+
+        // System information display
+        function showSystemInfo() {
+            alert(`
+🔥 360° Yong'in Signalizatsiya Tizimi
+────────────────────────────────────
+Versiya: 2.1
+Sensorlar: 8 ta IR receiver
+Qamrov: 360° x 5 metr
+Javob vaqti: < 0.5 sekund
+Batareya: 3.7V Li-ion
+Ishlash vaqti: 24/7
+            `);
+        }
+
+        // Add info button
+        const infoBtn = document.createElement('button');
+        infoBtn.className = 'btn btn-primary';
+        infoBtn.textContent = 'ℹ️ Tizim haqida';
+        infoBtn.onclick = showSystemInfo;
+        
+        controlGroups[1].appendChild(infoBtn);
+
+        // Enhanced component interactions
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add hover effects to components
+            const components = document.querySelectorAll('.bc547-transistor, .capacitor, .resistor, .red-led, .buzzer, .power-supply');
+            
+            components.forEach(component => {
+                component.addEventListener('mouseenter', function() {
+                    if (powerOn) {
+                        this.style.transform = 'scale(1.1)';
+                        this.style.zIndex = '20';
+                    }
+                });
+                
+                component.addEventListener('mouseleave', function() {
+                    this.style.transform = 'scale(1)';
+                    this.style.zIndex = 'auto';
+                });
+            });
+        });
+
+        // Final initialization
+        updateStatus();
+        updateTemperature();
+
+        console.log('🔥 360° Fire Alarm Simulator initialized!');
+        console.log('Keyboard shortcuts: P(power), F(fire), T(test), R(reset)');
+    </script>
+</body>
+</html>

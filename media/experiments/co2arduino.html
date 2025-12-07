@@ -1,0 +1,1466 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arduino CO2 Sensor Tajribasi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #e6f3ff;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: auto;
+        }
+
+        /* HEADER */
+        .header {
+            display: flex;
+            align-items: center;
+            background:#000075;
+            color: white;
+            padding: 10px 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            width: 100%;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000075;
+            font-weight: bold;
+        }
+
+        /* MAIN LAYOUT */
+        .main-container {
+            display: flex;
+            margin-top: 20px;
+            gap: 20px;
+        }
+
+        /* LEFT PANEL */
+        .left-panel {
+            width: 250px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            height: fit-content;
+            position: relative;
+            z-index: 1;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 15px;
+        }
+
+        .control-group h3 {
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 8px;
+            font-size: 14px;
+            border-radius: 5px;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn-success { 
+            background: #28a745; 
+            color: white; 
+        }
+        .btn-danger { 
+            background: #dc3545; 
+            color: white; 
+        }
+        .btn-primary { 
+            background: #000075; 
+            color: white; 
+        }
+        .btn-info { 
+            background:#000075 ; 
+            color: white; 
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .title-header {
+            background: #000075;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0 auto 30px;
+            text-align: center;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        /* CO2 EXPERIMENT SECTION */
+        .experiment-container {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .circuit-board {
+            background: #f8f9fa;
+            border: 3px solid #000075;
+            border-radius: 15px;
+            padding: 20px;
+            position: relative;
+            width: 100%;
+            max-width: 900px;
+            aspect-ratio: 7 / 4.5;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        /* Arduino */
+        .arduino {
+            position: absolute;
+            left: 7%;
+            top: 18%;
+            width: 17%;
+            height: 18%;
+            background: #0066cc;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.75vw;
+            box-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+            
+        }
+
+        .arduino img {
+            width: 350px;
+            height: 350px;
+            object-fit: contain;
+        }
+
+        /* CO2 Sensor */
+        .co2-sensor {
+            position: absolute;
+            right: 40%;
+            top: 57%;
+            z-index: 2;
+            width: 11%;
+            height: 11%;
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.6vw;
+        }
+
+        .co2-sensor img {   
+            width: 100px;
+            height: 100px;
+            object-fit: contain;
+        }
+
+        /* Buzzer */
+        .buzzer {
+            position: absolute;
+            left: 36.5%;
+            top: 59%;
+            width: 5.7%;
+            height: 9%;
+            z-index: 2;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.5vw;
+            transition: all 0.3s ease;
+        }
+
+        .buzzer img {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+        }
+
+        .buzzer.active {
+            animation: buzzerVibrate 0.2s ease-in-out infinite alternate;
+        }
+
+        @keyframes buzzerVibrate {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.1); }
+        }
+
+        /* LED */
+        .led {
+            position: absolute;
+            left: 45.7%;
+            top: 59%;
+            width: 2.8%;
+            height: 6.7%;
+            border-radius: 10px 10px 0 0;
+            background: #666;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+            transition: all 0.3s ease;
+        }
+
+        .led.active {
+            background: #ff0000;
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.8);
+        }
+
+        /* Breadboard */
+        .breadboard {
+                position: absolute;
+                bottom: 15%;
+                left: 52%;
+                transform: translateX(-50%);
+                width: 43%;
+                height: 56%;
+                border-radius: 5px;
+                display: grid;
+                grid-template-columns: repeat(10, 1fr);
+                gap: 2px;
+                padding: 5px;
+        }
+
+        .breadboard img {
+            width: 400px;
+            height: 450px;
+            object-fit: contain;
+        }
+
+        /* Wires */
+        .wire {
+            position: absolute;
+            border-radius: 2px;
+            z-index: 5;
+        }
+
+        .wire-red { background: #ff0000; }
+        .wire-black { background: #000000; }
+        .wire-green { background: #00ff00; }
+        .wire-blue { background: #0066ff; }
+        .wire-yellow { background: #ffff00; }
+        .wire-purple{background: blueviolet;}
+        .wire-orange{background: orange;}
+
+        /* Wire connections - RESPONSIVE */
+        .wire1 { width: 4.5%; height: 0.7%; top: 31.5%; left: 0.3%; }
+        .wire2 { width: 3.5%; height: 0.7%; top: 33.3%; left: 1%;  }
+        .wire3 { width: 0.4%; height: 53.7%; top: 33.3%; left: 1%; }
+        .wire4 { width: 0.4%; height: 53.7%; top: 31.5%; left: 0.3%; }
+        .wire5 { width: 53.5%; height: 0.7%; bottom: 14.4%; left: 0.3%; }
+        .wire6 { width: 53.7%; height: 0.7%; bottom: 12.7%; left: 1%; }
+        .wire7 { width: 3%; height: 0.7%; bottom: 58.1%; left: 1.4%; }
+        .wire8 { width: 0.4%; height: 34%; top: 41.6%; left: 1.4%; }
+        .wire9 { width: 52%; height: 0.7%; bottom: 23.8%; left: 1.4%; }
+        .wire10 { width: 0.4%; height: 8.1%; bottom: 23.8%; left: 53.5%;transform: rotate(2deg); }
+        .wire11 { width: 6.7%; height: 0.7%; top: 32.9%; left: 26.1%; }
+        .wire12 { width: 8.1%; height: 0.7%; top: 30.7%; left: 26.1%; }
+        .wire13 { width: 0.4%; height: 32.6%; top: 32.9%; left: 32.6%; }
+        .wire14 { width: 0.4%; height: 36.5%; top: 30.7%; left: 34%; }
+        .wire15 { width: 6%; height: 0.7%; top: 65.2%; left: 32.6%; }
+        .wire16 { width: 12%; height: 0.7%; top: 66.6%; left: 34%; }
+        .wire17 { width: 0.4%; height: 18%; bottom: 14.4%; left: 54%; transform: rotate(3deg); }
+        .wire18 { width: 0.4%; height: 19.8%; bottom: 12.7%; left: 54.5%; transform: rotate(2deg); }
+        .wire19 { width: 0.4%; height: 21.6%; bottom: 12.9%; left: 40.5%; transform: rotate(-2deg); }
+        .wire20 { width: 0.4%; height: 21.6%; bottom: 12.7%; left: 48%; transform: rotate(-2deg); }
+        .wire21 { width: 0.4%; height: 11.1%; bottom: 32.9%; left: 32.6%; }
+        .wire22 { width: 0.4%; height: 11.1%; bottom: 30.7%; left: 34%; }
+        
+        /* CO2 Gas Animation */
+        .co2-gas {
+            position: absolute;
+            right: 38%;
+            top: 52.4%;
+            width: 8.6%;
+            height: 17.8%;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .gas-particle {
+            position: absolute;
+            width: 13.3%;
+            height: 10%;
+            background: rgba(128, 128, 128, 0.7);
+            border-radius: 50%;
+            opacity: 0;
+            animation: gasFlow 2s linear infinite;
+        }
+
+        .gas-particle:nth-child(1) { animation-delay: 0s; left: 16.7%; }
+        .gas-particle:nth-child(2) { animation-delay: 0.3s; left: 33.3%; }
+        .gas-particle:nth-child(3) { animation-delay: 0.6s; left: 50%; }
+        .gas-particle:nth-child(4) { animation-delay: 0.9s; left: 66.7%; }
+        .gas-particle:nth-child(5) { animation-delay: 1.2s; left: 25%; }
+        .gas-particle:nth-child(6) { animation-delay: 1.5s; left: 58.3%; }
+
+        @keyframes gasFlow {
+            0% { 
+                transform: translateY(100%) scale(0.5);
+                opacity: 0;
+            }
+            20% {
+                opacity: 0.8;
+                transform: translateY(75%) scale(1);
+            }
+            80% {
+                opacity: 0.8;
+                transform: translateY(-25%) scale(1.2);
+            }
+            100% { 
+                transform: translateY(-50%) scale(0.3);
+                opacity: 0;
+            }
+        }
+
+        /* CO2 Level Display */
+        .co2-display {
+            position: absolute;
+            top: 4.4%;
+            right: 2.9%;
+            background: #333;
+            color: #00ff00;
+            padding: 1.1% 2.1%;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9vw;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .co2-value {
+            font-size: 1.2vw;
+            font-weight: bold;
+        }
+
+        .co2-unit {
+            font-size: 0.75vw;
+            margin-left: 5px;
+        }
+
+        /* Status indicators */
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 8px 0;
+            font-size: 13px;
+        }
+
+        .status-led {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #dc3545;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+        }
+
+        .status-led.on {
+            background: #28a745;
+            box-shadow: 0 0 10px rgba(40, 167, 69, 0.8);
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            backdrop-filter: blur(3px);
+        }
+
+        .modal-content {
+            background: #000075;
+            color: white;
+            margin: 5% auto;
+            padding: 20px;
+            width: 70%;
+            max-width: 800px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+            animation: slideDown 0.4s ease;
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+            transition: color 0.3s;
+        }
+        .close:hover {
+            color: #ffcc00;
+        }
+
+        .modal-content h2 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            border-bottom: 2px solid rgba(255,255,255,0.2);
+            padding-bottom: 8px;
+        }
+
+        .tab-buttons {
+            display: flex;
+            margin-bottom: 10px;
+        }
+        .tab-buttons button {
+            flex: 1;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            border-radius: 5px 5px 0 0;
+            transition: background 0.3s;
+        }
+        .tab-buttons button.active {
+            background: rgba(255,255,255,0.3);
+        }
+        .tab-buttons button:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        pre {
+            background: rgba(0,0,0,0.4);
+            padding: 12px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 0.9rem;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .circuit-board {
+                max-width: 100%;
+            }
+            
+            .arduino {
+                font-size: 1vw;
+            }
+            
+            .arduino img {
+                width: 250px;
+                height: 250px;
+            }
+            
+            .co2-sensor {
+                font-size: 0.8vw;
+            }
+            
+            .co2-sensor img {
+                width: 80px;
+                height: 80px;
+            }
+            
+            .buzzer {
+                font-size: 0.7vw;
+            }
+            
+            .buzzer img {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .breadboard img {
+                width: 250px;
+                height: 200px;
+            }
+            
+            .co2-display {
+                font-size: 1.2vw;
+            }
+            
+            .co2-value {
+                font-size: 1.5vw;
+            }
+            
+            .co2-unit {
+                font-size: 1vw;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .left-panel {
+                width: 100%;
+            }
+            
+            .circuit-board {
+                width: 100%;
+                aspect-ratio: 7 / 5;
+            }
+            
+            .arduino {
+                font-size: 1.5vw;
+            }
+            
+            .arduino img {
+                width: 180px;
+                height: 180px;
+            }
+            
+            .co2-sensor {
+                font-size: 1.2vw;
+            }
+            
+            .co2-sensor img {
+                width: 60px;
+                height: 60px;
+            }
+            
+            .buzzer {
+                font-size: 1vw;
+            }
+            
+            .buzzer img {
+                width: 30px;
+                height: 30px;
+            }
+            
+            .breadboard img {
+                width: 180px;
+                height: 150px;
+            }
+            
+            .co2-display {
+                font-size: 2vw;
+            }
+            
+            .co2-value {
+                font-size: 2.5vw;
+            }
+            
+            .co2-unit {
+                font-size: 1.5vw;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .circuit-board {
+                aspect-ratio: 7 / 6;
+            }
+            
+            .arduino {
+                font-size: 2vw;
+            }
+            
+            .arduino img {
+                width: 120px;
+                height: 120px;
+            }
+            
+            .co2-sensor {
+                font-size: 1.8vw;
+            }
+            
+            .co2-sensor img {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .buzzer {
+                font-size: 1.5vw;
+            }
+            
+            .buzzer img {
+                width: 20px;
+                height: 20px;
+            }
+            
+            .breadboard img {
+                display: none;
+            }
+            
+            .co2-display {
+                font-size: 3vw;
+                padding: 2% 3%;
+            }
+            
+            .co2-value {
+                font-size: 3.5vw;
+            }
+            
+            .co2-unit {
+                font-size: 2vw;
+            }
+  .card {
+    display: flex;
+    gap: 15px;
+    background: #000075;
+    color: white;
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    align-items: center;
+}
+
+.card img {
+    width: 150px;
+    border-radius: 10px;
+}
+
+.card .text h3 {
+    margin-bottom: 8px;
+    color: white;
+}
+
+            .left-panel{width:280px;max-width:95%;background:#fff;border-radius:14px;padding:16px;box-shadow:0 6px 16px rgba(0,0,0,.08)}
+  .left-panel h3{margin:0 0 12px;font-size:16px;color:#333}
+  .btn{display:block;width:100%;padding:10px 12px;margin:8px 0;border:0;border-radius:10px;cursor:pointer;transition:.25s;text-align:left;font-weight:600}
+  .btn-primary{background:#000075;color:#fff}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 14px rgba(0,0,0,.1)}
+  .flex-container-40-60{display:flex;gap:20px;align-items:flex-start;background:rgba(255,255,255,.1);padding:20px;border-radius:15px;margin-bottom:20px}
+  .flex-text-60{flex:1}
+  .flex-text-60 p{font-size:16px;line-height:1.8}
+  .flex-container-30-70{display:flex;gap:20px;align-items:flex-start;background:rgba(255,255,255,.1);padding:20px;border-radius:15px;margin-bottom:20px}
+  .flex-image-30{flex:0 0 30%}
+  .flex-image-30 img{width:100%;border-radius:10px}
+  .flex-text-70{flex:0 0 70%}
+  .flex-text-70 strong{color:#ffcc00;font-size:18px;display:block;margin-bottom:10px}
+  .modal{display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.8);backdrop-filter:blur(5px);overflow-y:auto}
+  .modal-content{background:#000075;color:#fff;margin:5vh auto;padding:30px;width:90%;max-width:1000px;border-radius:20px;box-shadow:0 15px 40px rgba(0,0,0,.5);position:relative;animation:slideDown .4s ease}
+  @keyframes slideDown{from{transform:translateY(-50px);opacity:0}to{transform:translateY(0);opacity:1}}
+  .close{position:absolute;right:20px;top:15px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:bold;cursor:pointer;color:#fff;transition:.3s;border-radius:50%;background:rgba(255,255,255,.1)}
+  .close:hover{background:rgba(255,204,0,.3);color:#ffcc00;transform:rotate(90deg)}
+  .modal-content h2{font-size:28px;margin-bottom:25px;padding-bottom:15px;border-bottom:2px solid rgba(255,255,255,.3);padding-right:50px}
+  .tab-buttons{display:flex;gap:8px;margin:12px 0 16px}
+  .tab-btn{flex:1;background:rgba(255,255,255,.12);color:#fff;border:0;border-radius:10px 10px 0 0;padding:10px;cursor:pointer;font-weight:600;transition:.2s}
+  .tab-btn:hover{background:rgba(255,255,255,.2)}
+  .tab-btn.active{background:rgba(255,255,255,.28)}
+  .tab-content{display:none}
+  .tab-content.active{display:block}
+  pre{background:rgba(0,0,0,.35);padding:12px;border-radius:10px;overflow:auto;white-space:pre-wrap;word-break:break-word;color:#fff;font-size:13.5px;line-height:1.55}
+  #infoFloatingBtn{position:fixed;bottom:30px;right:30px;width:120px;height:120px;border-radius:50%;background:linear-gradient(135deg,#000075,#0000ff);color:#fff;border:4px solid #fff;cursor:pointer;font-size:16px;font-weight:bold;box-shadow:0 8px 20px rgba(0,0,0,.4);z-index:1500;transition:.3s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px}
+  #infoFloatingBtn:hover{transform:scale(1.1);box-shadow:0 12px 30px rgba(0,0,255,.6)}
+  #infoFloatingBtn span:first-child{font-size:36px}
+  .video-full{width:100%;border-radius:15px;background:#000}
+  .video-full video{width:100%;height:auto;border-radius:15px;max-height:70vh}
+  @media (max-width:1024px){.flex-container-40-60,.flex-container-30-70{flex-direction:column}.flex-image-30,.flex-text-70{flex:0 0 100%}}
+  @media (max-width:768px){.modal-content{width:96%;padding:20px 15px}#infoFloatingBtn{width:90px;height:90px;font-size:14px;bottom:20px;right:20px}#infoFloatingBtn span:first-child{font-size:28px}}
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="logo">
+             <a href="/"><img src="/static/image/logo.png" width="80px" height="80px" alt=""></a>
+          
+            <span>Arduino CO2 Sensor Tajribasi</span>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <div class="main-container">
+        <!-- LEFT PANEL -->
+        <div class="left-panel">
+            <div class="control-group">
+                <h3>Boshqaruv</h3>
+                <button class="btn btn-success" onclick="startExperiment()" id="startBtn">
+                    Boshlash
+                </button>
+                <button class="btn btn-danger" onclick="stopExperiment()" id="stopBtn">
+                    To'xtatish
+                </button>
+                <button class="btn btn-primary" onclick="togglePower()">
+                    Quvvat
+                </button>
+                <button class="btn btn-info" onclick="simulateGas()">
+                    CO2 Simulyatsiya
+                </button>
+            </div>
+
+      
+                <div class="control-group">
+                <h3>📚 Ma'lumotlar</h3>
+                <button class="btn btn-primary" id="schemaBtn">
+                    📋 Sxema Haqida
+                </button>
+                 <button class="btn btn-primary" id="codeBtn">💻 Kod</button>
+                <button class="btn btn-primary" id="componentsBtn">
+                    🔌 Qurilmalar
+                </button>
+           
+            </div>
+
+            <div class="control-group">
+                <h3>Qurilma holati</h3>
+                <div class="status-row">
+                    <span>Quvvat:</span>
+                    <div class="status-led" id="powerLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>CO2 Sensor:</span>
+                    <div class="status-led" id="sensorLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>LED:</span>
+                    <div class="status-led" id="ledStatusLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Buzzer:</span>
+                    <div class="status-led" id="buzzerStatusLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>CO2 Darajasi:</span>
+                    <span id="co2Level">0 ppm</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+            <div class="experiment-container">
+                <div class="circuit-board">
+                    <!-- CO2 Level Display -->
+                    <div class="co2-display">
+                        CO2: <span class="co2-value" id="co2DisplayValue">350</span><span class="co2-unit">ppm</span>
+                    </div>
+
+                    <!-- CO2 Gas Animation -->
+                    <div class="co2-gas" id="gasAnimation">
+                        <div class="gas-particle"></div>
+                        <div class="gas-particle"></div>
+                        <div class="gas-particle"></div>
+                        <div class="gas-particle"></div>
+                        <div class="gas-particle"></div>
+                        <div class="gas-particle"></div>
+                    </div>
+
+                    <!-- Arduino -->
+                    <div class="arduino">
+                        <img src="/static/image/arduino1.png" alt="">
+                    </div>
+
+                    <!-- CO2 Sensor -->
+                    <div class="co2-sensor" id="co2Sensor">
+                        <img src="/static/image/co2-sensor-.png" alt="">
+                    </div>
+                    
+                    <!-- Buzzer -->
+                    <div class="buzzer" id="buzzer">
+                        <img src="/static/image/buzzer3.png" alt="">
+                    </div>
+                    <div class="breadboard">
+                        <img src="/static/image/breadboard-removebg-preview.png" alt="">
+                    </div>
+           
+                    <!-- LED -->
+                    <div class="led" id="led"></div>
+
+             
+                    <!-- Wires -->
+                    <div class="wire wire-red wire1"></div>
+                    <div class="wire wire-black wire2"></div>
+                    <div class="wire wire-black wire3"></div>
+                    <div class="wire wire-red wire4"></div>
+                    <div class="wire wire-red wire5"></div>
+                    <div class="wire wire-black wire6"></div>
+                    <div class="wire wire-yellow wire7"></div>
+                    <div class="wire wire-yellow wire8"></div>
+                    <div class="wire wire-yellow wire9"></div>
+                    <div class="wire wire-yellow wire10"></div>
+                    <div class="wire wire-purple wire11"></div>
+                    <div class="wire wire-orange wire12"></div>
+                    <div class="wire wire-purple wire13"></div>
+                    <div class="wire wire-orange wire14"></div>
+                    <div class="wire wire-purple wire15"></div>
+                    <div class="wire wire-orange wire16"></div>
+                    <div class="wire wire-red wire17"></div>
+                    <div class="wire wire-black wire18"></div>
+                    <div class="wire wire-black wire19"></div>
+                    <div class="wire wire-black wire20"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALS -->
+<div class="modal" id="schemaModal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>💡 Sxema qayerda ishlatiladi (RGB LED)</h2>
+    <div class="flex-container-40-60">
+         <div class="flex-video-40">
+                <iframe 
+                    src="https://www.youtube.com/embed/Jwwx00hhztY?si=EmuZ-_njnEuf_Zm8" 
+                    title="YouTube video player" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+      <div class="flex-text-60">
+        <strong>🔄 Ishlash prinsipi</strong>
+      
+        <p>Arduino CO₂ sensoridan ma’lumot oladi.
+
+Sensor o‘lchov natijasini ppm (parts per million) da beradi.
+
+Arduino:
+
+Agar CO₂ darajasi normaldan yuqori bo‘lsa (masalan >1000 ppm):
+
+Buzzer signal beradi
+
+LED yoqiladi
+
+Agar CO₂ darajasi normal bo‘lsa:
+
+Ekranda faqat raqam ko‘rsatiladi
+
+Ma’lumot ekranda yoki Serial Monitor orqali kuzatiladi.
+
+Qo‘shimcha: WiFi yoki Bluetooth orqali ma’lumotni mobil ilovaga yoki serverga yuborish mumkin.</p>
+      </div>
+    </div>
+    <div class="flex-container-40-60">
+         <div class="flex-video-40">
+                <iframe 
+                    src="https://www.youtube.com/embed/Gp-5t1zlnuw?si=pL5FgJxhr6t5a3OH" 
+                    title="YouTube video player" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+      <div class="flex-text-60">
+        <strong>Qo‘shimcha funksiyalar  </strong>
+    <p>OLED/LCD ekran: CO₂ darajasi, harorat va namlik ko‘rsatish
+
+Data logging: SD karta yoki EEPROM orqali ma’lumotlarni saqlash
+
+IoT integratsiyasi: ESP8266/ESP32 bilan ma’lumotni internetga yuborish
+
+Ventilyatsiya boshqaruvi: CO₂ yuqori bo‘lsa, fan yoki havo oqimi avtomatik yoqilishi</p>
+      </div>
+    </div>
+    <div class="flex-container-40-60">
+         <div class="flex-video-40">
+                <iframe 
+                    src="https://www.youtube.com/embed/BQU5yZs9XwQ?si=AdLv_MObsqEkxwNX" 
+                    title="YouTube video player" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+      <div class="flex-text-60">
+        <strong>Afzalliklari</strong>
+<p>Havo sifati nazoratini osonlashtiradi
+
+Xonadagi yoki ofisdagi CO₂ darajasini monitoring qiladi
+
+Arduino bilan sensor va ogohlantirish tizimini amalda o‘rganish imkoniyati
+
+IoT va ekologik loyihalarga tayyor asos</p>
+   
+    </div>
+    </div>
+  </div>
+</div>
+
+<!-- Kod (mBlock ↔ Arduino) -->
+<div class="modal" id="codeModal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>💻 Kod</h2>
+
+    <div class="tab-buttons">
+      <button class="tab-btn active" data-tab="mblock">mBlock Kodi</button>
+      <button class="tab-btn" data-tab="arduino">Arduino Kodi</button>
+    </div>
+
+    <div class="tab-content active" id="mblock">
+      <!-- mBlock blok kodi rasmi qo'ying: led_mblock.png -->
+      <pre><img src="/static/image/arduinoled.jpg" alt="mBlock – LED Blink/Fade" style="width:80%;height:auto"></pre>
+    </div>
+
+    <div class="tab-content" id="arduino">
+      <pre>
+// 🔧 Pinlar
+#define MQ2_PIN A0       // Gaz sensori analog chiqishi
+#define DHT_PIN 7        // DHT11 signali
+#define BUZZER_PIN 8     // Buzzer
+#define LED_PIN 9        // LED
+
+#include "DHT.h"
+#define DHTTYPE DHT11
+
+DHT dht(DHT_PIN, DHTTYPE);
+
+void setup() {
+  Serial.begin(9600);
+  dht.begin();
+  
+  pinMode(MQ2_PIN, INPUT);
+  pinMode(BUZZER_PIN, OUTPUT);
+  pinMode(LED_PIN, OUTPUT);
+
+  Serial.println("Gaz va Harorat nazorati tizimi ishga tushdi!");
+}
+
+void loop() {
+  // 🌫 Gaz sensori o'qish
+  int gasValue = analogRead(MQ2_PIN);
+  
+  // 🌡 DHT11 dan harorat va namlik
+  float humidity = dht.readHumidity();
+  float temperature = dht.readTemperature();
+
+  Serial.print("Gaz: "); Serial.print(gasValue);
+  Serial.print(" | Harorat: "); Serial.print(temperature);
+  Serial.print("°C | Namlik: "); Serial.print(humidity);
+  Serial.println("%");
+
+  // 🚨 Shart: gaz qiymati yuqori bo'lsa yoki harorat > 35°C bo'lsa
+  if (gasValue > 400 || temperature > 35) {
+    digitalWrite(BUZZER_PIN, HIGH);
+    digitalWrite(LED_PIN, HIGH);
+  } else {
+    digitalWrite(BUZZER_PIN, LOW);
+    digitalWrite(LED_PIN, LOW);
+  }
+
+  delay(1000);
+}
+      </pre>
+    </div>
+  </div>
+</div>
+  <!-- Ishlatilgan qurilmalar (modal) -->
+    <div class="modal" id="componentsModal">
+        <div class="modal-content">
+            <span class="close" title="Yopish">&times;</span>
+            <h2>🔌 Ishlatilgan Qurilmalar</h2>
+
+            <div class="card">
+                <img src="/static/image/co2-sensor-.png" width="150px" height="150px" alt="Rezistor">
+                <div class="text">
+                    <h3>MQ-2 Gaz sensori</h3>
+              <p>Vazifasi: Havo tarkibidagi gaz (LPG, metan, tutun)ni aniqlaydi.
+
+Xususiyatlari:
+
+Ish kuchlanishi: 5V
+
+Analog chiqish (A0) va raqamli chiqish (D0)
+
+Ish prinsipi: Qizdirilgan SnO₂ elementining qarshiligi gaz miqdoriga qarab o‘zgaradi.
+
+Qo‘llanilishi: Tutun/gaz detektorlari, xavfsizlik tizimlari.</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <img src="/static/image/buzzer3.png" alt="LM393P Komparator">
+                <div class="text">
+                    <h3>3.7V Li-ion qayta zaryadlanadigan batareya</h3>
+                    <p>
+                        Vazifasi: Energiya manbai sifatida ishlaydi, sxemani mustaqil quvvat bilan ta’minlaydi.
+
+                        Izoh: USB orqali zaryadlanadi; sxemadagi LED’lar zaryad holatini bildiradi.
+                    </p>
+                </div>
+            </div>
+
+            <div class="card">
+                <img src="/static/image/arduino1.png" alt="5V Relay modul">
+                <div class="text">
+                    <h3>Arduino UNO</h3>
+                    <p>Vazifasi: Markaziy mikrokontroller sifatida barcha sensor va aktuatorlarni boshqaradi.
+
+Xususiyatlari:
+
+ATmega328P mikrokontroller
+
+14 ta raqamli (shundan 6 tasi PWM) va 6 ta analog pin
+
+Ish kuchlanishi: 5V
+
+Qo‘llanilishi: Har xil avtomatlashtirilgan tizimlar, sensorli o‘lchov va boshqaruv loyihalari.</p>
+                </div>
+            </div>
+            <div class="card">
+                <img src="/static/image/breadboard-removebg-preview.png" alt="5V Relay modul">
+                <div class="text">
+                    <h3>Breadboard</h3>
+                    <p>
+                  Vazifasi: Elektr komponentlarni lehimlamasdan ulash uchun mo‘ljallangan.
+
+Xususiyatlari:
+
++/− quvvat liniyalari
+
+Teshiklar orqali jumper simlar bilan ulanish imkoniyati
+
+Qo‘llanilishi: Elektron sxemalarni sinovdan o‘tkazish.
+                    </p>
+                </div>
+            </div>
+
+
+            <div class="card">
+                <img src="/static/image/led-removebg-preview.png" alt="5V Relay modul">
+                <div class="text">
+                    <h3>Led</h3>
+                    <p>
+                        Vazifasi: Elektr toki o‘tganda yorug‘lik chiqaradi; indikator sifatida ishlatiladi.
+
+Xususiyatlari:
+
+Ish kuchlanishi: 2V–3V (rangga qarab)
+
+Tavsiya etilgan oqim: 10–20 mA
+
+Qarshilik (rezistor) bilan ulanadi (odatda 220Ω–330Ω)
+
+Qo‘llanilishi: Qurilma holatini bildirish, chiroq, signal va vizual indikatsiya tizimlarida.
+                    </p>
+                </div>
+            </div>
+             <div class="card">
+                <img src="/static/image/buzzer3.png" alt="5V Relay modul">
+                <div class="text">
+                    <h3>Buzzer (Ovozli signal beruvchi)</h3>
+                    <p>
+                     Vazifasi: Elektr signalga javoban tovush chiqaradi (signalizatsiya, ogohlantirish yoki xabar berish uchun).
+
+Xususiyatlari:
+
+Ish kuchlanishi: 3–5V
+
+Aktiv buzzer — faqat 5V signal bilan ishlaydi
+
+Passiv buzzer — PWM signal orqali turli tonlarda ovoz chiqaradi
+
+Qo‘llanilishi: Xavfsizlik tizimlari, tugma bosilganda ogohlantirish, ovozli bildirish tizimlari.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+    </div>
+<div class="modal" id="infoModal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>📚 Qo'shimcha Ma'lumot</h2>
+    <div class="video-full">
+      <video controls>
+        <source src="/media/2.mp4" type="video/mp4">
+        Brauzeringiz video formatni qo'llab-quvvatlamaydi.
+      </video>
+    </div>
+  </div>
+</div>
+
+<button id="infoFloatingBtn"><span>📚</span><span>Ma'lumot</span></button>
+
+    <div class="modal" id="codeModal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Arduino kodi</h2>
+
+            <!-- Tab tugmalar -->
+            <div class="tab-buttons">
+                <button class="tab-btn active" data-tab="arduino">Arduino C++</button>
+                <button class="tab-btn" data-tab="explanation">Mblock kodi</button>
+            </div>
+
+            <!-- Arduino kodi -->
+            <div class="tab-content active" id="arduino">
+                <pre>
+// CO2 Sensor (MQ-135) va LED/Buzzer boshqaruvi
+const int co2Pin = A0;      // CO2 sensor analog pin
+const int ledPin = 8;       // LED pin
+const int buzzerPin = 9;    // Buzzer pin
+
+int co2Level = 0;
+int threshold = 400;        // CO2 chegarasi (ppm)
+
+void setup() {
+  pinMode(ledPin, OUTPUT);
+  pinMode(buzzerPin, OUTPUT);
+  Serial.begin(9600);
+  
+  Serial.println("CO2 Sensor boshlanmoqda...");
+  delay(2000);  // Sensor isitish vaqti
+}
+
+void loop() {
+  // CO2 darajasini o'qish
+  int sensorValue = analogRead(co2Pin);
+  
+  // Analog qiymatni ppm ga o'tkazish (taxminiy formula)
+  co2Level = map(sensorValue, 0, 1023, 300, 2000);
+  
+  Serial.print("CO2 Darajasi: ");
+  Serial.print(co2Level);
+  Serial.println(" ppm");
+  
+  // Agar CO2 darajasi chegaradan yuqori bo'lsa
+  if (co2Level > threshold) {
+    // LED va buzzer yoqish
+    digitalWrite(ledPin, HIGH);
+    
+    // Buzzer ovozini chiqarish
+    tone(buzzerPin, 1000, 500);  // 1000Hz, 500ms
+    
+    Serial.println("OGOHLANTIRISH: CO2 darajasi yuqori!");
+    
+    delay(1000);
+    digitalWrite(ledPin, LOW);
+    delay(500);
+  } else {
+    // LED va buzzer o'chirish
+    digitalWrite(ledPin, LOW);
+    noTone(buzzerPin);
+    
+    Serial.println("CO2 darajasi normal");
+  }
+  
+  delay(2000);  // 2 soniya kutish
+}
+                </pre>
+            </div>
+
+            <!-- Kod tushunchasi -->
+            <div class="tab-content" id="explanation">
+                <pre>
+                    <img src="/static/image/lesson2.png" alt="">
+                </pre>
+            </div>
+        </div>
+    </div>
+
+   
+
+    <script>
+        // System State Variables
+        let powerOn = false;
+        let experimentRunning = false;
+        let co2Value = 350;
+        let gasSimulating = false;
+        let alarmActive = false;
+
+        // DOM Elements
+        const elements = {
+            powerLed: document.getElementById('powerLed'),
+            sensorLed: document.getElementById('sensorLed'),
+            ledStatusLed: document.getElementById('ledStatusLed'),
+            buzzerStatusLed: document.getElementById('buzzerStatusLed'),
+            co2Level: document.getElementById('co2Level'),
+            co2DisplayValue: document.getElementById('co2DisplayValue'),
+            co2Sensor: document.getElementById('co2Sensor'),
+            led: document.getElementById('led'),
+            buzzer: document.getElementById('buzzer'),
+            gasAnimation: document.getElementById('gasAnimation')
+        };
+function openModal(id){ document.getElementById(id).style.display="block"; }
+function closeAll(){ document.querySelectorAll(".modal").forEach(m=>m.style.display="none"); }
+
+document.getElementById("schemaBtn").onclick = ()=>openModal("schemaModal");
+document.getElementById("codeBtn").onclick = ()=>openModal("codeModal");
+document.getElementById("componentsBtn").onclick = ()=>openModal("componentsModal");
+
+document.querySelectorAll(".close").forEach(c=>c.onclick = closeAll);
+window.onclick = e=>{ if(e.target.classList.contains("modal")) closeAll(); };
+
+document.querySelectorAll(".tab-btn").forEach(btn=>{
+  btn.onclick = ()=>{
+    let tab = btn.dataset.tab;
+    btn.parentNode.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+
+    let modal = btn.closest(".modal-content");
+    modal.querySelectorAll(".tab-content").forEach(c => c.classList.toggle("active", c.id === tab));
+  }
+});
+
+        // Update Status Display
+        function updateStatus() {
+            elements.powerLed.classList.toggle('on', powerOn);
+            elements.sensorLed.classList.toggle('on', experimentRunning);
+            elements.ledStatusLed.classList.toggle('on', alarmActive);
+            elements.buzzerStatusLed.classList.toggle('on', alarmActive);
+            elements.co2Level.textContent = co2Value + ' ppm';
+            elements.co2DisplayValue.textContent = co2Value;
+        }
+
+        // Power Control
+        function togglePower() {
+            powerOn = !powerOn;
+            if (!powerOn) {
+                stopExperiment();
+            }
+            updateStatus();
+        }
+
+        // Start Experiment
+        function startExperiment() {
+            if (!powerOn) {
+                alert('Avval quvvatni yoqing!');
+                return;
+            }
+            
+            experimentRunning = true;
+            elements.co2Sensor.style.background = '#2196F3';
+            updateStatus();
+            
+            // Start monitoring CO2 levels
+            monitorCO2();
+        }
+
+        // Stop Experiment
+        function stopExperiment() {
+            experimentRunning = false;
+            gasSimulating = false;
+            alarmActive = false;
+            co2Value = 350;
+            
+            elements.co2Sensor.style.background = '#4CAF50';
+            elements.led.classList.remove('active');
+            elements.buzzer.classList.remove('active');
+            elements.gasAnimation.style.display = 'none';
+            
+            updateStatus();
+        }
+
+        // Simulate Gas
+        function simulateGas() {
+            if (!powerOn || !experimentRunning) {
+                alert('Avval quvvatni yoqing va tajribani boshlang!');
+                return;
+            }
+            
+            gasSimulating = true;
+            elements.gasAnimation.style.display = 'block';
+            
+            // Gradually increase CO2 level
+            let increaseInterval = setInterval(() => {
+                if (!gasSimulating || co2Value >= 800) {
+                    clearInterval(increaseInterval);
+                    return;
+                }
+                co2Value += Math.random() * 20 + 10;
+                co2Value = Math.min(co2Value, 800);
+                updateStatus();
+            }, 200);
+            
+            // Stop gas simulation after 5 seconds
+            setTimeout(() => {
+                gasSimulating = false;
+                elements.gasAnimation.style.display = 'none';
+                
+                // Gradually decrease CO2 level
+                let decreaseInterval = setInterval(() => {
+                    if (co2Value <= 350) {
+                        co2Value = 350;
+                        clearInterval(decreaseInterval);
+                        return;
+                    }
+                    co2Value -= Math.random() * 15 + 5;
+                    co2Value = Math.max(co2Value, 350);
+                    updateStatus();
+                }, 300);
+            }, 5000);
+        }
+
+        // Monitor CO2 Levels
+        function monitorCO2() {
+            if (!experimentRunning) return;
+            
+            // Check if CO2 level exceeds threshold (400 ppm)
+            if (co2Value > 400) {
+                if (!alarmActive) {
+                    activateAlarm();
+                }
+            } else {
+                if (alarmActive) {
+                    deactivateAlarm();
+                }
+            }
+            
+            // Continue monitoring
+            setTimeout(monitorCO2, 500);
+        }
+
+        // Web Audio buzzer
+        let audioCtx = null;
+        let oscillator = null;
+
+        // Ovoz chiqarish
+        function playBuzzerSound() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            oscillator = audioCtx.createOscillator();
+            oscillator.type = "square";
+            oscillator.frequency.setValueAtTime(1000, audioCtx.currentTime);
+            oscillator.connect(audioCtx.destination);
+            oscillator.start();
+        }
+
+        // Ovoz o'chirish
+        function stopBuzzerSound() {
+            if (oscillator) {
+                oscillator.stop();
+                oscillator.disconnect();
+                oscillator = null;
+            }
+        }
+
+        // Activate Alarm
+        function activateAlarm() {
+            alarmActive = true;
+            elements.led.classList.add('active');
+            elements.buzzer.classList.add('active');
+            playBuzzerSound();
+            updateStatus();
+        }
+
+        // Deactivate Alarm
+        function deactivateAlarm() {
+            alarmActive = false;
+            elements.led.classList.remove('active');
+            elements.buzzer.classList.remove('active');
+            stopBuzzerSound();
+            updateStatus();
+        }
+
+        // Modal Control Functions
+        function openModal(id) {
+            document.getElementById(id).style.display = "block";
+        }
+        
+        function closeModal(id) {
+            document.getElementById(id).style.display = "none";
+        }
+
+        // Event Listeners for Modals
+        document.getElementById("schemaBtn").addEventListener("click", function() {
+            openModal("schemaModal");
+        });
+        document.getElementById("codeBtn").addEventListener("click", function() {
+            openModal("codeModal");
+        });
+        document.getElementById("componentsBtn").addEventListener("click", function() {
+            openModal("componentsModal");
+        });
+
+        // Modal close buttons
+        document.querySelectorAll(".modal .close").forEach(btn => {
+            btn.addEventListener("click", function() {
+                this.closest(".modal").style.display = "none";
+            });
+        });
+
+        // Click outside modal to close
+        window.addEventListener("click", function(e) {
+            document.querySelectorAll(".modal").forEach(modal => {
+                if (e.target === modal) {
+                    modal.style.display = "none";
+                }
+            });
+        });
+
+        // Tab control for code modal
+        document.querySelectorAll(".tab-btn").forEach(button => {
+            button.addEventListener("click", function() {
+                const tab = this.dataset.tab;
+
+                // Update buttons
+                document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+                this.classList.add("active");
+
+                // Update content
+                document.querySelectorAll(".tab-content").forEach(content => {
+                    content.classList.remove("active");
+                    if (content.id === tab) {
+                        content.classList.add("active");
+                    }
+                });
+            });
+        });
+
+        // Initialize system
+        updateStatus();
+    </script>
+</body>
+</html>

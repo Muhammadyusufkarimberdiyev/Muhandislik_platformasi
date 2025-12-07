@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elektr Motor Tajribasi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #e6f3ff;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: auto;
+        }
+
+        /* HEADER */
+        .header {
+            display: flex;
+            align-items: center;
+            background: #000075;
+            color: white;
+            padding: 10px 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            width: 100%;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #000075;
+        }
+
+        /* MAIN LAYOUT */
+        .main-container {
+            display: flex;
+            margin-top: 20px;
+            gap: 20px;
+        }
+
+        /* LEFT PANEL */
+        .left-panel {
+            width: 250px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            height: fit-content;
+            position: relative;
+            z-index: 1;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 15px;
+        }
+
+        .control-group h3 {
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 8px;
+            font-size: 14px;
+            border-radius: 5px;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn-success { 
+            background: #28a745; 
+            color: white; 
+        }
+        .btn-danger { 
+            background: #dc3545; 
+            color: white; 
+        }
+        .btn-primary { 
+            background: #000075; 
+            color: white; 
+        }
+        .btn-info { 
+            background: #000075; 
+            color: white; 
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .title-header {
+            background: #000075;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0 auto 30px;
+            text-align: center;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        /* MOTOR EXPERIMENT SECTION */
+        .motor-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 400px;
+            position: relative;
+        }
+
+        .motor-base {
+            position: relative;
+            width: 300px;
+            height: 200px;
+        }
+
+        /* Battery */
+        .battery {
+            position: absolute;
+            bottom: 55px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #2c3e50, #34495e);
+        
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 4px 4px 12px rgba(0,0,0,0.3);
+        }
+
+        
+        .battery_2{
+             position: absolute;
+            bottom: 15px;
+            left: 25%;
+        }
+        
+        /* Wire Coil */
+        .wire-coil {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 80px;
+            border: 4px solid #d35400;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.1s linear;
+        }
+
+        .wire-coil.spinning {
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: translateX(-50%) rotate(0deg); }
+            100% { transform: translateX(-50%) rotate(360deg); }
+        }
+
+        /* Coil inner winding */
+        .coil-winding {
+            width: 60px;
+            height: 60px;
+            border: 3px solid #e67e22;
+            border-radius: 50%;
+            position: relative;
+        }
+
+        .coil-winding::before,
+        .coil-winding::after {
+            content: '';
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border: 2px solid #f39c12;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .coil-winding::after {
+            width: 25px;
+            height: 25px;
+            border-color: #d68910;
+        }
+
+        /* Support wires/axle */
+        .support-wire {
+            position: absolute;
+            height: 2px;
+            background: #7f8c8d;
+            top: 60px;
+        }
+
+        .support-wire.left {
+            left: 80px;
+            width: 50px;
+        }
+
+        .support-wire.right {
+            right: 80px;
+            width: 50px;
+        }
+
+        /* Connection wires */
+        .connection-wire {
+            position: absolute;
+            background: #e74c3c;
+            border-radius: 1px;
+        }
+
+        .wire-positive {
+            width: 3px;
+            height: 100px;
+            bottom: 40px;
+            left: 75px;
+        }
+
+        .wire-negative {
+            width: 3px;
+            height: 100px;
+            bottom: 40px;
+            right: 75px;
+            background: #000;
+        }
+
+        .wire-horizontal-pos {
+            width: 30px;
+            height: 3px;
+            top: 59px;
+            left: 75px;
+        }
+
+        .wire-horizontal-neg {
+            width: 30px;
+            height: 3px;
+            top: 59px;
+            right: 75px;
+            background: #000;
+        }
+
+        /* Magnetic field visualization */
+        .magnetic-field {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            top: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .magnetic-field.active {
+            opacity: 0.6;
+        }
+
+        .field-line {
+            position: absolute;
+            width: 2px;
+            background: #3498db;
+            border-radius: 1px;
+        }
+
+        .field-line:nth-child(1) { height: 60px; top: 20px; left: 100px; transform: rotate(20deg); }
+        .field-line:nth-child(2) { height: 80px; top: 60px; left: 160px; transform: rotate(70deg); }
+        .field-line:nth-child(3) { height: 80px; top: 120px; left: 150px; transform: rotate(120deg); }
+        .field-line:nth-child(4) { height: 60px; top: 140px; left: 100px; transform: rotate(160deg); }
+        .field-line:nth-child(5) { height: 80px; top: 120px; left: 40px; transform: rotate(-120deg); }
+        .field-line:nth-child(6) { height: 80px; top: 60px; left: 30px; transform: rotate(-70deg); }
+
+        /* STATUS DISPLAY */
+        .status-display {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            min-width: 220px;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            z-index: 100;
+        }
+
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 8px 0;
+            font-size: 13px;
+        }
+
+        .status-led {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #dc3545;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+        }
+
+        .status-led.on {
+            background: #28a745;
+            box-shadow: 0 0 10px rgba(40, 167, 69, 0.8);
+        }
+
+        /* Information Panel */
+        .info-panel {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #000075;
+        }
+
+        .info-panel h3 {
+            color: #000075;
+            margin-bottom: 10px;
+        }
+
+        .info-panel p {
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        /* RESPONSIVE DESIGN */
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .left-panel {
+                width: 100%;
+            }
+            
+            .status-display {
+                position: relative;
+                margin: 20px auto;
+                width: fit-content;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="logo">
+              <a href="/"><img src="/static/image/logo.png" width="80px" height="80px" alt=""></a>
+            <span>Elektr Motor Tajribasi</span>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <div class="main-container">
+        <!-- LEFT PANEL -->
+        <div class="left-panel">
+            <div class="control-group">
+                <h3>Boshqaruv</h3>
+                <button class="btn btn-success" onclick="startMotor()" id="startBtn">
+                    Motorni Ishga Tushirish
+                </button>
+                <button class="btn btn-danger" onclick="stopMotor()" id="stopBtn">
+                    Motorni To'xtatish
+                </button>
+                <button class="btn btn-primary" onclick="togglePower()">
+                    Quvvat Almashtirish
+                </button>
+                <button class="btn btn-info" onclick="showMagneticField()">
+                    Magnit Maydonini Ko'rsatish
+                </button>
+            </div>
+
+            <div class="control-group">
+                <h3>Ma'lumotlar</h3>
+                <button class="btn btn-primary" onclick="showPrinciple()">
+                    Ishlash Printsipi
+                </button>
+                <button class="btn btn-primary" onclick="showComponents()">
+                    Komponentlar
+                </button>
+                <button class="btn btn-primary" onclick="showApplications()">
+                    Qo'llanilishi
+                </button>
+            </div>
+
+            <div class="control-group">
+                <h3>Motor Holati</h3>
+                <div class="status-row">
+                    <span>Quvvat:</span>
+                    <div class="status-led" id="powerLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Batareya:</span>
+                    <div class="status-led" id="batteryLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Magnit Maydoni:</span>
+                    <div class="status-led" id="magneticLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Aylanish:</span>
+                    <div class="status-led" id="rotationLed"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+            <div class="title-header">Elektr Motor Tajribasi</div>
+            
+            <div class="motor-container">
+                <div class="motor-base">
+                    <!-- Battery -->
+                    <div class="battery" id="battery">
+                        
+                    </div>
+                    <div class="battery_2">
+                        <img src="/static/image/litium - Copy.png" width="150px" height="50px" alt="">
+                    </div>
+                    <!-- Connection Wires -->
+                    <div class="connection-wire wire-positive"></div>
+                    <div class="connection-wire wire-negative"></div>
+                    <div class="connection-wire wire-horizontal-pos"></div>
+                    <div class="connection-wire wire-horizontal-neg"></div>
+
+                    <!-- Support Structure -->
+                    <div class="support-wire left"></div>
+                    <div class="support-wire right"></div>
+
+                    <!-- Wire Coil -->
+                    <div class="wire-coil" id="wireCoil">
+                        <div class="coil-winding"></div>
+                    </div>
+
+                    <!-- Magnetic Field Lines -->
+                    <div class="magnetic-field" id="magneticField">
+                        <div class="field-line"></div>
+                        <div class="field-line"></div>
+                        <div class="field-line"></div>
+                        <div class="field-line"></div>
+                        <div class="field-line"></div>
+                        <div class="field-line"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-panel" id="infoPanel">
+                <h3>Elektr Motor Haqida</h3>
+                <p>Bu oddiy elektr motor namunasi bo'lib, magnit maydon va elektr toki orasidagi ta'sirni ko'rsatadi.</p>
+                <p>Motor ishga tushganda, sim halqadan elektr toki o'tadi va magnit maydoni hosil bo'ladi. Bu maydon batareya atrofidagi magnit maydon bilan ta'sirlashib, sim halqani aylanishga majbur qiladi.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- STATUS DISPLAY -->
+    <div class="status-display">
+        <div class="status-row">
+            <strong>Motor Holati:</strong>
+        </div>
+        <div class="status-row">
+            <span>Quvvat:</span>
+            <div class="status-led" id="powerStatus"></div>
+        </div>
+        <div class="status-row">
+            <span>Aylanish:</span>
+            <div class="status-led" id="rotationStatus"></div>
+        </div>
+        <div class="status-row">
+            <span>Magnit Maydoni:</span>
+            <div class="status-led" id="magneticStatus"></div>
+        </div>
+    </div>
+
+    <script>
+        // System State Variables
+        let motorRunning = false;
+        let powerOn = false;
+        let magneticFieldVisible = false;
+
+        // DOM Elements
+        const elements = {
+            wireCoil: document.getElementById('wireCoil'),
+            magneticField: document.getElementById('magneticField'),
+            powerLed: document.getElementById('powerLed'),
+            batteryLed: document.getElementById('batteryLed'),
+            magneticLed: document.getElementById('magneticLed'),
+            rotationLed: document.getElementById('rotationLed'),
+            powerStatus: document.getElementById('powerStatus'),
+            rotationStatus: document.getElementById('rotationStatus'),
+            magneticStatus: document.getElementById('magneticStatus'),
+            infoPanel: document.getElementById('infoPanel')
+        };
+
+        // Update Status LEDs
+        function updateStatus() {
+            elements.powerLed.classList.toggle('on', powerOn);
+            elements.batteryLed.classList.toggle('on', powerOn);
+            elements.magneticLed.classList.toggle('on', magneticFieldVisible);
+            elements.rotationLed.classList.toggle('on', motorRunning);
+            
+            elements.powerStatus.classList.toggle('on', powerOn);
+            elements.rotationStatus.classList.toggle('on', motorRunning);
+            elements.magneticStatus.classList.toggle('on', magneticFieldVisible);
+        }
+
+        // Start Motor
+        function startMotor() {
+            if (!powerOn) {
+                alert('Avval quvvatni yoqing!');
+                return;
+            }
+            
+            motorRunning = true;
+            elements.wireCoil.classList.add('spinning');
+            magneticFieldVisible = true;
+            elements.magneticField.classList.add('active');
+            
+            updateStatus();
+        }
+
+        // Stop Motor
+        function stopMotor() {
+            motorRunning = false;
+            elements.wireCoil.classList.remove('spinning');
+            
+            updateStatus();
+        }
+
+        // Toggle Power
+        function togglePower() {
+            powerOn = !powerOn;
+            
+            if (!powerOn) {
+                stopMotor();
+                magneticFieldVisible = false;
+                elements.magneticField.classList.remove('active');
+            }
+            
+            updateStatus();
+        }
+
+        // Show Magnetic Field
+        function showMagneticField() {
+            if (!powerOn) {
+                alert('Avval quvvatni yoqing!');
+                return;
+            }
+            
+            magneticFieldVisible = !magneticFieldVisible;
+            elements.magneticField.classList.toggle('active', magneticFieldVisible);
+            
+            updateStatus();
+        }
+
+        // Information Functions
+        function showPrinciple() {
+            elements.infoPanel.innerHTML = `
+                <h3>Ishlash Printsipi</h3>
+                <p><strong>Elektromagnit Induktsiya:</strong> Elektr toki sim halqadan o'tganda, atrofida magnit maydon hosil bo'ladi.</p>
+                <p><strong>Kuch Ta'siri:</strong> Bu magnit maydon boshqa magnit maydon (magnitlar) bilan ta'sirlashib, kuch hosil qiladi.</p>
+                <p><strong>Aylanish Harakati:</strong> Hosil bo'lgan kuch sim halqani aylanishga majbur qiladi.</p>
+                <p><strong>Doimiy Harakat:</strong> Kommutator yordamida toki yo'nalishi almashib, doimiy aylanish ta'minlanadi.</p>
+            `;
+        }
+
+        function showComponents() {
+            elements.infoPanel.innerHTML = `
+                <h3>Komponentlar</h3>
+                <p><strong>Batareya:</strong> Elektr energiya manbai (3V)</p>
+                <p><strong>Sim Halqa:</strong> Mis simdan yasalgan o'ram, elektr tokini o'tkazadi</p>
+                <p><strong>Magnitlar:</strong> Doimiy magnit maydon hosil qiladi</p>
+                <p><strong>Ulanish Simlari:</strong> Elektr zanjirinisaqlaydi</p>
+                <p><strong>Tayanch:</strong> Sim halqani aylanish uchun mahkamlaydi</p>
+            `;
+        }
+
+        function showApplications() {
+            elements.infoPanel.innerHTML = `
+                <h3>Qo'llanilishi</h3>
+                <p><strong>Uy Jihozlari:</strong> Ventilyator, chang yutgich, kir yuvish mashinasi</p>
+                <p><strong>Transport:</strong> Elektr avtomashinalar, metro, tramvay</p>
+                <p><strong>Sanoat:</strong> Konveyer, nasoslar, kompressorlar</p>
+                <p><strong>Elektronika:</strong> CD/DVD pleyer, printer, kompyuter kulerları</p>
+                <p><strong>Robotika:</strong> Robot qo'llari, harakatlantiruvchi tizimlar</p>
+            `;
+        }
+
+        // Initialize
+        updateStatus();
+    </script>
+</body>
+</html>

@@ -1,0 +1,2051 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Distance Sensing Circuit Using Arduino</title>
+    <style>
+        /* First file styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #e6f3ff;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        /* HEADER */
+        .header {
+            display: flex;
+            align-items: center;
+            background:#000075;
+            color: white;
+            padding: 10px 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            width: 100%;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .logo-icon img {
+            border-radius: 50%;
+            border: 2px solid white;
+            width: 40px;
+            height: 40px;
+        }
+
+        /* MAIN LAYOUT */
+        .main-container {
+            display: flex;
+            margin-top: 20px;
+            gap: 20px;
+        }
+
+        /* LEFT PANEL */
+        .left-panel {
+            width: 300px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            height: fit-content;
+            position: relative;
+            z-index: 1;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 15px;
+        }
+
+        .control-group h3 {
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 8px;
+            font-size: 14px;
+            border-radius: 5px;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn-success { 
+            background: #28a745; 
+            color: white; 
+        }
+        .btn-danger { 
+            background: #dc3545; 
+            color: white; 
+        }
+        .btn-primary { 
+            background: #000075; 
+            color: white; 
+        }
+        .btn-info { 
+            background:#000075 ; 
+            color: white; 
+        }
+
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 8px 0;
+            font-size: 13px;
+        }
+
+        .status-led {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #dc3545;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+        }
+
+        .status-led.on {
+            background: #28a745;
+            box-shadow: 0 0 10px rgba(40, 167, 69, 0.8);
+        }
+
+        /* Second file styles */
+        .title-header {
+            background: linear-gradient(45deg, #8b5cf6, #a855f7);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 20px;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+            position: relative;
+        }
+
+        .circuit-board {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            height: 350px;
+            background: white;
+            border: 3px solid #333;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        /* Arduino UNO */
+        .arduino {
+            position: absolute;
+            left: 30px;
+            top: 80px;
+            width: 100px;
+            height: 160px;
+            background: #2563eb;
+            border-radius: 5px;
+            border: 2px solid #1d4ed8;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .arduino::before {
+            content: '';
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            right: 8px;
+            height: 15px;
+            background: #1e40af;
+            border-radius: 2px;
+        }
+
+        .arduino-pins {
+            position: absolute;
+            bottom: 5px;
+            left: 5px;
+            right: 5px;
+            height: 20px;
+            background: #1e40af;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+        }
+
+        .pin {
+            width: 3px;
+            height: 10px;
+            background: #fbbf24;
+            border-radius: 1px;
+        }
+
+        .arduino-label {
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-weight: bold;
+            color: #333;
+            font-size: 14px;
+        }
+
+        /* HC-SR04 Sensor */
+        .hc-sr04 {
+            position: absolute;
+            right: 60px;
+            top: 40px;
+            width: 170px;
+            height: 100px;
+            
+            border-radius: 5px;
+            
+        }
+        .hc-sr04 img{
+            width: 100%;
+            height: 100%;
+        }
+        .sensor-eyes {
+            position: absolute;
+            top: 8px;
+            left: 12px;
+            right: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sensor-eye {
+            width: 18px;
+            height: 18px;
+            background: #1f2937;
+            border-radius: 50%;
+            border: 2px solid #374151;
+            position: relative;
+        }
+
+        .sensor-eye::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            background: #6b7280;
+            border-radius: 50%;
+        }
+
+        .hc-sr04-label {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-weight: bold;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .sensor-pins {
+            position: absolute;
+            bottom: 5px;
+            left: 10px;
+            right: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .sensor-pin {
+            width: 8px;
+            height: 12px;
+            background: #fbbf24;
+            border-radius: 1px;
+        }
+
+        /* Buzzer */
+        .buzzer {
+            position: absolute;
+            right: 80px;
+            bottom: 60px;
+            width: 45px;
+            height: 45px;
+            background: #1f2937;
+            border-radius: 50%;
+            border: 2px solid #374151;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        
+
+        .buzzer.active {
+            background: #ef4444;
+            animation: buzz-shake 0.1s infinite;
+        }
+
+        .buzzer.active::before {
+            background: #dc2626;
+        }
+
+        .buzzer-label {
+            position: absolute;
+            bottom: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 11px;
+            font-weight: bold;
+            color: #333;
+            white-space: nowrap;
+        }
+
+        @keyframes buzz-shake {
+            0%, 100% { transform: rotate(-1deg) scale(1); }
+            25% { transform: rotate(1deg) scale(1.02); }
+            50% { transform: rotate(-1deg) scale(1); }
+            75% { transform: rotate(1deg) scale(1.02); }
+        }
+
+        /* Connection Wires - exactly like in image */
+        .wire {
+            position: absolute;
+            z-index: 10;
+        }
+
+        /* Red wire - VCC */
+        .wire-red {
+            width: 3px;
+            height: 50px;
+            background: #ef4444;
+            right: 155px;
+            top: 120px;
+           
+        }
+
+        /* Black wire - GND */
+        .wire-black {
+            width: 3px;
+            height: 60px;
+            background: #1f2937;
+            right: 135px;
+            top: 120px;
+            
+        }
+         .wire-red2 {
+            width: 3px;
+            height: 130px;
+            background: #ef4444;
+            right: 282px;
+            top: 40px;
+           
+        }
+
+        /* Black wire - GND */
+        .wire-black2 {
+            width: 3px;
+            height: 150px;
+            background: #1f2937;
+            right: 292px;
+            top: 30px;
+            
+        }
+         .wire-red3 {
+            width: 203px;
+            height: 3px;
+            background: #ef4444;
+            left: 110px;
+            top: 38px;
+           
+        }
+
+        /* Black wire - GND */
+        .wire-black3 {
+            width: 203.5px;
+            height: 3px;
+            background: #1f2937;
+            left: 100px;
+            top: 29px;
+            
+        }
+         .wire-red4 {
+            width: 3px;
+            height: 155px;
+            background: #ef4444;
+            left: 110px;
+            top: 40px;
+           
+        }
+
+        /* Black wire - GND */
+        .wire-black4 {
+            width: 3px;
+            height: 175px;
+            background: #1f2937;
+            left: 100px;
+            top: 30px;
+            
+        }
+         .wire-red1 {
+            width: 130px;
+            height: 3px;
+            background: #ef4444;
+            right: 155px;
+            top: 168px;
+           
+        }
+
+        /* Black wire - GND */
+        .wire-black1 {
+            width: 160px;
+            height: 3px;
+            background: #1f2937;
+            right: 135px;
+            top: 180px;
+            
+        }
+          .wire-red5 {
+            width: 35px;
+            height: 3px;
+            background: #ef4444;
+            left: 110px;
+            top: 194px;
+           
+        }
+
+        /* Black wire - GND */
+        .wire-black5 {
+            width: 45px;
+            height: 3px;
+            background: #1f2937;
+            left: 100px;
+            top: 204px;
+            
+        }
+        /* Blue wire - Trig */
+        .wire-blue {
+            width: 3px;
+            height: 95px;
+            background: #3b82f6;
+                  right: 148px;
+            top: 120px;
+            transform: rotate(0deg);
+        }
+
+        /* Purple wire - Echo */
+        .wire-purple {
+            width: 4px;
+            height: 100px;
+            background: #8b5cf6;
+            right: 141px;
+            top: 120px;
+            transform: rotate(0deg);
+        }
+        .wire-blue1 {
+            width: 165px;
+            height: 3px;
+            background: #3b82f6;
+                  right: 148px;
+            top: 215px;
+            transform: rotate(0deg);
+        }
+
+        /* Purple wire - Echo */
+        .wire-purple1 {
+            width: 172px;
+            height: 4px;
+            background: #8b5cf6;
+            right: 141px;
+            top: 220px;
+            transform: rotate(0deg);
+        }
+
+        /* Buzzer wires */
+        .buzzer-wire-1 {
+            width: 3px;
+            height: 70px;
+            background: black;
+            right: 155px;
+            bottom: 25px;
+            transform: rotate(54deg);
+        }
+
+        .buzzer-wire-2 {
+            width: 3px;
+            height: 40px;
+            background: red;
+             right: 127px;
+            bottom: 25px;
+            transform: rotate(54deg);
+        }
+          .buzzer-wire2 {
+            width: 3px;
+            height: 125px;
+            background: black;
+            right: 182px;
+            bottom: 38px;
+           
+        }
+
+        .buzzer-wire3 {
+            width: 157px;
+            height: 3px;
+            background: red;
+             right: 142px;
+            bottom: 33px;
+            
+        }
+         .buzzer-wire4 {
+            width: 15px;
+            height: 3px;
+            background: red;
+            right: 296px;
+            bottom: 105px;
+            
+        }
+          .buzzer-wire5 {
+            width: 3px;
+            height: 70px;
+            background: red;
+            right: 296px;
+            bottom: 35px;
+           
+        }
+        /* Sound Wave Animation */
+        .sound-waves {
+            position: absolute;
+            right: 20px;
+            bottom: 80px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .sound-waves.active {
+            opacity: 1;
+        }
+
+        .wave {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #10b981;
+            border-radius: 50%;
+            position: absolute;
+            animation: wave-expand 1s infinite;
+        }
+
+        .wave:nth-child(2) {
+            animation-delay: 0.3s;
+        }
+
+        .wave:nth-child(3) {
+            animation-delay: 0.6s;
+        }
+
+        @keyframes wave-expand {
+            0% {
+                transform: scale(0);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(2.5);
+                opacity: 0;
+            }
+        }
+
+        /* Green checkmark like in image */
+        .check-circle {
+            position: absolute;
+            bottom: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 60px;
+            background: #10b981;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .checkmark {
+            color: white;
+            font-size: 30px;
+            font-weight: bold;
+        }
+
+        /* Car and Wall Demo - exactly like image */
+        .demo-section {
+            width: 100%;
+            max-width: 500px;
+            height: 120px;
+            margin-top: 40px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .wall-section {
+            position: absolute;
+            left: 400px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .wall-label {
+            font-weight: bold;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .wall-barrier {
+            width: 15px;
+            height: 250px;
+            background: linear-gradient(45deg, #dc2626, #b91c1c);
+            border-radius: 3px;
+            border: 2px solid #991b1b;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .car-track {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 400px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 1px;
+        }
+
+        .car {
+            width: 80px;
+            height: 45px;
+            background: #4b5563;
+            border-radius: 6px;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            right: 50px;
+        }
+
+        .car::before {
+            content: '';
+            position: absolute;
+            top: 6px;
+            left: 10px;
+            right: 10px;
+            bottom: 6px;
+            background: #6b7280;
+            border-radius: 3px;
+        }
+
+        .car::after {
+            content: '';
+            position: absolute;
+            left: 6px;
+            top: 12px;
+            bottom: 12px;
+            width: 6px;
+            background: #374151;
+            border-radius: 1px;
+        }
+
+        .car.danger {
+            animation: car-shake 0.2s infinite;
+            background: #dc2626 !important;
+        }
+
+        .car.danger::before {
+            background: #ef4444;
+        }
+
+        @keyframes car-shake {
+            0%, 100% { transform: translateY(-50%) translateX(0); }
+            25% { transform: translateY(-50%) translateX(-2px); }
+            75% { transform: translateY(-50%) translateX(2px); }
+        }
+
+        .car-headlights {
+            position: absolute;
+            left: 2px;
+            top: 15px;
+            bottom: 15px;
+            width: 3px;
+            background: #fbbf24;
+            border-radius: 1px;
+        }
+
+        .parking-label {
+            position: absolute;
+            bottom: -25px;
+            right: 60px;
+            font-weight: bold;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .distance-waves {
+            position: absolute;
+            right: 130px;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .distance-waves.active {
+            opacity: 1;
+        }
+
+        .distance-line {
+            width: 40px;
+            height: 2px;
+            background: #10b981;
+            margin: 3px 0;
+            border-radius: 1px;
+            animation: pulse-line 1s infinite;
+        }
+
+        .distance-line:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .distance-line:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes pulse-line {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        /* Control Panel */
+        .controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .distance-display {
+            background: #1f2937;
+            color: #10b981;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 18px;
+            font-weight: bold;
+            border: 2px solid #374151;
+            min-width: 180px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .distance-display.danger {
+            color: #ef4444;
+            border-color: #ef4444;
+            animation: blink-red 0.5s infinite;
+        }
+
+        @keyframes blink-red {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.7; }
+        }
+
+        .slider-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .slider {
+            width: 250px;
+            height: 8px;
+            border-radius: 4px;
+            background: #d1d5db;
+            outline: none;
+          
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .slider::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Attribution */
+        .attribution {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #374151;
+            font-size: 14px;
+        }
+
+        .logo {
+            width: 30px;
+            height: 30px;
+            background: #3b82f6;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .auto-text {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            color: #666;
+        }
+        body.danger-bg {
+    animation: dangerFlash 0.5s infinite;
+}
+
+@keyframes dangerFlash {
+    0%, 100% { background-color: #ffe5e5; }
+    50% { background-color: #ffcccc; }
+}
+/* MODAL umumiy style */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(0,0,0,0.6);
+    backdrop-filter: blur(3px);
+}
+
+/* MODAL ichki qismi */
+.modal-content {
+    background: #000075;
+    color: white;
+    margin: 5% auto;
+    padding: 20px;
+    width: 50%;
+    max-width: 700px;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+    animation: slideDown 0.4s ease;
+    position: relative;
+}
+
+/* Close tugmasi */
+.close {
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    color: white;
+    transition: color 0.3s;
+}
+.close:hover {
+    color: #ffcc00;
+}
+
+/* Sarlavha */
+.modal-content h2 {
+    font-size: 1.5em;
+    margin-bottom: 15px;
+    border-bottom: 2px solid rgba(255,255,255,0.2);
+    padding-bottom: 8px;
+}
+
+/* CARD dizayni */
+.card {
+    background: rgba(255,255,255,0.08);
+    padding: 10px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    overflow: hidden;
+    transition: background 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+.card:hover {
+    background: rgba(255,255,255,0.15);
+}
+
+/* CARD ichidagi rasm */
+.card img {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    border-radius: 8px;
+    background: white;
+    padding: 5px;
+}
+
+/* CARD matn qismi */
+.card .text {
+    flex: 1;
+}
+.card h3 {
+    margin: 0;
+    font-size: 1.1rem;
+}
+.card p {
+    margin: 5px 0 0;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+/* Tab tugmalar */
+.tab-buttons {
+    display: flex;
+    margin-bottom: 10px;
+}
+.tab-buttons button {
+    flex: 1;
+    background: rgba(255,255,255,0.1);
+    color: white;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    border-radius: 5px 5px 0 0;
+    transition: background 0.3s;
+}
+.tab-buttons button.active {
+    background: rgba(255,255,255,0.3);
+}
+.tab-buttons button:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+/* Kod bo'lagi */
+.tab-content {
+    display: none;
+}
+.tab-content.active {
+    display: block;
+}
+pre {
+    background: rgba(0,0,0,0.4);
+    padding: 12px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-size: 0.9rem;
+}
+
+/* Animatsiya */
+@keyframes slideDown {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+.main-content{
+     width: 100%;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            height: fit-content;
+            position: relative;
+            z-index: 1;
+}
+
+/* ==================== MOBILE RESPONSIVE ==================== */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    /* Header responsive */
+    .header {
+        padding: 8px 12px;
+        flex-wrap: wrap;
+    }
+
+    .logo {
+        font-size: 14px;
+        gap: 5px;
+    }
+
+    .logo-icon img {
+        width: 30px;
+        height: 30px;
+    }
+
+    .header span {
+        margin-left: 10px !important;
+        font-size: 14px;
+    }
+
+    /* Main container - stack vertically */
+    .main-container {
+        flex-direction: column;
+        gap: 15px;
+        margin-top: 15px;
+    }
+
+    /* Left panel full width on mobile */
+    .left-panel {
+        width: 100%;
+        padding: 12px;
+    }
+
+    .control-group h3 {
+        font-size: 14px;
+    }
+
+    .btn {
+        padding: 8px;
+        font-size: 13px;
+    }
+
+    /* Main content responsive */
+    .main-content {
+        padding: 12px;
+    }
+
+    .title-header {
+        font-size: 16px;
+        padding: 10px 15px;
+        text-align: center;
+    }
+
+    /* Circuit board - scale down for mobile */
+    .circuit-board {
+        height: 250px;
+        transform-origin: top left;
+        transform: scale(0.7);
+        margin-bottom: 10px;
+    }
+
+    /* Demo section - fully responsive */
+    .demo-section {
+        max-width: 100%;
+        height: 100px;
+        margin-top: 20px;
+        padding: 15px;
+    }
+
+    .wall-section {
+        left: auto;
+        right: 10px;
+    }
+
+    .wall-label {
+        font-size: 12px;
+    }
+
+    .wall-barrier {
+        width: 10px;
+        height: 180px;
+    }
+
+    .car-track {
+        width: 250px;
+        right: 30px;
+    }
+
+    .car {
+        width: 60px;
+        height: 35px;
+        right: 35px;
+    }
+
+    .distance-waves {
+        right: 90px;
+    }
+
+    .distance-line {
+        width: 25px;
+    }
+
+    /* Controls responsive */
+    .controls {
+        gap: 15px;
+    }
+
+    .distance-display {
+        font-size: 16px;
+        padding: 10px 15px;
+        min-width: 150px;
+    }
+
+    .slider {
+        width: 200px;
+    }
+
+    .slider-container label {
+        font-size: 14px;
+    }
+
+    #autoMove {
+        padding: 10px 20px !important;
+        font-size: 13px !important;
+    }
+
+    #warningText {
+        font-size: 14px;
+        text-align: center;
+    }
+
+    /* Attribution responsive */
+    .attribution {
+        position: relative;
+        bottom: auto;
+        left: auto;
+        margin-top: 20px;
+        justify-content: center
+        ;
+        font-size: 12px;
+    }
+
+    .logo {
+        width: 25px;
+        height: 25px;
+        font-size: 14px;
+    }
+
+    .auto-text {
+        font-size: 10px;
+        padding: 4px 8px;
+    }
+
+    /* Check circle responsive */
+    .check-circle {
+        width: 45px;
+        height: 45px;
+        bottom: -35px;
+    }
+
+    .checkmark {
+        font-size: 22px;
+    }
+
+    /* Modal responsive */
+    .modal-content {
+        width: 90%;
+        margin: 10% auto;
+        padding: 15px;
+    }
+
+    .modal-content h2 {
+        font-size: 1.2em;
+    }
+
+    .card {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .card img {
+        width: 60px;
+        height: 60px;
+    }
+
+    .card h3 {
+        font-size: 1rem;
+    }
+
+    .card p {
+        font-size: 0.85rem;
+    }
+
+    .tab-buttons button {
+        font-size: 0.85rem;
+        padding: 8px;
+    }
+
+    pre {
+        font-size: 0.75rem;
+        padding: 8px;
+    }
+}
+
+/* Extra small devices */
+@media (max-width: 480px) {
+    .header span {
+        font-size: 12px;
+    }
+
+    .title-header {
+        font-size: 14px;
+        padding: 8px 12px;
+    }
+
+    .circuit-board {
+        transform: scale(0.55);
+        width: 600px;
+        height: 350px;
+    }
+
+    .demo-section {
+        height: 80px;
+        padding: 10px;
+    }
+
+    .wall-barrier {
+        height: 140px;
+    }
+
+    .car {
+        width: 50px;
+        height: 30px;
+    }
+
+    .car-track {
+        width: 200px;
+    }
+
+    .distance-display {
+        font-size: 14px;
+        padding: 8px 12px;
+        min-width: 130px;
+    }
+
+    .slider {
+        width: 180px;
+    }
+
+    #autoMove {
+        padding: 8px 16px !important;
+        font-size: 12px !important;
+    }
+
+    .control-group {
+        margin-bottom: 15px;
+        padding-bottom: 12px;
+    }
+
+    .btn {
+        padding: 7px;
+        font-size: 12px;
+    }
+
+    .status-row {
+        font-size: 12px;
+    }
+
+    .distance-waves {
+        right: 70px;
+    }
+
+    .distance-line {
+        width: 20px;
+    }
+}
+
+/* Landscape mobile optimization */
+@media (max-width: 768px) and (orientation: landscape) {
+    .circuit-board {
+        transform: scale(0.6);
+        height: 220px;
+    }
+
+    .demo-section {
+        height: 90px;
+    }
+
+    .main-container {
+        gap: 10px;
+    }
+}
+  /* Tugmalar */
+    .btn{
+      display:block;width:100%;padding:10px 12px;margin:8px 0;border:0;border-radius:10px;
+      cursor:pointer;transition:.25s;text-align:left;font-weight:600
+    }
+    .btn-primary{background:#000075;color:#fff}
+    .btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 14px rgba(0,0,0,.1)}
+
+    /* FLEX maketlari */
+    .flex-container-40-60{
+      display:flex;gap:20px;align-items:flex-start;background:rgba(255,255,255,.1);
+      padding:20px;border-radius:15px;margin-bottom:20px
+    }
+    .flex-video-40{flex:0 0 40%}
+    .flex-video-40 iframe{width:100%;height:250px;border-radius:10px}
+    .flex-text-60{flex:0 0 60%}
+    .flex-text-60 p{font-size:16px;line-height:1.8}
+
+    .flex-container-30-70{
+      display:flex;gap:20px;align-items:flex-start;background:rgba(255,255,255,.1);
+      padding:20px;border-radius:15px;margin-bottom:20px
+    }
+    .flex-image-30{flex:0 0 30%}
+    .flex-image-30 img{width:100%;border-radius:10px}
+    .flex-text-70{flex:0 0 70%}
+    .flex-text-70 strong{color:#ffcc00;font-size:18px;display:block;margin-bottom:10px}
+
+    /* Video-full (local) */
+    .video-full{width:100%;border-radius:15px;background:#000}
+    .video-full video{width:100%;height:auto;border-radius:15px;max-height:70vh}
+
+    /* Floating info button */
+    #infoFloatingBtn{
+      position:fixed;bottom:30px;right:30px;width:120px;height:120px;border-radius:50%;
+      background:linear-gradient(135deg,#000075,#0000ff);color:#fff;border:4px solid #fff;
+      cursor:pointer;font-size:16px;font-weight:bold;box-shadow:0 8px 20px rgba(0,0,0,.4);
+      z-index:1500;transition:.3s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px
+    }
+    #infoFloatingBtn:hover{transform:scale(1.1);box-shadow:0 12px 30px rgba(0,0,255,.6)}
+    #infoFloatingBtn span:first-child{font-size:36px}
+
+    /* Modal */
+    .modal{display:none;position:fixed;z-index:2000;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(5px);overflow-y:auto}
+    .modal-content{
+      background:#000075;color:#fff;margin:5vh auto;padding:30px;width:90%;max-width:1000px;border-radius:20px;
+      box-shadow:0 15px 40px rgba(0,0,0,.5);position:relative;animation:slideDown .4s ease
+    }
+    @keyframes slideDown{from{transform:translateY(-50px);opacity:0}to{transform:translateY(0);opacity:1}}
+    .close{
+      position:absolute;right:20px;top:15px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;
+      font-size:32px;font-weight:bold;cursor:pointer;color:#fff;transition:.3s;border-radius:50%;background:rgba(255,255,255,.1)
+    }
+    .close:hover{background:rgba(255,204,0,.3);color:#ffcc00;transform:rotate(90deg)}
+    .modal-content h2{
+      font-size:28px;margin-bottom:25px;padding-bottom:15px;border-bottom:2px solid rgba(255,255,255,.3);padding-right:50px
+    }
+
+    /* Tabs */
+    .tab-buttons{display:flex;gap:8px;margin:12px 0 16px}
+    .tab-btn{
+      flex:1;background:rgba(255,255,255,.12);color:#fff;border:0;border-radius:10px 10px 0 0;padding:10px;
+      cursor:pointer;font-weight:600;transition:.2s
+    }
+    .tab-btn:hover{background:rgba(255,255,255,.2)}
+    .tab-btn.active{background:rgba(255,255,255,.28)}
+    .tab-content{display:none}
+    .tab-content.active{display:block}
+
+    /* Code block */
+    pre{
+      background:rgba(0,0,0,.35);padding:12px;border-radius:10px;overflow:auto;white-space:pre-wrap;word-break:break-word;
+      color:#fff;font-size:13.5px;line-height:1.55
+    }
+
+    @media (max-width:1024px){
+      .flex-container-40-60,.flex-container-30-70{flex-direction:column}
+      .flex-video-40,.flex-text-60,.flex-image-30,.flex-text-70{flex:0 0 100%}
+    }
+    @media (max-width:768px){
+      .modal-content{width:96%;padding:20px 15px}
+      #infoFloatingBtn{width:90px;height:90px;font-size:14px;bottom:20px;right:20px}
+      #infoFloatingBtn span:first-child{font-size:28px}
+    }
+    </style>
+</head>
+<body>
+    <!-- Integrated Header -->
+    <div class="header">
+        <div class="logo">
+                 <a href="/"><img src="/static/image/logo.png" width="80px" height="80px" alt=""></a>
+          
+        </div>
+           <p></p>
+            <span style="margin-left: 50px;">Masofa sensor tizimi</span>
+    </div>
+
+    <!-- Main Container with Left Panel and Content -->
+    <div class="main-container">
+        <!-- Left Panel -->
+        <div class="left-panel">
+            <div class="control-group">
+                <h3>Boshqaruv</h3>
+                <button class="btn btn-success" onclick="startSimulation()" id="startBtn">
+                    Start
+                </button>
+                <button class="btn btn-danger" onclick="stopSimulation()" id="stopBtn">
+                     Stop
+                </button>
+                <button class="btn btn-primary" onclick="togglePower()">
+                     Quvvat
+                </button>
+                <button class="btn btn-info" onclick="runTest()">
+                     Test
+                </button>
+            </div>
+
+             <div class="control-group">
+                <h3>📊 Ma'lumotlar</h3>
+                <button class="btn btn-primary" id="schemaBtn">
+                    💡 Sxema
+                </button>
+                <button class="btn btn-primary" id="codeBtn">
+                    💻 Kod
+                </button>
+                <button class="btn btn-primary" id="componentsBtn">
+                    🔌 Qurilmalar
+                </button>
+
+            </div>
+
+            <div class="control-group">
+                <h3>Qurilma holati</h3>
+                <div class="status-row">
+                    <span>Quvvat:</span>
+                    <div class="status-led" id="powerLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Sensor:</span>
+                    <div class="status-led" id="sensorLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Buzzer:</span>
+                    <div class="status-led" id="buzzerLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Xavf:</span>
+                    <div class="status-led" id="dangerLed"></div>
+                </div>
+            </div>
+        </div>
+
+
+
+  <!-- MODAL 1: Sxema qayerda ishlatiladi (3ta video – masofa sensorli mashina) -->
+  <div class="modal" id="schemaModal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>💡 Sxema qayerda ishlatiladi</h2>
+
+      <!-- Video #1: Obstacle avoidance car umumiy tushuncha -->
+      <div class="flex-container-40-60">
+        <div class="flex-video-40">
+          <!-- O'zingizning videongizni qo'ying -->
+          <iframe src="https://www.youtube.com/embed/jzPZ0N-Zels?si=mXFShVEAka_NszGr" title="Obstacle avoidance car – 1" allowfullscreen></iframe>
+          <!-- Maslahat: YouTube embed qo'ying: https://www.youtube.com/embed/VIDEO_ID -->
+        </div>
+        <div class="flex-text-60">
+          <strong>To‘siqlardan qochuvchi mashina (umumiy)</strong>
+          <p>
+            HC-SR04 masofa sensori yordamida to‘siqqacha bo‘lgan masofa o‘lchanadi,
+            belgilangan chegaradan kichik bo‘lsa, mashina to‘xtaydi va buriladi.
+          </p>
+        </div>
+      </div>
+
+      <!-- Video #2: Ulanish va kalibrovka -->
+      <div class="flex-container-40-60">
+        <div class="flex-video-40">
+          <iframe src="https://www.youtube.com/embed/QEIl2Nxot5M?si=e5RLBTTVa3PUxn9s" title="Ulash va kalibrovka – 2" allowfullscreen></iframe>
+        </div>
+        <div class="flex-text-60">
+          <strong>Ulanish va kalibrovka</strong>
+          <p>
+            Trig/Echo pinlarini to‘g‘ri ulash, vaqtni o‘lchash va <em>threshold</em> masofa (sm) ni
+            sinovdan o‘tkazish tartibi ko‘rsatiladi.
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODAL 2: Kod (mBlock ↔ Arduino) -->
+  <div class="modal" id="codeModal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>💻 Kod</h2>
+
+      <div class="tab-buttons">
+        <button class="tab-btn active" data-tab="mblock">mBlock Kodi</button>
+        <button class="tab-btn" data-tab="arduino">Arduino Kodi</button>
+      </div>
+
+      <!-- mBlock — rasm qo'ying -->
+      <div class="tab-content active" id="mblock">
+        <!-- O'zingizning blok-kod rasmingizni qo'ying: mblock_car.png -->
+        <pre><img src="/static/image/arduinoultrasonicbuzzer3.jpg" alt="mBlock – obstacle avoidance car" style="width:80%;height:auto"></pre>
+      </div>
+
+      <!-- Arduino — to'liq kod -->
+      <div class="tab-content" id="arduino">
+        <pre>
+// Obstacle Avoidance Car (HC-SR04 + L298N)
+// Ulanish:
+// HC-SR04: TRIG->D9, ECHO->D8
+// L298N: IN1->D2, IN2->D3 (chap motor)
+//        IN3->D4, IN4->D5 (o'ng motor)
+// ENA/ENB -> 5V (yoki PWM pinlar orqali tezlik)
+// Vcc (motor) -> akkumulyator, 5V -> Arduino (ehtiyot bo'ling)
+
+#define TRIG 9
+#define ECHO 8
+
+#define IN1 2
+#define IN2 3
+#define IN3 4
+#define IN4 5
+
+const int SAFE_CM = 20;   // To'siqka qadar minimal masofa (sm)
+const int TURN_MS = 400;  // Burilish vaqti (ms) — tajribada moslang
+const int BACK_MS = 250;  // Orqaga yurish vaqti
+
+long measureCM(){
+  digitalWrite(TRIG, LOW); delayMicroseconds(2);
+  digitalWrite(TRIG, HIGH); delayMicroseconds(10);
+  digitalWrite(TRIG, LOW);
+  long duration = pulseIn(ECHO, HIGH, 25000UL); // 25ms timeout (~4m)
+  if (duration == 0) return 999;               // timeout — juda uzoq deb qabul qilamiz
+  long cm = duration / 58;                     // ~ us->sm
+  return cm;
+}
+
+void motorsStop(){
+  digitalWrite(IN1, LOW); digitalWrite(IN2, LOW);
+  digitalWrite(IN3, LOW); digitalWrite(IN4, LOW);
+}
+
+void motorsForward(){
+  digitalWrite(IN1, HIGH); digitalWrite(IN2, LOW);
+  digitalWrite(IN3, HIGH); digitalWrite(IN4, LOW);
+}
+
+void motorsBackward(){
+  digitalWrite(IN1, LOW); digitalWrite(IN2, HIGH);
+  digitalWrite(IN3, LOW); digitalWrite(IN4, HIGH);
+}
+
+void motorsLeft(){
+  // chap motor orqaga, o'ng motor oldinga — joyida chapga burilish
+  digitalWrite(IN1, LOW); digitalWrite(IN2, HIGH);
+  digitalWrite(IN3, HIGH); digitalWrite(IN4, LOW);
+}
+
+void motorsRight(){
+  // chap motor oldinga, o'ng motor orqaga — joyida o'ngga burilish
+  digitalWrite(IN1, HIGH); digitalWrite(IN2, LOW);
+  digitalWrite(IN3, LOW);  digitalWrite(IN4, HIGH);
+}
+
+void setup(){
+  pinMode(TRIG, OUTPUT);
+  pinMode(ECHO, INPUT);
+
+  pinMode(IN1, OUTPUT); pinMode(IN2, OUTPUT);
+  pinMode(IN3, OUTPUT); pinMode(IN4, OUTPUT);
+
+  motorsStop();
+}
+
+void loop(){
+  long d = measureCM();
+
+  if (d <= SAFE_CM){
+    motorsStop();
+    delay(80);
+
+    // Orqaga biroz
+    motorsBackward(); delay(BACK_MS);
+    motorsStop();     delay(60);
+
+    // Tasodifiy tomonga burilish (oddiy)
+    if (millis() % 2 == 0){ motorsLeft();  } else { motorsRight(); }
+    delay(TURN_MS);
+
+    motorsStop();
+    delay(60);
+  } else {
+    motorsForward();
+  }
+
+  delay(20);
+}
+        </pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 3: Qurilmalar -->
+  <div class="modal" id="componentsModal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>🔌 Ishlatilgan Qurilmalar</h2>
+
+      <div class="flex-container-30-70">
+        <div class="flex-image-30">
+          <img src="/static/image/ultrasonic.png" alt="HC-SR04 masofa sensori">
+        </div>
+        <div class="flex-text-70">
+          <strong>HC-SR04 masofa sensori</strong>
+          <p>Ultratovush bilan masofa o‘lchaydi. TRIG/ECHO orqali impuls yuborish va qabul qilish.</p>
+        </div>
+      </div>
+
+      
+      <div class="flex-container-30-70">
+        <div class="flex-image-30">
+          <img src="/static/image/buzzer.png" alt="Shassi va motorlar">
+        </div>
+        <div class="flex-text-70">
+          <strong>Buzzer</strong>
+          <p>Ushbu qurilma asosan xabar berish va tovush hosil qilishda ishlatiladi</p>
+        </div>
+      </div>
+
+      <div class="flex-container-30-70">
+        <div class="flex-image-30">
+          <img src="/static/image/arduino1 - Copy.png" alt="Akkumulyator">
+        </div>
+        <div class="flex-text-70">
+          <strong>Akkumulyator va ulash simlarni boshqaruvchi qurilma</strong>
+          <p>Motorlar uchun alohida quvvat tavsiya etiladi. Yer (GND) umumiy qilinsin.</p>
+        </div>
+      </div>
+
+      
+    </div>
+  </div>
+
+  <!-- MODAL 4: Ma'lumot (lokal demo video) -->
+  <div class="modal" id="infoModal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>📚 Qo'shimcha Ma'lumot</h2>
+      <div class="video-full">
+        <!-- O'zingizning demo videongizni qo'ying: car_demo.mp4 -->
+        <video controls>
+          <source src="/media/2.mp4" type="video/mp4">
+          Brauzeringiz video formatni qo'llab-quvvatlamaydi.
+        </video>
+      </div>
+    </div>
+  </div>
+
+  <!-- O'ng pastdagi dumaloq tugma -->
+  <button id="infoFloatingBtn">
+    <span>📚</span>
+    <span>Ma'lumot</span>
+  </button>
+
+        <!-- Main Content Area -->
+        <div class="main-content">
+        
+            <div class="circuit-board">
+                <!-- Arduino UNO -->
+                <img src="/static/image/arduino1.png" style="margin-left: 90px; margin-top: 50px;" width="250px" height="250px" alt="">
+                
+                <!-- HC-SR04 Sensor -->
+                <img class="hc-sr04" src="/static/image/ultrasonic.png" width="200px" height="150px" alt="">
+                
+                <!-- Buzzer -->
+                <div class="buzzer" id="buzzer">
+                    <img src="/static/image/buzzer.png" width="100px" height="100px" alt="">
+                </div>
+                
+                <!-- Wires -->
+                <div class="wire wire-red"></div>
+                <div class="wire wire-black"></div>
+                <div class="wire wire-red1"></div>
+                <div class="wire wire-black1"></div>
+                <div class="wire wire-red2"></div>
+                <div class="wire wire-black2"></div>
+                <div class="wire wire-red3"></div>
+                <div class="wire wire-black3"></div>
+                <div class="wire wire-red4"></div>
+                <div class="wire wire-black4"></div>
+                <div class="wire wire-red5"></div>
+                <div class="wire wire-black5"></div>
+                <div class="wire wire-blue"></div>
+                <div class="wire wire-purple"></div>
+                <div class="wire wire-blue1"></div>
+                <div class="wire wire-purple1"></div>
+                <div class="wire buzzer-wire-1"></div>
+                <div class="wire buzzer-wire-2"></div>
+                <div class="wire buzzer-wire2"></div>
+                <div class="wire buzzer-wire3"></div>
+                <div class="wire buzzer-wire4"></div>
+                <div class="wire buzzer-wire5"></div>
+                
+                <!-- Sound waves -->
+                <div class="sound-waves" id="soundWaves">
+                    <div class="wave"></div>
+                    <div class="wave"></div>    
+                    <div class="wave"></div>
+                </div>
+                
+                <!-- Green checkmark -->
+                <div class="check-circle">
+                    <div class="checkmark">✓</div>
+                </div>
+            </div>
+            
+            <!-- Demo Section -->
+            <div class="demo-section">
+                <div class="wall-section">
+                    <span class="wall-label">Devor</span>
+                    <div class="wall-barrier"></div>
+                </div>
+                
+                <div class="car-track"></div>
+                
+                <div>
+                    <img class="car" id="car" src="/static/image/car.png" width="100px" height="80px" alt="">
+                </div>
+                
+                <div class="distance-waves" id="distanceWaves">
+                    <div class="distance-line"></div>
+                    <div class="distance-line"></div>
+                    <div class="distance-line"></div>
+                </div>
+            </div>
+            
+            <!-- Controls -->
+            <div class="controls">
+                <div class="distance-display" id="distanceDisplay">Masofa: 50 sm</div>
+                
+                <div class="slider-container">
+                    <label for="distanceSlider"><strong>Masofani sozlash</strong></label>
+                    <input type="range" id="distanceSlider" class="slider" min="5" max="100" value="50">
+                    <span id="sliderValue">50 sm</span>
+                </div>
+                
+                <button id="autoMove" onclick="startAutoMovement()" style="
+                    background: linear-gradient(45deg, #10b981, #059669);
+                    color: white;
+                    border: none;
+                    padding: 12px 24px;
+                    border-radius: 8px;
+                    font-weight: bold;
+                    cursor: pointer;
+                    font-size: 14px;
+                    box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+                    transition: all 0.3s ease;
+                " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                    🚗 Avto Demo
+                </button>
+            </div>  
+            <div id="warningText" style="font-weight:bold; color:red; margin-top:10px;"></div>
+        </div>
+    </div>
+    
+    <!-- Attribution -->
+    <div class="attribution">
+        <div class="logo">M</div>
+        <span>@Milliy muhandislik</span>
+    </div>
+    
+    <div class="auto-text">▶ Automatic Still Guide in Community tab!</div>
+
+    <script>
+            // ---- Modal helpers ----
+    function openModal(id){ const m=document.getElementById(id); if(m) m.style.display='block'; }
+    function closeModal(el){ const m=el.closest('.modal'); if(m) m.style.display='none'; }
+
+    // (X) yopish
+    document.addEventListener('click', (e)=>{
+      if (e.target.matches('.modal .close')) closeModal(e.target);
+    });
+    // fon bosilsa yopish
+    window.addEventListener('click', (e)=>{
+      document.querySelectorAll('.modal').forEach(m=>{ if(e.target===m) m.style.display='none'; });
+    });
+
+    // ---- Tugmalar → modallar
+    document.getElementById('schemaBtn')?.addEventListener('click', ()=>openModal('schemaModal'));
+    document.getElementById('codeBtn')?.addEventListener('click', ()=>openModal('codeModal'));
+    document.getElementById('componentsBtn')?.addEventListener('click', ()=>openModal('componentsModal'));
+    document.getElementById('infoFloatingBtn')?.addEventListener('click', ()=>openModal('infoModal'));
+
+    // ---- Kod modalidagi tablar (scope: #codeModal)
+    (function(){
+      const codeModal = document.getElementById('codeModal');
+      if(!codeModal) return;
+      codeModal.querySelectorAll('.tab-btn').forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          const targetId = btn.dataset.tab; // "mblock" yoki "arduino"
+          // tugmalar
+          codeModal.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+          btn.classList.add('active');
+          // kontent
+          codeModal.querySelectorAll('.tab-content').forEach(p=>{
+            p.classList.toggle('active', p.id===targetId);
+          });
+        });
+      });
+    })();
+
+        // System State Variables for the distance sensor
+        let powerOn = false;
+        let sensorActive = false;
+        let buzzerActive = false;
+        let dangerState = false;
+
+        // DOM Elements for status LEDs
+        const powerLed = document.getElementById('powerLed');
+        const sensorLed = document.getElementById('sensorLed');
+        const buzzerLed = document.getElementById('buzzerLed');
+        const dangerLed = document.getElementById('dangerLed');
+
+        // Toggle power function
+        function togglePower() {
+            powerOn = !powerOn;
+            updateStatus();
+            if(!powerOn) {
+                stopSimulation();
+            }
+        }
+
+        // Update status LEDs
+        function updateStatus() {
+            powerLed.classList.toggle('on', powerOn);
+            sensorLed.classList.toggle('on', sensorActive);
+            buzzerLed.classList.toggle('on', buzzerActive);
+            dangerLed.classList.toggle('on', dangerState);
+        }
+
+        // Start simulation
+        function startSimulation() {
+            if(!powerOn) return;
+            sensorActive = true;
+            updateStatus();
+            // Add actual simulation start logic here
+        }
+
+        // Stop simulation
+        function stopSimulation() {
+            sensorActive = false;
+            buzzerActive = false;
+            dangerState = false;
+            updateStatus();
+            // Add actual simulation stop logic here
+        }
+
+        // Run test
+        function runTest() {
+            if(!powerOn) return;
+            startAutoMovement();
+        }
+
+        // Original distance sensor code
+        const distanceSlider = document.getElementById('distanceSlider');
+        const distanceDisplay = document.getElementById('distanceDisplay');
+        const sliderValue = document.getElementById('sliderValue');
+        const buzzer = document.getElementById('buzzer');
+        const soundWaves = document.getElementById('soundWaves');
+        const distanceWaves = document.getElementById('distanceWaves');
+        const car = document.getElementById('car');
+        const warningText = document.getElementById('warningText');
+
+        let audioContext = null;
+        let oscillator = null;
+        let isMoving = false;
+        let currentDistance = 50;
+        let targetDistance = 50;
+
+        function initAudio() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playBuzzerSound() {
+            if (audioContext && audioContext.state === 'running') {
+                if (oscillator) {
+                    oscillator.stop();
+                }
+                
+                oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                // Higher frequency for danger
+                oscillator.frequency.setValueAtTime(1200, audioContext.currentTime);
+                oscillator.type = 'square';
+                gainNode.gain.setValueAtTime(0.08, audioContext.currentTime);
+                
+                oscillator.start();
+                
+                setTimeout(() => {
+                    if (oscillator) {
+                        try {
+                            oscillator.stop();
+                        } catch(e) {}
+                        oscillator = null;
+                    }
+                }, 150);
+            }
+        }
+
+        function stopBuzzerSound() {
+            if (oscillator) {
+                try {
+                    oscillator.stop();
+                } catch(e) {}
+                oscillator = null;
+            }
+        }
+
+        function moveCarToPosition(distance) {
+            const maxDistance = 400;
+            const minDistance = 60;
+            
+            const carPosition = minDistance + (distance / 100) * (maxDistance - minDistance);
+            car.style.right = carPosition + 'px';
+            
+            distanceWaves.style.right = (carPosition + 90) + 'px';
+        }
+
+        function updateSystem() {
+            targetDistance = parseInt(distanceSlider.value);
+            
+            if (Math.abs(currentDistance - targetDistance) > 1) {
+                const step = (targetDistance - currentDistance) * 0.1;
+                currentDistance += step;
+                moveCarToPosition(currentDistance);
+            } else {
+                currentDistance = targetDistance;
+                moveCarToPosition(currentDistance);
+            }
+            
+            const distance = Math.round(currentDistance);
+            
+            distanceDisplay.textContent = `Distance: ${distance} cm`;
+            sliderValue.textContent = `${distance} cm`;
+            distanceSlider.value = distance;
+            
+            const isDangerous = distance < 20;
+            const isVeryClose = distance < 15;
+            
+            if (isDangerous) {
+                buzzerActive = true;
+                dangerState = true;
+                buzzer.classList.add('active');
+                soundWaves.classList.add('active');
+                distanceWaves.classList.add('active');
+                distanceDisplay.classList.add('danger');
+                car.classList.add('danger');
+                
+                if (isVeryClose) {
+                    playBuzzerSound();
+                    setTimeout(playBuzzerSound, 200);
+                    warningText.textContent = "XAVF: Juda yaqin masofa!";
+                } else {
+                    playBuzzerSound();
+                    warningText.textContent = "Ogohlantirish: Masofa juda kam!";
+                }
+            } else {
+                buzzerActive = false;
+                dangerState = false;
+                buzzer.classList.remove('active');
+                soundWaves.classList.remove('active');
+                distanceWaves.classList.remove('active');
+                distanceDisplay.classList.remove('danger');
+                car.classList.remove('danger');
+                warningText.textContent = "";
+                stopBuzzerSound();
+            }
+            
+            updateStatus();
+        }
+
+        function startAutoMovement() {
+            if (isMoving) return;
+            isMoving = true;
+            
+            const button = document.getElementById('autoMove');
+            button.textContent = 'Moving...';
+            button.disabled = true;
+            
+            distanceSlider.value = 100;
+            targetDistance = 100;
+            currentDistance = 100;
+            
+            const moveInterval = setInterval(() => {
+                if (targetDistance > 10) {
+                    targetDistance -= 2;
+                    distanceSlider.value = targetDistance;
+                } else {
+                    clearInterval(moveInterval);
+                    setTimeout(() => {
+                        const returnInterval = setInterval(() => {
+                            if (targetDistance < 80) {
+                                targetDistance += 3;
+                                distanceSlider.value = targetDistance;
+                            } else {
+                                clearInterval(returnInterval);
+                                isMoving = false;
+                                button.textContent = '🚗 Avto Demo';
+                                button.disabled = false;
+                            }
+                        }, 80);
+                    }, 2000);
+                }
+            }, 100);
+        }
+
+        // Event listeners
+        distanceSlider.addEventListener('input', () => {
+            targetDistance = parseInt(distanceSlider.value);
+        });
+
+        // Initialize audio on first user interaction
+        document.addEventListener('click', initAudio, { once: true });
+        document.addEventListener('touchstart', initAudio, { once: true });
+
+        // Main animation loop
+        setInterval(updateSystem, 50);
+
+        // Initial setup
+        moveCarToPosition(50);
+        updateSystem();
+    </script>
+</body>
+</html>

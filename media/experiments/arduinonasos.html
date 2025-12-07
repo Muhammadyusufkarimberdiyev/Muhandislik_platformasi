@@ -1,0 +1,2226 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arduino Bluetooth Nasos Boshqaruvi</title>
+    <style>
+        
+/* MODAL TUZATISH - Responsive va to'g'ri ko'rinish */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    overflow-y: auto;
+    padding: 20px 0;
+}
+
+.modal-content {
+    background: #000075;
+    color: white;
+    margin: 10vh auto 5vh;
+    padding: 30px;
+    width: 90%;
+    max-width: 800px;
+    border-radius: 20px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+    position: relative;
+    animation: slideDown 0.4s ease;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+/* Scroll bar stilizatsiyasi */
+.modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.close {
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    font-size: 32px;
+    font-weight: bold;
+    cursor: pointer;
+    color: white;
+    transition: all 0.3s;
+    z-index: 2010;
+    line-height: 1;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.close:hover {
+    background: rgba(255, 204, 0, 0.3);
+    color: #ffcc00;
+    transform: rotate(90deg);
+}
+
+.modal-content h2 {
+    font-size: 28px;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+    padding-right: 50px;
+}
+
+.card {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    transition: all 0.3s;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    z-index: 1;
+}
+
+.card:hover {
+    background: rgba(255, 255, 255, 0.18);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.card video {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    background: #000;
+    position: relative;
+    z-index: 2;
+}
+
+.card p {
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 10px 0 0;
+    position: relative;
+    z-index: 2;
+}
+
+.card strong {
+    color: #ffcc00;
+    font-size: 18px;
+}
+
+/* Tab buttons */
+.tab-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 2;
+}
+
+.tab-buttons button {
+    flex: 1;
+    min-width: 150px;
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s;
+    position: relative;
+    z-index: 2;
+}
+
+.tab-buttons button:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+}
+
+.tab-buttons button.active {
+    background: rgba(255, 204, 0, 0.4);
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(255, 204, 0, 0.3);
+}
+
+.tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease;
+    position: relative;
+    z-index: 2;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.tab-content pre {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    border-radius: 12px;
+    overflow-x: auto;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #00ff00;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    z-index: 2;
+}
+
+.tab-content pre::-webkit-scrollbar {
+    height: 8px;
+}
+
+.tab-content pre::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.tab-content pre::-webkit-scrollbar-thumb {
+    background: rgba(0, 255, 0, 0.3);
+    border-radius: 10px;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+/* Flex Layout: 40% Video + 60% Text */
+.flex-container-40-60 {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+}
+
+.flex-video-40 {
+    flex: 0 0 40%;
+}
+
+.flex-video-40 iframe {
+    width: 100%;
+    height: 250px;
+    border-radius: 10px;
+}
+
+.flex-text-60 {
+    flex: 0 0 60%;
+}
+
+.flex-text-60 p {
+    font-size: 16px;
+    line-height: 1.8;
+}
+
+/* Flex Layout: 30% Image + 70% Text */
+.flex-container-30-70 {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+}
+
+.flex-image-30 {
+    flex: 0 0 30%;
+}
+
+.flex-image-30 img {
+    width: 100%;
+    border-radius: 10px;
+}
+
+.flex-text-70 {
+    flex: 0 0 70%;
+}
+
+.flex-text-70 strong {
+    color: #ffcc00;
+    font-size: 18px;
+    display: block;
+    margin-bottom: 10px;
+}
+
+/* 100% Video */
+.video-full video {
+    width: 100%;
+    border-radius: 15px;
+}
+
+/* Dumaloq tugma */
+#infoFloatingBtn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #000075, #0000ff);
+    color: white;
+    border: 4px solid white;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    z-index: 1500;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+#infoFloatingBtn:hover {
+    transform: scale(1.1);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .flex-container-40-60,
+    .flex-container-30-70 {
+        flex-direction: column;
+    }
+    
+    .flex-video-40, .flex-text-60,
+    .flex-image-30, .flex-text-70 {
+        flex: 0 0 100%;
+    }
+}
+/* Tablet responsive */
+@media (max-width: 1024px) {
+    .modal {
+        padding: 15px 0;
+    }
+    
+    .modal-content {
+        width: 95%;
+        padding: 25px;
+        max-height: 75vh;
+        margin: 8vh auto 5vh;
+    }
+    
+    .modal-content h2 {
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+    
+    .card {
+        padding: 15px;
+    }
+    
+    .card p {
+        font-size: 15px;
+    }
+    
+    .tab-buttons button {
+        font-size: 15px;
+        padding: 10px 15px;
+    }
+}
+
+/* Mobile responsive */ 
+@media (max-width: 768px) {
+    .modal {
+        padding: 10px 0;
+    }
+    
+    .modal-content {
+        width: 96%;
+        padding: 20px 15px;
+        margin: 5vh auto 3vh;
+        max-height: 85vh;
+        border-radius: 15px;
+    }
+    
+    .close {
+        right: 10px;
+        top: 10px;
+        font-size: 28px;
+        width: 35px;
+        height: 35px;
+    }
+    
+    .modal-content h2 {
+        font-size: 20px;
+        margin-bottom: 15px;
+        padding-bottom: 12px;
+        padding-right: 45px;
+    }
+    
+    .card {
+        padding: 12px;
+        margin-bottom: 15px;
+        border-radius: 12px;
+    }
+    
+    .card video {
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+    
+    .card p {
+        font-size: 14px;
+        line-height: 1.5;
+    }
+    
+    .card strong {
+        font-size: 16px;
+    }
+    
+    .tab-buttons {
+        gap: 8px;
+        margin-bottom: 15px;
+    }
+    
+    .tab-buttons button {
+        min-width: 120px;
+        font-size: 14px;
+        padding: 10px 12px;
+        border-radius: 8px;
+    }
+    
+    .tab-content pre {
+        padding: 15px;
+        font-size: 12px;
+        line-height: 1.5;
+        border-radius: 10px;
+    }
+}
+
+
+/* Small mobile */
+@media (max-width: 480px) {
+    .modal {
+        padding: 5px 0;
+    }
+    
+    .modal-content {
+        width: 98%;
+        padding: 15px 12px;
+        margin: 3vh auto 2vh;
+        max-height: 90vh;
+        border-radius: 12px;
+    }
+    
+    .close {
+        right: 8px;
+        top: 8px;
+        font-size: 24px;
+        width: 30px;
+        height: 30px;
+    }
+    
+    .modal-content h2 {
+        font-size: 18px;
+        margin-bottom: 12px;
+        padding-bottom: 10px;
+        padding-right: 40px;
+    }
+    
+    .card {
+        padding: 10px;
+        margin-bottom: 12px;
+        border-radius: 10px;
+    }
+    
+    .card p {
+        font-size: 13px;
+    }
+    
+    .card strong {
+        font-size: 15px;
+    }
+    
+    .tab-buttons {
+        flex-direction: column;
+        gap: 6px;
+    }
+    
+    .tab-buttons button {
+        width: 100%;
+        min-width: 100%;
+        font-size: 13px;
+        padding: 10px;
+    }
+    
+    .tab-content pre {
+        padding: 12px;
+        font-size: 11px;
+        line-height: 1.4;
+    }
+}
+
+/* Very small mobile */
+@media (max-width: 360px) {
+    .modal-content {
+        padding: 12px 10px;
+        margin: 2vh auto 1vh;
+    }
+    
+    .modal-content h2 {
+        font-size: 16px;
+    }
+    
+    .card {
+        padding: 8px;
+    }
+    
+    .card p {
+        font-size: 12px;
+    }
+    
+    .tab-buttons button {
+        font-size: 12px;
+        padding: 8px;
+    }
+    
+    .tab-content pre {
+        padding: 10px;
+        font-size: 10px;
+    }
+}
+
+/* Landscape mode fixes */
+@media (max-width: 1024px) and (orientation: landscape) {
+    .modal-content {
+        max-height: 80vh;
+        margin: 5vh auto 3vh;
+    }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .tab-buttons button {
+        min-height: 44px;
+    }
+    
+    .close {
+        min-width: 44px;
+        min-height: 44px;
+    }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    .modal-content {
+        border: 3px solid white;
+    }
+    
+    .card {
+        border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .modal-content,
+    .card,
+    .tab-buttons button,
+    .close {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+/* Print styles */
+@media print {
+    .modal {
+        display: none !important;
+    }
+}
+
+/* Scroll bar stilizatsiyasi */
+.modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.close {
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    font-size: 32px;
+    font-weight: bold;
+    cursor: pointer;
+    color: white;
+    transition: all 0.3s;
+    z-index: 10;
+    line-height: 1;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.close:hover {
+    background: rgba(255, 204, 0, 0.3);
+    color: #ffcc00;
+    transform: rotate(90deg);
+}
+
+.modal-content h2 {
+    font-size: 28px;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+    padding-right: 50px;
+}
+
+.card {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    transition: all 0.3s;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.card:hover {
+    background: rgba(255, 255, 255, 0.18);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.card video {
+    width: 100%;
+    max-width: 70%;
+    height: auto;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    background: #000;
+}
+
+.card p {
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 10px 0 0;
+}
+
+
+.card strong {
+    color: #ffcc00;
+    font-size: 18px;
+}
+
+/* Tab buttons */
+.tab-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.tab-buttons button {
+    flex: 1;
+    min-width: 150px;
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.tab-buttons button:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+}
+
+.tab-buttons button.active {
+    background: rgba(255, 204, 0, 0.4);
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(255, 204, 0, 0.3);
+}
+
+.tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.tab-content pre {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    border-radius: 12px;
+    overflow-x: auto;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #00ff00;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tab-content pre::-webkit-scrollbar {
+    height: 8px;
+}
+
+.tab-content pre::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.tab-content pre::-webkit-scrollbar-thumb {
+    background: rgba(0, 255, 0, 0.3);
+    border-radius: 10px;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Tablet responsive */
+@media (max-width: 1024px) {
+    .modal {
+        padding: 15px 0;
+    }
+    
+    .modal-content {
+        width: 95%;
+        padding: 25px;
+        max-height: 80vh;
+    }
+    
+    .modal-content h2 {
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+    
+    .card {
+        padding: 15px;
+    }
+    
+    .card p {
+        font-size: 15px;
+    }
+    
+    .tab-buttons button {
+        font-size: 15px;
+        padding: 10px 15px;
+    }
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .modal {
+        padding: 10px 0;
+    }
+    
+    .modal-content {
+        width: 96%;
+        padding: 20px 15px;
+        margin: 2vh auto;
+        max-height: 90vh;
+        border-radius: 15px;
+    }
+    
+    .close {
+        right: 10px;
+        top: 10px;
+        font-size: 28px;
+        width: 35px;
+        height: 35px;
+    }
+    
+    .modal-content h2 {
+        font-size: 20px;
+        margin-bottom: 15px;
+        padding-bottom: 12px;
+        padding-right: 45px;
+    }
+    
+    .card {
+        padding: 12px;
+        margin-bottom: 15px;
+        border-radius: 12px;
+    }
+    
+    .card video {
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+    
+    .card p {
+        font-size: 14px;
+        line-height: 1.5;
+    }
+    
+    .card strong {
+        font-size: 16px;
+    }
+    
+    .tab-buttons {
+        gap: 8px;
+        margin-bottom: 15px;
+    }
+    
+    .tab-buttons button {
+        min-width: 120px;
+        font-size: 14px;
+        padding: 10px 12px;
+        border-radius: 8px;
+    }
+    
+    .tab-content pre {
+        padding: 15px;
+        font-size: 12px;
+        line-height: 1.5;
+        border-radius: 10px;
+    }
+}
+
+
+/* Small mobile */
+@media (max-width: 480px) {
+    .modal {
+        padding: 5px 0;
+    }
+    
+    .modal-content {
+        width: 98%;
+        padding: 15px 12px;
+        margin: 1vh auto;
+        max-height: 92vh;
+        border-radius: 12px;
+    }
+    
+    .close {
+        right: 8px;
+        top: 8px;
+        font-size: 24px;
+        width: 30px;
+        height: 30px;
+    }
+    
+    .modal-content h2 {
+        font-size: 18px;
+        margin-bottom: 12px;
+        padding-bottom: 10px;
+        padding-right: 40px;
+    }
+    
+    .card {
+        padding: 10px;
+        margin-bottom: 12px;
+        border-radius: 10px;
+    }
+    
+    .card p {
+        font-size: 13px;
+    }
+    
+    .card strong {
+        font-size: 15px;
+    }
+    
+    .tab-buttons {
+        flex-direction: column;
+        gap: 6px;
+    }
+    
+    .tab-buttons button {
+        width: 100%;
+        min-width: 100%;
+        font-size: 13px;
+        padding: 10px;
+    }
+    
+    .tab-content pre {
+        padding: 12px;
+        font-size: 11px;
+        line-height: 1.4;
+    }
+}
+
+/* Very small mobile */
+@media (max-width: 360px) {
+    .modal-content {
+        padding: 12px 10px;
+    }
+    
+    .modal-content h2 {
+        font-size: 16px;
+    }
+    
+    .card {
+        padding: 8px;
+    }
+    
+    .card p {
+        font-size: 12px;
+    }
+    
+    .tab-buttons button {
+        font-size: 12px;
+        padding: 8px;
+    }
+    
+    .tab-content pre {
+        padding: 10px;
+        font-size: 10px;
+    }
+}
+
+/* Landscape mode fixes */
+@media (max-width: 1024px) and (orientation: landscape) {
+    .modal-content {
+        max-height: 85vh;
+        margin: 2vh auto;
+    }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .tab-buttons button {
+        min-height: 44px;
+    }
+    
+    .close {
+        min-width: 44px;
+        min-height: 44px;
+    }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    .modal-content {
+        border: 3px solid white;
+    }
+    
+    .card {
+        border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .modal-content,
+    .card,
+    .tab-buttons button,
+    .close {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+/* Print styles */
+@media print {
+    .modal {
+        display: none !important;
+    }
+}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+           
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: auto;
+        }
+
+        /* HEADER */
+        .header {
+            display: flex;
+            align-items: center;
+            background: rgba(0, 0, 117, 0.9);
+            color: white;
+            padding: 15px 25px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            border-radius: 15px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+        }
+
+        /* MAIN LAYOUT */
+        .main-container {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        /* LEFT PANEL */
+        .left-panel {
+            width: 280px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            height: fit-content;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .control-group {
+            margin-bottom: 25px;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 20px;
+        }
+
+        .control-group h3 {
+            margin-bottom: 15px;
+            color: #333;
+            font-size: 18px;
+            text-align: center;
+            padding: 10px;
+            background: linear-gradient(45deg, #000075, #4169e1);
+            color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 12px 15px;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 10px;
+            font-size: 14px;
+            border-radius: 10px;
+            transition: all 0.3s;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .btn-success { 
+            background: linear-gradient(45deg, #28a745, #20c997); 
+            color: white; 
+        }
+        .btn-danger { 
+            background: linear-gradient(45deg, #dc3545, #ff6b6b); 
+            color: white; 
+        }
+        .btn-primary { 
+            background: linear-gradient(45deg, #000075, #4169e1); 
+            color: white; 
+        }
+        .btn-info { 
+            background: linear-gradient(45deg, #17a2b8, #20c997); 
+            color: white; 
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            flex: 1;
+            min-width: 600px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 25px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        /* CIRCUIT DIAGRAM */
+        .circuit-container {
+        
+            justify-content: center;
+            align-items: center;
+            gap: 60px;
+     
+            flex-wrap: wrap;
+            min-height: 500px;
+            position: relative;
+        }
+
+        .component {
+            
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+        }
+
+        .component-box {
+           
+            
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+            text-align: center;
+        
+           
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+       
+
+        /* ENHANCED PHONE DESIGN */
+        .phone {
+            background: linear-gradient(145deg, #2c3e50, #34495e);
+            width: 100px;
+            height: 180px;
+            border-radius: 25px;
+            border: 4px solid #1a252f;
+            position: absolute;
+            top: 250px;
+            left:120px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            
+        }
+
+        .phone-screen {
+            position: absolute;
+            top: 20px;
+            left: 10px;
+            right: 10px;
+            bottom: 20px;
+            background: linear-gradient(145deg, #1e3c72, #2a5298);
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px;
+        }
+
+        .phone-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .phone-btn {
+            padding: 6px 8px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 10px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            color: white;
+        }
+
+        .phone-btn-on {
+            background: linear-gradient(45deg, #4caf50, #8bc34a);
+        }
+
+        .phone-btn-off {
+            background: linear-gradient(45deg, #f44336, #ff5722);
+        }
+
+        .phone-btn-connect {
+            background: linear-gradient(45deg, #2196f3, #03a9f4);
+        }
+
+        .phone-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(255,255,255,0.3);
+        }
+
+        .phone-status {
+            font-size: 8px;
+            color: #fff;
+            text-align: center;
+        }
+
+      
+        .component-box:hover {
+            transform: scale(1.08);
+            
+        }
+
+        /* ENHANCED WATER FLOW ANIMATION */
+        .water-container {
+            position: absolute;
+            top: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 200px;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .water-drop {
+            position: absolute;
+            width: 8px;
+            height: 15px;
+            background: linear-gradient(to bottom, #87ceeb, #4169e1);
+            border-radius: 0 0 50% 50%;
+            opacity: 0;
+            animation-fill-mode: forwards;
+        }
+
+        .water-drop.active {
+            opacity: 0.9;
+            animation: waterDrop 1.5s linear infinite;
+        }
+
+        @keyframes waterDrop {
+            0% {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.9;
+            }
+            90% {
+                opacity: 0.9;
+            }
+            100% {
+                transform: translateY(180px);
+                opacity: 0;
+            }
+        }
+
+        /* WATER SPLASH EFFECT */
+        .water-splash {
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 20px;
+            background: radial-gradient(circle, rgba(135,206,235,0.6) 0%, transparent 70%);
+            border-radius: 50%;
+            opacity: 0;
+            animation-fill-mode: forwards;
+        }
+
+        .water-splash.active {
+            animation: splash 1.5s ease-out infinite;
+        }
+
+        @keyframes splash {
+            0% {
+                opacity: 0;
+                transform: translateX(-50%) scale(0.5);
+            }
+            20% {
+                opacity: 0.8;
+                transform: translateX(-50%) scale(1);
+            }
+            80% {
+                opacity: 0.8;
+                transform: translateX(-50%) scale(1.5);
+            }
+            100% {
+                opacity: 0;
+                transform: translateX(-50%) scale(2);
+            }
+        }
+
+        /* PUMP ANIMATION */
+        .pump.active {
+            animation: pumpWorking 0.8s infinite;
+        }
+
+        @keyframes pumpWorking {
+            0% { 
+                transform: scale(1); 
+                box-shadow: 0 8px 25px rgba(40, 167, 69, 0.4);
+            }
+            50% { 
+                transform: scale(1.05); 
+                box-shadow: 0 12px 35px rgba(40, 167, 69, 0.8);
+            }
+            100% { 
+                transform: scale(1); 
+                box-shadow: 0 8px 25px rgba(40, 167, 69, 0.4);
+            }
+        }
+        
+
+        /* STATUS INDICATORS */
+        .status-section {
+            margin-top: 30px;
+            padding: 25px;
+            background: rgba(0,0,0,0.05);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 15px 0;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+
+
+        .wire{
+
+            position: absolute;
+            z-index: 1;
+        }
+        .wire-red{
+            background-color: red;
+            top: 173px;
+            right: 530px;
+            width: 3px;
+            height:280px;
+              transform: rotate(-2deg);
+        }
+        .wire-black{
+            background-color: black;
+            top: 180px;
+            right: 558px;
+            width: 4px;
+            height:100px;
+            transform: rotate(15deg);
+        }
+        .wire-green{
+            background-color: green;
+            top: 180px;
+            right: 561px;
+            width: 4px;
+            height:100px;
+            transform: rotate(-13deg);
+        }
+         .wire-orange{
+            background-color: orange;
+            top: 178px;
+            right: 560px;
+            width: 4px;
+            height:100px;
+            transform: rotate();
+        }
+        .status-led {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: #dc3545;
+            transition: all 0.4s ease;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+        }
+          .wire-red1{
+            background-color: red;
+            top: 442px;
+            right: 555px;
+            width: 2px;
+            height:110px;
+              transform: rotate(32deg);
+        }
+        .wire-black1{
+            background-color: black;
+            top: 450px;
+            right: 505px;
+            width: 4px;
+            height:50px;
+            
+        }
+         .wire-black2{
+            background-color: black;
+            top: 500px;
+            right: 505px;
+            width: 85px;
+            height:3px;
+            
+        }
+         .wire-black3{
+            background-color: black;
+            top: 500px;
+            right: 590px;
+            width: 2px;
+            height:45px;
+            
+        }
+        @media (min-width:1605px) and  (max-width:5605px) {
+            .wire{
+                position: absolute;
+                left: 50%;
+            }
+            .wire-black2{
+                display: none;
+            }
+             .wire-black1{
+                  display: none;
+        
+             }
+             .wire-black3{
+            background-color: black;
+              top: 440px;
+            right: 555px;
+            width: 2px;
+            height:120px;
+             
+            transform: rotate(35deg);
+            
+        }
+        .wire-red{
+            background-color: red;
+            top: 173px;
+            right: 530px;
+            width: 3px;
+            height:280px;
+              transform: rotate(-10deg);
+        }
+.wire-green{
+            background-color: green;
+            top: 180px;
+            right: 561px;
+            width: 4px;
+            height:100px;
+            transform: rotate(-15deg);
+        }
+        }
+        .status-led.on {
+            background: #28a745;
+            box-shadow: 0 0 20px rgba(40, 167, 69, 0.8);
+        }
+
+        /* CONTROL BUTTONS */
+        .control-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin: 40px 0;
+            flex-wrap: wrap;
+        }
+
+        .control-button {
+            padding: 18px 30px;
+            border: none;
+            border-radius: 35px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            transition: all 0.4s ease;
+            min-width: 160px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+
+        .btn-connect {
+            background: linear-gradient(45deg, #2196f3, #21cbf3);
+            color: white;
+        }
+
+        .btn-pump-on {
+            background: linear-gradient(45deg, #4caf50, #8bc34a);
+            color: white;
+        }
+
+        .btn-pump-off {
+            background: linear-gradient(45deg, #f44336, #ff9800);
+            color: white;
+        }
+
+        .control-button:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.4);
+        }
+
+        /* NOTIFICATION */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 15px;
+            color: white;
+            font-weight: bold;
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: all 0.4s ease;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background: linear-gradient(45deg, #4caf50, #8bc34a);
+        }
+
+        .notification.error {
+            background: linear-gradient(45deg, #f44336, #ff5722);
+        }
+
+        .notification.info {
+            background: linear-gradient(45deg, #2196f3, #03a9f4);
+        }
+
+        /* RESPONSIVE DESIGN */
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .left-panel {
+                width: 100%;
+            }
+            
+            .main-content {
+                min-width: auto;
+            }
+            
+            .circuit-container {
+                flex-direction: column;
+                gap: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="logo">
+                           <a href="/"><img src="/static/image/logo.png" width="80px" height="80px" alt=""></a>
+            <span>Arduino Bluetooth Nasos Boshqaruvi</span>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <div class="main-container">
+        <!-- LEFT PANEL -->
+        <div class="left-panel">
+            <div class="control-group">
+                <h3>Bluetooth Boshqaruv</h3>
+                <button class="btn btn-primary" onclick="connectBluetooth()" id="connectBtn">
+                    📱 Bluetooth Ulash
+                </button>
+                <button class="btn btn-info" onclick="disconnectBluetooth()" id="disconnectBtn">
+                    ❌ Uzish
+                </button>
+            </div>
+
+            <div class="control-group">
+                <h3>Nasos Boshqaruv</h3>
+                <button class="btn btn-success" onclick="turnOnPump()" id="pumpOnBtn">
+                    ⚡ Nasosni Yoqish
+                </button>
+                <button class="btn btn-danger" onclick="turnOffPump()" id="pumpOffBtn">
+                    🔌 Nasosni O'chirish
+                </button>
+            </div>
+<div class="control-group">
+    <h3>Ma'lumotlar</h3>
+    <button class="btn btn-primary" id="schemaBtn">💡 Sxema qayerda ishlatiladi</button>
+    <button class="btn btn-primary" id="codeBtn">💻 Kod</button>
+    <button class="btn btn-primary" id="componentsBtn">🔌 Qurilmalar</button>
+</div>
+
+            <div class="control-group">
+                <h3>Tizim Holati</h3>
+                <div class="status-row">
+                    <span>Bluetooth:</span>
+                    <div class="status-led" id="bluetoothLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Arduino:</span>
+                    <div class="status-led" id="arduinoLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Nasos:</span>
+                    <div class="status-led" id="pumpLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Quvvat:</span>
+                    <div class="status-led" id="powerLed"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+            <!-- CIRCUIT DIAGRAM -->
+            <div class="circuit-container">
+                <!-- PHONE WITH CONTROLS -->
+                <div class="component">
+                    <div class="component-box phone">
+                        <div class="phone-screen">
+                            <div class="phone-status" id="phoneStatus">Arduino Control</div>
+                            <div class="phone-controls">
+                                <button class="phone-btn phone-btn-connect" onclick="connectBluetooth()">
+                                    📶 Ulan
+                                </button>
+                                <button class="phone-btn phone-btn-on" onclick="turnOnPump()">
+                                    🚰 ON
+                                </button>
+                                <button class="phone-btn phone-btn-off" onclick="turnOffPump()">
+                                    ⛔ OFF
+                                </button>
+                            </div>
+                            <div class="phone-status" id="phoneConnStatus">Uzilgan</div>
+                        </div>
+                    </div>
+            
+                </div>
+
+                <!-- BLUETOOTH MODULE -->
+                <div class="component">
+                    <div class="component-box bluetooth" id="bluetoothModule">
+                       <img src="/static/image/bluetooth-hc-05-removebg-preview.png" width="100px" height="200px" alt="">
+                    </div>
+                    
+                </div>
+
+                <!-- ARDUINO -->
+                <div class="component">
+                    <div class="component-box arduino" id="arduinoBoard">
+                      <img src="/static/image/arduino1 - Copy.png" width="340px" height="320px" alt="">
+                    </div>
+                    
+                </div>
+                <div class="wire wire-red"></div>
+                <div class="wire wire-red1"></div>
+                <div class="wire wire-orange"></div>
+                <div class="wire wire-green"></div>
+                <div class="wire wire-black"></div>
+                <div class="wire wire-black1"></div>
+                <div class="wire wire-black2"></div>
+                <div class="wire wire-black3"></div>
+                <!-- PUMP WITH ENHANCED WATER ANIMATION -->
+                <div class="component">
+                    <div class="component-box pump" id="waterPump">
+                     <img src="/static/image/dcpump-removebg-preview.png" width="150px" height="150px" walt="">
+                        
+                        <!-- WATER ANIMATION CONTAINER -->
+                        <div class="water-container" id="waterContainer">
+                            <div class="water-drop" id="waterDrop1"></div>
+                            <div class="water-drop" id="waterDrop2"></div>
+                            <div class="water-drop" id="waterDrop3"></div>
+                            <div class="water-drop" id="waterDrop4"></div>
+                            <div class="water-drop" id="waterDrop5"></div>
+                        </div>
+                        
+                        <!-- WATER SPLASH EFFECT -->
+                        <div class="water-splash" id="waterSplash"></div>
+                    </div>
+                            </div>
+
+                <!-- BATTERY -->
+                
+            </div>
+
+            <!-- CONTROL BUTTONS -->
+            <div class="control-buttons">
+                <button class="control-button btn-connect" onclick="simulateConnection()">
+                    🔗 Ulanishni Sinash
+                </button>
+                <button class="control-button btn-pump-on" onclick="simulatePumpOn()">
+                    🚰 Nasos Yoqish
+                </button>
+                <button class="control-button btn-pump-off" onclick="simulatePumpOff()">
+                    🛑 Nasos O'chirish
+                </button>
+            </div>
+
+            <!-- STATUS SECTION -->
+            <div class="status-section">
+                <h3 style="text-align: center; margin-bottom: 20px;">Tizim Holati</h3>
+                <div id="systemStatus">
+                    <p><strong>Oxirgi buyruq:</strong> <span id="lastCommand">Hech qanday</span></p>
+                    <p><strong>Ulanish vaqti:</strong> <span id="connectionTime">--:--</span></p>
+                    <p><strong>Nasos holati:</strong> <span id="pumpStatus">O'chiq</span></p>
+                    <p><strong>Suv oqimi:</strong> <span id="waterFlowStatus">Yo'q</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+<!-- ✅ 1) Sxema qayerda ishlatiladi (DC Motor / L298N) -->
+    <div class="modal" id="schemaModal">
+        <div class="modal-content">
+            <span class="close" title="Yopish">&times;</span>
+            <h2>💡 Sxema qayerda ishlatiladi </h2>
+
+            <div class="flex-container-40-60">
+                <div class="flex-video-40">
+                    <!-- 1-video (xohlasangiz almashtiring) -->
+                    <iframe src="https://www.youtube.com/embed/KRDgay5uSmw?si=7VvA5T7g08vVxBjN" title="DC Motor Control with L298N"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen></iframe>
+                </div>
+                <div class="flex-text-60">
+                    <strong>Arduino DC Nasos Boshqaruvi</strong>
+                   <p>Bluetooth HC-05 → Arduino UNO ulanishi
+HC-05 pini	Arduino pini
+VCC	5V
+GND	GND
+TXD	D0 (RX)
+RXD	D1 (TX)</p>
+                </div>
+            </div>
+
+            <div class="flex-container-40-60">
+                <div class="flex-video-40">
+                    <!-- 2-video (ixtiyoriy) -->
+                    <iframe src="https://www.youtube.com/embed/Skgv3DF5qxw?si=59I7sEIwG4cmepcU" title="PWM Speed Control"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen></iframe>
+                </div>
+                <div class="flex-text-60">
+                    <strong>🔄 Ishlash prinsipi</strong>
+                    <p>Telefon Bluetooth orqali HC-05 modulga komanda yuboradi
+Masalan: "ON" yoki "OFF".
+
+HC-05 bu komandani Arduino RX piniga uzatadi.
+
+Arduino bu komandani Serial orqali o‘qiydi.
+
+Agar "ON" bo‘lsa → motorga 5V beradi
+Agar "OFF" bo‘lsa → motorni o‘chiradi</p>
+                </div>
+            </div>
+              <div class="flex-container-40-60">
+                <div class="flex-video-40">
+                    <!-- 2-video (ixtiyoriy) -->
+                    <iframe src="https://www.youtube.com/embed/7RT2V2TS0Sc?si=ogGabeqpWGvnoJQ6" title="PWM Speed Control"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen></iframe>
+                </div>
+                <div class="flex-text-60">
+                    <strong>Qo‘shimcha tajriba g‘oyalari</strong>
+               <p></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+  <div class="modal" id="codeModal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>💻 Kod</h2>
+
+        <div class="tab-buttons">
+            <button class="tab-btn active" data-tab="mblock">mBlock Kodi</button>
+            <button class="tab-btn" data-tab="arduino">Arduino Kodi</button>
+        </div>
+
+        <div class="tab-content active" id="mblock">
+            <pre><img src="/static/image/arduino bluetooth car.jpg" alt="mBlock Code" style="width: 80%; height: auto;"></pre>
+        </div>
+
+        <div class="tab-content" id="arduino">
+            <pre>
+String data = "";
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(13, OUTPUT);
+}
+
+void loop() {
+  if (Serial.available() > 0) {
+    data = Serial.readString();
+    
+    if (data == "ON") {
+      digitalWrite(13, HIGH);
+    }
+    if (data == "OFF") {
+      digitalWrite(13, LOW);
+    }
+  }
+}
+
+            </pre>
+        </div>
+    </div>
+</div>
+    <!-- ✅ 3) Qurilmalar -->
+    <div class="modal" id="componentsModal">
+        <div class="modal-content">
+            <span class="close" title="Yopish">&times;</span>
+            <h2>🔌 Ishlatilgan Qurilmalar</h2>
+
+
+            <div class="flex-container-30-70">
+                <div class="flex-image-30"><img src="/static/image/arduino1 - Copy.png" alt="Breadboard"></div>
+                <div class="flex-text-70">
+                    <strong>Arduino UNO</strong>
+                    <p>Arduino UNO — mikrokontroller plata bo‘lib, butun tizimning “miyasi” hisoblanadi. Sensorlardan maʼlumot oladi, Bluetooth moduli bilan aloqa qiladi va motorni boshqaradi.
+
+Vazifasi:
+
+Bluetooth moduldan kelgan buyruqlarni o‘qish
+
+Motorni ON/OFF qilish
+
+Quvvat taqsimlash</p>
+                </div>
+            </div>
+                       <div class="flex-container-30-70">
+                <div class="flex-image-30"><img src="/static/image/bluetooth-hc-05-removebg-preview.png" alt="Breadboard"></div>
+                <div class="flex-text-70">
+                    <strong>HC-05 Bluetooth Modul</strong>
+                    <p>HC-05 — Arduino bilan telefon orasida kabelli emas, simsiz (Bluetooth) aloqa yaratadigan modul.
+
+Vazifasi:
+
+Telefon → Arduino (komanda yuborish)
+
+Arduino → Telefon (status qaytarish)
+
+Pinlari:
+
+VCC → 5V
+
+GND → GND
+
+TXD → Transmit (Arduino RX ga ketadi)
+
+RXD → Receive (Arduino TX ga ketadi)</p>
+                </div>
+            </div>
+                       <div class="flex-container-30-70">
+                <div class="flex-image-30"><img src="/static/image/dcpump-removebg-preview.png" alt="Breadboard"></div>
+                <div class="flex-text-70">
+                    <strong>Mini DC Motor (5V suv nasosi yoki oddiy motor)</strong>
+                    <p>
+                        Bu kichik 5V motor bo‘lib, Arduino bilan boshqariladigan aktuator.
+
+Vazifasi:
+
+Arduino’dan signal kelganda aylanish
+
+Nasos, fan, propeller yoki kichik mexanik tizimni aylantirish
+
+⚠ MUHIM: DC motorni to‘g‘ridan-to‘g‘ri Arduino’dan quvvatlash tavsiya etilmaydi, lekin rasmda shunday ko‘rsatilgani uchun tushuntirib berildi. Amalda transistor + diod qo‘shilgan bo‘lishi kerak.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ✅ 4) Qo'shimcha info (ixtiyoriy) + suzuvchi tugma -->
+    <div class="modal" id="infoModal">
+        <div class="modal-content">
+            <span class="close" title="Yopish">&times;</span>
+            <h2>📚 Qo'shimcha Ma'lumot</h2>
+            <div class="video-full">
+                <video controls>
+                    <source src="/media/2.mp4" type="video/mp4">
+                    Brauzeringiz video formatni qo'llab-quvvatlamaydi.
+                </video>
+            </div>
+        </div>
+    </div>
+
+    <button id="infoFloatingBtn"><span>📚</span><span>Ma'lumot</span></button>
+
+    <!-- NOTIFICATION -->
+    <div class="notification" id="notification"></div>
+
+    <script>
+        // System State Variables
+        let bluetoothConnected = false;
+        let arduinoConnected = false;
+        let pumpRunning = false;
+        let powerOn = true;
+        let waterFlowActive = false;
+// Modalni ochish
+function openModal(id) {
+    document.getElementById(id).style.display = "block";
+}
+
+// Tugmalarni ulash
+document.getElementById("schemaBtn").addEventListener("click", () => openModal("schemaModal"));
+document.getElementById("codeBtn").addEventListener("click", () => openModal("codeModal"));
+document.getElementById("componentsBtn").addEventListener("click", () => openModal("componentsModal"));
+document.getElementById("infoFloatingBtn").addEventListener("click", () => openModal("infoModal"));
+
+// Yopish tugmalari
+document.querySelectorAll(".close").forEach(btn => {
+    btn.addEventListener("click", function() {
+        this.closest(".modal").style.display = "none";
+    });
+});
+
+// Tab switching (Kod uchun)
+document.querySelectorAll(".tab-btn").forEach(button => {
+    button.addEventListener("click", function() {
+        const tab = this.dataset.tab;
+        document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+        this.classList.add("active");
+        document.querySelectorAll(".tab-content").forEach(content => {
+            content.classList.remove("active");
+            if (content.id === tab) content.classList.add("active");
+        });
+    });
+});
+        // DOM Elements
+        const elements = {
+            bluetoothLed: document.getElementById('bluetoothLed'),
+            arduinoLed: document.getElementById('arduinoLed'),
+            pumpLed: document.getElementById('pumpLed'),
+            powerLed: document.getElementById('powerLed'),
+            lastCommand: document.getElementById('lastCommand'),
+            connectionTime: document.getElementById('connectionTime'),
+            pumpStatus: document.getElementById('pumpStatus'),
+            waterFlowStatus: document.getElementById('waterFlowStatus'),
+            notification: document.getElementById('notification'),
+            bluetoothModule: document.getElementById('bluetoothModule'),
+            arduinoBoard: document.getElementById('arduinoBoard'),
+            waterPump: document.getElementById('waterPump'),
+            powerSource: document.getElementById('powerSource'),
+            phoneStatus: document.getElementById('phoneStatus'),
+            phoneConnStatus: document.getElementById('phoneConnStatus'),
+            waterContainer: document.getElementById('waterContainer'),
+            waterSplash: document.getElementById('waterSplash')
+        };
+
+        // Initialize system
+        function initializeSystem() {
+            updateSystemStatus();
+            showNotification('Tizim ishga tushirildi', 'info');
+        }
+
+        // Update system status display
+        function updateSystemStatus() {
+            elements.bluetoothLed.classList.toggle('on', bluetoothConnected);
+            elements.arduinoLed.classList.toggle('on', arduinoConnected);
+            elements.pumpLed.classList.toggle('on', pumpRunning);
+            elements.powerLed.classList.toggle('on', powerOn);
+
+            // Update phone screen
+            elements.phoneConnStatus.textContent = bluetoothConnected ? 'Ulangan ✅' : 'Uzilgan ❌';
+            elements.phoneConnStatus.style.color = bluetoothConnected ? '#4caf50' : '#f44336';
+
+            // Update pump status
+            elements.pumpStatus.textContent = pumpRunning ? 'Ishlayapti' : 'O\'chiq';
+            elements.pumpStatus.style.color = pumpRunning ? '#4caf50' : '#f44336';
+
+            // Update water flow status
+            elements.waterFlowStatus.textContent = waterFlowActive ? 'Faol 💧' : 'Yo\'q';
+            elements.waterFlowStatus.style.color = waterFlowActive ? '#2196f3' : '#666';
+
+            // Visual effects
+            elements.waterPump.classList.toggle('active', pumpRunning);
+            
+            // Control water animation
+            controlWaterAnimation(pumpRunning);
+        }
+
+        // Enhanced water animation control
+        function controlWaterAnimation(active) {
+            waterFlowActive = active;
+            const waterDrops = document.querySelectorAll('.water-drop');
+            const waterSplash = elements.waterSplash;
+            
+            waterDrops.forEach((drop, index) => {
+                if (active) {
+                    drop.classList.add('active');
+                    drop.style.animationDelay = `${index * 0.3}s`;
+                } else {
+                    drop.classList.remove('active');
+                }
+            });
+
+            if (active) {
+                waterSplash.classList.add('active');
+            } else {
+                waterSplash.classList.remove('active');
+            }
+        }
+
+        // Bluetooth connection functions
+        function connectBluetooth() {
+            if (bluetoothConnected) {
+                showNotification('Bluetooth allaqachon ulangan!', 'info');
+                return;
+            }
+
+            showNotification('Bluetooth ulanishni sinab ko\'rmoqda...', 'info');
+            
+            // Simulate connection delay
+            setTimeout(() => {
+                bluetoothConnected = true;
+                arduinoConnected = true;
+                elements.connectionTime.textContent = new Date().toLocaleTimeString();
+                updateSystemStatus();
+                showNotification('Bluetooth muvaffaqiyatli ulandi!', 'success');
+                elements.lastCommand.textContent = 'Bluetooth ulash';
+                
+                // Add visual feedback
+                elements.bluetoothModule.style.boxShadow = '0 0 25px rgba(30, 144, 255, 0.8)';
+            }, 2000);
+        }
+
+        function disconnectBluetooth() {
+            if (!bluetoothConnected) {
+                showNotification('Bluetooth allaqachon uzilgan!', 'info');
+                return;
+            }
+
+            bluetoothConnected = false;
+            arduinoConnected = false;
+            pumpRunning = false;
+            updateSystemStatus();
+            showNotification('Bluetooth uzildi', 'info');
+            elements.lastCommand.textContent = 'Bluetooth uzish';
+            
+            // Remove visual feedback
+            elements.bluetoothModule.style.boxShadow = '0 8px 25px rgba(0,0,0,0.4)';
+        }
+
+        // Pump control functions
+        function turnOnPump() {
+            if (!bluetoothConnected) {
+                showNotification('Avval Bluetooth ulang!', 'error');
+                return;
+            }
+
+            if (pumpRunning) {
+                showNotification('Nasos allaqachon ishlayapti!', 'info');
+                return;
+            }
+
+            pumpRunning = true;
+            updateSystemStatus();
+            showNotification('Nasos yoqildi! Suv oqishi boshlandi 💧', 'success');
+            elements.lastCommand.textContent = 'Nasos yoqish';
+            
+            // Add pump glow effect
+            elements.waterPump.style.boxShadow = '0 0 30px rgba(40, 167, 69, 0.8)';
+        }
+
+        function turnOffPump() {
+            if (!bluetoothConnected) {
+                showNotification('Avval Bluetooth ulang!', 'error');
+                return;
+            }
+
+            if (!pumpRunning) {
+                showNotification('Nasos allaqachon o\'chiq!', 'info');
+                return;
+            }
+
+            pumpRunning = false;
+            updateSystemStatus();
+            showNotification('Nasos o\'chirildi! Suv oqishi to\'xtatildi', 'info');
+            elements.lastCommand.textContent = 'Nasos o\'chirish';
+            
+            // Remove pump glow effect
+            elements.waterPump.style.boxShadow = '0 8px 25px rgba(0,0,0,0.4)';
+        }
+
+        // Simulation functions for testing
+        function simulateConnection() {
+            connectBluetooth();
+        }
+
+        function simulatePumpOn() {
+            turnOnPump();
+        }
+
+        function simulatePumpOff() {
+            turnOffPump();
+        }
+
+        // Notification system
+        function showNotification(message, type = 'info') {
+            const notification = elements.notification;
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 4000);
+        }
+
+        // Initialize system when page loads
+        window.addEventListener('load', initializeSystem);
+
+        // Add interactive effects
+        document.querySelectorAll('.component-box').forEach(box => {
+            box.addEventListener('click', function() {
+                this.style.transform = 'scale(1.1)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1)';
+                }, 300);
+            });
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.key === '1') connectBluetooth();
+            if (e.key === '2') turnOnPump();
+            if (e.key === '3') turnOffPump();
+            if (e.key === '4') disconnectBluetooth();
+        });
+
+        // Add realistic water sound simulation
+        function playWaterSound() {
+            if (pumpRunning) {
+                console.log('🌊 Suv oqish tovushi...');
+            }
+        }
+
+        // Periodic water sound simulation
+        setInterval(() => {
+            if (pumpRunning) {
+                playWaterSound();
+            }
+        }, 2000);
+
+        // Enhanced phone screen updates
+        setInterval(() => {
+            if (bluetoothConnected) {
+                elements.phoneStatus.textContent = pumpRunning ? '💧 Suv oqmoqda' : '⏹️ Kutish rejimi';
+            } else {
+                elements.phoneStatus.textContent = '📱 Arduino Control';
+            }
+        }, 1000);
+
+        // Arduino code simulation for reference
+        const arduinoCode = `
+// Arduino Bluetooth Nasos Boshqaruvi
+#include <SoftwareSerial.h>
+
+SoftwareSerial bluetooth(2, 3); // RX, TX
+const int pumpPin = 7;
+const int ledPin = 13;
+
+void setup() {
+    Serial.begin(9600);
+    bluetooth.begin(9600);
+    pinMode(pumpPin, OUTPUT);
+    pinMode(ledPin, OUTPUT);
+    
+    Serial.println("Arduino Bluetooth Nasos Boshqaruvi tayyor");
+}
+
+void loop() {
+    if (bluetooth.available()) {
+        String command = bluetooth.readString();
+        command.trim();
+        
+        if (command == "PUMP_ON") {
+            digitalWrite(pumpPin, HIGH);
+            digitalWrite(ledPin, HIGH);
+            bluetooth.println("Nasos yoqildi");
+            Serial.println("Nasos yoqildi - Suv oqishi boshlandi");
+        }
+        else if (command == "PUMP_OFF") {
+            digitalWrite(pumpPin, LOW);
+            digitalWrite(ledPin, LOW);
+            bluetooth.println("Nasos o'chirildi");
+            Serial.println("Nasos o'chirildi - Suv oqishi to'xtatildi");
+        }
+        else if (command == "STATUS") {
+            boolean pumpStatus = digitalRead(pumpPin);
+            bluetooth.print("Nasos holati: ");
+            bluetooth.println(pumpStatus ? "Yoqiq" : "O'chiq");
+        }
+    }
+    
+    delay(100);
+}`;
+
+    </script>
+</body>
+</html>

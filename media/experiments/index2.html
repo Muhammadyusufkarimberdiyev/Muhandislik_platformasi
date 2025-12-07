@@ -1,0 +1,1500 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>360° Servo Motor & Robot Arm Control</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #e6f3ff;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: auto;
+        }
+
+        /* HEADER */
+        .header {
+            display: flex;
+            align-items: center;
+            background: #000075;
+            color: white;
+            padding: 10px 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            width: 100%;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .logo-icon img {
+            border-radius: 50%;
+            border: 2px solid white;
+            width: 40px;
+            height: 40px;
+        }
+
+        /* MAIN LAYOUT */
+        .main-container {
+            display: flex;
+            margin-top: 20px;
+            gap: 20px;
+         
+
+        }
+
+        /* LEFT PANEL */
+        .left-panel {
+            width: 250px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            height: fit-content;
+            position: relative;
+            z-index: 1;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 15px;
+        }
+
+        .control-group h3 {
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 8px;
+            font-size: 14px;
+            border-radius: 5px;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn-success { 
+            background: #28a745; 
+            color: white; 
+        }
+        .btn-danger { 
+            background: #dc3545; 
+            color: white; 
+        }
+        .btn-primary { 
+            background: #000075; 
+            color: white; 
+        }
+        .btn-info { 
+            background: #000075; 
+            color: white; 
+        }
+
+        /* STATUS LEDS */
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 8px 0;
+            font-size: 13px;
+        }
+
+        .status-led {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #dc3545;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+        }
+
+        .status-led.on {
+            background: #28a745;
+            box-shadow: 0 0 10px rgba(40, 167, 69, 0.8);
+        }
+
+        /* CONTROL PANEL */
+        .control-panel {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        .control-button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            min-width: 120px;
+        }
+
+        .btn-power {
+            background: linear-gradient(45deg, #4169e1, #8a2be2);
+            color: white;
+        }
+
+        .btn-test {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+        }
+
+        .btn-reset {
+            background: #000075;
+            color: white;
+        }
+
+        .control-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .control-button:active {
+            transform: translateY(-1px);
+        }
+
+        /* Servo Motor Styles */
+        .container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            margin-left: 146px;
+        }
+
+        .circuit-board {
+            position: relative;
+            width: 100%;
+            height: 700px;
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            border: 2px solid #000075;
+        }
+
+        /* Component containers */
+        .servo-container {
+            position: absolute;
+            top: 100px;
+            left: 150px;
+            width: 120px;
+            height: 80px;
+        }
+
+        .servo-motor {
+            width: 100%;
+            height: 100%;
+            border-radius: 8px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        /* Servo pins */
+        .servo-pin {
+            position: absolute;
+            width: 8px;
+            height: 4px;
+            background: #FFD700;
+        }
+
+        .servo-pin-vcc { top: -4px; left: 20px; }
+        .servo-pin-gnd { top: -4px; left: 50px; }
+        .servo-pin-sig { top: -4px; left: 80px; }
+
+        .ne555-container {
+            position: absolute;
+            top: 250px;
+            left: 200px;
+            width: 80px;
+            height: 60px;
+        }
+
+        .ne555-chip {
+            width: 100%;
+            height: 100%;
+            background: #333;
+            border-radius: 8px;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            position: relative;
+        }
+
+        .chip-pins {
+            position: absolute;
+        }
+
+        .pin {
+            width: 3px;
+            height: 8px;
+            background: #666;
+            position: absolute;
+        }
+
+        .potentiometer-container {
+            position: absolute;
+            bottom: 150px;
+            left: 100px;
+            width: 60px;
+            height: 80px;
+        }
+
+        .potentiometer {
+            width: 50px;
+            height: 50px;
+            background: #8D6E63;
+            border-radius: 50%;
+            border: 3px solid #5D4037;
+            position: relative;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .pot-knob {
+            width: 30px;
+            height: 30px;
+            background: #FFA726;
+            border-radius: 50%;
+            position: relative;
+            transition: transform 0.1s ease;
+        }
+
+        .pot-indicator {
+            position: absolute;
+            top: 2px;
+            left: 50%;
+            width: 2px;
+            height: 12px;
+            background: #333;
+            transform-origin: 50% 100%;
+        }
+
+        .capacitor-container {
+            position: absolute;
+            top: 200px;
+            left: 50px;
+            width: 40px;
+            height: 60px;
+        }
+
+        .capacitor {
+            width: 25px;
+            height: 40px;
+            background: #FFA726;
+            border-radius: 8px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .resistor-container {
+            position: absolute;
+            bottom: 200px;
+            right: 100px;
+        }
+
+        .resistor {
+            width: 50px;
+            height: 15px;
+            background: #D2691E;
+            border-radius: 7px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+            color: white;
+        }
+
+        .resistor-bands {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                to right,
+                transparent 0px,
+                transparent 8px,
+                #8B4513 8px,
+                #8B4513 10px
+            );
+        }
+
+        .battery-container {
+            position: absolute;
+            bottom: 50px;
+            left: 50px;
+            width: 100px;
+            height: 40px;
+        }
+
+        .battery {
+            width: 80px;
+            height: 30px;
+            border-radius: 5px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .battery-terminal {
+            position: absolute;
+            right: -5px;
+            top: 8px;
+            width: 8px;
+            height: 14px;
+            background: #2E7D32;
+            border-radius: 2px;
+        }
+
+        /* Wires */
+        .wire {
+            position: absolute;
+            border-radius: 2px;
+            z-index: 1;
+        }
+
+        .wire-red { background: #FF5722; }
+        .wire-black { background: #333; }
+        .wire-blue { background: #2196F3; }
+        .wire-purple { background: #9C27B0; }
+        .wire-orange { background: #FF9800; }
+
+        .wire-h {
+            height: 4px;
+        }
+
+        .wire-v {
+            width: 4px;
+        }
+
+        .connection-point {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: #666;
+            border-radius: 50%;
+            z-index: 2;
+            border: 2px solid #fff;
+        }
+
+        /* Control Panel */
+        .servo-control-panel {
+            position: absolute;
+            right: 20px;
+            top: 100px;
+            background: rgba(255,255,255,0.9);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            width: 200px;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+        }
+        .control-group {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 15px;
+        }
+
+        .control-group h3 {
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 16px;
+        }
+        .control-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: #ddd;
+            outline: none;
+       
+        }
+
+        .slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #2196F3;
+            cursor: pointer;
+        }
+
+        .value-display {
+            text-align: center;
+            padding: 10px;
+            background: #f0f0f0;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .pwm-indicator {
+            width: 100%;
+            height: 30px;
+            background: #f0f0f0;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            position: relative;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .pwm-signal {
+            height: 100%;
+            background: #4CAF50;
+            transition: width 0.2s ease;
+        }
+
+        .status-led {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: #4CAF50;
+            box-shadow: 0 0 10px #4CAF50;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .footer-text {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #666;
+            font-size: 12px;
+            background: rgba(255,255,255,0.8);
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+        
+        .wire {
+            position: absolute;
+            z-index: 10;
+        }
+
+        /* Red wire - VCC */
+        .wire-red {
+          width: 30px;
+            height: 3px;
+            background: red;
+            left: 120px;
+            top: 135px;
+        }
+        
+        .wire-red1{
+          width: 90px;
+            height: 3px;
+            background: orange;
+            left: 60px;
+            top: 140px;
+        }
+        
+        .wire-red2{
+          width: 3px;
+            height: 155px;
+            background: orange;
+            left: 60px;
+            top: 140px;
+        }
+        
+        .wire-red3{
+          width: 150px;
+            height: 3px;
+            background: orange;
+            left: 60px;
+            top: 290px; 
+        }
+        
+        .wire-red4{
+          width: 3px;
+            height: 50px;
+            background: red;
+            left: 120px;
+            top: 135px;
+        }
+           
+        .wire-red5{
+          width: 160px;
+            height: 3px;
+            background: red;
+            left: 120px;
+            top: 182px;
+        }
+        .wire-red6{
+          width: 155px;
+            height: 3px;
+            background: red;
+            left: 70px;
+            bottom: 165px;
+            transform: rotate(-47deg);
+        }  
+        .wire-black3{
+          width: 3px;
+            height: 70px;
+            background: red;
+            left: 277px;
+            top: 182px;
+        }
+        
+        .wire-black4{
+            width: 190px;
+            height: 3px;
+            background: red;
+            left: 278px;
+            top: 247px;
+            
+        }
+           
+        .wire-black5{
+            width: 3px;
+            height: 350px;
+            background: red;
+            right: 130px;
+            top: 247px;
+            
+        }
+        
+        .wire-black6{
+            width: 270px;
+            height: 3px;
+            background: red;
+            right:130px;
+            bottom: 103px;
+            
+        }
+        
+        .wire-black7{
+            width: 3px;
+            height: 285px;
+            background: red;
+            left: 200px;
+            bottom: 105px;
+            
+        }
+        
+        /* Black wire - GND */
+        .wire-black {
+            width: 80px;
+            height: 3px;
+            background: #1f2937;
+            left: 80px;
+            top: 130px;
+            
+        }
+        
+        .wire-black1 {
+            width: 3px;
+            height: 465px;
+            background: #1f2937;
+            left: 80px;
+            top: 130px;
+            
+        }
+     
+        .wire-black8{
+              width: 3px;
+            height: 20px;
+            background: #1f2937;
+            left: 150px;
+            top: 245px; 
+        }
+        
+        .wire-black2 {
+            width: 120px;
+            height: 3px;
+            background: #1f2937;
+            left:82px;
+            top: 245px;
+            
+        }
+        
+        .wire-pink{
+             width: 120px;
+            height: 3px;
+            background: pink;
+            left:142px;
+            bottom: 188px;
+        }
+         
+        .wire-pink1{
+             width: 3px;
+            height: 105px;
+            background: pink;
+            left:260px;
+            bottom: 188px;
+        }
+          
+        .wire-pink2{
+             width: 165px;
+            height: 3px;
+            background: pink;
+            left:260px;
+            bottom: 290px;
+        }
+           
+        .wire-pink3{
+             width: 3px;
+            height: 140px;
+            background: pink;
+            right:175px;
+            bottom: 290px;
+        }
+           
+        .wire-pink4{
+             width: 145px;
+            height: 3px;
+            background: pink;
+            left:280px;
+            bottom: 430px;
+        }
+        
+        .wire-purple1{
+              width: 110px;
+            height: 3px;
+            background: blue;
+            left:290px;
+            bottom: 370px;
+        }
+          
+        .wire-purple2{
+              width: 3px ;
+            height: 40px;
+            background: blue;
+            left:290px;
+            bottom: 370px;
+        }
+          
+        .wire-purple3{
+              width: 40px ;
+            height: 3px;
+            background: blue;
+            left:252px;
+            bottom: 407px;
+        }
+        
+        .wire-purple4{
+              width: 100px ;
+            height: 3px;
+            background: blue;
+            left:160px;
+            bottom: 413px;
+            transform: rotate(7deg);
+        }
+        
+        .center{
+            margin-top: 30px;
+            margin-left: 250px;
+        }
+
+        /* RESPONSIVE DESIGN */
+        @media (max-width: 1024px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .servo-control-panel {
+                position: relative;
+                margin: 20px auto;
+                width: 100%;
+                max-width: 400px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .left-panel {
+                width: 100%;
+            }
+            
+            .circuit-board {
+                height: 500px;
+            }
+            
+            .control-button {
+                padding: 10px 15px;
+                font-size: 12px;
+                min-width: 100px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .control-panel {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .control-button {
+                width: 100%;
+                max-width: 250px;
+            }
+            
+            .circuit-board {
+                height: 400px;
+            }
+        }
+        /* MODAL umumiy style */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(0,0,0,0.6);
+    backdrop-filter: blur(3px);
+}
+
+/* MODAL ichki qismi */
+.modal-content {
+    background: #000075;
+    color: white;
+    margin: 5% auto;
+    padding: 20px;
+    width: 50%;
+    max-width: 700px;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+    animation: slideDown 0.4s ease;
+    position: relative;
+}
+
+/* Close tugmasi */
+.close {
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    color: white;
+    transition: color 0.3s;
+}
+.close:hover {
+    color: #ffcc00;
+}
+
+/* Sarlavha */
+.modal-content h2 {
+    font-size: 1.5em;
+    margin-bottom: 15px;
+    border-bottom: 2px solid rgba(255,255,255,0.2);
+    padding-bottom: 8px;
+}
+
+/* CARD dizayni */
+.card {
+    background: rgba(255,255,255,0.08);
+    padding: 10px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    overflow: hidden;
+    transition: background 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+.card:hover {
+    background: rgba(255,255,255,0.15);
+}
+
+/* CARD ichidagi rasm */
+.card img {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    border-radius: 8px;
+    background: white;
+    padding: 5px;
+}
+
+/* CARD matn qismi */
+.card .text {
+    flex: 1;
+}
+.card h3 {
+    margin: 0;
+    font-size: 1.1rem;
+}
+.card p {
+    margin: 5px 0 0;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+/* Tab tugmalar */
+.tab-buttons {
+    display: flex;
+    margin-bottom: 10px;
+}
+.tab-buttons button {
+    flex: 1;
+    background: rgba(255,255,255,0.1);
+    color: white;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    border-radius: 5px 5px 0 0;
+    transition: background 0.3s;
+}
+.tab-buttons button.active {
+    background: rgba(255,255,255,0.3);
+}
+.tab-buttons button:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+/* Kod bo‘lagi */
+.tab-content {
+    display: none;
+}
+.tab-content.active {
+    display: block;
+}
+pre {
+    background: rgba(0,0,0,0.4);
+    padding: 12px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-size: 0.9rem;
+}
+
+/* Animatsiya */
+@keyframes slideDown {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+ .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 10% auto;
+            padding: 20px;
+            width: 70%;
+            max-width: 700px;
+            border-radius: 10px;
+            position: relative;
+            box-shadow: 0 5px 30px rgba(0,0,0,0.3);
+        }
+
+        .close {
+            position: absolute;
+            right: 15px;
+            top: 10px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #aaa;
+        }
+
+        .close:hover {
+            color: #333;
+        }
+
+        .modal h2 {
+            margin-bottom: 15px;
+            color: #0078d7;
+        }
+
+        .modal p, .modal pre {
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="logo">
+            <a href="/"><img src="/static/image/logo.png" width="80px" height="80px" alt=""></a>
+            <span>360° Servo Motor & Robot Arm Control</span>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <div class="main-container">
+        <!-- LEFT PANEL -->
+        <div class="left-panel">
+            <div class="control-group">
+                <h3>Boshqaruv</h3>
+                <button class="btn btn-success" onclicka="startSimulation()" id="startBtn">
+                    Start
+                </button>
+                <button class="btn btn-danger" onclick="stopSimulation()" id="stopBtn">
+                     Stop
+                </button>
+                <button class="btn btn-primary" onclick="togglePower()">
+                     Quvvat
+                </button>
+                <button class="btn btn-info" onclick="runTest()">
+                     Test
+                </button>
+            </div>
+            
+            <div class="control-group">
+                <h3>Ma'lumotlar</h3>
+                <button class="btn btn-primary" id="schemaBtn">
+                    💻 Sxema qayerda ishlatiladi
+                </button>
+                <button class="btn btn-primary" id="codeBtn">
+                    💻  Kod
+                </button>
+                <button class="btn btn-primary" id="componentsBtn">
+                    🔌 Qurilmalar
+                </button>
+            </div>
+            <div class="control-group">
+                <h3>Qurilma holati</h3>
+                <div class="status-row">
+                    <span>Quvvat:</span>
+                    <div class="status-led" id="powerLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Motor:</span>
+                    <div class="status-led" id="motorLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Signal:</span>
+                    <div class="status-led" id="signalLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Holat:</span>
+                    <div class="status-led" id="statusLed"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+            <div class="container">
+                <div class="circuit-board">
+                    <!-- Servo Motor -->
+                    <div class="servo-container">
+                        <div class="servo-motor">
+                            <img src="/static/image/servo.m - Copy.png"  width="150px" height="150px" alt="">
+                            <div class="servo-arm" id="servoArm"></div>
+                            <div class="servo-horn" id="servoHorn" style="position: absolute; left: 7px; top: -20px;">
+                                <img src="/static/image/hep.png" width="70px" height="100px" alt="">
+                            </div>
+                            <div class="robot-arm" id="robotArm"></div>
+                            <div class="robot-hand" id="robotHand">
+                                <div class="robot-finger finger-1"></div>
+                                <div class="robot-finger finger-2"></div>
+                                <div class="robot-finger finger-3"></div>
+                                <div class="robot-finger finger-4"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <img src="/static/image/104.png" width="50px" height="50px" style="margin-left: 100px; margin-top: 225px;" alt="">
+                    
+                    <div class="wire wire-red"></div>
+                    <div class="wire wire-black"></div>
+                    <div class="wire wire-red1"></div>
+                    <div class="wire wire-black1"></div>
+                    <div class="wire wire-red2"></div>
+                    <div class="wire wire-black2"></div>
+                    <div class="wire wire-red3"></div>
+                    <div class="wire wire-black3"></div>
+                    <div class="wire wire-red4"></div>
+                    <div class="wire wire-black4"></div>
+                    <div class="wire wire-red5"></div>
+                    <div class="wire wire-black5"></div>
+                    <div class="wire wire-black6"></div>
+                    <div class="wire wire-black7"></div>
+                    <div class="wire wire-black8"></div>
+                    <div class="wire wire-pink"></div>
+                    <div class="wire wire-purple"></div>
+                    <div class="wire wire-pink1"></div>
+                    <div class="wire wire-purple1"></div>
+                    <div class="wire wire-pink2"></div>
+                    <div class="wire wire-purple2"></div>
+                    <div class="wire wire-pink3"></div>
+                    <div class="wire wire-purple3"></div>
+                    <div class="wire wire-pink4"></div>
+                    <div class="wire wire-purple4"></div>
+                      <div class="wire wire-red6"></div>
+                    <!-- NE555 Timer -->
+                    <div class="ne555-container">
+                        <div class="ne555-chip">
+                            <img src="/static/image/ne555p.png" width="150px" height="120px" alt="">
+                        </div>
+                    </div>
+
+                    <!-- Potentiometer -->
+                    <div class="potentiometer-container">
+                        <div class="potentiometer" id="potentiometer">
+                            <div class="pot-knob" id="potKnob">
+                                <div class="pot-indicator"></div>
+                            </div>
+                        </div>
+                        <div style="text-align: center; margin-top: 5px; font-size: 10px; font-weight: bold;">47k pot</div>
+                    </div>
+                    
+                    <div class="center">
+                        <img src="/static/image/resistor1.png" width="80px" height="80px" alt="">
+                        <img src="/static/image/1n.png" width="80px" height="80px" alt="">
+                    </div>
+                    
+                    <!-- Resistors -->
+                    <div class="resistor-container">
+                        <img src="/static/image/resistor.png" width="50px" height="40px" style="margin-right: 300px; margin-top:120px;" alt="">
+                    </div>
+
+                    <!-- Battery -->
+                    <div class="battery-container">
+                        <div class="battery">
+                            <img src="/static/image/battery.png" width="100px" height="80px" alt="">
+                        </div>
+                    </div>
+
+                    <div class="status-led" id="statusLed"></div>
+                </div>
+            </div>
+            
+            <!-- Control Panel -->
+            <div class="servo-control-panel">
+                <div class="control-group">
+                    <label class="control-label">Servo Angle (0-360°)</label>
+                    <input type="range" class="slider" id="angleSlider" min="0" max="360" value="180">
+                    <div class="value-display" id="angleDisplay">180°</div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label">PWM Signal</label>
+                    <div class="pwm-indicator">
+                        <div class="pwm-signal" id="pwmSignal"></div>
+                    </div>
+                    <div class="value-display" id="pwmDisplay">1.5ms / 20ms</div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label">Frequency</label>
+                    <input type="range" class="slider" id="freqSlider" min="40" max="60" value="50">
+                    <div class="value-display" id="freqDisplay">50 Hz</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONTROL PANEL -->
+    <div class="control-panel">
+        <button class="control-button btn-power" onclick="togglePower()">
+            ⚡ Quvvat Yoqish/O'chirish
+        </button>
+        <button class="control-button btn-test" onclick="runTest()">
+            🔍 Tizimni sinash
+        </button>
+        <button class="control-button btn-reset" onclick="resetAll()">
+            🔄 Qayta o'rnatish
+        </button>
+    </div>
+
+   <div class="modal" id="schemaModal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Sxema qayerda ishlatiladi</h2>
+
+        <div class="card">
+            <video controls>
+                <source src="videos/kitchen.mp4" type="video/mp4">
+            </video>
+            <p>Oshxona va qo'l yuvish joylarida gigiyena uchun ishlatiladi.</p>
+        </div>
+
+        <div class="card">
+               <video controls>
+                <source src="videos/kitchen.mp4" type="video/mp4">
+            </video>
+            <p>Avtomatlashtirilgan sug‘orish tizimlarida suv oqimini boshqarish uchun.</p>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal" id="codeModal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Kod</h2>
+
+        <!-- Tab tugmalar -->
+        <div class="tab-buttons">
+            <button class="tab-btn active" data-tab="mblock">mBlock Kodi</button>
+            <button class="tab-btn" data-tab="arduino">Arduino Kodi</button>
+        </div>
+
+        <!-- mBlock kodi -->
+        <div class="tab-content active" id="mblock">
+            <pre>
+// mBlock blok kodi bu yerda bo‘ladi (grafik kod tavsifi)
+say "Qo'l aniqlansa relay yoqiladi"
+            </pre>
+        </div>
+
+        <!-- Arduino kodi -->
+        <div class="tab-content" id="arduino">
+            <pre>
+// TCRT5000 Sensor va Relay boshqaruvi
+const int sensorPin = 2;
+const int relayPin = 3;
+
+void setup() {
+  pinMode(sensorPin, INPUT);
+  pinMode(relayPin, OUTPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  int sensorValue = digitalRead(sensorPin);
+  
+  if (sensorValue == LOW) {
+    digitalWrite(relayPin, HIGH);
+    Serial.println("Qo'l aniqlangan - Suv oqimi yoqildi");
+  } else {
+    digitalWrite(relayPin, LOW);
+    Serial.println("Qo'l yo'q - Suv oqimi o'chirildi");
+  }
+  
+  delay(100);
+}
+            </pre>
+        </div>
+    </div>
+</div>
+<div class="modal" id="componentsModal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Ishlatilgan qurilmalar</h2>
+
+        <div class="card">
+            <img src="images/tcrt5000.png" alt="TCRT5000 Sensor">
+            <div class="text">
+                <h3>TCRT5000 Infraqizil Sensor</h3>
+                <p>Qo‘l mavjudligini aniqlash uchun infraqizil texnologiya asosida ishlaydi.</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <img src="images/lm393p.png" alt="LM393P Komparator">
+            <div class="text">
+                <h3>LM393P Komparator</h3>
+                <p>Sensor signalini qayta ishlash va solishtirish uchun ishlatiladi.</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <img src="images/relay.png" alt="5V Relay">
+            <div class="text">
+                <h3>5V Relay</h3>
+                <p>Solenoid valve’ni elektr signal orqali boshqaradi.</p>
+            </div>
+        </div>
+
+        <!-- qolgan qurilmalar ham shu tarzda -->
+    </div>
+</div>
+    <script>
+         // Modal ochish / yopish
+function openModal(id) {
+    document.getElementById(id).style.display = "block";
+}
+function closeModal(id) {
+    document.getElementById(id).style.display = "none";
+}
+
+document.querySelectorAll(".modal .close").forEach(btn => {
+    btn.addEventListener("click", function() {
+        this.closest(".modal").style.display = "none";
+    });
+});
+
+window.addEventListener("click", function(e) {
+    document.querySelectorAll(".modal").forEach(modal => {
+        if (e.target === modal) {
+            modal.style.display = "none";
+        }
+    });
+});
+
+// Tab boshqaruvi
+document.querySelectorAll(".tab-btn").forEach(button => {
+    button.addEventListener("click", function() {
+        const tab = this.dataset.tab;
+
+        // Tugmalarni yangilash
+        document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+        this.classList.add("active");
+
+        // Kontentni yangilash
+        document.querySelectorAll(".tab-content").forEach(content => {
+            content.classList.remove("active");
+            if (content.id === tab) {
+                content.classList.add("active");
+            }
+        });
+    });
+});
+
+        // System State Variables
+        let powerOn = false;
+        let motorActive = false;
+        let signalDetected = false;
+        let systemStatus = false;
+
+        // DOM Elements
+        const elements = {
+            powerLed: document.getElementById('powerLed'),
+            motorLed: document.getElementById('motorLed'),
+            signalLed: document.getElementById('signalLed'),
+            statusLed: document.getElementById('statusLed'),
+            angleSlider: document.getElementById('angleSlider'),
+            freqSlider: document.getElementById('freqSlider'),
+            angleDisplay: document.getElementById('angleDisplay'),
+            pwmDisplay: document.getElementById('pwmDisplay'),
+            freqDisplay: document.getElementById('freqDisplay'),
+            pwmSignal: document.getElementById('pwmSignal'),
+            servoArm: document.getElementById('servoArm'),
+            servoHorn: document.getElementById('servoHorn'),
+            robotArm: document.getElementById('robotArm'),
+            robotHand: document.getElementById('robotHand'),
+            potentiometer: document.getElementById('potentiometer'),
+            potKnob: document.getElementById('potKnob'),
+            statusLed: document.getElementById('statusLed')
+        };
+
+        // Update Status LEDs
+        function updateStatus() {
+            elements.powerLed.classList.toggle('on', powerOn);
+            elements.motorLed.classList.toggle('on', motorActive);
+            elements.signalLed.classList.toggle('on', signalDetected);
+            elements.statusLed.classList.toggle('on', systemStatus);
+        }
+
+        // Power Control
+        function togglePower() {
+            powerOn = !powerOn;
+            
+            if (!powerOn) {
+                // Turn off everything when power is off
+                stopAllSystems();
+            }
+            
+            updateStatus();
+        }
+
+        // Convert angle to PWM pulse width (0.5ms to 2.5ms) for 360° servo
+        function angleToPulseWidth(angle) {
+            return 0.5 + (angle / 360) * 2.0;
+        }
+
+        // Convert angle to servo rotation (0-360°)
+        function angleToRotation(angle) {
+            return angle;
+        }
+
+        // Update servo position and PWM display
+        function updateServo() {
+            if (!powerOn) return;
+            
+            const angle = parseInt(elements.angleSlider.value);
+            const frequency = parseInt(elements.freqSlider.value);
+            
+            // Update displays
+            elements.angleDisplay.textContent = angle + '°';
+            elements.freqDisplay.textContent = frequency + ' Hz';
+            
+            // Calculate PWM values
+            const pulseWidth = angleToPulseWidth(angle);
+            const period = 1000 / frequency; // in ms
+            const dutyCycle = (pulseWidth / period) * 100;
+            
+            elements.pwmDisplay.textContent = pulseWidth.toFixed(2) + 'ms / ' + period.toFixed(1) + 'ms';
+            elements.pwmSignal.style.width = Math.min(dutyCycle, 100) + '%';
+            
+            // Update servo visual position
+            const rotation = angleToRotation(angle);
+            elements.servoArm.style.transform = `translateX(-50%) rotate(${rotation}deg)`;
+            elements.servoHorn.style.transform = `rotate(${rotation}deg)`;
+            elements.robotArm.style.transform = `translateX(-50%) rotate(${rotation}deg)`;
+            elements.robotHand.style.transform = `translateX(-50%) rotate(${rotation}deg)`;
+            
+            // Update potentiometer knob
+            const potRotation = (angle / 360) * 270; // Map to potentiometer range
+            elements.potKnob.style.transform = `rotate(${potRotation}deg)`;
+            
+            // Update status LED color based on angle
+            if (angle < 120) {
+                elements.statusLed.style.background = '#FF5722';
+                elements.statusLed.style.boxShadow = '0 0 10px #FF5722';
+            } else if (angle > 240) {
+                elements.statusLed.style.background = '#2196F3';
+                elements.statusLed.style.boxShadow = '0 0 10px #2196F3';
+            } else {
+                elements.statusLed.style.background = '#4CAF50';
+                elements.statusLed.style.boxShadow = '0 0 10px #4CAF50';
+            }
+            
+            // Update system status
+            motorActive = true;
+            signalDetected = true;
+            systemStatus = true;
+            updateStatus();
+        }
+
+        // Interactive potentiometer control
+        let isDragging = false;
+
+        elements.potentiometer.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            updatePotFromMouse(e);
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                updatePotFromMouse(e);
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+
+        function updatePotFromMouse(e) {
+            const rect = elements.potentiometer.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            
+            const angle = Math.atan2(e.clientY - centerY, e.clientX - centerX);
+            let degrees = (angle * 180 / Math.PI + 90 + 360) % 360;
+            
+            // Map potentiometer rotation to servo angle
+            const servoAngle = Math.round(degrees);
+            elements.angleSlider.value = Math.max(0, Math.min(360, servoAngle));
+            updateServo();
+        }
+
+        // System Controls
+        function runTest() {
+            if (!powerOn) {
+                alert('Avval quvvatni yoqing!');
+                return;
+            }
+            
+            // Simulate servo movement from 0 to 360 degrees
+            let angle = 0;
+            const interval = setInterval(() => {
+                elements.angleSlider.value = angle;
+                updateServo();
+                
+                angle += 10;
+                if (angle > 360) {
+                    clearInterval(interval);
+                    // Reset after test
+                    setTimeout(() => {
+                        elements.angleSlider.value = 180;
+                        updateServo();
+                    }, 500);
+                }
+            }, 100);
+        }
+
+        function resetAll() {
+            stopAllSystems();
+            elements.angleSlider.value = 180;
+            elements.freqSlider.value = 50;
+            updateServo();
+        }
+
+        function stopAllSystems() {
+            motorActive = false;
+            signalDetected = false;
+            systemStatus = false;
+            updateStatus();
+        }
+
+        // Initialize
+        elements.angleSlider.addEventListener('input', updateServo);
+        elements.freqSlider.addEventListener('input', updateServo);
+        updateServo();
+    </script>
+</body>
+</html>

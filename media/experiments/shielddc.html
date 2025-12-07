@@ -1,0 +1,2054 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arduino Motor Shield Tajriba</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #e6f3ff;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: auto;
+        }
+
+/* MODAL TUZATISH - Responsive va to'g'ri ko'rinish */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    overflow-y: auto;
+    padding: 20px 0;
+}
+
+.modal-content {
+    background: #000075;
+    color: white;
+    margin: 10vh auto 5vh;
+    padding: 30px;
+    width: 90%;
+    max-width: 800px;
+    border-radius: 20px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+    position: relative;
+    animation: slideDown 0.4s ease;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+/* Scroll bar stilizatsiyasi */
+.modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.close {
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    font-size: 32px;
+    font-weight: bold;
+    cursor: pointer;
+    color: white;
+    transition: all 0.3s;
+    z-index: 2010;
+    line-height: 1;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.close:hover {
+    background: rgba(255, 204, 0, 0.3);
+    color: #ffcc00;
+    transform: rotate(90deg);
+}
+
+.modal-content h2 {
+    font-size: 28px;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+    padding-right: 50px;
+}
+
+.card {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    transition: all 0.3s;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    z-index: 1;
+}
+
+.card:hover {
+    background: rgba(255, 255, 255, 0.18);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.card video {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    background: #000;
+    position: relative;
+    z-index: 2;
+}
+
+.card p {
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 10px 0 0;
+    position: relative;
+    z-index: 2;
+}
+
+.card strong {
+    color: #ffcc00;
+    font-size: 18px;
+}
+
+/* Tab buttons */
+.tab-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 2;
+}
+
+.tab-buttons button {
+    flex: 1;
+    min-width: 150px;
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s;
+    position: relative;
+    z-index: 2;
+}
+
+.tab-buttons button:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+}
+
+.tab-buttons button.active {
+    background: rgba(255, 204, 0, 0.4);
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(255, 204, 0, 0.3);
+}
+
+.tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease;
+    position: relative;
+    z-index: 2;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.tab-content pre {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    border-radius: 12px;
+    overflow-x: auto;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #00ff00;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    z-index: 2;
+}
+
+.tab-content pre::-webkit-scrollbar {
+    height: 8px;
+}
+
+.tab-content pre::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.tab-content pre::-webkit-scrollbar-thumb {
+    background: rgba(0, 255, 0, 0.3);
+    border-radius: 10px;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+/* Flex Layout: 40% Video + 60% Text */
+.flex-container-40-60 {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+}
+
+.flex-video-40 {
+    flex: 0 0 40%;
+}
+
+.flex-video-40 iframe {
+    width: 100%;
+    height: 250px;
+    border-radius: 10px;
+}
+
+.flex-text-60 {
+    flex: 0 0 60%;
+}
+
+.flex-text-60 p {
+    font-size: 16px;
+    line-height: 1.8;
+}
+
+/* Flex Layout: 30% Image + 70% Text */
+.flex-container-30-70 {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+}
+
+.flex-image-30 {
+    flex: 0 0 30%;
+}
+
+.flex-image-30 img {
+    width: 100%;
+    border-radius: 10px;
+}
+
+.flex-text-70 {
+    flex: 0 0 70%;
+}
+
+.flex-text-70 strong {
+    color: #ffcc00;
+    font-size: 18px;
+    display: block;
+    margin-bottom: 10px;
+}
+
+/* 100% Video */
+.video-full video {
+    width: 100%;
+    border-radius: 15px;
+}
+
+/* Dumaloq tugma */
+#infoFloatingBtn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #000075, #0000ff);
+    color: white;
+    border: 4px solid white;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    z-index: 1500;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+#infoFloatingBtn:hover {
+    transform: scale(1.1);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .flex-container-40-60,
+    .flex-container-30-70 {
+        flex-direction: column;
+    }
+    
+    .flex-video-40, .flex-text-60,
+    .flex-image-30, .flex-text-70 {
+        flex: 0 0 100%;
+    }
+}
+/* Tablet responsive */
+@media (max-width: 1024px) {
+    .modal {
+        padding: 15px 0;
+    }
+    
+    .modal-content {
+        width: 95%;
+        padding: 25px;
+        max-height: 75vh;
+        margin: 8vh auto 5vh;
+    }
+    
+    .modal-content h2 {
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+    
+    .card {
+        padding: 15px;
+    }
+    
+    .card p {
+        font-size: 15px;
+    }
+    
+    .tab-buttons button {
+        font-size: 15px;
+        padding: 10px 15px;
+    }
+}
+
+/* Mobile responsive */ 
+@media (max-width: 768px) {
+    .modal {
+        padding: 10px 0;
+    }
+    
+    .modal-content {
+        width: 96%;
+        padding: 20px 15px;
+        margin: 5vh auto 3vh;
+        max-height: 85vh;
+        border-radius: 15px;
+    }
+    
+    .close {
+        right: 10px;
+        top: 10px;
+        font-size: 28px;
+        width: 35px;
+        height: 35px;
+    }
+    
+    .modal-content h2 {
+        font-size: 20px;
+        margin-bottom: 15px;
+        padding-bottom: 12px;
+        padding-right: 45px;
+    }
+    
+    .card {
+        padding: 12px;
+        margin-bottom: 15px;
+        border-radius: 12px;
+    }
+    
+    .card video {
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+    
+    .card p {
+        font-size: 14px;
+        line-height: 1.5;
+    }
+    
+    .card strong {
+        font-size: 16px;
+    }
+    
+    .tab-buttons {
+        gap: 8px;
+        margin-bottom: 15px;
+    }
+    
+    .tab-buttons button {
+        min-width: 120px;
+        font-size: 14px;
+        padding: 10px 12px;
+        border-radius: 8px;
+    }
+    
+    .tab-content pre {
+        padding: 15px;
+        font-size: 12px;
+        line-height: 1.5;
+        border-radius: 10px;
+    }
+}
+
+
+/* Small mobile */
+@media (max-width: 480px) {
+    .modal {
+        padding: 5px 0;
+    }
+    
+    .modal-content {
+        width: 98%;
+        padding: 15px 12px;
+        margin: 3vh auto 2vh;
+        max-height: 90vh;
+        border-radius: 12px;
+    }
+    
+    .close {
+        right: 8px;
+        top: 8px;
+        font-size: 24px;
+        width: 30px;
+        height: 30px;
+    }
+    
+    .modal-content h2 {
+        font-size: 18px;
+        margin-bottom: 12px;
+        padding-bottom: 10px;
+        padding-right: 40px;
+    }
+    
+    .card {
+        padding: 10px;
+        margin-bottom: 12px;
+        border-radius: 10px;
+    }
+    
+    .card p {
+        font-size: 13px;
+    }
+    
+    .card strong {
+        font-size: 15px;
+    }
+    
+    .tab-buttons {
+        flex-direction: column;
+        gap: 6px;
+    }
+    
+    .tab-buttons button {
+        width: 100%;
+        min-width: 100%;
+        font-size: 13px;
+        padding: 10px;
+    }
+    
+    .tab-content pre {
+        padding: 12px;
+        font-size: 11px;
+        line-height: 1.4;
+    }
+}
+
+/* Very small mobile */
+@media (max-width: 360px) {
+    .modal-content {
+        padding: 12px 10px;
+        margin: 2vh auto 1vh;
+    }
+    
+    .modal-content h2 {
+        font-size: 16px;
+    }
+    
+    .card {
+        padding: 8px;
+    }
+    
+    .card p {
+        font-size: 12px;
+    }
+    
+    .tab-buttons button {
+        font-size: 12px;
+        padding: 8px;
+    }
+    
+    .tab-content pre {
+        padding: 10px;
+        font-size: 10px;
+    }
+}
+
+/* Landscape mode fixes */
+@media (max-width: 1024px) and (orientation: landscape) {
+    .modal-content {
+        max-height: 80vh;
+        margin: 5vh auto 3vh;
+    }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .tab-buttons button {
+        min-height: 44px;
+    }
+    
+    .close {
+        min-width: 44px;
+        min-height: 44px;
+    }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    .modal-content {
+        border: 3px solid white;
+    }
+    
+    .card {
+        border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .modal-content,
+    .card,
+    .tab-buttons button,
+    .close {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+/* Print styles */
+@media print {
+    .modal {
+        display: none !important;
+    }
+}
+
+/* Scroll bar stilizatsiyasi */
+.modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.close {
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    font-size: 32px;
+    font-weight: bold;
+    cursor: pointer;
+    color: white;
+    transition: all 0.3s;
+    z-index: 10;
+    line-height: 1;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.close:hover {
+    background: rgba(255, 204, 0, 0.3);
+    color: #ffcc00;
+    transform: rotate(90deg);
+}
+
+.modal-content h2 {
+    font-size: 28px;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+    padding-right: 50px;
+}
+
+.card {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    transition: all 0.3s;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.card:hover {
+    background: rgba(255, 255, 255, 0.18);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.card video {
+    width: 100%;
+    max-width: 70%;
+    height: auto;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    background: #000;
+}
+
+.card p {
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 10px 0 0;
+}
+
+
+.card strong {
+    color: #ffcc00;
+    font-size: 18px;
+}
+
+/* Tab buttons */
+.tab-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.tab-buttons button {
+    flex: 1;
+    min-width: 150px;
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.tab-buttons button:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+}
+
+.tab-buttons button.active {
+    background: rgba(255, 204, 0, 0.4);
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(255, 204, 0, 0.3);
+}
+
+.tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.tab-content pre {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    border-radius: 12px;
+    overflow-x: auto;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #00ff00;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tab-content pre::-webkit-scrollbar {
+    height: 8px;
+}
+
+.tab-content pre::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.tab-content pre::-webkit-scrollbar-thumb {
+    background: rgba(0, 255, 0, 0.3);
+    border-radius: 10px;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Tablet responsive */
+@media (max-width: 1024px) {
+    .modal {
+        padding: 15px 0;
+    }
+    
+    .modal-content {
+        width: 95%;
+        padding: 25px;
+        max-height: 80vh;
+    }
+    
+    .modal-content h2 {
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+    
+    .card {
+        padding: 15px;
+    }
+    
+    .card p {
+        font-size: 15px;
+    }
+    
+    .tab-buttons button {
+        font-size: 15px;
+        padding: 10px 15px;
+    }
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .modal {
+        padding: 10px 0;
+    }
+    
+    .modal-content {
+        width: 96%;
+        padding: 20px 15px;
+        margin: 2vh auto;
+        max-height: 90vh;
+        border-radius: 15px;
+    }
+    
+    .close {
+        right: 10px;
+        top: 10px;
+        font-size: 28px;
+        width: 35px;
+        height: 35px;
+    }
+    
+    .modal-content h2 {
+        font-size: 20px;
+        margin-bottom: 15px;
+        padding-bottom: 12px;
+        padding-right: 45px;
+    }
+    
+    .card {
+        padding: 12px;
+        margin-bottom: 15px;
+        border-radius: 12px;
+    }
+    
+    .card video {
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+    
+    .card p {
+        font-size: 14px;
+        line-height: 1.5;
+    }
+    
+    .card strong {
+        font-size: 16px;
+    }
+    
+    .tab-buttons {
+        gap: 8px;
+        margin-bottom: 15px;
+    }
+    
+    .tab-buttons button {
+        min-width: 120px;
+        font-size: 14px;
+        padding: 10px 12px;
+        border-radius: 8px;
+    }
+    
+    .tab-content pre {
+        padding: 15px;
+        font-size: 12px;
+        line-height: 1.5;
+        border-radius: 10px;
+    }
+}
+
+
+/* Small mobile */
+@media (max-width: 480px) {
+    .modal {
+        padding: 5px 0;
+    }
+    
+    .modal-content {
+        width: 98%;
+        padding: 15px 12px;
+        margin: 1vh auto;
+        max-height: 92vh;
+        border-radius: 12px;
+    }
+    
+    .close {
+        right: 8px;
+        top: 8px;
+        font-size: 24px;
+        width: 30px;
+        height: 30px;
+    }
+    
+    .modal-content h2 {
+        font-size: 18px;
+        margin-bottom: 12px;
+        padding-bottom: 10px;
+        padding-right: 40px;
+    }
+    
+    .card {
+        padding: 10px;
+        margin-bottom: 12px;
+        border-radius: 10px;
+    }
+    
+    .card p {
+        font-size: 13px;
+    }
+    
+    .card strong {
+        font-size: 15px;
+    }
+    
+    .tab-buttons {
+        flex-direction: column;
+        gap: 6px;
+    }
+    
+    .tab-buttons button {
+        width: 100%;
+        min-width: 100%;
+        font-size: 13px;
+        padding: 10px;
+    }
+    
+    .tab-content pre {
+        padding: 12px;
+        font-size: 11px;
+        line-height: 1.4;
+    }
+}
+
+/* Very small mobile */
+@media (max-width: 360px) {
+    .modal-content {
+        padding: 12px 10px;
+    }
+    
+    .modal-content h2 {
+        font-size: 16px;
+    }
+    
+    .card {
+        padding: 8px;
+    }
+    
+    .card p {
+        font-size: 12px;
+    }
+    
+    .tab-buttons button {
+        font-size: 12px;
+        padding: 8px;
+    }
+    
+    .tab-content pre {
+        padding: 10px;
+        font-size: 10px;
+    }
+}
+
+/* Landscape mode fixes */
+@media (max-width: 1024px) and (orientation: landscape) {
+    .modal-content {
+        max-height: 85vh;
+        margin: 2vh auto;
+    }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .tab-buttons button {
+        min-height: 44px;
+    }
+    
+    .close {
+        min-width: 44px;
+        min-height: 44px;
+    }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    .modal-content {
+        border: 3px solid white;
+    }
+    
+    .card {
+        border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .modal-content,
+    .card,
+    .tab-buttons button,
+    .close {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+/* Print styles */
+@media print {
+    .modal {
+        display: none !important;
+    }
+}
+        /* HEADER */
+        .header {
+            display: flex;
+            align-items: center;
+            background: #000075;
+            color: white;
+            padding: 10px 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            width: 100%;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        /* MAIN LAYOUT */
+        .main-container {
+            display: flex;
+            margin-top: 20px;
+            gap: 20px;
+        }
+
+        /* LEFT PANEL */
+        .left-panel {
+            width: 250px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            height: fit-content;
+            position: relative;
+            z-index: 1;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 15px;
+        }
+
+        .control-group h3 {
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 8px;
+            font-size: 14px;
+            border-radius: 5px;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn-success { 
+            background: #28a745; 
+            color: white; 
+        }
+        .btn-danger { 
+            background: #dc3545; 
+            color: white; 
+        }
+        .btn-primary { 
+            background: #000075; 
+            color: white; 
+        }
+        .btn-info { 
+            background: #17a2b8; 
+            color: white; 
+        }
+
+        .speed-slider {
+            width: 100%;
+            margin: 10px 0;
+        }
+
+        .speed-display {
+            text-align: center;
+            font-weight: bold;
+            color: #000075;
+            margin: 5px 0;
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+
+        .title-header {
+            background: #000075;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0 auto 30px;
+            text-align: center;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        /* EXPERIMENT CONTAINER - FIXED SIZE */
+        .experiment-container {
+            width: 1200px;
+            height: 900px;
+            display: flex;
+            justify-content: space-between;
+            gap: 30px;
+            margin-top: 30px;
+            border: 2px solid blue;
+            border-radius: 20px;
+            position: relative;
+        }
+
+        /* ARDUINO SHIELD SECTION */
+        .arduino-section {
+            flex: 1;
+            min-width: 400px;
+            max-width: 600px;
+            position: relative;
+        }
+
+        .arduino-board {
+            border-radius: 15px;
+            padding: 20px;
+            position: relative;
+            min-height: 500px;
+        }
+
+        .board-label {
+            background: white;
+            color: #1e3a8a;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            position: absolute;
+            top: -12px;
+            left: 20px;
+        }
+
+        /* USB Connector */
+        .usb-connector {
+            width: 30px;
+            height: 15px;
+            border-radius: 3px;
+            position: absolute;
+            top: 170px;
+            left: 78px;
+        }
+
+        .usb-label {
+            position: absolute;
+            top: 35px;
+            left: -25px;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        /* Power Jack */
+        .power-jack {
+            border-radius: 50%;
+            position: absolute;
+            bottom: 5px;
+            left: 92px;
+        }
+
+        .power-label {
+            position: absolute;
+            bottom: 40px;
+            left: -35px;
+            font-size: 10px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        /* Pin Headers */
+        .pin-header {
+            display: flex;
+            gap: 3px;
+            position: absolute;
+        }
+
+        .pin {
+            width: 8px;
+            height: 25px;
+            background: #333;
+            border: 1px solid #666;
+        }
+
+        .digital-pins {
+            top: 80px;
+            right: 20px;
+        }
+
+        .analog-pins {
+            bottom: 80px;
+            right: 20px;
+        }
+
+        /* Microcontroller */
+        .microcontroller {
+            width: 80px;
+            height: 40px;
+            background: #333;
+            border-radius: 5px;
+            position: absolute;
+            top: 150px;
+            left: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        /* Motor Driver IC */
+        .motor-driver {
+            width: 60px;
+            height: 30px;
+            background: #2d3748;
+            border-radius: 5px;
+            position: absolute;
+            top: 200px;
+            right: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 9px;
+            font-weight: bold;
+        }
+
+        /* Terminal Blocks */
+        .terminal-block {
+            width: 80px;
+            height: 20px;
+            background: #4a5568;
+            border-radius: 5px;
+            position: absolute;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 9px;
+        }
+
+        .motor-terminal {
+            top: 120px;
+            right: 50px;
+        }
+
+        /* LEDs */
+        .led {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            position: absolute;
+        }
+
+        .power-led {
+            background: #10b981;
+            top: 250px;
+            left: 30px;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.8);
+        }
+
+        .status-led {
+            background: #ef4444;
+            top: 250px;
+            left: 50px;
+        }
+
+        .status-led.active {
+            background: #10b981;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.8);
+        }
+
+        /* Wiring */
+        .wire {
+            position: absolute;
+            height: 3px;
+            border-radius: 2px;
+        }
+
+        .wire-red { background: #ef4444; }
+        .wire-black { background: #1f2937; }
+        .wire-yellow { background: #fbbf24; }
+        .wire-blue { background: #3b82f6; }
+
+        /* MOTOR SECTION */
+        .motor-section {
+            width: 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            position: relative;
+        }
+
+        .motor-container {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+        }
+
+        .motor-body {
+            width: 120px;
+            height: 80px;
+            border-radius: 10px;
+            position: absolute;
+            top: 180px;
+            left:-340px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .motor-shaft {
+            width: 8px;
+            height: 60px;
+            position: absolute;
+            top: 30px;
+            left: 96px;
+            border-radius: 4px;
+        }
+
+        .motor-rotor {
+            width: 100px;
+            height: 100px;
+            border: 4px solid #ef4444;
+            border-radius: 50%;
+            position: absolute;
+            top: 170px;
+            left:-330px;
+            background: radial-gradient(circle at center, 
+                rgba(239, 68, 68, 0.1) 0%, 
+                rgba(239, 68, 68, 0.3) 70%, 
+                transparent 100%);
+            transition: transform 0.1s linear;
+        }
+
+        .rotor-indicator {
+            width: 6px;
+            height: 80px;
+            background: #ef4444;
+            position: absolute;
+            top: 5px;
+            left: 40px;
+            border-radius: 3px;
+        }
+
+        .motor-wires {
+            position: absolute;
+            top:  490px;
+            left:-735px;    
+            display: flex;
+            gap: 5px;
+        }
+
+        .motor-wire {
+            width: 4px;
+            height: 30px;
+            border-radius: 2px;
+        }
+        .motor-wire1 {
+            width: 75px;
+            height: 3px;
+            border-radius: 2px;
+            position: absolute;
+            top:  518px;
+            right:850px;    
+            gap: 5px;  
+        }
+        .motor-wire2{
+            position: absolute;
+            top:  410px;
+            right:850px;    
+            display: flex;
+            gap: 5px;
+            width: 4px;
+            height: 111px;
+            border-radius: 2px;
+        }
+
+        .wire-red{
+            width: 70px;
+            height: 3px;
+            border-radius: 2px;
+            position: absolute;
+            top:  532px;
+            right:915px;    
+            background: red;
+            gap: 5px;  
+        }
+
+        .wire-red1{
+            position: absolute;
+            top:  410px;
+            right:915px;    
+            display: flex;
+            gap: 5px;
+            width: 4px;
+            height: 125px;
+            border-radius: 2px;
+            background: red;
+        }
+        .wire-red-motor { background: #ef4444;  }
+        .wire-black-motor { background: #1f2937; }
+
+        /* CONNECTION WIRES */
+        .connection-wire {
+            position: absolute;
+            z-index: 5;
+        }
+
+        .connection-1 {
+            width: 165px;
+            height: 3px;
+            background: #ef4444;
+            top: 250px;
+            right: -32px;
+            transform: rotate(-15deg);
+        }
+
+        .connection-2 {
+            width: 175px;
+            height: 3px;
+            background: #1f2937;
+            top: 265px;
+            right: -42px;
+            transform: rotate(-15deg);
+        }
+
+        /* STATUS DISPLAY */
+        .status-display {
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            min-width: 220px;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 8px 0;
+            font-size: 13px;
+        }
+
+        .status-led-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #dc3545;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+        }
+
+        .status-led-indicator.on {
+            background: #28a745;
+            box-shadow: 0 0 10px rgba(40, 167, 69, 0.8);
+        }
+
+        /* ROTATING ANIMATION */
+        @keyframes motorRotateClockwise {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes motorRotateCounterClockwise {
+            from { transform: rotate(360deg); }
+            to { transform: rotate(0deg); }
+        }
+
+        .motor-rotor.rotating-cw {
+            animation: motorRotateClockwise linear infinite;
+        }
+
+        .motor-rotor.rotating-ccw {
+            animation: motorRotateCounterClockwise linear infinite;
+        }
+
+        /* RESPONSIVE DESIGN */
+        @media (max-width: 1024px) {
+            .experiment-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .arduino-section {
+                min-width: 350px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .left-panel {
+                width: 100%;
+            }
+            
+            .arduino-board {
+                min-height: 400px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="logo">
+             <a href="/"><img src="/static/image/logo.png" width="80px" height="80px" alt=""></a>
+            <span>Arduino Motor Shield Tajriba</span>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <div class="main-container">
+        <!-- LEFT PANEL -->
+        <div class="left-panel">
+            <div class="control-group">
+                <h3>Motor Boshqaruvi</h3>
+                <button class="btn btn-success" onclick="startMotorCW()" id="startCWBtn">
+                    Soat yo'nalishi
+                </button>
+                <button class="btn btn-info" onclick="startMotorCCW()" id="startCCWBtn">
+                    Soat yo'nalishi teskari
+                </button>
+                <button class="btn btn-danger" onclick="stopMotor()" id="stopBtn">
+                    To'xtatish
+                </button>
+            </div>
+
+            <div class="control-group">
+                <h3>Tezlik Sozlamalari</h3>
+                <label for="speedSlider">Tezlik:</label>
+                <input type="range" id="speedSlider" class="speed-slider" min="0" max="255" value="128" oninput="updateSpeed()">
+                <div class="speed-display" id="speedDisplay">Tezlik: 128 (50%)</div>
+            </div>
+<div class="control-group">
+    <h3>Ma'lumotlar</h3>
+    <button class="btn btn-primary" id="schemaBtn">💡 Sxema qayerda ishlatiladi</button>
+    <button class="btn btn-primary" id="codeBtn">💻 Kod</button>
+    <button class="btn btn-primary" id="componentsBtn">🔌 Qurilmalar</button>
+</div>
+
+            <div class="control-group">
+                <h3>Quvvat</h3>
+                <button class="btn btn-primary" onclick="togglePower()">
+                    Quvvat Yoqish/O'chirish
+                </button>
+            </div>
+
+            <div class="control-group">
+                <h3>Motor Holati</h3>
+                <div class="status-row">
+                    <span>Quvvat:</span>
+                    <div class="status-led-indicator" id="powerLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Motor:</span>
+                    <div class="status-led-indicator" id="motorLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Yo'nalish:</span>
+                    <span id="directionStatus">To'xtagan</span>
+                </div>
+                <div class="status-row">
+                    <span>Tezlik:</span>
+                    <span id="speedStatus">0 RPM</span>
+                </div>
+            </div>
+        </div>
+<!-- ✅ 1) Sxema qayerda ishlatiladi (DC Motor / L298N) -->
+    <div class="modal" id="schemaModal">
+        <div class="modal-content">
+            <span class="close" title="Yopish">&times;</span>
+            <h2>💡 Sxema qayerda ishlatiladi </h2>
+
+            <div class="flex-container-40-60">
+                <div class="flex-video-40">
+                    <!-- 1-video (xohlasangiz almashtiring) -->
+                    <iframe src="https://www.youtube.com/embed/Kaby9cK29hM?si=NlSE-GqLW2pfuuuc" title="DC Motor Control with L298N"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen></iframe>
+                </div>
+                <div class="flex-text-60">
+                    <strong>Tajriba haqida ma'lumot</strong>
+                   <p>Bu tajribada Arduino Motor Shield L293D, DC motor, USB quvvat, va tashqi adapter birgalikda ishlatiladi. Motor Shield motorlarni xavfsiz boshqarish uchun mo‘ljallangan.</p>
+                </div>
+            </div>
+
+            <div class="flex-container-40-60">
+                <div class="flex-video-40">
+                    <!-- 2-video (ixtiyoriy) -->
+                    <iframe src="https://www.youtube.com/embed/DAQJekWJDZg?si=8cR4QhcyXubKM7Yj" title="PWM Speed Control"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen></iframe>
+                </div>
+                <div class="flex-text-60">
+                    <strong>🔄 Ishlash prinsipi</strong>
+                    <p>Qizil sim → M3 terminal (+)
+
+Qora sim → M3 terminal (–)
+
+Bu orqali motorning aylanish yo‘nalishi belgilanadi.
+Agar kabelni almashtirsangiz, motor orqaga aylana boshlaydi.</p>
+                </div>
+            </div>
+              <div class="flex-container-40-60">
+                <div class="flex-video-40">
+                    <!-- 2-video (ixtiyoriy) -->
+                    <iframe src="https://www.youtube.com/embed/0XihwdulmDQ?si=Ik8OSLPL-2eSKa0a" title="PWM Speed Control"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen></iframe>
+                </div>
+                <div class="flex-text-60">
+                    <strong>Tajriba Maqsadi</strong>
+               <p>Bu tajriba orqali o‘rgatiladi:
+
+Motor Shield orqali motorni ulash
+
+DC motorni to‘g‘ri quvvatlantirish
+
+Shildga USB + tashqi quvvatni birgalikda ulash
+
+Motorning aylanishini CSS/JS animatsiya orqali ko‘rsatish</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+  <div class="modal" id="codeModal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>💻 Kod</h2>
+
+        <div class="tab-buttons">
+            <button class="tab-btn active" data-tab="mblock">mBlock Kodi</button>
+            <button class="tab-btn" data-tab="arduino">Arduino Kodi</button>
+        </div>
+
+        <div class="tab-content active" id="mblock">
+            <pre><img src="/static/image/arduinoled.jpg" alt="mBlock Code" style="width: 80%; height: auto;"></pre>
+        </div>
+
+        <div class="tab-content" id="arduino">
+            <pre>
+#include <AFMotor.h>
+
+// M3 portidagi DC motor (Motor 3)
+AF_DCMotor motor(3);
+
+void setup() {
+  Serial.begin(9600);
+
+  motor.setSpeed(200);   // 0–255 oralig'i
+  delay(1000);
+}
+
+void loop() {
+
+  // 🔄 Oldinga aylantirish
+  motor.run(FORWARD);
+  motor.setSpeed(255);   // Maksimal tezlik
+  delay(3000);
+
+  // ⏹ To‘xtatish
+  motor.run(RELEASE);
+  delay(1000);
+
+  // 🔄 Orqaga aylantirish
+  motor.run(BACKWARD);
+  motor.setSpeed(200);
+  delay(3000);
+
+  // ⏹ Yana to‘xtatish
+  motor.run(RELEASE);
+  delay(1000);
+}
+
+            </pre>
+        </div>
+    </div>
+</div>
+
+<!-- ✅ 3) Qurilmalar -->
+<div class="modal" id="componentsModal">
+    <div class="modal-content">
+        <span class="close" title="Yopish">&times;</span>
+        <h2>🔌 Ishlatilgan Qurilmalar</h2>
+
+        <!-- USB Kabel -->
+        <div class="flex-container-30-70">
+            <div class="flex-image-30">
+               <img src="/static/image/cabel.png" alt="USB Cable">
+            </div>
+            <div class="flex-text-70">
+                <strong>USB Kabel</strong>
+                <p>Arduino platasini 5V bilan quvvatlash va kompyuterga ulash uchun ishlatiladi.</p>
+            </div>
+        </div>
+
+        <!-- Adapter -->
+        <div class="flex-container-30-70">
+            <div class="flex-image-30">
+               <img src="/static/image/adaptor.png" alt="Adapter">
+            </div>
+            <div class="flex-text-70">
+                <strong>Adapter (6V–12V)</strong>
+                <p>Motorlar kuchli aylanishi uchun zarur tashqi quvvat manbai.</p>
+            </div>
+        </div>
+
+        <!-- Motor Shield -->
+        <div class="flex-container-30-70">
+            <div class="flex-image-30">
+               <img src="/static/image/shieldarduino.png" alt="Motor Shield" style="width:130px;">
+            </div>
+            <div class="flex-text-70">
+                <strong>L293D Motor Shield</strong>
+                <p>DC motorlarni xavfsiz boshqarish uchun mo‘ljallangan modul.</p>
+            </div>
+        </div>
+
+        <!-- DC Motor -->
+        <div class="flex-container-30-70">
+            <div class="flex-image-30">
+               <img src="/static/image/dcmotor.png" alt="DC Motor">
+            </div>
+            <div class="flex-text-70">
+                <strong>DC Motor</strong>
+                <p>M3 portiga ulanadi. Qizil va qora simlar orqali aylanish yo‘nalishi boshqariladi.</p>
+            </div>
+        </div>
+
+     
+    </div>
+</div>
+
+
+    <!-- ✅ 4) Qo'shimcha info (ixtiyoriy) + suzuvchi tugma -->
+    <div class="modal" id="infoModal">
+        <div class="modal-content">
+            <span class="close" title="Yopish">&times;</span>
+            <h2>📚 Qo'shimcha Ma'lumot</h2>
+            <div class="video-full">
+                <video controls>
+                    <source src="/media/2.mp4" type="video/mp4">
+                    Brauzeringiz video formatni qo'llab-quvvatlamaydi.
+                </video>
+            </div>
+        </div>
+    </div>
+
+    <button id="infoFloatingBtn"><span>📚</span><span>Ma'lumot</span></button>
+
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+            <div class="experiment-container">
+                <!-- ARDUINO SHIELD SECTION -->
+                <div class="arduino-section">
+                    <div class="arduino-board">
+                        <!-- USB Connector -->
+                        <div class="usb-connector">
+                           <img src="/static/image/cabel.png" width="150px" height="150px" alt="">
+                        </div>
+                        
+                        <!-- Power Jack -->
+                        <div class="power-jack">
+                           <img src="/static/image/adaptor.png" width="150px" height="150px" alt="">
+                        </div>
+               
+                       <img src="/static/image/shieldarduino.png" style="position: absolute; top: 180px; left: 192px;" width="300px" height="250px" alt="">
+                        <div class="connection-wire connection-1"></div>
+                        <div class="connection-wire connection-2"></div>
+                    </div>
+                </div>
+
+                <!-- MOTOR SECTION -->
+                <div class="motor-section">
+                    <div class="motor-container">
+                        <div class="motor-body">
+                           <img src="/static/image/dcmotor.png" width="150px" height="150px" alt="">
+                        </div>
+                        <div class="motor-shaft"></div>
+                        <div class="motor-rotor" id="motorRotor">
+                            <div class="rotor-indicator"></div>
+                        </div>
+                        <div class="motor-wires">
+                            <div class="motor-wire wire-red-motor" style="height: 45px;"></div>
+                            <div class="motor-wire wire-black-motor"></div>
+                        </div>
+                        <div class="motor-wire1 wire-black-motor"></div>
+                        <div class="motor-wire2 wire-red-motor"></div>
+                        <div class="motor-wire2 wire-black-motor"></div>
+                    </div>
+                    <div class="wire-red"></div>
+                    <div class="wire-red1"></div>
+                    <div class="status-display">
+                        <div class="status-row">
+                            <span>Kirish Kuchlanishi:</span>
+                            <span id="inputVoltage">9V</span>
+                        </div>
+                        <div class="status-row">
+                            <span>Motor Kuchlanishi:</span>
+                            <span id="motorVoltage">0V</span>
+                        </div>
+                        <div class="status-row">
+                            <span>PWM Qiymati:</span>
+                            <span id="pwmValue">0</span>
+                        </div>
+                        <div class="status-row">
+                            <span>Oqim:</span>
+                            <span id="currentValue">0 mA</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // System State Variables
+        let powerOn = false;
+        let motorRunning = false;
+        let motorDirection = 'stop'; // 'cw', 'ccw', 'stop'
+        let motorSpeed = 128; // 0-255
+        // Modalni ochish
+function openModal(id) {
+    document.getElementById(id).style.display = "block";
+}
+
+// Tugmalarni ulash
+document.getElementById("schemaBtn").addEventListener("click", () => openModal("schemaModal"));
+document.getElementById("codeBtn").addEventListener("click", () => openModal("codeModal"));
+document.getElementById("componentsBtn").addEventListener("click", () => openModal("componentsModal"));
+document.getElementById("infoFloatingBtn").addEventListener("click", () => openModal("infoModal"));
+
+// Yopish tugmalari
+document.querySelectorAll(".close").forEach(btn => {
+    btn.addEventListener("click", function() {
+        this.closest(".modal").style.display = "none";
+    });
+});
+
+// Tab switching (Kod uchun)
+document.querySelectorAll(".tab-btn").forEach(button => {
+    button.addEventListener("click", function() {
+        const tab = this.dataset.tab;
+        document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+        this.classList.add("active");
+        document.querySelectorAll(".tab-content").forEach(content => {
+            content.classList.remove("active");
+            if (content.id === tab) content.classList.add("active");
+        });
+    });
+});
+        // DOM Elements
+        const elements = {
+            powerLed: document.getElementById('powerLed'),
+            motorLed: document.getElementById('motorLed'),
+            boardPowerLed: document.getElementById('boardPowerLed'),
+            boardStatusLed: document.getElementById('boardStatusLed'),
+            motorRotor: document.getElementById('motorRotor'),
+            speedSlider: document.getElementById('speedSlider'),
+            speedDisplay: document.getElementById('speedDisplay'),
+            directionStatus: document.getElementById('directionStatus'),
+            speedStatus: document.getElementById('speedStatus'),
+            inputVoltage: document.getElementById('inputVoltage'),
+            motorVoltage: document.getElementById('motorVoltage'),
+            pwmValue: document.getElementById('pwmValue'),
+            currentValue: document.getElementById('currentValue')
+        };
+
+        // Update Status Displays
+        function updateStatus() {
+            // LED indicators
+            elements.powerLed.classList.toggle('on', powerOn);
+            elements.motorLed.classList.toggle('on', motorRunning);
+            if (elements.boardStatusLed) {
+                elements.boardStatusLed.classList.toggle('active', motorRunning);
+            }
+            
+            // Direction status
+            switch(motorDirection) {
+                case 'cw':
+                    elements.directionStatus.textContent = 'Soat yo\'nalishi';
+                    break;
+                case 'ccw':
+                    elements.directionStatus.textContent = 'Soat yo\'nalishi teskari';
+                    break;
+                default:
+                    elements.directionStatus.textContent = 'To\'xtagan';
+            }
+            
+            // Speed and voltage calculations
+            const speedPercent = Math.round((motorSpeed / 255) * 100);
+            const motorVolt = powerOn ? ((motorSpeed / 255) * 9).toFixed(1) : '0';
+            const estimatedRPM = motorRunning ? Math.round((motorSpeed / 255) * 3000) : 0;
+            const estimatedCurrent = motorRunning ? Math.round((motorSpeed / 255) * 200) : 0;
+            
+            elements.speedStatus.textContent = `${estimatedRPM} RPM`;
+            elements.motorVoltage.textContent = `${motorVolt}V`;
+            elements.pwmValue.textContent = motorSpeed;
+            elements.currentValue.textContent = `${estimatedCurrent} mA`;
+        }
+
+        // Power Control
+        function togglePower() {
+            powerOn = !powerOn;
+            
+            if (!powerOn) {
+                stopMotor();
+            }
+            
+            updateStatus();
+        }
+
+        // Motor Control Functions
+        function startMotorCW() {
+            if (!powerOn) {
+                alert('Avval quvvatni yoqing!');
+                return;
+            }
+            
+            motorRunning = true;
+            motorDirection = 'cw';
+            
+            // Remove previous rotation classes
+            elements.motorRotor.classList.remove('rotating-ccw');
+            
+            // Calculate animation duration based on speed
+            const duration = (500 - (motorSpeed / 255) * 400) / 1000; // 0.1s to 0.5s
+            elements.motorRotor.style.animationDuration = `${duration}s`;
+            elements.motorRotor.classList.add('rotating-cw');
+            
+            updateStatus();
+        }
+
+        function startMotorCCW() {
+            if (!powerOn) {
+                alert('Avval quvvatni yoqing!');
+                return;
+            }
+            
+            motorRunning = true;
+            motorDirection = 'ccw';
+            
+            // Remove previous rotation classes
+            elements.motorRotor.classList.remove('rotating-cw');
+            
+            // Calculate animation duration based on speed
+            const duration = (500 - (motorSpeed / 255) * 400) / 1000;
+            elements.motorRotor.style.animationDuration = `${duration}s`;
+            elements.motorRotor.classList.add('rotating-ccw');
+            
+            updateStatus();
+        }
+
+        function stopMotor() {
+            motorRunning = false;
+            motorDirection = 'stop';
+            
+            // Remove all rotation classes
+            elements.motorRotor.classList.remove('rotating-cw', 'rotating-ccw');
+            
+            updateStatus();
+        }
+
+        // Speed Control
+        function updateSpeed() {
+            motorSpeed = parseInt(elements.speedSlider.value);
+            const speedPercent = Math.round((motorSpeed / 255) * 100);
+            elements.speedDisplay.textContent = `Tezlik: ${motorSpeed} (${speedPercent}%)`;
+            
+            // Update motor rotation speed if running
+            if (motorRunning) {
+                const duration = (500 - (motorSpeed / 255) * 400) / 1000;
+                elements.motorRotor.style.animationDuration = `${duration}s`;
+            }
+            
+            updateStatus();
+        }
+
+        // Initialize the simulation
+        function initializeSimulation() {
+            updateStatus();
+            
+            // Set initial power LED state for the board
+            if (elements.boardPowerLed) {
+                elements.boardPowerLed.style.background = '#10b981';
+                elements.boardPowerLed.style.boxShadow = '0 0 10px rgba(16, 185, 129, 0.8)';
+            }
+        }
+
+        // Start initialization when page loads
+        document.addEventListener('DOMContentLoaded', initializeSimulation);
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(event) {
+            if (!powerOn) return;
+            
+            switch(event.key) {
+                case '1':
+                    startMotorCW();
+                    break;
+                case '2':
+                    startMotorCCW();
+                    break;
+                case ' ':
+                    event.preventDefault();
+                    stopMotor();
+                    break;
+            }
+        });
+    </script>
+</body>
+</html>

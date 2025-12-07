@@ -1,0 +1,2120 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aqlli uy Tizimi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #e6f3ff;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: auto;
+        }
+
+/* MODAL TUZATISH - Responsive va to'g'ri ko'rinish */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    overflow-y: auto;
+    padding: 20px 0;
+}
+
+.modal-content {
+    background: #000075;
+    color: white;
+    margin: 10vh auto 5vh;
+    padding: 30px;
+    width: 90%;
+    max-width: 800px;
+    border-radius: 20px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+    position: relative;
+    animation: slideDown 0.4s ease;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+/* Scroll bar stilizatsiyasi */
+.modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.close {
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    font-size: 32px;
+    font-weight: bold;
+    cursor: pointer;
+    color: white;
+    transition: all 0.3s;
+    z-index: 2010;
+    line-height: 1;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.close:hover {
+    background: rgba(255, 204, 0, 0.3);
+    color: #ffcc00;
+    transform: rotate(90deg);
+}
+
+.modal-content h2 {
+    font-size: 28px;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+    padding-right: 50px;
+}
+
+.card {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    transition: all 0.3s;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    z-index: 1;
+}
+
+.card:hover {
+    background: rgba(255, 255, 255, 0.18);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.card video {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    background: #000;
+    position: relative;
+    z-index: 2;
+}
+
+.card p {
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 10px 0 0;
+    position: relative;
+    z-index: 2;
+}
+
+.card strong {
+    color: #ffcc00;
+    font-size: 18px;
+}
+
+/* Tab buttons */
+.tab-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 2;
+}
+
+.tab-buttons button {
+    flex: 1;
+    min-width: 150px;
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s;
+    position: relative;
+    z-index: 2;
+}
+
+.tab-buttons button:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+}
+
+.tab-buttons button.active {
+    background: rgba(255, 204, 0, 0.4);
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(255, 204, 0, 0.3);
+}
+
+.tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease;
+    position: relative;
+    z-index: 2;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.tab-content pre {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    border-radius: 12px;
+    overflow-x: auto;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #00ff00;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    z-index: 2;
+}
+
+.tab-content pre::-webkit-scrollbar {
+    height: 8px;
+}
+
+.tab-content pre::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.tab-content pre::-webkit-scrollbar-thumb {
+    background: rgba(0, 255, 0, 0.3);
+    border-radius: 10px;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+/* Flex Layout: 40% Video + 60% Text */
+.flex-container-40-60 {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+}
+
+.flex-video-40 {
+    flex: 0 0 40%;
+}
+
+.flex-video-40 iframe {
+    width: 100%;
+    height: 250px;
+    border-radius: 10px;
+}
+
+.flex-text-60 {
+    flex: 0 0 60%;
+}
+
+.flex-text-60 p {
+    font-size: 16px;
+    line-height: 1.8;
+}
+
+/* Flex Layout: 30% Image + 70% Text */
+.flex-container-30-70 {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+}
+
+.flex-image-30 {
+    flex: 0 0 30%;
+}
+
+.flex-image-30 img {
+    width: 100%;
+    border-radius: 10px;
+}
+
+.flex-text-70 {
+    flex: 0 0 70%;
+}
+
+.flex-text-70 strong {
+    color: #ffcc00;
+    font-size: 18px;
+    display: block;
+    margin-bottom: 10px;
+}
+
+/* 100% Video */
+.video-full video {
+    width: 100%;
+    border-radius: 15px;
+}
+
+/* Dumaloq tugma */
+#infoFloatingBtn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #000075, #0000ff);
+    color: white;
+    border: 4px solid white;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    z-index: 1500;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+#infoFloatingBtn:hover {
+    transform: scale(1.1);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .flex-container-40-60,
+    .flex-container-30-70 {
+        flex-direction: column;
+    }
+    
+    .flex-video-40, .flex-text-60,
+    .flex-image-30, .flex-text-70 {
+        flex: 0 0 100%;
+    }
+}
+/* Tablet responsive */
+@media (max-width: 1024px) {
+    .modal {
+        padding: 15px 0;
+    }
+    
+    .modal-content {
+        width: 95%;
+        padding: 25px;
+        max-height: 75vh;
+        margin: 8vh auto 5vh;
+    }
+    
+    .modal-content h2 {
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+    
+    .card {
+        padding: 15px;
+    }
+    
+    .card p {
+        font-size: 15px;
+    }
+    
+    .tab-buttons button {
+        font-size: 15px;
+        padding: 10px 15px;
+    }
+}
+
+/* Mobile responsive */ 
+@media (max-width: 768px) {
+    .modal {
+        padding: 10px 0;
+    }
+    
+    .modal-content {
+        width: 96%;
+        padding: 20px 15px;
+        margin: 5vh auto 3vh;
+        max-height: 85vh;
+        border-radius: 15px;
+    }
+    
+    .close {
+        right: 10px;
+        top: 10px;
+        font-size: 28px;
+        width: 35px;
+        height: 35px;
+    }
+    
+    .modal-content h2 {
+        font-size: 20px;
+        margin-bottom: 15px;
+        padding-bottom: 12px;
+        padding-right: 45px;
+    }
+    
+    .card {
+        padding: 12px;
+        margin-bottom: 15px;
+        border-radius: 12px;
+    }
+    
+    .card video {
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+    
+    .card p {
+        font-size: 14px;
+        line-height: 1.5;
+    }
+    
+    .card strong {
+        font-size: 16px;
+    }
+    
+    .tab-buttons {
+        gap: 8px;
+        margin-bottom: 15px;
+    }
+    
+    .tab-buttons button {
+        min-width: 120px;
+        font-size: 14px;
+        padding: 10px 12px;
+        border-radius: 8px;
+    }
+    
+    .tab-content pre {
+        padding: 15px;
+        font-size: 12px;
+        line-height: 1.5;
+        border-radius: 10px;
+    }
+}
+
+
+/* Small mobile */
+@media (max-width: 480px) {
+    .modal {
+        padding: 5px 0;
+    }
+    
+    .modal-content {
+        width: 98%;
+        padding: 15px 12px;
+        margin: 3vh auto 2vh;
+        max-height: 90vh;
+        border-radius: 12px;
+    }
+    
+    .close {
+        right: 8px;
+        top: 8px;
+        font-size: 24px;
+        width: 30px;
+        height: 30px;
+    }
+    
+    .modal-content h2 {
+        font-size: 18px;
+        margin-bottom: 12px;
+        padding-bottom: 10px;
+        padding-right: 40px;
+    }
+    
+    .card {
+        padding: 10px;
+        margin-bottom: 12px;
+        border-radius: 10px;
+    }
+    
+    .card p {
+        font-size: 13px;
+    }
+    
+    .card strong {
+        font-size: 15px;
+    }
+    
+    .tab-buttons {
+        flex-direction: column;
+        gap: 6px;
+    }
+    
+    .tab-buttons button {
+        width: 100%;
+        min-width: 100%;
+        font-size: 13px;
+        padding: 10px;
+    }
+    
+    .tab-content pre {
+        padding: 12px;
+        font-size: 11px;
+        line-height: 1.4;
+    }
+}
+
+/* Very small mobile */
+@media (max-width: 360px) {
+    .modal-content {
+        padding: 12px 10px;
+        margin: 2vh auto 1vh;
+    }
+    
+    .modal-content h2 {
+        font-size: 16px;
+    }
+    
+    .card {
+        padding: 8px;
+    }
+    
+    .card p {
+        font-size: 12px;
+    }
+    
+    .tab-buttons button {
+        font-size: 12px;
+        padding: 8px;
+    }
+    
+    .tab-content pre {
+        padding: 10px;
+        font-size: 10px;
+    }
+}
+
+/* Landscape mode fixes */
+@media (max-width: 1024px) and (orientation: landscape) {
+    .modal-content {
+        max-height: 80vh;
+        margin: 5vh auto 3vh;
+    }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .tab-buttons button {
+        min-height: 44px;
+    }
+    
+    .close {
+        min-width: 44px;
+        min-height: 44px;
+    }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    .modal-content {
+        border: 3px solid white;
+    }
+    
+    .card {
+        border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .modal-content,
+    .card,
+    .tab-buttons button,
+    .close {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+/* Print styles */
+@media print {
+    .modal {
+        display: none !important;
+    }
+}
+
+/* Scroll bar stilizatsiyasi */
+.modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.close {
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    font-size: 32px;
+    font-weight: bold;
+    cursor: pointer;
+    color: white;
+    transition: all 0.3s;
+    z-index: 10;
+    line-height: 1;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.close:hover {
+    background: rgba(255, 204, 0, 0.3);
+    color: #ffcc00;
+    transform: rotate(90deg);
+}
+
+.modal-content h2 {
+    font-size: 28px;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+    padding-right: 50px;
+}
+
+.card {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    transition: all 0.3s;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.card:hover {
+    background: rgba(255, 255, 255, 0.18);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.card video {
+    width: 100%;
+    max-width: 70%;
+    height: auto;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    background: #000;
+}
+
+.card p {
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 10px 0 0;
+}
+
+
+.card strong {
+    color: #ffcc00;
+    font-size: 18px;
+}
+
+/* Tab buttons */
+.tab-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.tab-buttons button {
+    flex: 1;
+    min-width: 150px;
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.tab-buttons button:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+}
+
+.tab-buttons button.active {
+    background: rgba(255, 204, 0, 0.4);
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(255, 204, 0, 0.3);
+}
+
+.tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.tab-content pre {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    border-radius: 12px;
+    overflow-x: auto;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #00ff00;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tab-content pre::-webkit-scrollbar {
+    height: 8px;
+}
+
+.tab-content pre::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.tab-content pre::-webkit-scrollbar-thumb {
+    background: rgba(0, 255, 0, 0.3);
+    border-radius: 10px;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Tablet responsive */
+@media (max-width: 1024px) {
+    .modal {
+        padding: 15px 0;
+    }
+    
+    .modal-content {
+        width: 95%;
+        padding: 25px;
+        max-height: 80vh;
+    }
+    
+    .modal-content h2 {
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+    
+    .card {
+        padding: 15px;
+    }
+    
+    .card p {
+        font-size: 15px;
+    }
+    
+    .tab-buttons button {
+        font-size: 15px;
+        padding: 10px 15px;
+    }
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .modal {
+        padding: 10px 0;
+    }
+    
+    .modal-content {
+        width: 96%;
+        padding: 20px 15px;
+        margin: 2vh auto;
+        max-height: 90vh;
+        border-radius: 15px;
+    }
+    
+    .close {
+        right: 10px;
+        top: 10px;
+        font-size: 28px;
+        width: 35px;
+        height: 35px;
+    }
+    
+    .modal-content h2 {
+        font-size: 20px;
+        margin-bottom: 15px;
+        padding-bottom: 12px;
+        padding-right: 45px;
+    }
+    
+    .card {
+        padding: 12px;
+        margin-bottom: 15px;
+        border-radius: 12px;
+    }
+    
+    .card video {
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+    
+    .card p {
+        font-size: 14px;
+        line-height: 1.5;
+    }
+    
+    .card strong {
+        font-size: 16px;
+    }
+    
+    .tab-buttons {
+        gap: 8px;
+        margin-bottom: 15px;
+    }
+    
+    .tab-buttons button {
+        min-width: 120px;
+        font-size: 14px;
+        padding: 10px 12px;
+        border-radius: 8px;
+    }
+    
+    .tab-content pre {
+        padding: 15px;
+        font-size: 12px;
+        line-height: 1.5;
+        border-radius: 10px;
+    }
+}
+
+
+/* Small mobile */
+@media (max-width: 480px) {
+    .modal {
+        padding: 5px 0;
+    }
+    
+    .modal-content {
+        width: 98%;
+        padding: 15px 12px;
+        margin: 1vh auto;
+        max-height: 92vh;
+        border-radius: 12px;
+    }
+    
+    .close {
+        right: 8px;
+        top: 8px;
+        font-size: 24px;
+        width: 30px;
+        height: 30px;
+    }
+    
+    .modal-content h2 {
+        font-size: 18px;
+        margin-bottom: 12px;
+        padding-bottom: 10px;
+        padding-right: 40px;
+    }
+    
+    .card {
+        padding: 10px;
+        margin-bottom: 12px;
+        border-radius: 10px;
+    }
+    
+    .card p {
+        font-size: 13px;
+    }
+    
+    .card strong {
+        font-size: 15px;
+    }
+    
+    .tab-buttons {
+        flex-direction: column;
+        gap: 6px;
+    }
+    
+    .tab-buttons button {
+        width: 100%;
+        min-width: 100%;
+        font-size: 13px;
+        padding: 10px;
+    }
+    
+    .tab-content pre {
+        padding: 12px;
+        font-size: 11px;
+        line-height: 1.4;
+    }
+}
+
+/* Very small mobile */
+@media (max-width: 360px) {
+    .modal-content {
+        padding: 12px 10px;
+    }
+    
+    .modal-content h2 {
+        font-size: 16px;
+    }
+    
+    .card {
+        padding: 8px;
+    }
+    
+    .card p {
+        font-size: 12px;
+    }
+    
+    .tab-buttons button {
+        font-size: 12px;
+        padding: 8px;
+    }
+    
+    .tab-content pre {
+        padding: 10px;
+        font-size: 10px;
+    }
+}
+
+/* Landscape mode fixes */
+@media (max-width: 1024px) and (orientation: landscape) {
+    .modal-content {
+        max-height: 85vh;
+        margin: 2vh auto;
+    }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .tab-buttons button {
+        min-height: 44px;
+    }
+    
+    .close {
+        min-width: 44px;
+        min-height: 44px;
+    }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    .modal-content {
+        border: 3px solid white;
+    }
+    
+    .card {
+        border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .modal-content,
+    .card,
+    .tab-buttons button,
+    .close {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+/* Print styles */
+@media print {
+    .modal {
+        display: none !important;
+    }
+}
+        /* HEADER */
+        .header {
+            display: flex;
+            align-items: center;
+            background: #000075;
+            color: white;
+            padding: 10px 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            width: 100%;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(45deg, #ff6b35, #f7931e);
+            border-radius: 50%;
+            border: 2px solid white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+        }
+
+        /* MAIN LAYOUT */
+        .main-container {
+            display: flex;
+            margin-top: 20px;
+            position: relative;
+            gap: 20px;
+        }
+
+        /* LEFT PANEL */
+        .left-panel {
+            width: 250px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            height: fit-content;
+            position: relative;
+            z-index: 1;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 15px;
+        }
+
+        .control-group h3 {
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 8px;
+            font-size: 14px;
+            border-radius: 5px;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn-success { 
+            background: #28a745; 
+            color: white; 
+        }
+        .btn-danger { 
+            background: #dc3545; 
+            color: white; 
+        }
+        .btn-primary { 
+            background: #000075; 
+            color: white; 
+        }
+        .btn-info { 
+            background: #17a2b8; 
+            color: white; 
+        }
+
+        /* STATUS INDICATORS */
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 8px 0;
+            font-size: 13px;
+        }
+
+        .status-led {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #dc3545;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+        }
+
+        .status-led.on {
+            background: #28a745;
+            box-shadow: 0 0 10px rgba(40, 167, 69, 0.8);
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .title-header {
+            background: #000075;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0 auto 30px;
+            text-align: center;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        /* CIRCUIT BOARD */
+        .circuit-container {
+           
+            border-radius: 15px;
+            padding: 30px;
+            position: relative;
+            min-height: 600px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .circuit-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(255,255,255,0.05) 1px, transparent 1px),
+                radial-gradient(circle at 80% 40%, rgba(255,255,255,0.05) 1px, transparent 1px),
+                radial-gradient(circle at 40% 80%, rgba(255,255,255,0.05) 1px, transparent 1px);
+            background-size: 40px 40px, 60px 60px, 80px 80px;
+        }
+
+        /* ARDUINO UNO */
+        .arduino-uno {
+            position: absolute;
+            top: 150px;
+            left: 50px;
+            width: 400px;
+            height: 400px;
+           border-radius: 8px;
+            
+             z-index: 10;
+        }
+
+        .arduino-label {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            background: rgba(0,0,0,0.3);
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .arduino-pins {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .pin-row {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .pin {
+            width: 8px;
+            height: 8px;
+            background: #ffd700;
+            border-radius: 2px;
+            border: 1px solid #333;
+        }
+
+        /* BLUETOOTH MODULE */
+        .bluetooth-module {
+            position: absolute;
+            top: 80px;
+            left: 00px;
+            width: 200px;
+            height: 100px;
+          border-radius: 6px;
+         z-index: 10;
+        }
+
+        .bluetooth-label {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        /* RELAY MODULES */
+        .relay-module {
+            position: absolute;
+            width: 200px;
+            height: 220px;
+            border-radius: 6px;
+            z-index: 10;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .relay-module:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(74, 144, 226, 0.6);
+        }
+
+  
+
+        .relay1 { top: 50px; left: 500px; }
+        .relay2 { top: 150px; left: 500px; }
+        .relay3 { top: 250px; left: 500px; }
+        .relay4 { top: 350px; left: 500px; }
+
+        .relay-label {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 9px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        /* LED INDICATORS */
+        .led-indicator {
+            position: absolute;
+           width: 20px;
+            height: 30px;
+            border-radius: 10px 10px 0 0;   
+            background: #dc3545;
+            border: 2px solid #333;
+            box-shadow: 2px 2px 6px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .led-indicator.on {
+            background: #ff4444;
+            box-shadow: 0 0 20px rgba(255, 68, 68, 0.8);
+            animation: ledGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes ledGlow {
+            0% { box-shadow: 0 0 20px rgba(255, 68, 68, 0.8); }
+            100% { box-shadow: 0 0 30px rgba(255, 68, 68, 1); }
+        }
+
+        .led1 { top: 130px; left: 700px; }
+        .led2 { top: 230px; left: 700px; }
+        .led3 { top: 330px; left: 700px; }
+        .led4 { top: 430px; left: 700px; }
+
+        /* POWER SUPPLY */
+        .power-supply {
+            position: absolute;
+            bottom: 0px;
+            left: 812px;
+            width: 50px;
+            height: 100px;
+            border-radius: 6px;
+            z-index: 10;
+        }
+
+        .power-label {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 9px;
+            font-weight: bold;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        /* WIRES */
+        .wire {
+            position: absolute;
+            border-radius: 2px;
+            z-index: 10;
+        }
+
+        .wire-red { background: #ff0000; }
+        .wire-black { background: #000000; }
+        .wire-blue { background: #0066ff; }
+        .wire-green { background: #00ff00; }
+        .wire-yellow { background: #ffff00; }
+        .wire-purple { background: #8a2be2; }
+        .wire-orange { background: #ff8c00; }
+
+        /* Horizontal wires */
+        .wire-h { height: 3px; }
+
+        /* Vertical wires */
+        .wire-v { width: 3px; }
+
+        /* Wire connections from Arduino to components */
+        .wire1 { top: 148px; left: 180px; width: 220px; }
+        .wire2 { top: 135px; left: 180px; width: 210px; height: 3px; }
+        .wire3 { top: 110px; left: 280px; width: 3px; height: 353px; }
+        .wire4 { top: 110px; left: 180px; width: 103px; height: 3px; }
+        .wire10{top: 122px; left: 180px; width: 53px; height: 3px; }
+        .wire11{top: 122px; left: 230px; width: 3px; height: 120px; }
+        .wire5 { top: 178px; left: 302px; width: 150px; }
+        .wire6 { top: 365px; left: 450px; width: 100px; height: 3px; }
+        .wire7 { top: 178px; left: 450px; width: 3px; height: 190px; }
+        .wire8 { top: 178px; left: 300px; width: 3px; height: 65px; }
+        .wire9{top: 460px; left: 283px; width: 3px; height: 18px}
+        .wire12{top: 475px; left: 283px; width: 260px; height: 3px}
+        .wire13{top: 175px; left: 473px; width: 3px; height: 303px}
+        .wire14{top: 174.5px; left: 473px; width: 80px; height: 3px}
+        .wire15{top: 274.5px; left: 473px; width: 80px; height: 3px}
+        .wire16{top: 374.5px; left: 473px; width: 80px; height: 3px}
+        .wire17{top: 460px; left: 294px; width: 3px; height: 28px}
+        .wire18{top: 485px; left: 294px; width: 250px; height: 3px}
+        .wire19{top: 185px; left: 485px; width: 3px; height: 303px}
+        .wire20{top: 184.5px; left: 485px; width: 60px; height: 3px}
+        .wire21{top: 284.5px; left: 485px; width: 60px; height: 3px}
+        .wire22{top: 384.5px; left: 485px; width: 60px; height: 3px}
+        .wire23 { top: 165px; left: 263px; width: 3px; height: 80px; }
+        .wire24 { top: 165px; left: 263px; width: 290px; height: 3px; }
+         .wire25 { top: 172px; left: 285px; width: 180px; }
+        .wire26 { top: 265px; left: 463px; width: 80px; height: 3px; }
+        .wire27 { top: 174px; left: 463px; width: 3px; height:92px; }
+        .wire28 { top: 174px; left: 285px; width: 3px; height: 70px; }
+          .wire29 { top: 190px; left: 240px; width: 190px; }
+        .wire30 { top: 465px; left: 430px; width: 110px; height: 3px; }
+        .wire31{ top: 190px; left: 430px; width: 3px; height: 278px; }
+        .wire32 { top: 190px; left: 240px; width: 3px; height: 55px; }
+        .wire33 { top: 485px; left: 662px; width: 170px; height: 3px; }
+        .wire34 { top: 465px; left: 662px; width: 175px; height: 3px; }
+         .wire35 { top: 385px; left: 662px; width: 170px; height: 3px;  }
+        .wire36 { top: 365px; left: 662px; width: 175px; height: 3px; }
+         .wire37 { top: 285px;left: 662px; width: 170px; height: 3px; }
+        .wire38 { top: 265px; left: 662px; width: 175px; height: 3px; }
+         .wire39 { top: 185px; left: 662px; width: 170px; height: 3px;  }
+        .wire40 { top: 165px; left: 662px; width: 175px; height: 3px; }
+        /* Power wires */
+        .wire-power1 { bottom: 100px; left: 831px; width: 3px; height: 315px; }
+        .wire-power2 { bottom: 100px; left: 835px; width: 3px; height: 335px;}
+        .wire-power3 { top: 148px; left: 397px; width: 3px; height: 95px; }
+        .wire-power4 { top: 137px; left: 387px; width: 3px; height: 106px; }
+        /* CONTROL PANEL */
+        .control-panel {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 100;
+        }
+
+        .control-button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 12px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            min-width: 120px;
+        }
+
+        .btn-connect {
+            background: linear-gradient(45deg, #4169e1, #8a2be2);
+            color: white;
+        }
+
+        .btn-disconnect {
+            background: linear-gradient(45deg, #dc3545, #c82333);
+            color: white;
+        }
+
+        .control-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        /* CONNECTION STATUS */
+        .connection-status {
+            position: fixed;
+            top: 90px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-size: 12px;
+            z-index: 100;
+        }
+
+        .status-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #dc3545;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+
+        .status-dot.connected {
+            background: #28a745;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        /* RESPONSIVE DESIGN */
+        @media (max-width: 1024px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .left-panel {
+                width: 100%;
+            }
+            
+            .circuit-container {
+                min-height: 500px;
+            }
+            
+            .control-panel {
+                position: relative;
+                margin-top: 20px;
+                flex-direction: row;
+                justify-content: center;
+            }
+            
+            .connection-status {
+                position: relative;
+                margin: 20px auto;
+                width: fit-content;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .arduino-uno {
+                width: 150px;
+                height: 90px;
+                top: 40px;
+                left: 30px;
+            }
+            
+            .bluetooth-module {
+                width: 80px;
+                height: 50px;
+                left: 200px;
+            }
+            
+            .relay-module {
+                width: 60px;
+                height: 40px;
+            }
+            
+            .relay1 { top: 200px; left: 300px; }
+            .relay2 { top: 200px; left: 380px; }
+            .relay3 { top: 260px; left: 300px; }
+            .relay4 { top: 260px; left: 380px; }
+        }
+           a{
+            text-decoration: none;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="logo">
+          <a href="/"><img src="/static/image/logo.png" width="80px" height="80px" alt=""></a>
+          <span>Smart Home Automation System</span>
+        </div>
+    </header>
+
+    <!-- CONNECTION STATUS -->
+    <div class="connection-status">
+        <span class="status-dot" id="connectionDot"></span>
+        <span id="connectionText">Bluetooth: Disconnected</span>
+    </div>
+
+    <!-- MAIN CONTAINER -->
+    <div class="main-container">
+        <!-- LEFT PANEL -->
+        <div class="left-panel">
+            <div class="control-group">
+                <h3>Device Control</h3>
+                <button class="btn btn-success" onclick="toggleRelay(1)" id="relay1Btn">
+                    Light 1: OFF
+                </button>
+                <button class="btn btn-success" onclick="toggleRelay(2)" id="relay2Btn">
+                    Light 2: OFF
+                </button>
+                <button class="btn btn-success" onclick="toggleRelay(3)" id="relay3Btn">
+                    Fan: OFF
+                </button>
+                <button class="btn btn-success" onclick="toggleRelay(4)" id="relay4Btn">
+                    Socket: OFF
+                </button>
+            </div>
+
+            <div class="control-group">
+                <h3>System Control</h3>
+                <button class="btn btn-primary" onclick="toggleAllDevices()">
+                    All ON/OFF
+                </button>
+                <button class="btn btn-info" onclick="scheduleMode()">
+                    Schedule Mode
+                </button>
+                <button class="btn btn-danger" onclick="emergencyStop()">
+                    Emergency Stop
+                </button>
+            </div>
+
+     <div class="control-group">
+    <h3>Ma'lumotlar</h3>
+    <button class="btn btn-primary" id="schemaBtn">💡 Sxema qayerda ishlatiladi</button>
+    <button class="btn btn-primary" id="codeBtn">💻 Kod</button>
+    <button class="btn btn-primary" id="componentsBtn">🔌 Qurilmalar</button>
+</div>
+
+
+            <div class="control-group">
+                <h3>Connection</h3>
+                <button class="btn btn-primary" onclick="connectBluetooth()" id="connectBtn">
+                    Connect Bluetooth
+                </button>
+                <button class="btn btn-danger" onclick="disconnectBluetooth()" id="disconnectBtn">
+                    Disconnect
+                </button>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+
+            
+            <div class="circuit-container">
+                <!-- Arduino UNO -->
+                  <div class="bluetooth-module">
+                   <img src="/static/image/bluetooth-hc-05-removebg-preview - Copy.png" width="100%" height="100%" alt="">
+                </div>
+                <div class="arduino-uno">
+                   <img src="/static/image/arduino1 - Copy.png" width="100%" height="100%" alt="">
+                </div>
+
+                <!-- Bluetooth Module -->   
+               
+
+                <!-- Relay Modules -->
+                <div class="relay-module relay1" id="relay1" onclick="toggleRelay(1)">
+                   <img src="/static/image/Single-Relay-Board-640x640-removebg-preview.png" width="100%" height="100%" alt="">
+                </div>
+                <div class="relay-module relay2" id="relay2" onclick="toggleRelay(2)">
+                   <img src="/static/image/Single-Relay-Board-640x640-removebg-preview.png" width="100%" height="100%" alt="">
+                </div>
+                <div class="relay-module relay3" id="relay3" onclick="toggleRelay(3)">
+                   <img src="/static/image/Single-Relay-Board-640x640-removebg-preview.png" width="100%" height="100%" alt="">
+           </div>
+                <div class="relay-module relay4" id="relay4" onclick="toggleRelay(4)">
+                   <img src="/static/image/Single-Relay-Board-640x640-removebg-preview.png" width="100%" height="100%" alt=""> 
+                </div>
+
+                <!-- LED Indicators -->
+                <div class="led-indicator led1" id="led1"></div>
+                <div class="led-indicator led2" id="led2"></div>
+                <div class="led-indicator led3" id="led3"></div>
+                <div class="led-indicator led4" id="led4"></div>
+
+                <!-- Power Supply -->
+                <div class="power-supply">
+                   <img src="/static/image/tpp.png" width="100%" height="100%"  alt="">
+                </div>
+
+                <!-- Wiring -->
+                <div class="wire wire-blue wire-h wire1"></div>
+                <div class="wire wire-blue wire-h wire2"></div>
+                <div class="wire wire-blue wire-v wire3"></div>
+                <div class="wire wire-blue wire-h wire4"></div>
+                     <div class="wire wire-blue wire-v wire10"></div>
+                <div class="wire wire-blue wire-h wire11"></div>
+                <div class="wire wire-green wire-h wire5"></div>
+                <div class="wire wire-green wire-h wire6"></div>
+                <div class="wire wire-green wire-v wire7"></div>
+                <div class="wire wire-green wire-v wire8"></div>
+                 <div class="wire wire-red wire-h wire9"></div>
+<div class="wire wire-red wire-h wire12"></div>
+<div class="wire wire-red wire-h wire13"></div>
+<div class="wire wire-red wire-h wire14"></div>
+<div class="wire wire-red wire-h wire15"></div>
+<div class="wire wire-red wire-h wire16"></div>
+         <div class="wire wire-black wire-h wire17"></div>
+<div class="wire wire-black wire-h wire18"></div>
+<div class="wire wire-black wire-h wire19"></div>
+<div class="wire wire-black wire-h wire20"></div>
+<div class="wire wire-black wire-h wire21"></div>
+<div class="wire wire-black wire-h wire22"></div>
+     <div class="wire wire-purple wire-v wire23"></div>
+                <div class="wire wire-yellow wire-h wire28"></div>
+                <div class="wire wire-yellow wire-h wire25"></div>
+                <div class="wire wire-yellow wire-v wire26"></div>
+                <div class="wire wire-yellow wire-v wire27"></div>
+                <div class="wire wire-purple wire-v wire24"></div>
+                 <div class="wire wire-green wire-h wire29"></div>
+                <div class="wire wire-green wire-h wire30"></div>
+                <div class="wire wire-green wire-v wire31"></div>
+                <div class="wire wire-green wire-v wire32"></div>
+                <div class="wire wire-red wire-v wire-power1"></div>
+                <div class="wire wire-black wire-h wire-power2"></div>
+                <div class="wire wire-blue wire-v wire-power3"></div>
+                <div class="wire wire-blue wire-v wire-power4"></div>
+                <div class="wire wire-red wire-h wire33"></div>
+                <div class="wire wire-black wire-h wire34"></div>
+                <div class="wire wire-red wire-h wire35"></div>
+                <div class="wire wire-black wire-h wire36"></div>
+                <div class="wire wire-red wire-h wire37"></div>
+                <div class="wire wire-black wire-h wire38"></div>
+                <div class="wire wire-red wire-h wire39"></div>
+                <div class="wire wire-black wire-h wire40"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONTROL PANEL -->
+    <div class="control-panel">
+        <button class="control-button btn-connect" onclick="connectBluetooth()">
+            📱 Qurilmani ulash
+        </button>
+        <button class="control-button btn-disconnect" onclick="resetSystem()">
+            🔄 Tizimni Qayta ishga tushirish 
+        </button>
+    </div>
+<!-- ✅ 1) Sxema qayerda ishlatiladi (DC Motor / L298N) -->
+    <div class="modal" id="schemaModal">
+        <div class="modal-content">
+            <span class="close" title="Yopish">&times;</span>
+            <h2>💡 Sxema qayerda ishlatiladi </h2>
+
+            <div class="flex-container-40-60">
+                <div class="flex-video-40">
+                    <!-- 1-video (xohlasangiz almashtiring) -->
+                    <iframe src="https://www.youtube.com/embed/Ohjlj0z85hQ?si=Yq0r3gaQDmtTmdUi" title="DC Motor Control with L298N"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen></iframe>
+                </div>
+                <div class="flex-text-60">
+                    <strong>Tajriba haqida to‘liq ma’lumot</strong>
+                   <p>Bu tajribada ishlatiladi:
+
+Arduino UNO
+
+Bluetooth HC-05
+
+4-kanalli Relay modullari
+
+4 ta LED yuk (simulyatsiya qurilma sifatida)
+
+USB 5V quvvat manbai
+</p>
+                </div>
+            </div>
+
+            <div class="flex-container-40-60">
+                <div class="flex-video-40">
+                    <!-- 2-video (ixtiyoriy) -->
+                    <iframe src="https://www.youtube.com/embed/vhyZUj5e64Y?si=niZVHK_JZT0IWWCi" title="PWM Speed Control"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen></iframe>
+                </div>
+                <div class="flex-text-60">
+                    <strong>🔄 Ishlash prinsipi</strong>
+                    <p>Bu tajribada telefoningiz orqali Bluetooth HC-05 moduliga buyruqlar yuborasiz. HC-05 Bluetooth signallarni qabul qilib, Arduino UNO ga uzatadi. Arduino kelgan buyruqlarni tahlil qiladi va mos ravishda 4 ta relay modulining birini yoqadi yoki o‘chiradi.
+
+Relay esa o‘z navbatida tashqi yuklar — LEDlar, lampalar yoki boshqa 5V qurilmalarni elektr tarmog‘iga ulaydi yoki uzib qo‘yadi. Shuning uchun telefon orqali haqiqiy elektr qurilmalarni boshqarish imkoni paydo bo‘ladi.</p>
+                </div>
+            </div>
+              <div class="flex-container-40-60">
+                <div class="flex-video-40">
+                    <!-- 2-video (ixtiyoriy) -->
+                    <iframe src="https://www.youtube.com/embed/3JyXT4uXgoc?si=kJR3PDyk3ng5Ay7p" title="PWM Speed Control"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen></iframe>
+                </div>
+                <div class="flex-text-60">
+                    <strong>Tajriba Maqsadi</strong>
+               <p>
+Bu tizimning maqsadi:
+📲 Telefon → Bluetooth orqali buyruq yuboradi → Arduino → Relay → LED (yoki real qurilmalar) boshqariladi.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+  <div class="modal" id="codeModal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>💻 Kod</h2>
+
+        <div class="tab-buttons">
+            <button class="tab-btn active" data-tab="mblock">mBlock Kodi</button>
+            <button class="tab-btn" data-tab="arduino">Arduino Kodi</button>
+        </div>
+
+        <div class="tab-content active" id="mblock">
+            <pre><img src="/static/image/smarthome2.gif" alt="mBlock Code" style="width: 80%; height: auto;"></pre>
+        </div>
+
+        <div class="tab-content" id="arduino">
+            <pre>
+#include <SoftwareSerial.h>
+
+SoftwareSerial BT(10, 11); // RX, TX
+
+// Relay pinlari
+#define RELAY1 2
+#define RELAY2 3
+#define RELAY3 4
+#define RELAY4 5
+
+void setup() {
+  Serial.begin(9600);
+  BT.begin(9600);
+
+  pinMode(RELAY1, OUTPUT);
+  pinMode(RELAY2, OUTPUT);
+  pinMode(RELAY3, OUTPUT);
+  pinMode(RELAY4, OUTPUT);
+
+  // Barcha releni o‘chirish
+  digitalWrite(RELAY1, HIGH);
+  digitalWrite(RELAY2, HIGH);
+  digitalWrite(RELAY3, HIGH);
+  digitalWrite(RELAY4, HIGH);
+
+  Serial.println("Bluetooth Relay System Started!");
+}
+
+void loop() {
+  if (BT.available()) {
+    char cmd = BT.read();
+    Serial.println(cmd);
+
+    switch (cmd) {
+
+      case '1': digitalWrite(RELAY1, LOW); break;
+      case 'A': digitalWrite(RELAY1, HIGH); break;
+
+      case '2': digitalWrite(RELAY2, LOW); break;
+      case 'B': digitalWrite(RELAY2, HIGH); break;
+
+      case '3': digitalWrite(RELAY3, LOW); break;
+      case 'C': digitalWrite(RELAY3, HIGH); break;
+
+      case '4': digitalWrite(RELAY4, LOW); break;
+      case 'D': digitalWrite(RELAY4, HIGH); break;
+
+    }
+  }
+}
+
+            </pre>
+        </div>
+    </div>
+</div>
+<div class="modal" id="componentsModal">
+    <div class="modal-content">
+        <span class="close" title="Yopish">&times;</span>
+        <h2>🔌 Ishlatilgan Qurilmalar</h2>
+
+        <!-- 1) Arduino UNO -->
+        <div class="flex-container-30-70">
+            <div class="flex-image-30">
+                <img src="/static/image/arduino1.png" alt="Arduino UNO">
+            </div>
+            <div class="flex-text-70">
+                <strong>Arduino UNO</strong>
+                <p>Boshqaruvchi mikrokontroller. Bluetoothdan kelgan signalni qabul qiladi va relaylarni boshqaradi.</p>
+            </div>
+        </div>
+
+        <!-- 2) Bluetooth HC-05 -->
+        <div class="flex-container-30-70">
+            <div class="flex-image-30">
+                <img src="/static/image/bluetooth-hc-05.png" alt="Bluetooth HC-05">
+            </div>
+            <div class="flex-text-70">
+                <strong>Bluetooth HC-05</strong>
+                <p>Telefon orqali Arduino bilan simsiz aloqa o‘rnatadi.</p>
+            </div>
+        </div>
+
+        <!-- 3) Relay Module -->
+        <div class="flex-container-30-70">
+            <div class="flex-image-30">
+                <img src="/static/image/relay.png" alt="Relay Module">
+            </div>
+            <div class="flex-text-70">
+                <strong>4-Kanalli Relay modul</strong>
+                <p>Yoritgich yoki boshqa qurilmalarni Arduino orqali elektr bilan boshqarish uchun ishlatiladi.</p>
+            </div>
+        </div>
+
+        <!-- 4) LED Lamp -->
+        <div class="flex-container-30-70">
+            <div class="flex-image-30">
+                <img src="/static/image/led.png" alt="LED Lamp">
+            </div>
+            <div class="flex-text-70">
+                <strong>LED</strong>
+                <p>Har bir relayga ulangan yuk (qurilma) sifatida ishlatiladi. Yongan/o‘chgan holat relay tomonidan boshqariladi.</p>
+            </div>
+        </div>
+
+        <!-- 5) USB Power -->
+        <div class="flex-container-30-70">
+            <div class="flex-image-30">
+                <img src="/static/image/tpp.png" alt="USB Power Supply">
+            </div>
+            <div class="flex-text-70">
+                <strong>USB quvvat manbai</strong>
+                <p>Arduino va relay modullariga 5V kuchlanish beradi.</p>
+            </div>
+        </div>
+
+        <!-- 6) Battery or Extra Power -->
+        <div class="flex-container-30-70">
+            <div class="flex-image-30">
+                <img src="/static/image/battery.png" alt="Battery Power">
+            </div>
+            <div class="flex-text-70">
+                <strong>Battereya va simlar</strong>
+                <p>Tizimga qo‘shimcha quvvat berish yoki simlar orqali ulanishlar uchun ishlatiladi.</p>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+    <!-- ✅ 4) Qo'shimcha info (ixtiyoriy) + suzuvchi tugma -->
+    <div class="modal" id="infoModal">
+        <div class="modal-content">
+            <span class="close" title="Yopish">&times;</span>
+            <h2>📚 Qo'shimcha Ma'lumot</h2>
+            <div class="video-full">
+                <video controls>
+                    <source src="/media/2.mp4" type="video/mp4">
+                    Brauzeringiz video formatni qo'llab-quvvatlamaydi.
+                </video>
+            </div>
+        </div>
+    </div>
+
+    <button id="infoFloatingBtn"><span>📚</span><span>Ma'lumot</span></button>
+
+    <script>
+        // System State
+        let bluetoothConnected = false;
+        let relayStates = {
+            1: false,
+            2: false,
+            3: false,
+            4: false
+        };
+// Modalni ochish
+function openModal(id) {
+    document.getElementById(id).style.display = "block";
+}
+
+// Tugmalarni ulash
+document.getElementById("schemaBtn").addEventListener("click", () => openModal("schemaModal"));
+document.getElementById("codeBtn").addEventListener("click", () => openModal("codeModal"));
+document.getElementById("componentsBtn").addEventListener("click", () => openModal("componentsModal"));
+document.getElementById("infoFloatingBtn").addEventListener("click", () => openModal("infoModal"));
+
+// Yopish tugmalari
+document.querySelectorAll(".close").forEach(btn => {
+    btn.addEventListener("click", function() {
+        this.closest(".modal").style.display = "none";
+    });
+});
+
+// Tab switching (Kod uchun)
+document.querySelectorAll(".tab-btn").forEach(button => {
+    button.addEventListener("click", function() {
+        const tab = this.dataset.tab;
+        document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+        this.classList.add("active");
+        document.querySelectorAll(".tab-content").forEach(content => {
+            content.classList.remove("active");
+            if (content.id === tab) content.classList.add("active");
+        });
+    });
+});
+        // DOM Elements
+        const elements = {
+            connectionDot: document.getElementById('connectionDot'),
+            connectionText: document.getElementById('connectionText'),
+            bluetoothLed: document.getElementById('bluetoothLed'),
+            relay1Led: document.getElementById('relay1Led'),
+            relay2Led: document.getElementById('relay2Led'),
+            relay3Led: document.getElementById('relay3Led'),
+            relay4Led: document.getElementById('relay4Led'),
+            relay1: document.getElementById('relay1'),
+            relay2: document.getElementById('relay2'),
+            relay3: document.getElementById('relay3'),
+            relay4: document.getElementById('relay4'),
+            led1: document.getElementById('led1'),
+            led2: document.getElementById('led2'),
+            led3: document.getElementById('led3'),
+            led4: document.getElementById('led4'),
+            relay1Btn: document.getElementById('relay1Btn'),
+            relay2Btn: document.getElementById('relay2Btn'),
+            relay3Btn: document.getElementById('relay3Btn'),
+            relay4Btn: document.getElementById('relay4Btn')
+        };
+
+        // Update Status Display
+        function updateStatus() {
+            // Update Bluetooth status
+            elements.bluetoothLed.classList.toggle('on', bluetoothConnected);
+            elements.connectionDot.classList.toggle('connected', bluetoothConnected);
+            elements.connectionText.textContent = bluetoothConnected ? 
+                'Bluetooth: Connected' : 'Bluetooth: Disconnected';
+
+            // Update relay statuses
+            for (let i = 1; i <= 4; i++) {
+                elements[`relay${i}Led`].classList.toggle('on', relayStates[i]);
+                elements[`relay${i}`].classList.toggle('active', relayStates[i]);
+                elements[`led${i}`].classList.toggle('on', relayStates[i]);
+                
+                // Update button text
+                const deviceNames = { 1: 'Light 1', 2: 'Light 2', 3: 'Fan', 4: 'Socket' };
+                elements[`relay${i}Btn`].textContent = 
+                    `${deviceNames[i]}: ${relayStates[i] ? 'ON' : 'OFF'}`;
+                elements[`relay${i}Btn`].className = 
+                    `btn ${relayStates[i] ? 'btn-danger' : 'btn-success'}`;
+            }
+        }
+
+        // Bluetooth Connection
+        function connectBluetooth() {
+            if (!bluetoothConnected) {
+                bluetoothConnected = true;
+                updateStatus();
+                
+                // Simulate connection animation
+                elements.connectionDot.style.animation = 'pulse 0.5s ease-in-out 3';
+                
+                setTimeout(() => {
+                    alert('Bluetooth HC-05 connected successfully!\nDevice ready for control.');
+                }, 500);
+            } else {
+                alert('Bluetooth is already connected!');
+            }
+        }
+
+        function disconnectBluetooth() {
+            bluetoothConnected = false;
+            updateStatus();
+            alert('Bluetooth disconnected.');
+        }
+
+        // Relay Control
+        function toggleRelay(relayNum) {
+            if (!bluetoothConnected) {
+                alert('Please connect Bluetooth first!');
+                return;
+            }
+
+            relayStates[relayNum] = !relayStates[relayNum];
+            updateStatus();
+
+            const deviceNames = { 1: 'Light 1', 2: 'Light 2', 3: 'Fan', 4: 'Socket' };
+            const status = relayStates[relayNum] ? 'turned ON' : 'turned OFF';
+            
+            // Simulate relay click sound and visual feedback
+            elements[`relay${relayNum}`].style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                elements[`relay${relayNum}`].style.transform = 'scale(1)';
+            }, 150);
+
+            console.log(`${deviceNames[relayNum]} ${status} via Bluetooth`);
+        }
+
+        // System Controls
+        function toggleAllDevices() {
+            if (!bluetoothConnected) {
+                alert('Please connect Bluetooth first!');
+                return;
+            }
+
+            const allOn = Object.values(relayStates).some(state => state);
+            const newState = !allOn;
+
+            for (let i = 1; i <= 4; i++) {
+                relayStates[i] = newState;
+            }
+
+            updateStatus();
+            alert(newState ? 'All devices turned ON' : 'All devices turned OFF');
+        }
+
+        function scheduleMode() {
+            if (!bluetoothConnected) {
+                alert('Please connect Bluetooth first!');
+                return;
+            }
+
+            alert('Schedule mode activated!\nDevices will follow programmed schedule.');
+            
+            // Simulate automated schedule
+            let scheduleStep = 0;
+            const schedule = [
+                { relay: 1, delay: 1000 },
+                { relay: 2, delay: 2000 },
+                { relay: 3, delay: 3000 },
+                { relay: 4, delay: 4000 }
+            ];
+
+            schedule.forEach(step => {
+                setTimeout(() => {
+                    toggleRelay(step.relay);
+                }, step.delay);
+            });
+        }
+
+        function emergencyStop() {
+            for (let i = 1; i <= 4; i++) {
+                relayStates[i] = false;
+            }
+            updateStatus();
+            alert('EMERGENCY STOP - All devices turned OFF!');
+        }
+
+        function resetSystem() {
+            bluetoothConnected = false;
+            for (let i = 1; i <= 4; i++) {
+                relayStates[i] = false;
+            }
+            updateStatus();
+            alert('System reset complete!');
+        }
+
+        // Initialize system
+        updateStatus();
+
+        // Simulate some system activity
+        setInterval(() => {
+            if (bluetoothConnected) {
+                elements.connectionDot.style.animation = 'pulse 1s ease-in-out';
+                setTimeout(() => {
+                    elements.connectionDot.style.animation = '';
+                }, 1000);
+            }
+        }, 5000);
+    </script>
+</body>
+</html>

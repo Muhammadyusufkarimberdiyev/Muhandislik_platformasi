@@ -1,0 +1,2698 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Imo-ishora boshqariladigan servomotor tizimi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #e6f3ff;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: auto;
+        }
+
+/* MODAL TUZATISH - Responsive va to'g'ri ko'rinish */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    overflow-y: auto;
+    padding: 20px 0;
+}
+
+.modal-content {
+    background: #000075;
+    color: white;
+    margin: 10vh auto 5vh;
+    padding: 30px;
+    width: 90%;
+    max-width: 800px;
+    border-radius: 20px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+    position: relative;
+    animation: slideDown 0.4s ease;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+/* Scroll bar stilizatsiyasi */
+.modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.close {
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    font-size: 32px;
+    font-weight: bold;
+    cursor: pointer;
+    color: white;
+    transition: all 0.3s;
+    z-index: 2010;
+    line-height: 1;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.close:hover {
+    background: rgba(255, 204, 0, 0.3);
+    color: #ffcc00;
+    transform: rotate(90deg);
+}
+
+.modal-content h2 {
+    font-size: 28px;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+    padding-right: 50px;
+}
+
+.card {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    transition: all 0.3s;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    z-index: 1;
+}
+
+.card:hover {
+    background: rgba(255, 255, 255, 0.18);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.card video {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    background: #000;
+    position: relative;
+    z-index: 2;
+}
+
+.card p {
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 10px 0 0;
+    position: relative;
+    z-index: 2;
+}
+
+.card strong {
+    color: #ffcc00;
+    font-size: 18px;
+}
+
+/* Tab buttons */
+.tab-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 2;
+}
+
+.tab-buttons button {
+    flex: 1;
+    min-width: 150px;
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s;
+    position: relative;
+    z-index: 2;
+}
+
+.tab-buttons button:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+}
+
+.tab-buttons button.active {
+    background: rgba(255, 204, 0, 0.4);
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(255, 204, 0, 0.3);
+}
+
+.tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease;
+    position: relative;
+    z-index: 2;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.tab-content pre {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    border-radius: 12px;
+    overflow-x: auto;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #00ff00;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    z-index: 2;
+}
+
+.tab-content pre::-webkit-scrollbar {
+    height: 8px;
+}
+
+.tab-content pre::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.tab-content pre::-webkit-scrollbar-thumb {
+    background: rgba(0, 255, 0, 0.3);
+    border-radius: 10px;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+/* Flex Layout: 40% Video + 60% Text */
+.flex-container-40-60 {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+}
+
+.flex-video-40 {
+    flex: 0 0 40%;
+}
+
+.flex-video-40 iframe {
+    width: 100%;
+    height: 250px;
+    border-radius: 10px;
+}
+
+.flex-text-60 {
+    flex: 0 0 60%;
+}
+
+.flex-text-60 p {
+    font-size: 16px;
+    line-height: 1.8;
+}
+
+/* Flex Layout: 30% Image + 70% Text */
+.flex-container-30-70 {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+}
+
+.flex-image-30 {
+    flex: 0 0 30%;
+}
+
+.flex-image-30 img {
+    width: 100%;
+    border-radius: 10px;
+}
+
+.flex-text-70 {
+    flex: 0 0 70%;
+}
+
+.flex-text-70 strong {
+    color: #ffcc00;
+    font-size: 18px;
+    display: block;
+    margin-bottom: 10px;
+}
+
+/* 100% Video */
+.video-full video {
+    width: 100%;
+    border-radius: 15px;
+}
+
+/* Dumaloq tugma */
+#infoFloatingBtn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #000075, #0000ff);
+    color: white;
+    border: 4px solid white;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    z-index: 1500;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+#infoFloatingBtn:hover {
+    transform: scale(1.1);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .flex-container-40-60,
+    .flex-container-30-70 {
+        flex-direction: column;
+    }
+    
+    .flex-video-40, .flex-text-60,
+    .flex-image-30, .flex-text-70 {
+        flex: 0 0 100%;
+    }
+}
+/* Tablet responsive */
+@media (max-width: 1024px) {
+    .modal {
+        padding: 15px 0;
+    }
+    
+    .modal-content {
+        width: 95%;
+        padding: 25px;
+        max-height: 75vh;
+        margin: 8vh auto 5vh;
+    }
+    
+    .modal-content h2 {
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+    
+    .card {
+        padding: 15px;
+    }
+    
+    .card p {
+        font-size: 15px;
+    }
+    
+    .tab-buttons button {
+        font-size: 15px;
+        padding: 10px 15px;
+    }
+}
+
+/* Mobile responsive */ 
+@media (max-width: 768px) {
+    .modal {
+        padding: 10px 0;
+    }
+    
+    .modal-content {
+        width: 96%;
+        padding: 20px 15px;
+        margin: 5vh auto 3vh;
+        max-height: 85vh;
+        border-radius: 15px;
+    }
+    
+    .close {
+        right: 10px;
+        top: 10px;
+        font-size: 28px;
+        width: 35px;
+        height: 35px;
+    }
+    
+    .modal-content h2 {
+        font-size: 20px;
+        margin-bottom: 15px;
+        padding-bottom: 12px;
+        padding-right: 45px;
+    }
+    
+    .card {
+        padding: 12px;
+        margin-bottom: 15px;
+        border-radius: 12px;
+    }
+    
+    .card video {
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+    
+    .card p {
+        font-size: 14px;
+        line-height: 1.5;
+    }
+    
+    .card strong {
+        font-size: 16px;
+    }
+    
+    .tab-buttons {
+        gap: 8px;
+        margin-bottom: 15px;
+    }
+    
+    .tab-buttons button {
+        min-width: 120px;
+        font-size: 14px;
+        padding: 10px 12px;
+        border-radius: 8px;
+    }
+    
+    .tab-content pre {
+        padding: 15px;
+        font-size: 12px;
+        line-height: 1.5;
+        border-radius: 10px;
+    }
+}
+
+
+/* Small mobile */
+@media (max-width: 480px) {
+    .modal {
+        padding: 5px 0;
+    }
+    
+    .modal-content {
+        width: 98%;
+        padding: 15px 12px;
+        margin: 3vh auto 2vh;
+        max-height: 90vh;
+        border-radius: 12px;
+    }
+    
+    .close {
+        right: 8px;
+        top: 8px;
+        font-size: 24px;
+        width: 30px;
+        height: 30px;
+    }
+    
+    .modal-content h2 {
+        font-size: 18px;
+        margin-bottom: 12px;
+        padding-bottom: 10px;
+        padding-right: 40px;
+    }
+    
+    .card {
+        padding: 10px;
+        margin-bottom: 12px;
+        border-radius: 10px;
+    }
+    
+    .card p {
+        font-size: 13px;
+    }
+    
+    .card strong {
+        font-size: 15px;
+    }
+    
+    .tab-buttons {
+        flex-direction: column;
+        gap: 6px;
+    }
+    
+    .tab-buttons button {
+        width: 100%;
+        min-width: 100%;
+        font-size: 13px;
+        padding: 10px;
+    }
+    
+    .tab-content pre {
+        padding: 12px;
+        font-size: 11px;
+        line-height: 1.4;
+    }
+}
+
+/* Very small mobile */
+@media (max-width: 360px) {
+    .modal-content {
+        padding: 12px 10px;
+        margin: 2vh auto 1vh;
+    }
+    
+    .modal-content h2 {
+        font-size: 16px;
+    }
+    
+    .card {
+        padding: 8px;
+    }
+    
+    .card p {
+        font-size: 12px;
+    }
+    
+    .tab-buttons button {
+        font-size: 12px;
+        padding: 8px;
+    }
+    
+    .tab-content pre {
+        padding: 10px;
+        font-size: 10px;
+    }
+}
+
+/* Landscape mode fixes */
+@media (max-width: 1024px) and (orientation: landscape) {
+    .modal-content {
+        max-height: 80vh;
+        margin: 5vh auto 3vh;
+    }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .tab-buttons button {
+        min-height: 44px;
+    }
+    
+    .close {
+        min-width: 44px;
+        min-height: 44px;
+    }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    .modal-content {
+        border: 3px solid white;
+    }
+    
+    .card {
+        border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .modal-content,
+    .card,
+    .tab-buttons button,
+    .close {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+/* Print styles */
+@media print {
+    .modal {
+        display: none !important;
+    }
+}
+
+/* Scroll bar stilizatsiyasi */
+.modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.close {
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    font-size: 32px;
+    font-weight: bold;
+    cursor: pointer;
+    color: white;
+    transition: all 0.3s;
+    z-index: 10;
+    line-height: 1;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.close:hover {
+    background: rgba(255, 204, 0, 0.3);
+    color: #ffcc00;
+    transform: rotate(90deg);
+}
+
+.modal-content h2 {
+    font-size: 28px;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+    padding-right: 50px;
+}
+
+.card {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    transition: all 0.3s;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.card:hover {
+    background: rgba(255, 255, 255, 0.18);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.card video {
+    width: 100%;
+    max-width: 70%;
+    height: auto;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    background: #000;
+}
+
+.card p {
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 10px 0 0;
+}
+
+
+.card strong {
+    color: #ffcc00;
+    font-size: 18px;
+}
+
+/* Tab buttons */
+.tab-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.tab-buttons button {
+    flex: 1;
+    min-width: 150px;
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.tab-buttons button:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+}
+
+.tab-buttons button.active {
+    background: rgba(255, 204, 0, 0.4);
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(255, 204, 0, 0.3);
+}
+
+.tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.tab-content pre {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    border-radius: 12px;
+    overflow-x: auto;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #00ff00;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tab-content pre::-webkit-scrollbar {
+    height: 8px;
+}
+
+.tab-content pre::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.tab-content pre::-webkit-scrollbar-thumb {
+    background: rgba(0, 255, 0, 0.3);
+    border-radius: 10px;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Tablet responsive */
+@media (max-width: 1024px) {
+    .modal {
+        padding: 15px 0;
+    }
+    
+    .modal-content {
+        width: 95%;
+        padding: 25px;
+        max-height: 80vh;
+    }
+    
+    .modal-content h2 {
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+    
+    .card {
+        padding: 15px;
+    }
+    
+    .card p {
+        font-size: 15px;
+    }
+    
+    .tab-buttons button {
+        font-size: 15px;
+        padding: 10px 15px;
+    }
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .modal {
+        padding: 10px 0;
+    }
+    
+    .modal-content {
+        width: 96%;
+        padding: 20px 15px;
+        margin: 2vh auto;
+        max-height: 90vh;
+        border-radius: 15px;
+    }
+    
+    .close {
+        right: 10px;
+        top: 10px;
+        font-size: 28px;
+        width: 35px;
+        height: 35px;
+    }
+    
+    .modal-content h2 {
+        font-size: 20px;
+        margin-bottom: 15px;
+        padding-bottom: 12px;
+        padding-right: 45px;
+    }
+    
+    .card {
+        padding: 12px;
+        margin-bottom: 15px;
+        border-radius: 12px;
+    }
+    
+    .card video {
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+    
+    .card p {
+        font-size: 14px;
+        line-height: 1.5;
+    }
+    
+    .card strong {
+        font-size: 16px;
+    }
+    
+    .tab-buttons {
+        gap: 8px;
+        margin-bottom: 15px;
+    }
+    
+    .tab-buttons button {
+        min-width: 120px;
+        font-size: 14px;
+        padding: 10px 12px;
+        border-radius: 8px;
+    }
+    
+    .tab-content pre {
+        padding: 15px;
+        font-size: 12px;
+        line-height: 1.5;
+        border-radius: 10px;
+    }
+}
+
+
+/* Small mobile */
+@media (max-width: 480px) {
+    .modal {
+        padding: 5px 0;
+    }
+    
+    .modal-content {
+        width: 98%;
+        padding: 15px 12px;
+        margin: 1vh auto;
+        max-height: 92vh;
+        border-radius: 12px;
+    }
+    
+    .close {
+        right: 8px;
+        top: 8px;
+        font-size: 24px;
+        width: 30px;
+        height: 30px;
+    }
+    
+    .modal-content h2 {
+        font-size: 18px;
+        margin-bottom: 12px;
+        padding-bottom: 10px;
+        padding-right: 40px;
+    }
+    
+    .card {
+        padding: 10px;
+        margin-bottom: 12px;
+        border-radius: 10px;
+    }
+    
+    .card p {
+        font-size: 13px;
+    }
+    
+    .card strong {
+        font-size: 15px;
+    }
+    
+    .tab-buttons {
+        flex-direction: column;
+        gap: 6px;
+    }
+    
+    .tab-buttons button {
+        width: 100%;
+        min-width: 100%;
+        font-size: 13px;
+        padding: 10px;
+    }
+    
+    .tab-content pre {
+        padding: 12px;
+        font-size: 11px;
+        line-height: 1.4;
+    }
+}
+
+/* Very small mobile */
+@media (max-width: 360px) {
+    .modal-content {
+        padding: 12px 10px;
+    }
+    
+    .modal-content h2 {
+        font-size: 16px;
+    }
+    
+    .card {
+        padding: 8px;
+    }
+    
+    .card p {
+        font-size: 12px;
+    }
+    
+    .tab-buttons button {
+        font-size: 12px;
+        padding: 8px;
+    }
+    
+    .tab-content pre {
+        padding: 10px;
+        font-size: 10px;
+    }
+}
+
+/* Landscape mode fixes */
+@media (max-width: 1024px) and (orientation: landscape) {
+    .modal-content {
+        max-height: 85vh;
+        margin: 2vh auto;
+    }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .tab-buttons button {
+        min-height: 44px;
+    }
+    
+    .close {
+        min-width: 44px;
+        min-height: 44px;
+    }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    .modal-content {
+        border: 3px solid white;
+    }
+    
+    .card {
+        border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .modal-content,
+    .card,
+    .tab-buttons button,
+    .close {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+/* Print styles */
+@media print {
+    .modal {
+        display: none !important;
+    }
+}
+        /* HEADER */
+        .header {
+            display: flex;
+            align-items: center;
+            background: #000075;
+            color: white;
+            padding: 10px 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            width: 100%;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        /* MAIN LAYOUT */
+        .main-container {
+            display: flex;
+            margin-top: 20px;
+            gap: 20px;
+        }
+
+        /* LEFT PANEL */
+        .left-panel {
+            width: 250px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            height: fit-content;
+            position: relative;
+            z-index: 1;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 15px;
+        }
+
+        .control-group h3 {
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 8px;
+            font-size: 14px;
+            border-radius: 5px;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn-success { 
+            background: #28a745; 
+            color: white; 
+        }
+        .btn-danger { 
+            background: #dc3545; 
+            color: white; 
+        }
+        .btn-primary { 
+            background: #000075; 
+            color: white; 
+        }
+        .btn-info { 
+            background: #000075; 
+            color: white; 
+        }
+
+        /* Status Display */
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 8px 0;
+            font-size: 13px;
+        }
+
+        .status-led {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #dc3545;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+        }
+
+        .status-led.on {
+            background: #28a745;
+            box-shadow: 0 0 10px rgba(40, 167, 69, 0.8);
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            
+        }
+
+        .title-header {
+            background: #000075;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0 auto 30px;
+            text-align: center;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        /* Circuit Container */
+        .circuit-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 30px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+            min-height: 600px;
+            position: relative;
+            background: rgba(240,248,255,0.3);
+            border-radius: 20px;
+            padding: 40px;
+        }
+
+        /* Arduino Board */
+        .arduino-board {
+            width: 200px;
+            height: 120px;
+            background: linear-gradient(145deg, #0066cc, #004499);
+            border-radius: 10px;
+            position: relative;
+            box-shadow: 0 8px 20px rgba(0,102,204,0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .arduino-board::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 5px;
+        }
+
+        /* Hand and Sensor */
+        .hand-sensor-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+            position: absolute;
+            top: 380px;
+            left: 280px;
+            z-index: 10;
+        }
+
+        .hand-demo {
+            font-size: 80px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.3));
+            user-select: none;
+            animation: handFloat 2s ease-in-out infinite;
+        }
+
+        @keyframes handFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .hand-demo:hover {
+            transform: scale(1.1) rotate(5deg);
+            color: #3498db;
+        }
+
+        .hand-demo.active {
+            animation: handWave 1s ease-in-out infinite;
+            color: #e74c3c;
+        }
+
+        @keyframes handWave {
+            0% { transform: translateY(0) rotate(-15deg) scale(1.1); }
+            25% { transform: translateY(-15px) rotate(0deg) scale(1.15); }
+            50% { transform: translateY(-10px) rotate(15deg) scale(1.1); }
+            75% { transform: translateY(-5px) rotate(0deg) scale(1.15); }
+            100% { transform: translateY(0) rotate(-15deg) scale(1.1); }
+        }
+
+        .mpu6050-sensor {
+          
+          
+            border-radius: 8px;
+            position: absolute;
+            top: 330px;
+            left: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .mpu6050-sensor.active {
+            background: linear-gradient(145deg, #e67e22, #d35400);
+            box-shadow: 0 0 20px rgba(230, 126, 34, 0.8);
+            animation: sensorPulse 0.8s ease-in-out infinite;
+        }
+
+        @keyframes sensorPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* Servo Motor */
+        .servo-motor {
+            width: 100px;
+            height: 60px;
+           
+            border-radius: 10px;
+            position: absolute;
+            top: -50px;
+            left: 770px;
+            
+        }
+
+     .servo-arm {
+    position: absolute;
+    top: 70px;
+    left: 50%;
+    transform-origin: center center; /* markazdan aylanish */
+    transform: translate(-50%, -50%) rotate(0deg);
+    border-radius: 4px;
+    transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.servo-arm.left {
+    transform: translate(-50%, -50%) rotate(-90deg);
+}
+
+.servo-arm.right {
+    transform: translate(-50%, -50%) rotate(90deg);
+}
+
+.servo-arm.center {
+    transform: translate(-50%, -50%) rotate(0deg);
+}
+
+
+        
+
+        /* Phone Charging */
+        .charging-area {
+            position: absolute;
+            top: 250px;
+            left: 710px;
+        }
+
+
+
+        /* Gesture controls */
+        .gesture-controls {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .gesture-btn {
+            padding: 10px 15px;
+            background: #000075;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            min-width: 120px;
+        }
+
+        .gesture-btn:hover {
+            background: #0000a0;
+            transform: scale(1.05);
+        }
+
+        .gesture-btn.active {
+            background: #e74c3c;
+            animation: btnPulse 0.5s ease-in-out;
+        }
+
+        @keyframes btnPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* Wiring */
+        .wire {
+            position: absolute;
+            height: 3px;
+            border-radius: 2px;
+            z-index: 1;
+        }
+
+
+
+        /* Connection wires */
+        .wire-red {
+            background: red;
+            width: 100px;
+            top: 242px;
+            left: 430px;
+            
+        }
+
+        .wire-black {
+            background: black;
+            width: 115px;
+            top: 252px;
+            left: 415px;
+           
+        }
+          .wire-purple{
+            background: purple;
+            width: 150px;
+            top: 330px;
+            left: 380px;
+            
+        }
+
+        .wire-blue {
+            background: blue;
+            width: 135px;
+            top: 340px;
+            left: 395px;
+           
+        }
+         .wire-red1 {
+            background: red;
+            width: 3px;
+            height: 120px;
+            top: 242px;
+            left: 430px;
+            
+        }
+
+        .wire-black1 {
+            background: black;
+                   width: 3px;
+            height: 110px;
+            top: 252px;
+            left: 415px;
+           
+        }
+          .wire-purple1{
+            background: purple;
+               width: 3px;
+            height: 33px;
+            top: 330px;
+            left: 380px;
+            
+        }
+
+        .wire-blue1 {
+            background: blue;
+              width: 3px;
+            height: 23px;
+            top: 340px;
+            left: 395px;
+           
+        }
+         .wire-black2 {
+            background: black;
+            width: 3px;
+            height: 150px;
+            top: 282px;
+            left: 467px;
+            transform: rotate(-45deg);
+        }
+              .wire-black3 {
+            background: black;
+            width: 225px;
+            height: 3px;
+            bottom: 188px;
+            left: 520px;
+            
+        }
+          .wire-black4 {
+            background: black;
+            width: 3px;
+            height: 170px;
+            bottom: 188px;
+            left: 745px;
+            
+        }
+             .wire-black5 {
+            background: black;
+            width: 3px;
+            height: 245px;
+            bottom: 340px;
+            left: 745px;
+            
+        }
+          .wire-black6 {
+            background: black;
+            width: 45px;
+            height: 3px;
+            top: 15px;
+            left: 745px;
+            
+        }
+         .wire-black7 {
+            background: black;
+            width: 30px;
+            height: 3px;
+            bottom: 340px;
+            left: 745px;
+            
+        }
+        .wire-orange {
+            background: orange;
+            width: 20px;
+            top: 313px;
+            left: 717px;
+            
+        }
+        .wire-orange1 {
+            background: orange;
+            width: 52px;
+            height: 3px;
+            top: 20px;
+            left: 735px;
+            
+        }
+        .wire-orange2 {
+            background: orange;
+            width: 3px;
+            height: 295px;
+            bottom: 285px;
+            left: 735px;
+            
+        }
+              .wire-red2 {
+            background: red;
+            width: 72px;
+            top: 17px;
+            left: 717px;
+            
+        }
+              .wire-red3 {
+            background: red;
+            width: 3px;
+            height: 255px;
+            top: 10px;
+            left: 755px;
+            transform: rotate(-18deg);
+        }
+      
+        /* Control Panel */
+        .control-panel {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            z-index: 100;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .control-button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            min-width: 140px;
+            text-transform: uppercase;
+        }
+
+        .btn-power {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-test {
+            background: linear-gradient(45deg, #2ecc71, #27ae60);
+            color: white;
+        }
+
+        .btn-reset {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            color: white;
+        }
+
+        .control-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: #000075;
+            color: white;
+            margin: 5% auto;
+            padding: 20px;
+            width: 50%;
+            max-width: 700px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+            animation: slideDown 0.4s ease;
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+            transition: color 0.3s;
+        }
+        .close:hover {
+            color: #ffcc00;
+        }
+
+        .modal h2 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            border-bottom: 2px solid rgba(255,255,255,0.2);
+            padding-bottom: 8px;
+        }
+
+        .card {
+            background: rgba(255,255,255,0.08);
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            transition: background 0.3s;
+        }
+        .card:hover {
+            background: rgba(255,255,255,0.15);
+        }
+
+        .card h3 {
+            margin: 0;
+            font-size: 1.1rem;
+        }
+        .card p {
+            margin: 5px 0 0;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        /* Tab Buttons */
+        .tab-buttons {
+            display: flex;
+            margin-bottom: 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 5px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            background: transparent;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .tab-btn.active {
+            background: rgba(255,255,255,0.2);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .tab-content {
+            display: none;
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        pre {
+            background: rgba(0,0,0,0.5);
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .left-panel {
+                width: 100%;
+            }
+            
+            .circuit-container {
+                flex-direction: column;
+                gap: 40px;
+                min-height: auto;
+                padding: 30px 20px;
+            }
+            
+            .control-panel {
+                position: relative;
+                margin-top: 30px;
+                transform: none;
+                left: auto;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .control-button {
+                padding: 10px 20px;
+                font-size: 12px;
+                min-width: 120px;
+            }
+            
+            .modal-content {
+                width: 95%;
+                padding: 20px;
+            }
+            
+            .hand-demo {
+                font-size: 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="logo">
+              <a href="/"><img src="/static/image/logo.png" width="80px" height="80px" alt=""></a>
+            <span>  Imo-ishora boshqariladigan servomotor tizimi</span>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <div class="main-container">
+        <!-- LEFT PANEL -->
+        <div class="left-panel">
+            <div class="control-group">
+                <h3>🎮 Boshqaruv</h3>
+                <button class="btn btn-success" onclick="startSystem()">
+                    ▶️ Tizimni Ishga Tushirish
+                </button>
+                <button class="btn btn-danger" onclick="stopSystem()">
+                    ⏹️ To'xtatish
+                </button>
+                <button class="btn btn-primary" onclick="togglePower()">
+                    ⚡ Quvvat
+                </button>
+                <button class="btn btn-info" onclick="runTest()">
+                    🔍 Test
+                </button>
+            </div>
+<div class="control-group">
+    <h3>Ma'lumotlar</h3>
+    <button class="btn btn-primary" id="schemaBtn">💡 Sxema qayerda ishlatiladi</button>
+    <button class="btn btn-primary" id="codeBtn">💻 Kod</button>
+    <button class="btn btn-primary" id="componentsBtn">🔌 Qurilmalar</button>
+</div>
+
+
+            <div class="control-group">
+                <h3>📊 Tizim Holati</h3>
+                <div class="status-item">
+                    <span>Quvvat:</span>
+                    <div class="status-led" id="powerLed"></div>
+                </div>
+                <div class="status-item">
+                    <span>Gesture Sensor:</span>
+                    <div class="status-led" id="sensorLed"></div>
+                </div>
+                <div class="status-item">
+                    <span>Servo Motor:</span>
+                    <div class="status-led" id="servoLed"></div>
+                </div>
+                <div class="status-item">
+                    <span>Telefon Zaryadkasi:</span>
+                    <div class="status-led" id="chargeLed"></div>
+                </div>
+                <div class="status-item">
+                    <span>Arduino:</span>
+                    <div class="status-led" id="arduinoLed"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+            <div class="title-header">
+           Imo-ishora boshqariladigan servomotor tizimi
+            </div>
+            
+            <div class="circuit-container">
+                <!-- Connection Wires -->
+                <div class="wire wire-red"></div>
+                <div class="wire wire-red2"></div>
+                <div class="wire wire-red3"></div>
+                <div class="wire wire-red4"></div>
+                <div class="wire wire-black"></div>
+                <div class="wire wire-purple"></div>
+                <div class="wire wire-blue"></div>
+                <div class="wire wire-red1"></div>
+                <div class="wire wire-black1"></div>
+                <div class="wire wire-black2"></div>
+                <div class="wire wire-black3"></div>
+                <div class="wire wire-black4"></div>
+                <div class="wire wire-black5"></div>
+                <div class="wire wire-black6"></div>
+                <div class="wire wire-black7"></div>
+                <div class="wire wire-purple1"></div>
+                <div class="wire wire-blue1"></div>
+                <div class="wire wire-orange"></div>
+                <div class="wire wire-orange1"></div>
+                <div class="wire wire-orange2"></div>
+                <!-- Arduino Board -->
+ 
+                    
+              
+
+                <!-- Hand and Sensor Area -->
+                <div class="hand-sensor-area">
+                    <div class="hand-demo" id="handDemo" 
+                         onclick="manualGesture()">
+                        ✋
+                    </div>
+                    
+               
+             
+                </div>
+                
+                       <img src="/static/image/Mpu.png" class="mpu6050-sensor" id="sensor" width="150px" height="150px" alt="">
+                 
+               <img src="/static/image/arduino1.png" width="350px" height="350px" style="position: absolute; top: 40px; left: 450px;" alt="">
+               <img src="/static/image/adaptor.png" width="170px" height="170px"  style="position: absolute; bottom: 500px; left: 405px;" alt="">
+                <!-- Servo Motor -->
+                <div class="servo-motor" >
+                
+                   <img src="/static/image/hep.png" class="servo-arm" id="servoArm" width="90px" height="100px" alt="">
+                   <img src="/static/image/servo.m - Copy.png" width="150px" height="150px" alt="">
+                </div>
+
+                <!-- Phone Charging Area -->
+                <div class="charging-area">
+                  <img src="/static/image/battery - touch.png" width="150px" height="150px" alt="">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- GESTURE CONTROLS -->
+    <div class="gesture-controls">
+        <button class="gesture-btn" onclick="gestureLeft()" id="leftBtn">← Chapga</button>
+        <button class="gesture-btn" onclick="gestureRight()" id="rightBtn">O'ngga →</button>
+        <button class="gesture-btn" onclick="gestureCenter()" id="centerBtn">↑ Markaz</button>
+    </div>
+
+    <!-- CONTROL PANEL -->
+    <div class="control-panel">
+        <button class="control-button btn-power" onclick="togglePower()">
+            ⚡ Quvvat Yoqish/O'chirish
+        </button>
+        <button class="control-button btn-test" onclick="runTest()">
+            🧪 Tizimni Sinash
+        </button>
+        <button class="control-button btn-reset" onclick="resetSystem()">
+            🔄 Qayta O'rnatish
+        </button>
+    </div>
+
+    <!-- MODALS -->
+    <!-- Schema Modal -->
+  <!-- ✅ 1) Sxema qayerda ishlatiladi (DC Motor / L298N) -->
+    <div class="modal" id="schemaModal">
+        <div class="modal-content">
+            <span class="close" title="Yopish">&times;</span>
+            <h2>💡 Sxema qayerda ishlatiladi </h2>
+
+            <div class="flex-container-40-60">
+                <div class="flex-video-40">
+                    <!-- 1-video (xohlasangiz almashtiring) -->
+                    <iframe src="https://www.youtube.com/embed/fH_dG9AcFAY?si=3f96M6pz0Q0qPTxZ" title="DC Motor Control with L298N"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen></iframe>
+                </div>
+                <div class="flex-text-60">
+                    <strong>Arduino, servo motor va mpu sensor</strong>
+                   <p>Arduino, servo motor va mpu sensor to'liq tahlil videosi</p>
+                </div>
+            </div>
+
+            <div class="flex-container-40-60">
+                <div class="flex-video-40">
+                    <!-- 2-video (ixtiyoriy) -->
+                    <iframe src="https://www.youtube.com/embed/r-72Lijethk?si=oOE0J3vwGb0q4AlF" title="PWM Speed Control"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen></iframe>
+                </div>
+                <div class="flex-text-60">
+                    <strong>🔄 Ishlash prinsipi</strong>
+                    <p>Bu tajribada Arduino yordamida MPU6050 sensoridan kelayotgan harakat va qiyalik ma’lumotlari o‘qiladi va shu ma’lumotlar asosida servo motor boshqariladi. MPU6050 — ichiga o‘rnatilgan giroskop va akselerometrga ega bo‘lgan sensor bo‘lib, u qurilmaning egilishi, tezlanishi yoki burilishini aniqlaydi. Arduino sensorning I2C chiqishlarini o‘qib, servo motorning aylanish burchagini mos ravishda o‘zgartiradi. Adapter va 9V batareya tajribaga quvvat beradi. Natijada, harakatga sezgir, servo motor bilan boshqariladigan mexanik tizim hosil bo‘ladi.</p>
+                </div>
+            </div>
+              <div class="flex-container-40-60">
+                <div class="flex-video-40">
+                    <!-- 2-video (ixtiyoriy) -->
+                    <iframe src="https://www.youtube.com/embed/9o7DFpJShsQ?si=yaZgclScI1qbStiy" title="PWM Speed Control"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen></iframe>
+                </div>
+                <div class="flex-text-60">
+                    <strong>Qo‘shimcha tajriba g‘oyalari</strong>
+               <p>Ushbu tajribada Bluetooth orqali arduino va servo motorlarga ulanish orqali telefondan boshqarish mumkinligi ko'rsatilga ko'plab servo motorlarni </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!-- ✅ 3) Qurilmalar MODALI -->
+<div class="modal" id="componentsModal">
+    <div class="modal-content">
+        <span class="close" title="Yopish">&times;</span>
+        <h2>🔌 Ishlatilgan Qurilmalar</h2>
+
+        <!-- MPU6050 Sensor -->
+        <div class="flex-container-30-70">
+            <div class="flex-image-30">
+               <img src="/static/image/Mpu.png" width="110px" alt="MPU6050 Sensor">
+            </div>
+            <div class="flex-text-70">
+                <strong>MPU6050 Harakat va Qiyalik Sensori</strong>
+                <p>
+                    Ichiga giroskop va akselerometr o‘rnatilgan sensor. Harakat, qiyalik,
+                    tebranish va tezlanishni aniqlaydi. Arduino bilan I2C orqali ulanadi.
+                </p>
+            </div>
+        </div>
+
+        <!-- Arduino UNO -->
+        <div class="flex-container-30-70">
+            <div class="flex-image-30">
+               <img src="/static/image/arduino1.png" width="120px" alt="Arduino UNO">
+            </div>
+            <div class="flex-text-70">
+                <strong>Arduino UNO</strong>
+                <p>
+                    Sensor ma'lumotlarini o‘qib, servo motorni boshqaradigan asosiy mikrocontroller.
+                    5V va GND orqali barcha qurilmalarni ulab turadi.
+                </p>
+            </div>
+        </div>
+
+        <!-- Servo Motor -->
+        <div class="flex-container-30-70">
+            <div class="flex-image-30">
+               <img src="/static/image/servo.m - Copy.png" width="95px" alt="Servo Motor">
+            </div>
+            <div class="flex-text-70">
+                <strong>Servo Motor</strong>
+                <p>
+                    Arduino signaliga qarab 0° dan 180° gacha buriladi. Mexanik harakatlar,
+                    qo‘l maketi, robot bo‘g‘inlari va avtomatik tizimlarda ishlatiladi.
+                </p>
+            </div>
+        </div>
+
+        <!-- Adapter / Quvvat manbai -->
+        <div class="flex-container-30-70">
+            <div class="flex-image-30">
+               <img src="/static/image/adaptor.png" width="90px" alt="Adaptor">
+            </div>
+            <div class="flex-text-70">
+                <strong>Adapter (5V / 9V Quvvat Manbai)</strong>
+                <p>
+                    Arduino platasi va butun tajribani barqaror quvvat bilan ta'minlaydi.
+                </p>
+            </div>
+        </div>
+
+        <!-- 9V Battery -->
+        <div class="flex-container-30-70">
+            <div class="flex-image-30">
+               <img src="/static/image/battery - touch.png" width="70px" alt="9V Battery">
+            </div>
+            <div class="flex-text-70">
+                <strong>9V Batareya</strong>
+                <p>
+                    Mustaqil quvvat manbai sifatida ishlaydi. Mobil tajribalar uchun juda qulay.
+                </p>
+            </div>
+        </div>
+
+        <!-- Wires -->
+        <div class="flex-container-30-70">
+            <div class="flex-image-30">
+               <img src="/static/image/resistor.png" style="transform: rotate(90deg);" width="70px" alt="Wires">
+            </div>
+            <div class="flex-text-70">
+                <strong>Ulanish Simlari</strong>
+                <p>
+                    MPU6050, servo motor va quvvat liniyalarini Arduino bilan ulash uchun ishlatiladi.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+    <!-- ✅ 4) Qo'shimcha info (ixtiyoriy) + suzuvchi tugma -->
+    <div class="modal" id="infoModal">
+        <div class="modal-content">
+            <span class="close" title="Yopish">&times;</span>
+            <h2>📚 Qo'shimcha Ma'lumot</h2>
+            <div class="video-full">
+                <video controls>
+                    <source src="/media/2.mp4" type="video/mp4">
+                    Brauzeringiz video formatni qo'llab-quvvatlamaydi.
+                </video>
+            </div>
+        </div>
+    </div>
+
+    <button id="infoFloatingBtn"><span>📚</span><span>Ma'lumot</span></button>
+
+    <div class="modal" id="codeModal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>💻 Kod</h2>
+
+        <div class="tab-buttons">
+            <button class="tab-btn active" data-tab="mblock">mBlock Kodi</button>
+            <button class="tab-btn" data-tab="arduino">Arduino Kodi</button>
+        </div>
+
+        <div class="tab-content active" id="mblock">
+            <pre><img src="/static/image/servo.png" alt="mBlock Code" style="width: 80%; height: auto;"></pre>
+        </div>
+
+        <div class="tab-content" id="arduino">
+            <pre>
+#include &lt;Wire.h&gt;
+#include &lt;MPU6050.h&gt;
+#include &lt;Servo.h&gt;
+
+MPU6050 mpu;
+Servo myServo;
+
+int16_t ax, ay, az;
+int16_t gx, gy, gz;
+
+const int servoPin = 9;
+const int chargePin = 7;
+int servoPosition = 90;
+
+void setup() {
+  Serial.begin(9600);
+  Wire.begin();
+  mpu.initialize();
+  
+  myServo.attach(servoPin);
+  pinMode(chargePin, OUTPUT);
+  
+  myServo.write(servoPosition);
+  
+  if(mpu.testConnection()) {
+    Serial.println("MPU6050 ulanish muvaffaqiyatli");
+  } else {
+    Serial.println("MPU6050 ulanish xato");
+  }
+}
+
+void loop() {
+  mpu.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
+  
+  // X o'qi bo'yicha gesture aniqlash
+  if(ax > 8000) {
+    servoPosition = 180;
+    digitalWrite(chargePin, HIGH);
+    Serial.println("O'ng tomonga harakat - Servo 180°, Zaryadka ON");
+  }
+  else if(ax < -8000) {
+    servoPosition = 0;
+    digitalWrite(chargePin, HIGH);
+    Serial.println("Chap tomonga harakat - Servo 0°, Zaryadka ON");
+  }
+  else {
+    servoPosition = 90;
+    digitalWrite(chargePin, LOW);
+    Serial.println("Markaziy holat - Servo 90°, Zaryadka OFF");
+  }
+  
+  myServo.write(servoPosition);
+  
+  delay(100);
+}
+            </pre>
+        </div>
+    </div>
+</div>
+
+  
+
+
+
+    <script>
+        // System State Variables
+        let systemRunning = false;
+        let powerOn = false;
+        let testMode = false;
+        let gestureDetected = false;
+        let currentGesture = 'center'; // 'left', 'right', 'center'
+
+        // Initialize System
+        window.addEventListener('load', function() {
+            initializeSystem();
+            setupEventListeners();
+        });
+// Modalni ochish
+function openModal(id) {
+    document.getElementById(id).style.display = "block";
+}
+
+// Tugmalarni ulash
+document.getElementById("schemaBtn").addEventListener("click", () => openModal("schemaModal"));
+document.getElementById("codeBtn").addEventListener("click", () => openModal("codeModal"));
+document.getElementById("componentsBtn").addEventListener("click", () => openModal("componentsModal"));
+document.getElementById("infoFloatingBtn").addEventListener("click", () => openModal("infoModal"));
+
+// Yopish tugmalari
+document.querySelectorAll(".close").forEach(btn => {
+    btn.addEventListener("click", function() {
+        this.closest(".modal").style.display = "none";
+    });
+});
+
+// Tab switching (Kod uchun)
+document.querySelectorAll(".tab-btn").forEach(button => {
+    button.addEventListener("click", function() {
+        const tab = this.dataset.tab;
+        document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+        this.classList.add("active");
+        document.querySelectorAll(".tab-content").forEach(content => {
+            content.classList.remove("active");
+            if (content.id === tab) content.classList.add("active");
+        });
+    });
+});
+        function initializeSystem() {
+            updateStatusLeds();
+            resetSystem();
+            console.log('Gesture Control System initialized');
+        }
+
+        function setupEventListeners() {
+            // Modal close buttons
+            const closeButtons = document.querySelectorAll('.close');
+            closeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const modal = this.closest('.modal');
+                    modal.style.display = 'none';
+                });
+            });
+
+            // Click outside modal to close
+            window.addEventListener('click', function(event) {
+                if (event.target.classList.contains('modal')) {
+                    event.target.style.display = 'none';
+                }
+            });
+        }
+
+        // System Control Functions
+        function startSystem() {
+            if (!powerOn) {
+                showNotification('⚠️ Avval quvvatni yoqing!', 'warning');
+                return;
+            }
+            
+            systemRunning = true;
+            updateStatusLeds();
+            activateArduino();
+            showNotification('✅ Tizim ishga tushdi! Gesture tugmalarini bosing.', 'success');
+        }
+
+        function stopSystem() {
+            systemRunning = false;
+            gestureDetected = false;
+            testMode = false;
+            currentGesture = 'center';
+            
+            // Stop all animations
+            document.getElementById('handDemo').classList.remove('active');
+            document.getElementById('sensor').classList.remove('active');
+            document.getElementById('servoArm').classList.remove('active', 'left', 'right', 'center');
+            document.getElementById('batteryFill').classList.remove('charging');
+            document.getElementById('powerAdapter').classList.remove('active');
+            
+            // Reset gesture buttons
+            document.querySelectorAll('.gesture-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            updateStatusLeds();
+            showNotification('⏹️ Tizim to\'xtatildi', 'info');
+        }
+
+        function togglePower() {
+            powerOn = !powerOn;
+            
+            if (!powerOn && systemRunning) {
+                stopSystem();
+            }
+            
+            updateStatusLeds();
+            
+            if (powerOn) {
+                showNotification('⚡ Quvvat yoqildi', 'success');
+            } else {
+                showNotification('🔌 Quvvat o\'chirildi', 'warning');
+            }
+        }
+
+        function runTest() {
+            if (!powerOn) {
+                showNotification('⚠️ Avval quvvatni yoqing!', 'warning');
+                return;
+            }
+            
+            testMode = true;
+            systemRunning = true;
+            updateStatusLeds();
+            
+            showNotification('🧪 Test rejimi boshlandi...', 'info');
+            
+            // Test sequence
+            setTimeout(() => testServoMotor(), 1000);
+            setTimeout(() => testGestureSensor(), 3000);
+            setTimeout(() => testChargingSystem(), 5000);
+            setTimeout(() => {
+                testMode = false;
+                updateStatusLeds();
+                showNotification('✅ Test yakunlandi!', 'success');
+            }, 8000);
+        }
+
+        function resetSystem() {
+            systemRunning = false;
+            powerOn = false;
+            testMode = false;
+            gestureDetected = false;
+            currentGesture = 'center';
+            
+            // Reset all visual elements
+            document.getElementById('handDemo').classList.remove('active');
+            document.getElementById('sensor').classList.remove('active');
+            document.getElementById('servoArm').classList.remove('active', 'left', 'right', 'center');
+            document.getElementById('batteryFill').classList.remove('charging');
+            document.getElementById('powerAdapter').classList.remove('active');
+            
+            // Reset gesture buttons
+            document.querySelectorAll('.gesture-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            updateStatusLeds();
+            showNotification('🔄 Tizim qayta o\'rnatildi', 'info');
+        }
+
+        // Gesture Control Functions
+        function gestureLeft() {
+            if (!systemRunning) {
+                showNotification('⚠️ Avval tizimni ishga tushiring!', 'warning');
+                return;
+            }
+            
+            currentGesture = 'left';
+            executeGesture();
+            showNotification('👈 Chap tomonga harakat!', 'info');
+        }
+
+        function gestureRight() {
+            if (!systemRunning) {
+                showNotification('⚠️ Avval tizimni ishga tushiring!', 'warning');
+                return;
+            }
+            
+            currentGesture = 'right';
+            executeGesture();
+            showNotification('👉 O\'ng tomonga harakat!', 'info');
+        }
+
+        function gestureCenter() {
+            if (!systemRunning) {
+                showNotification('⚠️ Avval tizimni ishga tushiring!', 'warning');
+                return;
+            }
+            
+            currentGesture = 'center';
+            executeGesture();
+            showNotification('👆 Markaziy holatga qaytish!', 'info');
+        }
+
+        function executeGesture() {
+            gestureDetected = true;
+            
+            // Activate hand and sensor
+            document.getElementById('handDemo').classList.add('active');
+            document.getElementById('sensor').classList.add('active');
+            
+            // Reset servo classes
+            const servoArm = document.getElementById('servoArm');
+            servoArm.classList.remove('left', 'right', 'center', 'active');
+            
+            // Apply new gesture
+            setTimeout(() => {
+                servoArm.classList.add('active', currentGesture);
+                
+                // Activate charging system for left and right gestures
+                if (currentGesture === 'left' || currentGesture === 'right') {
+                    activateChargingSystem();
+                } else {
+                    deactivateChargingSystem();
+                }
+            }, 300);
+            
+            // Update gesture button states
+            document.querySelectorAll('.gesture-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            if (currentGesture === 'left') {
+                document.getElementById('leftBtn').classList.add('active');
+            } else if (currentGesture === 'right') {
+                document.getElementById('rightBtn').classList.add('active');
+            } else {
+                document.getElementById('centerBtn').classList.add('active');
+            }
+            
+            updateStatusLeds();
+            
+            // Auto return to inactive state after 3 seconds
+            setTimeout(() => {
+                if (gestureDetected && currentGesture !== 'center') {
+                    gestureDetected = false;
+                    document.getElementById('handDemo').classList.remove('active');
+                    document.getElementById('sensor').classList.remove('active');
+                    updateStatusLeds();
+                }
+            }, 3000);
+        }
+
+        // Manual gesture toggle (for hand click)
+        function manualGesture() {
+            if (!systemRunning) {
+                showNotification('⚠️ Avval tizimni ishga tushiring!', 'warning');
+                return;
+            }
+            
+            // Cycle through gestures
+            if (currentGesture === 'center') {
+                gestureRight();
+            } else if (currentGesture === 'right') {
+                gestureLeft();
+            } else {
+                gestureCenter();
+            }
+        }
+
+        // Test Functions
+        function testServoMotor() {
+            const servoArm = document.getElementById('servoArm');
+            servoArm.classList.add('active');
+            showNotification('🔄 Servo motor testi...', 'info');
+            
+            // Test sequence: center -> right -> left -> center
+            setTimeout(() => servoArm.classList.add('right'), 500);
+            setTimeout(() => {
+                servoArm.classList.remove('right');
+                servoArm.classList.add('left');
+            }, 1000);
+            setTimeout(() => {
+                servoArm.classList.remove('left');
+                servoArm.classList.add('center');
+            }, 1500);
+            setTimeout(() => {
+                servoArm.classList.remove('active', 'center');
+            }, 2000);
+        }
+
+        function testGestureSensor() {
+            document.getElementById('sensor').classList.add('active');
+            document.getElementById('handDemo').classList.add('active');
+            showNotification('🔍 Gesture sensor testi...', 'info');
+            
+            setTimeout(() => {
+                document.getElementById('sensor').classList.remove('active');
+                document.getElementById('handDemo').classList.remove('active');
+            }, 2000);
+        }
+
+        function testChargingSystem() {
+            document.getElementById('powerAdapter').classList.add('active');
+            document.getElementById('batteryFill').classList.add('charging');
+            showNotification('🔋 Zaryadka tizimi testi...', 'info');
+            
+            setTimeout(() => {
+                document.getElementById('powerAdapter').classList.remove('active');
+                document.getElementById('batteryFill').classList.remove('charging');
+            }, 3000);
+        }
+
+        // Charging System Functions
+        function activateChargingSystem() {
+            document.getElementById('powerAdapter').classList.add('active');
+            document.getElementById('batteryFill').classList.add('charging');
+        }
+
+        function deactivateChargingSystem() {
+            document.getElementById('powerAdapter').classList.remove('active');
+            document.getElementById('batteryFill').classList.remove('charging');
+        }
+
+        // Arduino Activation
+        function activateArduino() {
+            const arduino = document.getElementById('arduino');
+            arduino.style.boxShadow = '0 8px 20px rgba(0,102,204,0.8)';
+            
+            setTimeout(() => {
+                arduino.style.boxShadow = '0 8px 20px rgba(0,102,204,0.4)';
+            }, 2000);
+        }
+
+        // Status LED Updates
+        function updateStatusLeds() {
+            // Power LED
+            const powerLed = document.getElementById('powerLed');
+            powerLed.classList.toggle('on', powerOn);
+            
+            // Arduino LED
+            const arduinoLed = document.getElementById('arduinoLed');
+            arduinoLed.classList.toggle('on', powerOn);
+            
+            // Sensor LED
+            const sensorLed = document.getElementById('sensorLed');
+            sensorLed.classList.toggle('on', systemRunning && gestureDetected);
+            
+            // Servo LED
+            const servoLed = document.getElementById('servoLed');
+            servoLed.classList.toggle('on', systemRunning && gestureDetected);
+            
+            // Charge LED
+            const chargeLed = document.getElementById('chargeLed');
+            chargeLed.classList.toggle('on', systemRunning && gestureDetected && (currentGesture === 'left' || currentGesture === 'right'));
+        }
+
+        // Modal Functions
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Tab Functions
+        function switchTab(tabName) {
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Add active class to selected tab
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+        }
+
+        // Notification System
+        function showNotification(message, type = 'info') {
+            // Remove existing notification
+            const existingNotification = document.querySelector('.notification');
+            if (existingNotification) {
+                existingNotification.remove();
+            }
+            
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.innerHTML = message;
+            
+            // Add styles
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 20px;
+                border-radius: 8px;
+                color: white;
+                font-weight: bold;
+                z-index: 10000;
+                min-width: 250px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                animation: slideInRight 0.4s ease;
+            `;
+            
+            // Set background color based on type
+            switch(type) {
+                case 'success':
+                    notification.style.background = '#28a745';
+                    break;
+                case 'warning':
+                    notification.style.background = '#ffc107';
+                    notification.style.color = '#000';
+                    break;
+                case 'error':
+                    notification.style.background = '#dc3545';
+                    break;
+                default:
+                    notification.style.background = '#000075';
+            }
+            
+            // Add animation styles
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideInRight {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+                @keyframes slideOutRight {
+                    from { transform: translateX(0); opacity: 1; }
+                    to { transform: translateX(100%); opacity: 0; }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            // Add to document
+            document.body.appendChild(notification);
+            
+            // Auto remove after 3 seconds
+            setTimeout(() => {
+                notification.style.animation = 'slideOutRight 0.4s ease';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.remove();
+                    }
+                }, 400);
+            }, 3000);
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(event) {
+            switch(event.code) {
+                case 'Space':
+                    event.preventDefault();
+                    manualGesture();
+                    break;
+                case 'ArrowLeft':
+                    event.preventDefault();
+                    gestureLeft();
+                    break;
+                case 'ArrowRight':
+                    event.preventDefault();
+                    gestureRight();
+                    break;
+                case 'ArrowUp':
+                    event.preventDefault();
+                    gestureCenter();
+                    break;
+                case 'KeyP':
+                    if (event.ctrlKey) {
+                        event.preventDefault();
+                        togglePower();
+                    }
+                    break;
+                case 'KeyS':
+                    if (event.ctrlKey) {
+                        event.preventDefault();
+                        if (systemRunning) {
+                            stopSystem();
+                        } else {
+                            startSystem();
+                        }
+                    }
+                    break;
+                case 'KeyT':
+                    if (event.ctrlKey) {
+                        event.preventDefault();
+                        runTest();
+                    }
+                    break;
+                case 'KeyR':
+                    if (event.ctrlKey) {
+                        event.preventDefault();
+                        resetSystem();
+                    }
+                    break;
+                case 'Escape':
+                    // Close all modals
+                    document.querySelectorAll('.modal').forEach(modal => {
+                        modal.style.display = 'none';
+                    });
+                    break;
+            }
+        });
+
+        // Touch gestures for mobile
+        let touchStartX = 0;
+        let touchStartY = 0;
+
+        document.addEventListener('touchstart', function(event) {
+            touchStartX = event.touches[0].clientX;
+            touchStartY = event.touches[0].clientY;
+        });
+
+        document.addEventListener('touchend', function(event) {
+            const touchEndX = event.changedTouches[0].clientX;
+            const touchEndY = event.changedTouches[0].clientY;
+            
+            const deltaX = touchEndX - touchStartX;
+            const deltaY = touchEndY - touchStartY;
+            
+            // Detect swipe gestures
+            if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
+                if (deltaX > 0) {
+                    // Swipe right
+                    gestureRight();
+                } else {
+                    // Swipe left
+                    gestureLeft();
+                }
+            } else if (Math.abs(deltaY) > 50 && deltaY < 0) {
+                // Swipe up
+                gestureCenter();
+            }
+        });
+
+        // Auto demonstration mode
+        function startAutoDemo() {
+            if (!systemRunning) return;
+            
+            const gestures = ['right', 'center', 'left', 'center'];
+            let currentIndex = 0;
+            
+            const demoInterval = setInterval(() => {
+                if (!systemRunning) {
+                    clearInterval(demoInterval);
+                    return;
+                }
+                
+                const gesture = gestures[currentIndex];
+                
+                if (gesture === 'left') {
+                    gestureLeft();
+                } else if (gesture === 'right') {
+                    gestureRight();
+                } else {
+                    gestureCenter();
+                }
+                
+                currentIndex = (currentIndex + 1) % gestures.length;
+            }, 2000);
+            
+            return demoInterval;
+        }
+
+        // Console commands for developers
+        window.gestureControl = {
+            start: startSystem,
+            stop: stopSystem,
+            power: togglePower,
+            test: runTest,
+            reset: resetSystem,
+            left: gestureLeft,
+            right: gestureRight,
+            center: gestureCenter,
+            autoDemo: startAutoDemo,
+            status: function() {
+                console.log('System Status:', {
+                    power: powerOn,
+                    running: systemRunning,
+                    gesture: gestureDetected,
+                    currentGesture: currentGesture,
+                    test: testMode
+                });
+            }
+        };
+
+        // Performance monitoring
+        let performanceMetrics = {
+            gestureCount: 0,
+            uptime: 0,
+            startTime: Date.now()
+        };
+
+        setInterval(() => {
+            if (systemRunning) {
+                performanceMetrics.uptime = Date.now() - performanceMetrics.startTime;
+            }
+        }, 1000);
+
+        // Error handling
+       
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Qushlar Ovozi Tajribasi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #e6f3ff;
+            min-height: 100vh;
+            padding: 1%;
+            overflow-x: auto;
+        }
+
+        /* HEADER */
+        .header {
+            display: flex;
+            align-items: center;
+            background:#000075;
+            color: white;
+            padding: 0.5% 2%;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            width: 100%;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1%;
+            font-size: 1.2vw;
+            font-weight: bold;
+        }
+
+        .logo-icon img {
+            border-radius: 50%;
+            border: 2px solid white;
+            width: 3vw;
+            height: 3vw;
+            min-width: 30px;
+            min-height: 30px;
+        }
+
+        /* MAIN LAYOUT */
+        .main-container {
+            display: flex;
+            margin-top: 2%;
+            gap: 2%;
+        }
+
+        /* LEFT PANEL */
+        .left-panel {
+            width: 20%;
+            min-width: 200px;
+            background: white;
+            padding: 1.5%;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            height: fit-content;
+            position: relative;
+            z-index: 1;
+        }
+
+        .control-group {
+            margin-bottom: 5%;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 5%;
+        }
+
+        .control-group h3 {
+            margin-bottom: 3%;
+            color: #333;
+            font-size: 1.1vw;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 2%;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 2%;
+            font-size: 0.9vw;
+            border-radius: 5px;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn-success { 
+            background: #28a745; 
+            color: white; 
+        }
+        .btn-danger { 
+            background: #dc3545; 
+            color: white; 
+        }
+        .btn-primary { 
+            background: #000075; 
+            color: white; 
+        }
+        .btn-info { 
+            background:#000075 ; 
+            color: white; 
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            flex: 1;
+            padding: 2%;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .title-header {
+            background: #000075;
+            color: white;
+            padding: 1% 2%;
+            border-radius: 20px;
+            font-size: 1.3vw;
+            font-weight: bold;
+            margin: 0 auto 3%;
+            text-align: center;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        /* CIRCUIT DISPLAY */
+        .circuit-display {
+            background: #f8f9fa;
+            border: 3px solid #000075;
+            border-radius: 20px;
+            padding: 3%;
+            position: relative;
+            width: 100%;
+            padding-bottom: 75%; /* Aspect ratio 4:3 */
+            overflow: hidden;
+        }
+
+        .circuit-content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 3%;
+        }
+
+        .circuit-title {
+            background: #000075;
+            color: white;
+            padding: 0.5% 2%;
+            border-radius: 15px;
+            font-size: 1vw;
+            font-weight: bold;
+            position: absolute;
+            top: -1.5%;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 3px 10px rgba(0,0,117,0.3);
+            white-space: nowrap;
+        }
+
+        /* COMPONENTS */
+        .component {
+            position: absolute;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7vw;
+            font-weight: bold;
+            color: white;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .component img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .component:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(0,0,0,0.3);
+        }
+
+        /* Arduino UNO */
+        .arduino {
+            width: 15%;
+            height: 12%;
+            top: 32%;
+            left: 38%;
+        }
+
+        /* Ultrasonic Sensors */
+        .ultrasonic {
+            width: 10%;
+            height: 5%;
+        }
+
+        .ultrasonic.left {
+            top: 8%;
+            left: 22%;
+        }
+
+        .ultrasonic.right {
+            top: 8%;
+            right: 22%;
+        }
+
+        /* Motors */
+        .motor {
+            width: 8%;
+            height: 10%;
+            border-radius: 50%;
+        }
+
+        .motor.left {
+            bottom: 15%;
+            left: 8%;
+        }
+
+        .motor.right {
+            bottom: 15%;
+            right: 8%;
+        }
+
+        /* Motor Driver */
+        .motor-driver {
+            width: 10%;
+            height: 8%;
+            bottom: 28%;
+            left: 22%;
+        }
+
+        /* Breadboard */
+        .breadboard {
+            width: 14%;
+            height: 10%;
+            top: 18%;
+            right: 14%;
+        }
+
+        /* Battery Pack */
+        .battery {
+            width: 9%;
+            height: 6%;
+            bottom: 8%;
+            left: 30%;
+        }
+
+        /* Power Switch */
+        .power-switch {
+            width: 12%;
+            height: 15%;
+            bottom: 8%;
+            right: 28%;
+        }
+
+        /* WIRES */
+        .wire {
+            position: absolute;
+            z-index: 5;
+            border-radius: 1px;
+        }
+
+        .wire-red { background: #e74c3c; }
+        .wire-black { background: #2c3e50; }
+        .wire-blue { background: #3498db; }
+        .wire-green { background: #27ae60; }
+        .wire-yellow { background: #f1c40f; }
+        .wire-orange { background: #e67e22; }
+
+        /* Horizontal wires */
+        .wire-h {
+            height: 0.4%;
+            min-height: 2px;
+        }
+
+        /* Vertical wires */
+        .wire-v {
+            width: 0.4%;
+            min-width: 2px;
+        }
+
+        /* Wire positions - RESPONSIVE */
+        .wire1 {
+            top: 10%;
+            left: 30%;
+            width: 12%;
+        }
+
+        .wire2 {
+            top: 11.5%;
+            left: 68%;
+            width: 12%;
+        }
+
+        .wire3 {
+            top: 38%;
+            left: 30%;
+            width: 8%;
+        }
+
+        .wire4 {
+            top: 39.5%;
+            left: 53%;
+            width: 8%;
+        }
+
+        .wire5 {
+            top: 26%;
+            left: 68%;
+            height: 13%;
+        }
+
+        .wire6 {
+            bottom: 22%;
+            left: 30%;
+            width: 12%;
+        }
+
+        .wire7 {
+            bottom: 16%;
+            left: 15%;
+            width: 8%;
+        }
+
+        .wire8 {
+            bottom: 16%;
+            right: 15%;
+            width: 8%;
+        }
+
+        /* STATUS INDICATORS */
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 2% 0;
+            font-size: 0.9vw;
+        }
+
+        .status-led {
+            width: 0.8vw;
+            height: 0.8vw;
+            min-width: 10px;
+            min-height: 10px;
+            border-radius: 50%;
+            background: #dc3545;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+        }
+
+        .status-led.on {
+            background: #28a745;
+            box-shadow: 0 0 10px rgba(40, 167, 69, 0.8);
+        }
+
+        /* ANIMATIONS */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .component.active {
+            animation: pulse 1s infinite;
+            box-shadow: 0 0 20px rgba(52, 152, 219, 0.8);
+        }
+
+        /* RESPONSIVE DESIGN */
+        @media (max-width: 1024px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .left-panel {
+                width: 100%;
+                min-width: unset;
+            }
+
+            .logo {
+                font-size: 2vw;
+            }
+
+            .control-group h3 {
+                font-size: 2vw;
+            }
+
+            .btn {
+                font-size: 1.8vw;
+                padding: 3%;
+            }
+
+            .status-row {
+                font-size: 1.8vw;
+            }
+
+            .status-led {
+                width: 1.5vw;
+                height: 1.5vw;
+                min-width: 12px;
+                min-height: 12px;
+            }
+
+            .title-header {
+                font-size: 2.5vw;
+            }
+
+            .circuit-title {
+                font-size: 1.8vw;
+            }
+
+            .component {
+                font-size: 1.3vw;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .circuit-display {
+                padding-bottom: 100%; /* Square aspect ratio on mobile */
+            }
+
+            .logo {
+                font-size: 3.5vw;
+            }
+
+            .control-group h3 {
+                font-size: 3.5vw;
+            }
+
+            .btn {
+                font-size: 3vw;
+            }
+
+            .status-row {
+                font-size: 3vw;
+            }
+
+            .status-led {
+                width: 3vw;
+                height: 3vw;
+                min-width: 15px;
+                min-height: 15px;
+            }
+
+            .title-header {
+                font-size: 4vw;
+            }
+
+            .circuit-title {
+                font-size: 3vw;
+            }
+
+            .component {
+                font-size: 2vw;
+            }
+        }
+
+        a {
+            text-decoration: none;
+            color: white;
+        }
+
+          .card {
+    display: flex;
+    gap: 15px;
+    background: #000075;
+    color: white;
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    align-items: center;
+}
+
+.card img {
+    width: 150px;
+    border-radius: 10px;
+}
+
+.card .text h3 {
+    margin-bottom: 8px;
+    color: white;
+}
+        .left-panel{width:280px;max-width:95%;background:#fff;border-radius:14px;padding:16px;box-shadow:0 6px 16px rgba(0,0,0,.08)}
+  .left-panel h3{margin:0 0 12px;font-size:16px;color:#333}
+  .btn{display:block;width:100%;padding:10px 12px;margin:8px 0;border:0;border-radius:10px;cursor:pointer;transition:.25s;text-align:left;font-weight:600}
+  .btn-primary{background:#000075;color:#fff}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 14px rgba(0,0,0,.1)}
+  .flex-container-40-60{display:flex;gap:20px;align-items:flex-start;background:rgba(255,255,255,.1);padding:20px;border-radius:15px;margin-bottom:20px}
+  .flex-text-60{flex:1}
+  .flex-text-60 p{font-size:16px;line-height:1.8}
+  .flex-container-30-70{display:flex;gap:20px;align-items:flex-start;background:rgba(255,255,255,.1);padding:20px;border-radius:15px;margin-bottom:20px}
+  .flex-image-30{flex:0 0 30%}
+  .flex-image-30 img{width:100%;border-radius:10px}
+  .flex-text-70{flex:0 0 70%}
+  .flex-text-70 strong{color:#ffcc00;font-size:18px;display:block;margin-bottom:10px}
+  .modal{display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.8);backdrop-filter:blur(5px);overflow-y:auto}
+  .modal-content{background:#000075;color:#fff;margin:5vh auto;padding:30px;width:90%;max-width:1000px;border-radius:20px;box-shadow:0 15px 40px rgba(0,0,0,.5);position:relative;animation:slideDown .4s ease}
+  @keyframes slideDown{from{transform:translateY(-50px);opacity:0}to{transform:translateY(0);opacity:1}}
+  .close{position:absolute;right:20px;top:15px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:bold;cursor:pointer;color:#fff;transition:.3s;border-radius:50%;background:rgba(255,255,255,.1)}
+  .close:hover{background:rgba(255,204,0,.3);color:#ffcc00;transform:rotate(90deg)}
+  .modal-content h2{font-size:28px;margin-bottom:25px;padding-bottom:15px;border-bottom:2px solid rgba(255,255,255,.3);padding-right:50px}
+  .tab-buttons{display:flex;gap:8px;margin:12px 0 16px}
+  .tab-btn{flex:1;background:rgba(255,255,255,.12);color:#fff;border:0;border-radius:10px 10px 0 0;padding:10px;cursor:pointer;font-weight:600;transition:.2s}
+  .tab-btn:hover{background:rgba(255,255,255,.2)}
+  .tab-btn.active{background:rgba(255,255,255,.28)}
+  .tab-content{display:none}
+  .tab-content.active{display:block}
+  pre{background:rgba(0,0,0,.35);padding:12px;border-radius:10px;overflow:auto;white-space:pre-wrap;word-break:break-word;color:#fff;font-size:13.5px;line-height:1.55}
+  #infoFloatingBtn{position:fixed;bottom:30px;right:30px;width:120px;height:120px;border-radius:50%;background:linear-gradient(135deg,#000075,#0000ff);color:#fff;border:4px solid #fff;cursor:pointer;font-size:16px;font-weight:bold;box-shadow:0 8px 20px rgba(0,0,0,.4);z-index:1500;transition:.3s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px}
+  #infoFloatingBtn:hover{transform:scale(1.1);box-shadow:0 12px 30px rgba(0,0,255,.6)}
+  #infoFloatingBtn span:first-child{font-size:36px}
+  .video-full{width:100%;border-radius:15px;background:#000}
+  .video-full video{width:100%;height:auto;border-radius:15px;max-height:70vh}
+  @media (max-width:1024px){.flex-container-40-60,.flex-container-30-70{flex-direction:column}.flex-image-30,.flex-text-70{flex:0 0 100%}}
+  @media (max-width:768px){.modal-content{width:96%;padding:20px 15px}#infoFloatingBtn{width:90px;height:90px;font-size:14px;bottom:20px;right:20px}#infoFloatingBtn span:first-child{font-size:28px}}
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="logo">
+                     <a href="/"><img src="/static/image/logo.png" width="80px" height="80px" alt=""></a>
+          
+            <span>Qushlar Ovozi Tajribasi</span>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <div class="main-container">
+        <!-- LEFT PANEL -->
+        <div class="left-panel">
+            <div class="control-group">
+                <h3>Boshqaruv</h3>
+                <button class="btn btn-success" onclick="startSimulation()" id="startBtn">
+                    Start
+                </button>
+                <button class="btn btn-danger" onclick="stopSimulation()" id="stopBtn">
+                    Stop
+                </button>
+                <button class="btn btn-primary" onclick="togglePower()">
+                    Quvvat
+                </button>
+               
+            </div>
+<aside class="left-panel">
+  <h3>Ma'lumotlar</h3>
+  <button class="btn btn-primary" id="schemaBtn">💡 Sxema qayerda ishlatiladi</button>
+  <button class="btn btn-primary" id="codeBtn">💻 Kod</button>
+  <button class="btn btn-primary" id="componentsBtn">🔌 Qurilmalar</button>
+</aside>
+           
+
+            <div class="control-group">
+                <h3>Qurilma holati</h3>
+                <div class="status-row">
+                    <span>Quvvat:</span>
+                    <div class="status-led" id="powerLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Arduino:</span>
+                    <div class="status-led" id="arduinoLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Chap sensor:</span>
+                    <div class="status-led" id="leftSensorLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>O'ng sensor:</span>
+                    <div class="status-led" id="rightSensorLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Motor driver:</span>
+                    <div class="status-led" id="driverLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Chap motor:</span>
+                    <div class="status-led" id="leftMotorLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>O'ng motor:</span>
+                    <div class="status-led" id="rightMotorLed"></div>
+                </div>
+            </div>
+        </div>
+<div class="modal" id="schemaModal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>💡 Sxema qayerda ishlatiladi (RGB LED)</h2>
+    <div class="flex-container-40-60">
+         <div class="flex-video-40">
+                <iframe 
+                    src="https://www.youtube.com/embed/eWfKKm9j23w?si=mpA6vK5EdcrwdEWi" 
+                    title="YouTube video player" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+      <div class="flex-text-60">
+        <strong>Tajriba Haqida</strong>
+        <p>Bu tajribada dinamik mikrofon (yoki kichik karnay) qushning ovozini qabul qiladi va uni kichik AC signal ko‘rinishida elektr impulsiga aylantiradi. Ushbu impuls ikki bosqichli BC547 tranzistor kuchaytirgichi orqali kuchaytiriladi.</p>
+    </div>
+    </div>
+    <div class="flex-container-40-60">
+         <div class="flex-video-40">
+                <iframe 
+                    src="https://www.youtube.com/embed/uux1bqZyyHM?si=I0hOkwNkkau2Abck" 
+                    title="YouTube video player" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+      <div class="flex-text-60">
+        <strong>🔄 Ishlash prinsipi</strong>
+<p>
+    Mikrofon tovush tebranishlarini juda kichik kuchlanish (5–15 mV) ko‘rinishida beradi.
+
+Bu signal 104 pF (0.1µF) kondensator orqali birinchi tranzistor bazasiga uzatiladi – bu kondensator yuqori chastotali shovqinlarni filtrlaydi.
+
+Birinchi BC547 kichik signalni kuchaytirib, ikkinchi bosqichga uzatadi.
+</p> 
+ </div>
+    </div>
+    <div class="flex-container-40-60">
+         <div class="flex-video-40">
+                <iframe 
+                    src="https://www.youtube.com/embed/AmYVj-iiKgY?si=CWXw-KVzpPmiGy9l" 
+                    title="YouTube video player" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+      <div class="flex-text-60">
+        <strong>🔄 Ishlash prinsipi 2</strong>
+   <p>Ikkinchi BC547 kuchaygan signalni yanada kuchaytiradi – bunda:
+
+O‘rta rezistor (qizil-qora-olov rangli) signalni barqarorlashtiradi
+
+470µF kondensator signalni “yumshatadi” va uni uzoqroq impulsga aylantiradi
+
+Tranzistorlar orqali chiqqan signal LED, buzzer, motor yoki boshqa indikatorlarga uzatilishi mumkin.
+
+Bu tajriba bilan “tovush → elektr signal → kuchaytirish → chiqish signal” zanjiri o‘rgatiladi.</p>
+   
+    </div>
+    </div>
+  </div>
+</div>
+
+<!-- ✅ 3) Qurilmalar -->
+<div class="modal" id="componentsModal">
+  <div class="modal-content">
+    <span class="close" title="Yopish">&times;</span>
+    <h2>🔌 Ishlatilgan Qurilmalar — Qush Ovozini Aniqlash Tajribasi</h2>
+
+    <!-- Mikrofon -->
+ 
+
+    <!-- BC547 tranzistorlar -->
+    <div class="flex-container-30-70">
+      <div class="flex-image-30">
+        <img src="/static/image/bc547.png" width="50px" height="200px" alt="BC547 Transistor">
+      </div>
+      <div class="flex-text-70">
+        <strong>2× BC547 NPN tranzistor</strong>
+        <p>Tovushdan kelgan juda kichik signalni ikki bosqichda kuchaytiradi. Birinchi tranzistor – past kuchlanishni, ikkinchisi – kuchaygan impulsni qayta ishlaydi.</p>
+      </div>
+    </div>
+
+    <!-- 104 kondensator -->
+    <div class="flex-container-30-70">
+      <div class="flex-image-30">
+        <img src="/static/image/1000uF25VElectrolyticCapacitor10x16mm.Leadspace-3.webp" alt="104 Capacitor">
+      </div>
+      <div class="flex-text-70">
+        <strong>104 (0.1µF) Keramik kondensator</strong>
+        <p>Yuqori chastotali shovqinlarni filtrlaydi va mikrofon signalini tranzistor bazasiga to‘g‘ri shaklda uzatadi.</p>
+      </div>
+    </div>
+
+    <!-- Rezistorlar -->
+    <div class="flex-container-30-70">
+      <div class="flex-image-30">
+        <img src="/static/image/resistor.png" alt="Resistor">
+      </div>
+      <div class="flex-text-70">
+        <strong>3× Rezistorlar (1k–10k oralig‘ida)</strong>
+        <p>Tranzistorlarning bazasini himoya qiladi, signal kuchini barqarorlashtiradi va umumiy kuchlanishni boshqaradi.</p>
+      </div>
+    </div>
+
+    <!-- 470uF kondensator -->
+    <div class="flex-container-30-70">
+      <div class="flex-image-30">
+        <img src="/static/image/470uf.jpg" alt="470uF Capacitor">
+      </div>
+      <div class="flex-text-70">
+        <strong>470µF elektrolit kondensator</strong>
+        <p>Kuchaytirilgan signalni bir necha millisekund davomida ushlab turadi – shu sababli indikator qurilma vaqtincha yonadi.</p>
+      </div>
+    </div>
+
+    <!-- Potensiometr -->
+    <div class="flex-container-30-70">
+      <div class="flex-image-30">
+        <img src="/static/image/potensiometr.jpg" alt="Potentiometer">
+      </div>
+      <div class="flex-text-70">
+        <strong>10k Potensiometr</strong>
+        <p>Tajribaning sezgirligini moslash uchun ishlatiladi. Qush ovozi qanchalik baland bo‘lishi kerakligini belgilaydi.</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="modal" id="infoModal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>📚 Qo'shimcha Ma'lumot</h2>
+    <div class="video-full">
+      <video controls>
+        <source src="/media/2.mp4" type="video/mp4">
+        Brauzeringiz video formatni qo'llab-quvvatlamaydi.
+      </video>
+    </div>
+  </div>
+</div>
+
+<button id="infoFloatingBtn"><span>📚</span><span>Ma'lumot</span></button>
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+            <div class="title-header">Qushlar Ovozi Sxemasi</div>
+            
+            <div class="circuit-display">
+                <div class="circuit-content">
+
+                    <img src="/static/image/birds.jpg" width="90%" height="auto" alt="">
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // System state variables
+        let powerOn = false;
+        let arduinoActive = false;
+        let leftSensorActive = false;
+        let rightSensorActive = false;
+        let motorDriverActive = false;
+        let leftMotorActive = false;
+        let rightMotorActive = false;
+
+        // DOM elements
+        const elements = {
+            powerLed: document.getElementById('powerLed'),
+            arduinoLed: document.getElementById('arduinoLed'),
+            leftSensorLed: document.getElementById('leftSensorLed'),
+            rightSensorLed: document.getElementById('rightSensorLed'),
+            driverLed: document.getElementById('driverLed'),
+            leftMotorLed: document.getElementById('leftMotorLed'),
+            rightMotorLed: document.getElementById('rightMotorLed'),
+            arduino: document.getElementById('arduino'),
+            leftSensor: document.getElementById('leftSensor'),
+            rightSensor: document.getElementById('rightSensor'),
+            motorDriver: document.getElementById('motorDriver'),
+            leftMotor: document.getElementById('leftMotor'),
+            rightMotor: document.getElementById('rightMotor')
+        };
+
+  function openModal(id){ const m=document.getElementById(id); if(m) m.style.display='block'; }
+  function closeModal(el){ const m=el.closest('.modal'); if(m) m.style.display='none'; }
+
+  document.addEventListener('click', (e)=>{ if(e.target.matches('.modal .close')) closeModal(e.target); });
+  window.addEventListener('click', (e)=>{ document.querySelectorAll('.modal').forEach(m=>{ if(e.target===m) m.style.display='none'; }); });
+
+  // buttons
+  document.getElementById('schemaBtn')?.addEventListener('click', ()=>openModal('schemaModal'));
+  document.getElementById('codeBtn')?.addEventListener('click',   ()=>openModal('codeModal'));
+  document.getElementById('componentsBtn')?.addEventListener('click', ()=>openModal('componentsModal'));
+  document.getElementById('infoFloatingBtn')?.addEventListener('click', ()=>openModal('infoModal'));
+
+  // tabs
+  (function(){
+    const codeModal=document.getElementById('codeModal');
+    if(!codeModal) return;
+    codeModal.querySelectorAll('.tab-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const t=btn.dataset.tab;
+        codeModal.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        codeModal.querySelectorAll('.tab-content').forEach(p=>p.classList.toggle('active', p.id===t));
+      });
+    });
+  })();
+        // Update status LEDs
+        function updateStatus() {
+            elements.powerLed.classList.toggle('on', powerOn);
+            elements.arduinoLed.classList.toggle('on', arduinoActive);
+            elements.leftSensorLed.classList.toggle('on', leftSensorActive);
+            elements.rightSensorLed.classList.toggle('on', rightSensorActive);
+            elements.driverLed.classList.toggle('on', motorDriverActive);
+            elements.leftMotorLed.classList.toggle('on', leftMotorActive);
+            elements.rightMotorLed.classList.toggle('on', rightMotorActive);
+        }
+
+        // Update component animations
+        function updateComponents() {
+            elements.arduino.classList.toggle('active', arduinoActive);
+            elements.leftSensor.classList.toggle('active', leftSensorActive);
+            elements.rightSensor.classList.toggle('active', rightSensorActive);
+            elements.motorDriver.classList.toggle('active', motorDriverActive);
+            elements.leftMotor.classList.toggle('active', leftMotorActive);
+            elements.rightMotor.classList.toggle('active', rightMotorActive);
+        }
+
+        // Power control
+        function togglePower() {
+            powerOn = !powerOn;
+            
+            if (powerOn) {
+                arduinoActive = true;
+                setTimeout(() => {
+                    leftSensorActive = true;
+                    rightSensorActive = true;
+                    motorDriverActive = true;
+                    updateStatus();
+                    updateComponents();
+                }, 500);
+            } else {
+                arduinoActive = false;
+                leftSensorActive = false;
+                rightSensorActive = false;
+                motorDriverActive = false;
+                leftMotorActive = false;
+                rightMotorActive = false;
+            }
+            
+            updateStatus();
+            updateComponents();
+        }
+
+        // Movement functions
+        function moveForward() {
+            if (!powerOn) {
+                alert('Avval quvvatni yoqing!');
+                return;
+            }
+            
+            leftMotorActive = true;
+            rightMotorActive = true;
+            updateStatus();
+            updateComponents();
+            
+            setTimeout(() => {
+                leftMotorActive = false;
+                rightMotorActive = false;
+                updateStatus();
+                updateComponents();
+            }, 2000);
+        }
+
+        function moveBackward() {
+            if (!powerOn) {
+                alert('Avval quvvatni yoqing!');
+                return;
+            }
+            
+            leftMotorActive = true;
+            rightMotorActive = true;
+            updateStatus();
+            updateComponents();
+            
+            setTimeout(() => {
+                leftMotorActive = false;
+                rightMotorActive = false;
+                updateStatus();
+                updateComponents();
+            }, 2000);
+        }
+
+        function turnLeft() {
+            if (!powerOn) {
+                alert('Avval quvvatni yoqing!');
+                return;
+            }
+            
+            rightMotorActive = true;
+            updateStatus();
+            updateComponents();
+            
+            setTimeout(() => {
+                rightMotorActive = false;
+                updateStatus();
+                updateComponents();
+            }, 1500);
+        }
+
+        function turnRight() {
+            if (!powerOn) {
+                alert('Avval quvvatni yoqing!');
+                return;
+            }
+            
+            leftMotorActive = true;
+            updateStatus();
+            updateComponents();
+            
+            setTimeout(() => {
+                leftMotorActive = false;
+                updateStatus();
+                updateComponents();
+            }, 1500);
+        }
+
+        // System control functions
+        function startSimulation() {
+            if (!powerOn) {
+                alert('Avval quvvatni yoqing!');
+                return;
+            }
+            
+            alert('Simulyatsiya boshlandi! Robot avtomatik harakat qiladi.');
+            
+            const movements = [moveForward, turnLeft, turnRight, moveBackward];
+            let currentMovement = 0;
+            
+            const simulationInterval = setInterval(() => {
+                if (!powerOn) {
+                    clearInterval(simulationInterval);
+                    return;
+                }
+                
+                movements[currentMovement % movements.length]();
+                currentMovement++;
+                
+                if (currentMovement > 8) {
+                    clearInterval(simulationInterval);
+                    alert('Simulyatsiya tugadi!');
+                }
+            }, 3000);
+        }
+
+        function stopSimulation() {
+            leftMotorActive = false;
+            rightMotorActive = false;
+            updateStatus();
+            updateComponents();
+            alert('Simulyatsiya to\'xtatildi!');
+        }
+
+        function runTest() {
+            if (!powerOn) {
+                alert('Avval quvvatni yoqing!');
+                return;
+            }
+            
+            alert('Tizim testi boshlandi...');
+            
+            setTimeout(() => {
+                leftSensorActive = true;
+                rightSensorActive = true;
+                updateStatus();
+                updateComponents();
+            }, 500);
+            
+            setTimeout(() => {
+                moveForward();
+            }, 1500);
+            
+            setTimeout(() => {
+                alert('Test muvaffaqiyatli yakunlandi!');
+            }, 4000);
+        }
+
+        // Component click handlers
+        elements.arduino.addEventListener('click', () => {
+            alert('Arduino UNO - Asosiy boshqaruvchi mikrocontroller');
+        });
+
+        elements.leftSensor.addEventListener('click', () => {
+            alert('HC-SR04 Ultrasonic Sensor - Chap tomondagi ob\'ektlarni aniqlaydi');
+        });
+
+        elements.rightSensor.addEventListener('click', () => {
+            alert('HC-SR04 Ultrasonic Sensor - O\'ng tomondagi ob\'ektlarni aniqlaydi');
+        });
+
+        elements.motorDriver.addEventListener('click', () => {
+            alert('L298N Motor Driver - Motorlarni boshqarish uchun');
+        });
+
+        elements.leftMotor.addEventListener('click', () => {
+            alert('Chap motor - Robotic harakatlanishi uchun');
+        });
+
+        elements.rightMotor.addEventListener('click', () => {
+            alert('O\'ng motor - Robotic harakatlanishi uchun');
+        });
+
+        // Initialize
+        updateStatus();
+        updateComponents();
+    </script>
+</body>
+</html>

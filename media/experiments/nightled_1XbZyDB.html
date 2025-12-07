@@ -1,0 +1,1959 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avtomatik Tungi Chiroq Tajribasi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+        
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: auto;
+        }
+
+        /* HEADER */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #000075;
+            color: white;
+            padding: 15px 25px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            border-radius: 15px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 3px solid white;
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            animation: logoGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes logoGlow {
+            0% { box-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
+            100% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.8); }
+        }
+
+        .header-stats {
+            display: flex;
+            gap: 20px;
+            font-size: 14px;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 10px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+        }
+
+        /* MAIN LAYOUT */
+        .main-container {
+            display: flex;
+            margin-top: 20px;
+            gap: 25px;
+        }
+
+        /* LEFT PANEL - KENGAYTIRILGAN */
+        .left-panel {
+            width: 300px;
+            background: linear-gradient(145deg, #ffffff, #f0f0f0);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            height: fit-content;
+            position: relative;
+            z-index: 1;
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+
+        .control-group {
+            margin-bottom: 25px;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 20px;
+        }
+
+        .control-group:last-child {
+            border-bottom: none;
+        }
+
+        .control-group h3 {
+            margin-bottom: 15px;
+            color: #000075;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 12px 15px;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 10px;
+            font-size: 15px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            text-align: left;
+            font-weight: 600;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+
+        .btn:active {
+            transform: translateY(-1px);
+        }
+
+        .btn-success { 
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white; 
+        }
+        .btn-danger { 
+            background: linear-gradient(135deg, #dc3545, #e74c3c);
+            color: white; 
+        }
+        .btn-primary { 
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white; 
+        }
+        .btn-info { 
+            background: linear-gradient(135deg, #17a2b8, #138496);
+            color: white; 
+        }
+        .btn-warning {
+            background: linear-gradient(135deg, #ffc107, #fd7e14);
+            color: #212529;
+        }
+
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 0;
+            font-size: 14px;
+            padding: 8px 12px;
+            background: rgba(0,0,0,0.05);
+            border-radius: 8px;
+        }
+
+        .status-led {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #dc3545;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+            position: relative;
+        }
+
+        .status-led.on {
+            background: #28a745;
+            box-shadow: 0 0 15px rgba(40, 167, 69, 0.8);
+        }
+
+        .status-led::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 12px;
+            height: 12px;
+            background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.8), transparent);
+            border-radius: 50%;
+        }
+
+        /* SENSOR READINGS PANEL */
+        .readings-panel {
+            background: linear-gradient(145deg, #f8f9fa, #e9ecef);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .reading-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 8px 0;
+            padding: 8px 10px;
+            background: white;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .reading-value {
+            font-weight: bold;
+            color: #007bff;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* EXPERIMENT LOG */
+        .log-panel {
+            max-height: 200px;
+            overflow-y: auto;
+            background: #000;
+            color: #00ff00;
+            padding: 10px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .log-entry {
+            margin: 2px 0;
+            padding: 2px 0;
+        }
+
+        .log-entry.info { color: #00ff00; }
+        .log-entry.warning { color: #ffff00; }
+        .log-entry.error { color: #ff4444; }
+
+        /* MAIN CONTENT */
+        .main-content {
+            flex: 1;
+            padding: 25px;
+            background: linear-gradient(145deg, #ffffff, #f8f9fa);
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+
+        .title-header {
+            background: #000075;
+            color: white;
+            padding: 20px 30px;
+            border-radius: 25px;
+            font-size: 22px;
+            font-weight: bold;
+            margin: 0 auto 40px;
+            text-align: center;
+            display: inline-block;
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .circuit-container {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 40px;
+            flex-wrap: wrap;
+            min-height: 600px;
+            position: relative;
+        }
+
+        /* CIRCUIT BOARD */
+        /* Circuit Board asosiy holat (yorug‘) */
+.circuit-board {
+    background: linear-gradient(skyblue, yellow);
+    width: 700px;
+    height: 500px;
+    border-radius: 15px;
+    position: relative;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+    border: 4px solid #1a1a1a;
+    overflow: hidden;
+}
+
+/* Qorong‘u rejim */
+.circuit-board.dark {
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+}
+
+/* Ornamentlar */
+.circuit-board::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        radial-gradient(circle at 20% 80%, rgba(255,255,255,0.1) 1px, transparent 1px),
+        radial-gradient(circle at 80% 20%, rgba(255,255,255,0.1) 1px, transparent 1px),
+        radial-gradient(circle at 40% 40%, rgba(255,255,255,0.1) 1px, transparent 1px);
+    background-size: 50px 50px;
+}
+
+
+        /* COMPONENTS */
+        .component {
+            position: absolute;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 12px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .component:hover {
+            transform: scale(1.1);
+            z-index: 20;
+        }
+
+       /* LED asosiy holat (o‘chgan) */
+.led-component {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(145deg, #333, #555);
+    border-radius: 50%;
+    position: absolute;
+    top: 100px;
+    left: 120px;
+    border: 4px solid #fff;
+    transition: all 0.3s ease;
+    box-shadow: inset 0 0 8px rgba(0,0,0,0.4);
+}
+
+/* Yoniq LED */
+.led-component.active {
+    background: radial-gradient(circle, #ffff00, #ffd700);
+    box-shadow: 0 0 30px #ffff00, 0 0 60px #ffff00, 0 0 90px rgba(255, 255, 0, 0.5);
+    animation: ledPulse 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes ledPulse {
+    0% {
+        box-shadow: 0 0 30px #ffff00, 0 0 60px #ffff00, 0 0 90px rgba(255, 255, 0, 0.5);
+        transform: scale(1);
+    }
+    100% {
+        box-shadow: 0 0 40px #ffff00, 0 0 80px #ffff00, 0 0 120px rgba(255, 255, 0, 0.7);
+        transform: scale(1.05);
+    }
+}
+
+        /* LDR SENSOR */
+        .ldr-sensor {
+            width: 50px;
+            height: 50px;
+           
+            border-radius: 50%;
+            top: 130px;
+            left: 290px;
+            position: relative;
+        }
+
+        .ldr-sensor::before {
+            content: 'LDR';
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .ldr-sensor::after {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
+            border: 2px dashed #fff;
+            border-radius: 50%;
+            animation: sensorScan 3s linear infinite;
+        }
+
+        @keyframes sensorScan {
+            0% { transform: rotate(0deg); opacity: 0.5; }
+            100% { transform: rotate(360deg); opacity: 0.5; }
+        }
+
+        /* TRANSISTOR */
+        .transistor {
+            width: 35px;
+            height: 45px;
+          
+            top: 100px;
+            left: 220px;
+            color: white;
+        
+        }
+
+        .transistor::before {
+            content: 'BC547';
+            font-size: 8px;
+            font-weight: bold;
+        }
+
+        /* RESISTORS */
+        .resistor {
+            height: 15px;
+        
+            border-radius: 8px;
+            position: relative;
+          
+        }
+
+        .resistor-10k {
+            width: 50px;
+            top: 140px;
+            left: 170px;
+            transform: rotate(45deg);
+        }
+
+        .resistor-220 {
+            width: 50px;
+            top: 210px;
+            left: 125px;
+            transform: rotate(0deg);
+        }
+
+        /* BATTERY */
+        .battery {
+            width: 80px;
+            height: 120px;
+            top: 300px;
+            left: 220px;
+            border-radius: 10px;
+            color: white;
+            flex-direction: column;
+            font-size: 12px;
+        
+        }
+
+        .battery::before {
+            content: '9V';
+            margin-bottom: 8px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .battery::after {
+            content: 'BATTERY';
+            font-size: 10px;
+        }
+
+        /* WIRES - Enhanced */
+        .wire {
+            position: absolute;
+            background: #ff0000;
+            z-index: 5;
+            border-radius: 2px;
+        }
+
+        .wire-horizontal {
+            height: 4px;
+        }
+
+        .wire-vertical {
+            width: 4px;
+        }
+
+        .wire1 { width: 100px; top: 215px; left: 160px; background: #000; }
+        .wire2 { height: 50px; top: 140px; left: 150px; }
+        .wire3 { width: 88px; top: 185px; left: 150px; }
+        .wire4 { width: 75px; top: 215px; left: 255px; background: #000; }
+        .wire5 { height: 150px; top: 140px; left: 125px; background: red; }
+        .wire6 { width: 150px; top: 288px; left: 125px; background: red; }
+        .wire7 { height: 15px; top: 171px; left: 234px; }
+        .wire8 { width: 50px; top: 205px; left: 250px; }
+        .wire9 { height: 38px; top: 171px; left: 247px; }
+        .wire10 { height: 45px; top: 171px; left: 261px; background: #000; }
+        .wire11 { height: 8px; top: 211px; left: 327px; background: #000; }
+        .wire12 { height: 95px; top: 218px; left: 251px; transform: rotate(12deg); background: #000; }
+        .wire13 { height: 20px; top: 288px; left: 272px; background: red; }
+        /* LIGHT SIMULATION */
+        .light-simulation {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            width: 120px;
+            height: 80px;
+            background: linear-gradient(135deg, #ffd700, #ffed4a);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            border: 3px solid #fff;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+        }
+
+        .light-simulation.dark {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: #ecf0f1;
+            box-shadow: 0 4px 15px rgba(44, 62, 80, 0.3);
+        }
+
+        .light-simulation::before {
+            content: '🌞 Yorug\'lik';
+            font-size: 12px;
+        }
+
+        .light-simulation.dark::before {
+            content: '🌙 Qorong\'ulik';
+        }
+
+        /* CONTROL PANEL */
+        .control-panel {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+            z-index: 100;
+            padding: 15px 25px;
+       
+            border-radius: 25px;
+   
+        }
+
+        .control-button {
+            padding: 15px 25px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+            min-width: 140px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .control-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+    
+            transition: left 0.5s;
+        }
+
+        .control-button:hover::before {
+            left: 100%;
+        }
+
+        .control-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        /* MODAL STYLES */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: linear-gradient(145deg, #667eea, #764ba2);
+            color: white;
+            margin: 3% auto;
+            padding: 30px;
+            width: 60%;
+            max-width: 800px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            animation: slideDown 0.4s ease;
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            right: 25px;
+            top: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+            transition: color 0.3s;
+        }
+
+        .close:hover {
+            color: #ffcc00;
+            transform: scale(1.1);
+        }
+
+        .modal-content h2 {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            border-bottom: 3px solid rgba(255,255,255,0.3);
+            padding-bottom: 10px;
+        }
+
+        .card {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .card:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateX(5px);
+        }
+
+        .card .component-placeholder {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+
+        .card .text {
+            flex: 1;
+        }
+
+        .card h3 {
+            margin: 0;
+            font-size: 1.3rem;
+            margin-bottom: 8px;
+        }
+
+        .card p {
+            margin: 0;
+            font-size: 1rem;
+            line-height: 1.5;
+            opacity: 0.9;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 1200px) {
+            .left-panel {
+                width: 280px;
+            }
+            
+            .circuit-board {
+                width: 600px;
+                height: 450px;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .circuit-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .control-panel {
+                position: relative;
+                margin-top: 30px;
+                transform: none;
+                left: auto;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .left-panel {
+                width: 100%;
+            }
+            
+            .circuit-board {
+                width: 100%;
+                height: 400px;
+            }
+            
+            .modal-content {
+                width: 90%;
+                margin: 10% auto;
+            }
+        }
+
+        /* ADDITIONAL ANIMATIONS */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .main-container {
+            animation: fadeIn 0.8s ease;
+        }
+
+        .circuit-board {
+            animation: fadeIn 1s ease 0.2s both;
+        }
+
+        .left-panel {
+            animation: fadeIn 1s ease 0.1s both;
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="logo">
+                  <a href="/"><img src="/static/image//static/image/logo.png" width="80px" height="80px" alt=""></a>
+            <span>Avtomatik Tungi Chiroq Tajribasi</span>
+        </div>
+        <div class="header-stats">
+            <div class="stat-item">
+                <span>⏱️</span>
+                <span id="runTime">00:00</span>
+            </div>
+            <div class="stat-item">
+                <span>🔄</span>
+                <span id="cycleCount">0</span>
+            </div>
+            <div class="stat-item">
+                <span>📊</span>
+                <span id="efficiency">0%</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <div class="main-container">
+        <!-- LEFT PANEL - KENGAYTIRILGAN -->
+        <div class="left-panel">
+            <div class="control-group">
+                <h3>🎮 Boshqaruv</h3>
+                <button class="btn btn-success" onclick="startExperiment()" id="startBtn">
+                    🚀 Tajribani Boshlash
+                </button>
+                <button class="btn btn-danger" onclick="stopExperiment()" id="stopBtn">
+                    🛑 To'xtatish
+                </button>
+                <button class="btn btn-primary" onclick="togglePower()">
+                    ⚡ Quvvat Yoqish/O'chirish
+                </button>
+                <button class="btn btn-info" onclick="runTest()">
+                    🔬 Avtomatik Test
+                </button>
+                <button class="btn btn-warning" onclick="runDemo()">
+                    🎭 Demo Rejim
+                </button>
+            </div>
+
+            <div class="control-group">
+                <h3>📊 Sensor Ma'lumotlari</h3>
+                <div class="readings-panel">
+                    <div class="reading-item">
+                        <span>LDR Qiymati:</span>
+                        <span class="reading-value" id="ldrValue">0</span>
+                    </div>
+                    <div class="reading-item">
+                        <span>Yorug'lik (%):</span>
+                        <span class="reading-value" id="lightLevel">100%</span>
+                    </div>
+                    <div class="reading-item">
+                        <span>Transistor:</span>
+                        <span class="reading-value" id="transistorState">OFF</span>
+                    </div>
+                    <div class="reading-item">
+                        <span>LED Quvvati:</span>
+                        <span class="reading-value" id="ledPower">0V</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <h3>📚 Ma'lumotlar</h3>
+                <button class="btn btn-primary" id="schemaBtn">
+                    📋 Sxema Haqida
+                </button>
+                <button class="btn btn-primary" id="codeBtn">
+                    💻 Dasturlash Kodi
+                </button>
+                <button class="btn btn-primary" id="componentsBtn">
+                    🔌 Komponentlar
+                </button>
+                <button class="btn btn-info" id="tutorialBtn">
+                    🎓 O'quv Qo'llanma
+                </button>
+            </div>
+
+            <div class="control-group">
+                <h3>⚡ Tizim Holati</h3>
+                <div class="status-row">
+                    <span>Quvvat:</span>
+                    <div class="status-led" id="powerLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>LDR Sensor:</span>
+                    <div class="status-led" id="ldrLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Transistor:</span>
+                    <div class="status-led" id="transistorLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>LED Chiroq:</span>
+                    <div class="status-led" id="ledLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Avtomatik Rejim:</span>
+                    <div class="status-led" id="autoLed"></div>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <h3>📝 Tajriba Jurnali</h3>
+                <div class="log-panel" id="experimentLog">
+                    <div class="log-entry info">Tizim ishga tayyor...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+      
+            <div class="circuit-container">
+                <div class="circuit-board">
+                    <!-- Light Simulation Control -->
+                    <div class="light-simulation" id="lightControl" onclick="toggleLight()">
+                        
+                    </div>
+
+                    <!-- LED Component -->
+                    <div class="component led-component" id="ledComponent" title="LED Chiroq">
+                        
+                    </div>
+                    <div class="component resistor resistor-220" title="220Ω Qarshilik">
+                        <img src="/static/image/resistor.png" width="50px" height="50px" alt="">
+                    </div>
+
+                    <!-- LDR Sensor -->
+                    <div class="component ldr-sensor" id="ldrSensor" title="LDR Yorug'lik Sensori">
+                        <img src="/static/image/ldr.png" width="150px" height="150px" alt="">
+                    </div>
+
+                    <!-- Transistor -->
+                    <div class="component transistor" id="transistorComponent" title="BC547 Transistor">
+                        <img src="/static/image/bc547 - Copy.png" width="50px" height="120px" alt="">
+                    </div>
+
+                    <!-- Resistors -->
+               
+                    
+                    <!-- Battery -->
+                    <div class="component battery" title="9V Batareya">
+                        <img src="/static/image/9v3.png" width="160px" height="150px" alt="">
+                    </div>
+
+                    <!-- Wires -->
+                    <div class="wire wire-horizontal wire1"></div>
+                    <div class="wire wire-vertical wire2"></div>
+                    <div class="wire wire-horizontal wire3"></div>
+                    <div class="wire wire-horizontal wire4"></div>
+                    <div class="wire wire-vertical wire5"></div>
+                    <div class="wire wire-horizontal wire6"></div>
+                    <div class="wire wire-vertical wire7"></div>
+                    <div class="wire wire-horizontal wire8"></div>
+                    <div class="wire wire-vertical wire9"></div>
+                    <div class="wire wire-vertical wire10"></div>
+                    <div class="wire wire-vertical wire11"></div>
+                    <div class="wire wire-vertical wire12"></div>
+                    <div class="wire wire-vertical wire13"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONTROL PANEL -->
+    <div class="control-panel">
+        <button class="control-button" onclick="togglePower()">
+            ⚡ Quvvat Yoqish/O'chirish
+        </button>
+        <button class="control-button" onclick="toggleLight()">
+            🌓 Yorug'likni O'zgartirish
+        </button>
+        <button class="control-button" onclick="resetAll()">
+            🔄 Qayta O'rnatish
+        </button>
+        <button class="control-button" onclick="runDemo()">
+            🎭 Demo Ko'rsatish
+        </button>
+    </div>
+
+    <!-- MODALS -->
+    <div class="modal" id="schemaModal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>🔬 Sxema Haqida Ma'lumot</h2>
+            
+            <div class="card">
+                <div class="component-placeholder">💡</div>
+                <div class="text">
+                    <h3>Avtomatik Tungi Chiroq</h3>
+                    <p>Bu sxema qorong'u tushganda avtomatik ravishda yonadigan chiroq yaratadi. Yorug'lik sensorli LDR va transistor yordamida ishlaydi. Energiya tejamkor va uzun muddat ishlaydi.</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="component-placeholder">🏠</div>
+                <div class="text">
+                    <h3>Qo'llanilish Joylari</h3>
+                    <p>Uylarning zinapoya, yo'lak, bog' va xavfsizlik chiroqlari uchun ishlatiladi. Avtomatik ishlash energiya tejashga yordam beradi va qulaylik yaratadi.</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="component-placeholder">⚙️</div>
+                <div class="text">
+                    <h3>Ishlash Prinsipi</h3>
+                    <p>Yorug'lik kamaysa, LDR qarshiligi oshadi, transistor ochiladi va LED yonadi. Yorug'lik ko'paysa, aksincha jarayon sodir bo'ladi.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="codeModal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>💻 Dasturlash Kodi</h2>
+
+            <div class="tab-buttons">
+                <button class="tab-btn active" data-tab="arduino">Arduino Kodi</button>
+                <button class="tab-btn" data-tab="logic">Mantiq Sxemasi</button>
+                <button class="tab-btn" data-tab="simulation">Simulatsiya</button>
+            </div>
+
+            <div class="tab-content active" id="arduino">
+                <pre>
+// Avtomatik Tungi Chiroq - Arduino Kodi
+const int ldrPin = A0;        // LDR sensor analog pin
+const int ledPin = 13;        // LED chiroq pin
+const int threshold = 300;    // Qorong'ulik chegarasi
+const int hysteresis = 50;    // Tebranishni oldini olish
+
+int lastLdrValue = 0;
+boolean ledState = false;
+
+void setup() {
+  pinMode(ledPin, OUTPUT);
+  Serial.begin(9600);
+  Serial.println("Avtomatik Tungi Chiroq ishga tushdi!");
+}
+
+void loop() {
+  int ldrValue = analogRead(ldrPin);
+  
+  // Ma'lumotlarni chiqarish
+  Serial.print("LDR qiymati: ");
+  Serial.print(ldrValue);
+  Serial.print(" | LED holati: ");
+  
+  // Hysteresis bilan boshqaruv
+  if (!ledState && ldrValue < (threshold - hysteresis)) {
+    digitalWrite(ledPin, HIGH);
+    ledState = true;
+    Serial.println("YONDI (Qorong'u)");
+  } 
+  else if (ledState && ldrValue > (threshold + hysteresis)) {
+    digitalWrite(ledPin, LOW);
+    ledState = false;
+    Serial.println("O'CHDI (Yorug')");
+  } else {
+    Serial.println(ledState ? "YONIQ" : "O'CHIQ");
+  }
+  
+  lastLdrValue = ldrValue;
+  delay(500);
+}
+
+// Qo'shimcha funksiyalar
+void calibrateSensor() {
+  Serial.println("Sensor kalibratsiyasi...");
+  int maxVal = 0, minVal = 1023;
+  
+  for(int i = 0; i < 100; i++) {
+    int val = analogRead(ldrPin);
+    if(val > maxVal) maxVal = val;
+    if(val < minVal) minVal = val;
+    delay(50);
+  }
+  
+  threshold = (maxVal + minVal) / 2;
+  Serial.print("Yangi chegara: ");
+  Serial.println(threshold);
+}
+                </pre>
+            </div>
+
+            <div class="tab-content" id="logic">
+                <pre>
+🔬 MANTIQIY ISHLASH TARTIBI:
+
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   Yorug'lik     │───▶│   LDR Sensor    │───▶│   Transistor    │
+│   Darajasi      │    │   Qarshiligi    │    │   Holati        │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+                                                       │
+                                                       ▼
+                                              ┌─────────────────┐
+                                              │   LED Chiroq    │
+                                              │   Holati        │
+                                              └─────────────────┘
+
+📊 QIYMATLAR JADVALI:
+╔═══════════════╦═══════════════╦═══════════════╦═══════════════╗
+║ Yorug'lik     ║ LDR (kΩ)      ║ Transistor    ║ LED           ║
+╠═══════════════╬═══════════════╬═══════════════╬═══════════════╣
+║ Yorug' (kun)  ║ 1-10          ║ O'CHIQ        ║ O'CHIQ        ║
+║ Xira          ║ 10-50         ║ Qisman        ║ Zaif          ║
+║ Qorong'u      ║ 50-500        ║ YONIQ         ║ YONIQ         ║
+║ Qop-qorong'u  ║ 500+          ║ To'liq        ║ Yorqin        ║
+╚═══════════════╩═══════════════╩═══════════════╩═══════════════╝
+
+⚡ KUCHLANISH HISOBLASH:
+- Base kuchlanishi: Vb = (R2 / (R1 + R2)) × Vcc
+- Transistor ochilishi: Vb > 0.7V
+- LED toki: I = (Vcc - Vled) / R3
+- Quvvat sarfi: P = V × I
+
+🔧 OPTIMALLASHTIRISH:
+- R1 (10kΩ): Base tokini cheklash
+- R2 (LDR): Yorug'lik sezgirlik
+- R3 (220Ω): LED tokini himoya
+- C1: Tebranishni kamaytirish (ixtiyoriy)
+                </pre>
+            </div>
+
+            <div class="tab-content" id="simulation">
+                <pre>
+🎮 SIMULATSIYA KODI (JavaScript):
+
+class AutoLightCircuit {
+    constructor() {
+        this.vcc = 9.0;           // Ta'minot kuchlanishi
+        this.r1 = 10000;          // 10kΩ
+        this.r3 = 220;            // 220Ω  
+        this.vbe = 0.7;           // Transistor base-emitter
+        this.vled = 2.0;          // LED kuchlanishi
+        this.ldrValue = 1000;     // LDR qarshiligi
+    }
+    
+    setLightLevel(percentage) {
+        // Yorug'lik darajasiga qarab LDR qarshiligini o'zgartirish
+        if (percentage > 80) {
+            this.ldrValue = 1000 + Math.random() * 5000;    // Yorug'
+        } else if (percentage > 50) {
+            this.ldrValue = 10000 + Math.random() * 20000;   // O'rtacha
+        } else if (percentage > 20) {
+            this.ldrValue = 50000 + Math.random() * 50000;   // Xira
+        } else {
+            this.ldrValue = 200000 + Math.random() * 300000; // Qorong'u
+        }
+    }
+    
+    calculateBaseVoltage() {
+        return (this.ldrValue / (this.r1 + this.ldrValue)) * this.vcc;
+    }
+    
+    isTransistorOn() {
+        return this.calculateBaseVoltage() > this.vbe;
+    }
+    
+    getLedCurrent() {
+        if (this.isTransistorOn()) {
+            return (this.vcc - this.vled) / this.r3;
+        }
+        return 0;
+    }
+    
+    simulate(lightLevel) {
+        this.setLightLevel(lightLevel);
+        
+        const baseVoltage = this.calculateBaseVoltage();
+        const transistorOn = this.isTransistorOn();
+        const ledCurrent = this.getLedCurrent();
+        const powerConsumption = ledCurrent * this.vcc;
+        
+        return {
+            ldrValue: Math.round(this.ldrValue),
+            baseVoltage: baseVoltage.toFixed(2),
+            transistorOn,
+            ledCurrent: ledCurrent.toFixed(3),
+            powerConsumption: powerConsumption.toFixed(3)
+        };
+    }
+}
+
+// Foydalanish:
+const circuit = new AutoLightCircuit();
+console.log("Kun vaqti:", circuit.simulate(90));
+console.log("Qorong'u:", circuit.simulate(10));
+                </pre>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="componentsModal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>🔌 Ishlatilgan Komponentlar</h2>
+
+            <div class="card">
+                <div class="component-placeholder">LDR</div>
+                <div class="text">
+                    <h3>LDR (Light Dependent Resistor)</h3>
+                    <p>Fotosezgir qarshilik. Yorug'lik ko'paysa qarshiligi 1kΩ gacha kamayadi, qorong'u bo'lsa 1MΩ gacha oshadi. Keng temperatura oralig'ida ishlaydi.</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="component-placeholder">BC547</div>
+                <div class="text">
+                    <h3>BC547 NPN Transistor</h3>
+                    <p>Kichik signalli NPN transistor. Base tokini 100-800 marta kuchaytiradi. Maksimal 100mA tok va 45V kuchlanishni ko'tara oladi.</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="component-placeholder">💡</div>
+                <div class="text">
+                    <h3>LED (Light Emitting Diode)</h3>
+                    <p>Yorug'lik chiqaruvchi diod. 2V kuchlanishda 20mA tok bilan ishlaydi. Oddiy lampaga qaraganda 10 baravar kam energiya sarflaydi.</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="component-placeholder">10kΩ</div>
+                <div class="text">
+                    <h3>10kΩ Qarshilik (Base uchun)</h3>
+                    <p>Transistorning base tokini cheklash va himoya qilish uchun ishlatiladi. LDR bilan voltage divider hosil qiladi.</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="component-placeholder">220Ω</div>
+                <div class="text">
+                    <h3>220Ω Qarshilik (LED uchun)</h3>
+                    <p>LED ni ortiqcha tokdan himoya qiladi. LEDdan o'tadigan tokni 20mA atrofida ushlab turadi.</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="component-placeholder">9V</div>
+                <div class="text">
+                    <h3>9V Batareya</h3>
+                    <p>Sxemani quvvat bilan ta'minlaydi. Alkalin batareya 6-12 oy ishlaydi, litium batareya esa 2-3 yil davom etadi.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="tutorialModal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>🎓 O'quv Qo'llanma</h2>
+
+            <div class="tab-buttons">
+                <button class="tab-btn active" data-tab="step1">1-Qadam</button>
+                <button class="tab-btn" data-tab="step2">2-Qadam</button>
+                <button class="tab-btn" data-tab="step3">3-Qadam</button>
+                <button class="tab-btn" data-tab="troubleshoot">Muammolar</button>
+            </div>
+
+            <div class="tab-content active" id="step1">
+                <h3>🔧 Komponentlarni Tayyorlash</h3>
+                <div class="card">
+                    <div class="component-placeholder">📦</div>
+                    <div class="text">
+                        <h3>Kerakli Materiallar</h3>
+                        <p>• 1x LDR (CdS fotosezgir qarshilik)<br>
+                        • 1x BC547 NPN transistor<br>
+                        • 1x LED (har qanday rang)<br>
+                        • 1x 10kΩ qarshilik<br>
+                        • 1x 220Ω qarshilik<br>
+                        • 1x 9V batareya va ulagich<br>
+                        • Breadboard va simlar</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="step2">
+                <h3>🔌 Sxemani Yig'ish</h3>
+                <div class="card">
+                    <div class="component-placeholder">⚡</div>
+                    <div class="text">
+                        <h3>Ulanish Tartibi</h3>
+                        <p>1. LDR va 10kΩ ni ketma-ket ulang<br>
+                        2. Voltage divider hosil qiling<br>
+                        3. Transistorning base ini o'rta nuqtaga ulang<br>
+                        4. Collectorga LED va 220Ω ulang<br>
+                        5. Emitterni massa bilan ulang<br>
+                        6. Batareyani ulang va sinab ko'ring</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="step3">
+                <h3>🧪 Sinov va Sozlash</h3>
+                <div class="card">
+                    <div class="component-placeholder">🔍</div>
+                    <div class="text">
+                        <h3>Test Jarayoni</h3>
+                        <p>1. Batareyani ulang<br>
+                        2. LDR ni qo'l bilan yoping (qorong'u)<br>
+                        3. LED yonishini tekshiring<br>
+                        4. Yorqin joyga qo'ying<br>
+                        5. LED o'chishini tekshiring<br>
+                        6. Sensor sezgirligini sozlang</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="troubleshoot">
+                <h3>🔧 Muammolarni Hal Qilish</h3>
+                <div class="card">
+                    <div class="component-placeholder">❗</div>
+                    <div class="text">
+                        <h3>Keng Tarqalgan Muammolar</h3>
+                        <p><strong>LED yonmaydi:</strong><br>
+                        - Batareya holatini tekshiring<br>
+                        - Ulanishlarni qayta tekshiring<br>
+                        - LED qutbini to'g'rilang<br><br>
+                        <strong>LED doimo yoniq:</strong><br>
+                        - Transistor buzilgan bo'lishi mumkin<br>
+                        - 10kΩ qarshilikni tekshiring<br><br>
+                        <strong>Sezgirlik past:</strong><br>
+                        - LDR ni tozalang<br>
+                        - Qarshilik qiymatini o'zgartiring</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // System variables
+        let powerOn = false;
+        let isDark = false;
+        let ledOn = false;
+        let experimentRunning = false;
+        let autoMode = false;
+        let startTime = Date.now();
+        let cycleCount = 0;
+        let demoMode = false;
+
+        // Audio context for sounds
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+        // System monitoring
+        let ldrValue = 500;
+        let lightLevel = 50;
+        let transistorState = "OFF";
+        let ledPower = "0V";
+
+        // Sound functions
+        function playBeep(frequency = 800, duration = 200, volume = 0.1) {
+            try {
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.value = frequency;
+                gainNode.gain.value = volume;
+                
+                oscillator.start();
+                setTimeout(() => oscillator.stop(), duration);
+            } catch (error) {
+                console.log("Audio not supported");
+            }
+        }
+
+        function playSuccessSound() {
+            playBeep(1000, 100);
+            setTimeout(() => playBeep(1200, 100), 100);
+        }
+
+        function playErrorSound() {
+            playBeep(400, 300);
+        }
+
+        function playClickSound() {
+            playBeep(600, 50);
+        }
+
+        function playNotificationSound() {
+            playBeep(800, 150);
+            setTimeout(() => playBeep(1000, 150), 200);
+        }
+
+        // DOM elements
+        const elements = {
+            powerLed: document.getElementById('powerLed'),
+            ldrLed: document.getElementById('ldrLed'),
+            transistorLed: document.getElementById('transistorLed'),
+            ledLed: document.getElementById('ledLed'),
+            autoLed: document.getElementById('autoLed'),
+            lightControl: document.getElementById('lightControl'),
+            ledComponent: document.getElementById('ledComponent'),
+            ldrSensor: document.getElementById('ldrSensor'),
+            transistorComponent: document.getElementById('transistorComponent'),
+            
+            // Readings
+            ldrValue: document.getElementById('ldrValue'),
+            lightLevel: document.getElementById('lightLevel'),
+            transistorState: document.getElementById('transistorState'),
+            ledPower: document.getElementById('ledPower'),
+            
+            // Stats
+            runTime: document.getElementById('runTime'),
+            cycleCount: document.getElementById('cycleCount'),
+            efficiency: document.getElementById('efficiency'),
+            
+            // Log
+            experimentLog: document.getElementById('experimentLog')
+        };
+
+        // Logging function
+        function addLogEntry(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString('uz-UZ');
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry ${type}`;
+            logEntry.innerHTML = `[${timestamp}] ${message}`;
+            
+            elements.experimentLog.appendChild(logEntry);
+            elements.experimentLog.scrollTop = elements.experimentLog.scrollHeight;
+            
+            // Keep only last 50 entries
+            while (elements.experimentLog.children.length > 50) {
+                elements.experimentLog.removeChild(elements.experimentLog.firstChild);
+            }
+        }
+
+        // Update sensor readings
+        function updateReadings() {
+            if (isDark) {
+                ldrValue = 800 + Math.random() * 200;
+                lightLevel = Math.floor(Math.random() * 30);
+            } else {
+                ldrValue = 50 + Math.random() * 100;
+                lightLevel = 70 + Math.floor(Math.random() * 30);
+            }
+            
+            transistorState = (powerOn && isDark) ? "ON" : "OFF";
+            ledPower = ledOn ? "3.0V" : "0V";
+            
+            elements.ldrValue.textContent = Math.round(ldrValue);
+            elements.lightLevel.textContent = lightLevel + '%';
+            elements.transistorState.textContent = transistorState;
+            elements.ledPower.textContent = ledPower;
+        }
+
+        // Update status LEDs
+        function updateStatus() {
+            elements.powerLed.classList.toggle('on', powerOn);
+            elements.ldrLed.classList.toggle('on', powerOn && isDark);
+            elements.transistorLed.classList.toggle('on', powerOn && isDark);
+            elements.ledLed.classList.toggle('on', ledOn);
+            elements.autoLed.classList.toggle('on', autoMode);
+            
+            updateReadings();
+        }
+
+        // Update stats
+        function updateStats() {
+            if (experimentRunning) {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                const minutes = Math.floor(elapsed / 60);
+                const seconds = elapsed % 60;
+                elements.runTime.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                elements.cycleCount.textContent = cycleCount;
+                
+                const efficiency = cycleCount > 0 ? Math.min(100, Math.floor((cycleCount / elapsed) * 100)) : 0;
+                elements.efficiency.textContent = efficiency + '%';
+            }
+        }
+
+        // Power control
+        function togglePower() {
+            playClickSound();
+            powerOn = !powerOn;
+            
+            if (!powerOn) {
+                ledOn = false;
+                autoMode = false;
+                elements.ledComponent.classList.remove('active');
+                addLogEntry("Quvvat o'chirildi", 'warning');
+                playErrorSound();
+            } else {
+                addLogEntry("Quvvat yoqildi", 'info');
+                playSuccessSound();
+                checkLightCondition();
+            }
+            
+            updateStatus();
+        }
+
+        // Light condition control
+       
+
+        // Check light condition and control LED
+        function checkLightCondition() {
+            if (!powerOn) return;
+            
+            const shouldBeOn = isDark;
+            
+            if (shouldBeOn !== ledOn) {
+                ledOn = shouldBeOn;
+                cycleCount++;
+                
+                if (ledOn) {
+                    elements.ledComponent.classList.add('active');
+                    addLogEntry("LED yondi (Qorong'u)", 'info');
+                    playBeep(800, 100);
+                } else {
+                    elements.ledComponent.classList.remove('active');
+                    addLogEntry("LED o'chdi (Yorug')", 'info');
+                }
+                
+                playNotificationSound();
+            }
+            
+            updateStatus();
+        }
+
+        // Experiment controls
+        function startExperiment() {
+            playSuccessSound();
+            experimentRunning = true;
+            autoMode = true;
+            powerOn = true;
+            startTime = Date.now();
+            cycleCount = 0;
+            
+            addLogEntry("Tajriba boshlandi", 'info');
+            checkLightCondition();
+            updateStatus();
+        }
+
+        function stopExperiment() {
+            playErrorSound();
+            experimentRunning = false;
+            autoMode = false;
+            powerOn = false;
+            ledOn = false;
+            
+            elements.ledComponent.classList.remove('active');
+            addLogEntry("Tajriba to'xtatildi", 'warning');
+            updateStatus();
+        }
+
+        function runTest() {
+            if (!powerOn) {
+                alert('Avval quvvatni yoqing!');
+                addLogEntry("Test amalga oshmadi - quvvat o'chiq", 'error');
+                playErrorSound();
+                return;
+            }
+            
+            addLogEntry("Avtomatik test boshlandi", 'info');
+            playSuccessSound();
+            
+            let testStep = 0;
+            const originalState = isDark;
+            
+            const testInterval = setInterval(() => {
+                switch(testStep) {
+                    case 0:
+                        isDark = false;
+                        elements.lightControl.classList.remove('dark');
+                        checkLightCondition();
+                        addLogEntry("Test 1/3: Yorug'lik rejimi", 'info');
+                        break;
+                    case 1:
+                        isDark = true;
+                        elements.lightControl.classList.add('dark');
+                        checkLightCondition();
+                        addLogEntry("Test 2/3: Qorong'u rejimi", 'info');
+                        break;
+                    case 2:
+                        isDark = false;
+                        elements.lightControl.classList.remove('dark');
+                        checkLightCondition();
+                        addLogEntry("Test 3/3: Yorug'lik rejimi", 'info');
+                        break;
+                    default:
+                        isDark = originalState;
+                        elements.lightControl.classList.toggle('dark', isDark);
+                        checkLightCondition();
+                        addLogEntry("Test yakunlandi", 'info');
+                        clearInterval(testInterval);
+                        playSuccessSound();
+                        return;
+                }
+                testStep++;
+            }, 2000);
+        }
+
+        function runDemo() {
+            if (!powerOn) {
+                togglePower();
+            }
+            
+            demoMode = !demoMode;
+            
+            if (demoMode) {
+                addLogEntry("Demo rejimi boshlandi", 'info');
+                playSuccessSound();
+                
+                const demoInterval = setInterval(() => {
+                    if (!demoMode) {
+                        clearInterval(demoInterval);
+                        return;
+                    }
+                    
+                    // Automatically toggle light every 3 seconds
+                    toggleLight();
+                }, 3000);
+            } else {
+                addLogEntry("Demo rejimi to'xtatildi", 'warning');
+                playErrorSound();
+            }
+        }
+      function toggleLight() {
+    isDark = !isDark;
+
+    // Light panel rangini almashtirish
+    elements.lightControl.classList.toggle('dark', isDark);
+
+    // Circuit board rangini almashtirish
+    document.querySelector('.circuit-board').classList.toggle('dark', isDark);
+
+    // LED mantiqini teskari qilish
+    const led = document.querySelector('.led-component');
+    if (isDark) {
+        led.classList.add('active');   // qorong‘uda yonadi
+    } else {
+        led.classList.remove('active'); // yorug‘da o‘chadi
+    }
+
+    checkLightCondition();
+}
+
+
+
+        function resetAll() {
+            playClickSound();
+            powerOn = false;
+            isDark = false;
+            ledOn = false;
+            experimentRunning = false;
+            autoMode = false;
+            demoMode = false;
+            cycleCount = 0;
+            
+            elements.ledComponent.classList.remove('active');
+            elements.lightControl.classList.remove('dark');
+            
+            // Clear log
+            elements.experimentLog.innerHTML = '<div class="log-entry info">Tizim qayta o\'rnatildi...</div>';
+            
+            addLogEntry("Tizim qayta o'rnatildi", 'info');
+            updateStatus();
+        }
+
+        // Modal functions
+        function openModal(id) {
+            document.getElementById(id).style.display = "block";
+            playClickSound();
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = "none";
+        }
+
+        // Event listeners
+        document.getElementById("schemaBtn").addEventListener("click", function() {
+            openModal("schemaModal");
+        });
+
+        document.getElementById("codeBtn").addEventListener("click", function() {
+            openModal("codeModal");
+        });
+
+        document.getElementById("componentsBtn").addEventListener("click", function() {
+            openModal("componentsModal");
+        });
+
+        document.getElementById("tutorialBtn").addEventListener("click", function() {
+            openModal("tutorialModal");
+        });
+
+        // Close modal events
+        document.querySelectorAll(".modal .close").forEach(btn => {
+            btn.addEventListener("click", function() {
+                this.closest(".modal").style.display = "none";
+                playClickSound();
+            });
+        });
+
+        // Click outside modal to close
+        window.addEventListener("click", function(e) {
+            document.querySelectorAll(".modal").forEach(modal => {
+                if (e.target === modal) {
+                    modal.style.display = "none";
+                    playClickSound();
+                }
+            });
+        });
+
+        // Tab control
+        document.querySelectorAll(".tab-btn").forEach(button => {
+            button.addEventListener("click", function() {
+                playClickSound();
+                const tab = this.dataset.tab;
+                const modal = this.closest('.modal');
+
+                // Update buttons
+                modal.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+                this.classList.add("active");
+
+                // Update content
+                modal.querySelectorAll(".tab-content").forEach(content => {
+                    content.classList.remove("active");
+                    if (content.id === tab) {
+                        content.classList.add("active");
+                    }
+                });
+            });
+        });
+
+        // Component click interactions
+        elements.ldrSensor.addEventListener("click", function() {
+            if (powerOn) {
+                playBeep(900, 100);
+                const resistance = isDark ? "500kΩ (Yuqori)" : "5kΩ (Past)";
+                alert(`LDR Sensor Ma'lumotlari:\n• Joriy qarshilik: ${resistance}\n• Yorug'lik darajasi: ${lightLevel}%\n• Holat: ${isDark ? 'Qorong\'u' : 'Yorug\''}`)
+                addLogEntry(`LDR sensor tekshirildi - ${resistance}`, 'info');
+            } else {
+                alert("Avval quvvatni yoqing!");
+                playErrorSound();
+            }
+        });
+
+        elements.transistorComponent.addEventListener("click", function() {
+            if (powerOn) {
+                playBeep(700, 100);
+                const state = isDark ? "YONIQ (Saturated)" : "O'CHIQ (Cut-off)";
+                const baseCurrent = isDark ? "0.5mA" : "0mA";
+                const collectorCurrent = isDark ? "18mA" : "0mA";
+                alert(`BC547 Transistor Ma'lumotlari:\n• Holat: ${state}\n• Base toki: ${baseCurrent}\n• Collector toki: ${collectorCurrent}\n• Amplifikatsiya: ${isDark ? 'Aktiv' : 'Passiv'}`);
+                addLogEntry(`Transistor tekshirildi - ${state}`, 'info');
+            } else {
+                alert("Avval quvvatni yoqing!");
+                playErrorSound();
+            }
+        });
+
+        elements.ledComponent.addEventListener("click", function() {
+            playBeep(1000, 100);
+            const current = ledOn ? "18mA" : "0mA";
+            const voltage = ledOn ? "3.0V" : "0V";
+            const power = ledOn ? "54mW" : "0mW";
+            alert(`LED Ma'lumotlari:\n• Holat: ${ledOn ? 'YONIQ 💡' : 'O\'CHIQ'}\n• Tok: ${current}\n• Kuchlanish: ${voltage}\n• Quvvat: ${power}`);
+            addLogEntry(`LED tekshirildi - ${ledOn ? 'Yoniq' : 'O\'chiq'}`, 'info');
+        });
+
+        // Battery component interaction
+        elements.battery = document.querySelector('.battery');
+        if (elements.battery) {
+            elements.battery.addEventListener("click", function() {
+                playBeep(600, 100);
+                const voltage = powerOn ? "9.0V" : "9.0V (O'chiq)";
+                const current = ledOn ? "20mA" : "0.1mA";
+                alert(`9V Batareya Ma'lumotlari:\n• Kuchlanish: ${voltage}\n• Joriy tok: ${current}\n• Quvvat holati: ${powerOn ? 'Faol' : 'Kutish rejimi'}\n• Taxminiy ish vaqti: ${ledOn ? '200-300 soat' : '6-12 oy'}`);
+                addLogEntry("Batareya holati tekshirildi", 'info');
+            });
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey || e.metaKey) return; // Ignore browser shortcuts
+            
+            switch(e.key.toLowerCase()) {
+                case 'p':
+                    e.preventDefault();
+                    togglePower();
+                    break;
+                case 'l':
+                    e.preventDefault();
+                    toggleLight();
+                    break;
+                case 't':
+                    e.preventDefault();
+                    runTest();
+                    break;
+                case 'r':
+                    e.preventDefault();
+                    resetAll();
+                    break;
+                case 's':
+                    e.preventDefault();
+                    if (experimentRunning) {
+                        stopExperiment();
+                    } else {
+                        startExperiment();
+                    }
+                    break;
+                case 'd':
+                    e.preventDefault();
+                    runDemo();
+                    break;
+            }
+        });
+
+        // Automatic updates
+        setInterval(() => {
+            if (experimentRunning || powerOn) {
+                updateStats();
+                updateReadings();
+                
+                // Random fluctuations in readings
+                if (Math.random() < 0.1) { // 10% chance every second
+                    const fluctuation = Math.random() * 20 - 10;
+                    ldrValue += fluctuation;
+                    if (ldrValue < 0) ldrValue = 0;
+                    if (ldrValue > 1023) ldrValue = 1023;
+                }
+            }
+        }, 1000);
+
+        // Initialize audio context on first user interaction
+        let audioInitialized = false;
+        document.addEventListener('click', function() {
+            if (!audioInitialized && audioContext.state === 'suspended') {
+                audioContext.resume();
+                audioInitialized = true;
+                addLogEntry("Audio tizimi faollashtirildi", 'info');
+            }
+        }, { once: true });
+
+        // Initialize tooltips
+        function initTooltips() {
+            const components = document.querySelectorAll('.component[title]');
+            components.forEach(component => {
+                component.addEventListener('mouseenter', function() {
+                    if (this.title && powerOn) {
+                        playBeep(400, 50, 0.05);
+                    }
+                });
+            });
+        }
+
+        // Performance monitoring
+        let performanceStats = {
+            responseTime: 0,
+            accuracy: 100,
+            uptime: 0
+        };
+
+        function updatePerformance() {
+            if (experimentRunning) {
+                performanceStats.uptime++;
+                
+                // Simulate response time (how quickly LED responds to light changes)
+                const expectedResponse = 100; // milliseconds
+                const actualResponse = 50 + Math.random() * 100;
+                performanceStats.responseTime = actualResponse;
+                
+                // Calculate accuracy based on false triggers
+                if (Math.random() < 0.02) { // 2% chance of minor "error"
+                    performanceStats.accuracy = Math.max(85, performanceStats.accuracy - 1);
+                } else {
+                    performanceStats.accuracy = Math.min(100, performanceStats.accuracy + 0.1);
+                }
+            }
+        }
+
+        // Advanced circuit simulation
+        class CircuitSimulator {
+            constructor() {
+                this.vcc = 9.0;
+                this.r1 = 10000; // 10kΩ
+                this.r3 = 220;   // 220Ω
+                this.vbe = 0.7;  // Base-emitter voltage
+                this.vled = 2.0; // LED forward voltage
+                this.hfe = 200;  // Transistor current gain
+            }
+            
+            simulate(lightLevel) {
+                // Calculate LDR resistance based on light level
+                let ldrResistance;
+                if (lightLevel > 80) {
+                    ldrResistance = 1000 + Math.random() * 4000;    // Bright
+                } else if (lightLevel > 50) {
+                    ldrResistance = 10000 + Math.random() * 15000;  // Medium
+                } else if (lightLevel > 20) {
+                    ldrResistance = 50000 + Math.random() * 50000;  // Dim
+                } else {
+                    ldrResistance = 200000 + Math.random() * 300000; // Dark
+                }
+                
+                // Voltage divider calculation
+                const baseVoltage = (ldrResistance / (this.r1 + ldrResistance)) * this.vcc;
+                
+                // Transistor switching logic
+                const transistorOn = baseVoltage > this.vbe;
+                
+                // LED current calculation
+                let ledCurrent = 0;
+                if (transistorOn) {
+                    const vce_sat = 0.2; // Collector-emitter saturation voltage
+                    ledCurrent = (this.vcc - this.vled - vce_sat) / this.r3;
+                }
+                
+                // Power calculations
+                const powerConsumption = this.vcc * (ledCurrent + (baseVoltage / this.r1));
+                
+                return {
+                    ldrResistance: Math.round(ldrResistance),
+                    baseVoltage: baseVoltage.toFixed(2),
+                    transistorOn,
+                    ledCurrent: ledCurrent.toFixed(3),
+                    powerConsumption: powerConsumption.toFixed(3),
+                    efficiency: ((ledCurrent * this.vled) / powerConsumption * 100).toFixed(1)
+                };
+            }
+        }
+
+        const circuitSim = new CircuitSimulator();
+
+        // Enhanced update function with simulation
+        function enhancedUpdate() {
+            if (powerOn) {
+                const simResult = circuitSim.simulate(lightLevel);
+                
+                // Update display with simulated values
+                ldrValue = simResult.ldrResistance;
+                transistorState = simResult.transistorOn ? "ON" : "OFF";
+                ledPower = simResult.transistorOn ? `${simResult.ledCurrent}mA` : "0mA";
+                
+                // Log significant changes
+                if (Math.random() < 0.05) { // 5% chance
+                    addLogEntry(`Simulatsiya: LDR=${simResult.ldrResistance}Ω, Vbase=${simResult.baseVoltage}V`, 'info');
+                }
+            }
+        }
+
+        // Advanced performance monitoring
+        setInterval(() => {
+            updatePerformance();
+            enhancedUpdate();
+        }, 500);
+
+        // Add helpful hints
+        const hints = [
+            "Maslahat: 'P' tugmasi bilan quvvatni yoqish/o'chirish mumkin",
+            "Maslahat: 'L' tugmasi bilan yorug'likni o'zgartiring",
+            "Maslahat: 'T' tugmasi bilan avtomatik test o'tkazing",
+            "Maslahat: Komponentlarni bosib batafsil ma'lumot oling",
+            "Maslahat: Demo rejimida avtomatik ishlashni kuzating"
+        ];
+
+        let hintIndex = 0;
+        setInterval(() => {
+            if (!experimentRunning && Math.random() < 0.3) {
+                addLogEntry(hints[hintIndex], 'info');
+                hintIndex = (hintIndex + 1) % hints.length;
+            }
+        }, 30000); // Every 30 seconds
+
+        // Initialize system
+        addLogEntry("Tizim ishga tayyor. Quvvatni yoqing va tajribani boshlang!", 'info');
+        addLogEntry("Yordam uchun komponentlarni bosing yoki tugmalar panelini ishlating", 'info');
+        updateStatus();
+        initTooltips();
+
+        // Add welcome message
+        setTimeout(() => {
+            if (!powerOn) {
+                addLogEntry("💡 Avtomatik tungi chiroq tajribasiga xush kelibsiz!", 'info');
+                playNotificationSound();
+            }
+        }, 2000);
+
+        console.log("🔬 Avtomatik Tungi Chiroq Tajribasi yuklandi");
+        console.log("Klaviatura yorliqlar: P(quvvat), L(yorug'lik), T(test), R(reset), S(start/stop), D(demo)");
+    </script>
+</body>
+</html>

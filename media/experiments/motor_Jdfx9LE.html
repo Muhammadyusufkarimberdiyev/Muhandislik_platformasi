@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elektr Motor Tajribasi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+
+            min-height: 100vh;
+            padding: 1vw;
+            overflow-x: auto;
+        }
+
+        /* HEADER */
+        .header {
+            display: flex;
+            align-items: center;
+            background: #000075;
+            color: white;
+            padding: 1vw 2vw;
+            box-shadow: 0 0.4vw 1.2vw rgba(0, 0, 0, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            width: 100%;
+            border-radius: 1vw;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1vw;
+            font-size: clamp(14px, 1.4vw, 18px);
+            font-weight: bold;
+        }
+
+        .logo img {
+            width: clamp(50px, 6vw, 80px);
+            height: auto;
+        }
+
+        .logo-icon {
+            width: clamp(35px, 3.5vw, 40px);
+            height: clamp(35px, 3.5vw, 40px);
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(20px, 2vw, 24px);
+            color: #000075;
+        }
+
+        /* MAIN LAYOUT */
+        .main-container {
+            display: flex;
+            margin-top: 2vw;
+            gap: 2vw;
+        }
+
+        /* LEFT PANEL */
+        .left-panel {
+            width: 20vw;
+            min-width: 200px;
+            background: white;
+            padding: 1.5vw;
+            border-radius: 0.8vw;
+            box-shadow: 0 0.4vw 0.8vw rgba(0, 0, 0, 0.1);
+            height: fit-content;
+            position: relative;
+            z-index: 1;
+        }
+
+        .control-group {
+            margin-bottom: 2vw;
+            border-bottom: 0.1vw solid #ddd;
+            padding-bottom: 1.5vw;
+        }
+
+        .control-group h3 {
+            margin-bottom: 1vw;
+            color: #333;
+            font-size: clamp(13px, 1.3vw, 16px);
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 1vw;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 0.8vw;
+            font-size: clamp(12px, 1.1vw, 14px);
+            border-radius: 0.5vw;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .btn:hover {
+            transform: translateY(-0.2vw);
+            box-shadow: 0 0.4vw 0.8vw rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-primary {
+            background: #000075;
+            color: white;
+        }
+
+        .btn-info {
+            background: #000075;
+            color: white;
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            flex: 1;
+            padding: 2vw;
+            background: white;
+            border-radius: 0.8vw;
+            box-shadow: 0 0.4vw 1.2vw rgba(0, 0, 0, 0.1);
+        }
+
+        .title-header {
+            background: #000075;
+            color: white;
+            padding: 1.2vw 2.5vw;
+            border-radius: 2vw;
+            font-size: clamp(15px, 1.5vw, 18px);
+            font-weight: bold;
+            margin: 0 auto 3vw;
+            text-align: center;
+            display: inline-block;
+            box-shadow: 0 0.4vw 1.5vw rgba(0, 0, 0, 0.2);
+        }
+
+        /* MOTOR CONTAINER - RESPONSIVE */
+        .motor-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 50vh;
+            position: relative;
+        }
+
+        .motor-base {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            aspect-ratio: 3 / 2;
+        }
+
+        /* BATTERY - RESPONSIVE WITH % */
+        .battery {
+            position: absolute;
+            bottom: 27.5%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 26.7%;
+            aspect-ratio: 2 / 1;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #2c3e50, #34495e);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0.4vw 0.4vw 1.2vw rgba(0, 0, 0, 0.3);
+        }
+
+        .battery_2 {
+            position: absolute;
+            bottom: 7.5%;
+            left: 25%;
+            width: 50%;
+            height: auto;
+        }
+
+        .battery_2 img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* WIRE COIL - RESPONSIVE */
+        .wire-coil {
+            position: absolute;
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 26.7%;
+            aspect-ratio: 1;
+            border: 0.5vw solid #d35400;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.1s linear;
+        }
+
+        .wire-coil.spinning {
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: translateX(-50%) rotate(0deg);
+            }
+
+            100% {
+                transform: translateX(-50%) rotate(360deg);
+            }
+        }
+
+        /* COIL WINDING */
+        .coil-winding {
+            width: 75%;
+            aspect-ratio: 1;
+            border: 0.4vw solid #e67e22;
+            border-radius: 50%;
+            position: relative;
+        }
+
+        .coil-winding::before,
+        .coil-winding::after {
+            content: '';
+            position: absolute;
+            border: 0.3vw solid #f39c12;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .coil-winding::before {
+            width: 66.7%;
+            aspect-ratio: 1;
+        }
+
+        .coil-winding::after {
+            width: 41.7%;
+            aspect-ratio: 1;
+            border-color: #d68910;
+        }
+
+        /* SUPPORT WIRES */
+        .support-wire {
+            position: absolute;
+            height: 0.3%;
+            background: #7f8c8d;
+            top: 30%;
+        }
+
+        .support-wire.left {
+            left: 26.7%;
+            width: 16.7%;
+        }
+
+        .support-wire.right {
+            right: 26.7%;
+            width: 16.7%;
+        }
+
+        /* CONNECTION WIRES - RESPONSIVE */
+        .connection-wire {
+            position: absolute;
+            background: #e74c3c;
+            border-radius: 0.1vw;
+        }
+
+        .wire-positive {
+            width: 0.5%;
+            height: 50%;
+            bottom: 20%;
+            left: 25%;
+        }
+
+        .wire-negative {
+            width: 0.5%;
+            height: 50%;
+            bottom: 20%;
+            right: 25%;
+            background: #000;
+        }
+
+        .wire-horizontal-pos {
+            width: 10%;
+            height: 0.5%;
+            top: 29.5%;
+            left: 25%;
+        }
+
+        .wire-horizontal-neg {
+            width: 10%;
+            height: 0.5%;
+            top: 29.5%;
+            right: 25%;
+            background: #000;
+        }
+
+        /* MAGNETIC FIELD */
+        .magnetic-field {
+            position: absolute;
+            width: 66.7%;
+            aspect-ratio: 1;
+            top: -25%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .magnetic-field.active {
+            opacity: 0.6;
+        }
+
+        .field-line {
+            position: absolute;
+            width: 0.3%;
+            background: #3498db;
+            border-radius: 0.1vw;
+        }
+
+        .field-line:nth-child(1) {
+            height: 30%;
+            top: 10%;
+            left: 50%;
+            transform: rotate(20deg);
+        }
+
+        .field-line:nth-child(2) {
+            height: 40%;
+            top: 30%;
+            left: 80%;
+            transform: rotate(70deg);
+        }
+
+        .field-line:nth-child(3) {
+            height: 40%;
+            top: 60%;
+            left: 75%;
+            transform: rotate(120deg);
+        }
+
+        .field-line:nth-child(4) {
+            height: 30%;
+            top: 70%;
+            left: 50%;
+            transform: rotate(160deg);
+        }
+
+        .field-line:nth-child(5) {
+            height: 40%;
+            top: 60%;
+            left: 20%;
+            transform: rotate(-120deg);
+        }
+
+        .field-line:nth-child(6) {
+            height: 40%;
+            top: 30%;
+            left: 15%;
+            transform: rotate(-70deg);
+        }
+
+        /* STATUS DISPLAY */
+        .status-display {
+            position: fixed;
+            top: 8vw;
+            right: 2vw;
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 1.5vw;
+            border-radius: 1.2vw;
+            min-width: 22vw;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 0.4vw 2vw rgba(0, 0, 0, 0.3);
+            z-index: 100;
+        }
+
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 0.8vw 0;
+            font-size: clamp(11px, 1.1vw, 13px);
+        }
+
+        .status-led {
+            width: clamp(10px, 1vw, 12px);
+            height: clamp(10px, 1vw, 12px);
+            border-radius: 50%;
+            background: #dc3545;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 0 0.5vw rgba(0, 0, 0, 0.5);
+        }
+
+        .status-led.on {
+            background: #28a745;
+            box-shadow: 0 0 1vw rgba(40, 167, 69, 0.8);
+        }
+
+        /* INFORMATION PANEL */
+        .info-panel {
+            margin-top: 3vw;
+            padding: 2vw;
+            background: #f8f9fa;
+            border-radius: 1vw;
+            border-left: 0.4vw solid #000075;
+        }
+
+        .info-panel h3 {
+            color: #000075;
+            margin-bottom: 1vw;
+            font-size: clamp(14px, 1.4vw, 16px);
+        }
+
+        .info-panel p {
+            line-height: 1.6;
+            margin-bottom: 1vw;
+            font-size: clamp(12px, 1.2vw, 14px);
+        }
+
+        /* RESPONSIVE DESIGN */
+        @media (max-width: 1024px) {
+            .main-container {
+                flex-direction: column;
+            }
+
+            .left-panel {
+                width: 100%;
+                order: 2;
+            }
+
+            .main-content {
+                order: 1;
+            }
+
+            .status-display {
+                position: relative;
+                margin: 2vw auto;
+                width: fit-content;
+                top: auto;
+                right: auto;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .motor-base {
+                aspect-ratio: 1;
+            }
+
+            .status-display {
+                min-width: 40vw;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .left-panel {
+                min-width: unset;
+            }
+        }
+
+        a {
+            text-decoration: none;
+            color: white;
+        }
+
+        .left-panel {
+            width: 280px;
+            max-width: 95%;
+            background: #fff;
+            border-radius: 14px;
+            padding: 16px;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, .08)
+        }
+
+        .left-panel h3 {
+            margin: 0 0 12px;
+            font-size: 16px;
+            color: #333
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 10px 12px;
+            margin: 8px 0;
+            border: 0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: .25s;
+            text-align: left;
+            font-weight: 600
+        }
+
+        .btn-primary {
+            background: #000075;
+            color: #fff
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(0, 0, 0, .1)
+        }
+
+        .flex-container-40-60 {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+            background: rgba(255, 255, 255, .1);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px
+        }
+
+        .flex-text-60 {
+            flex: 1
+        }
+
+        .flex-text-60 p {
+            font-size: 16px;
+            line-height: 1.8
+        }
+
+        .flex-container-30-70 {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+            background: rgba(255, 255, 255, .1);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px
+        }
+
+        .flex-image-30 {
+            flex: 0 0 30%
+        }
+
+        .flex-image-30 img {
+            width: 100%;
+            border-radius: 10px
+        }
+
+        .flex-text-70 {
+            flex: 0 0 70%
+        }
+
+        .flex-text-70 strong {
+            color: #ffcc00;
+            font-size: 18px;
+            display: block;
+            margin-bottom: 10px
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 2000;
+            background: rgba(0, 0, 0, .8);
+            backdrop-filter: blur(5px);
+            overflow-y: auto
+        }
+
+        .modal-content {
+            background: #000075;
+            color: #fff;
+            margin: 5vh auto;
+            padding: 30px;
+            width: 90%;
+            max-width: 1000px;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, .5);
+            position: relative;
+            animation: slideDown .4s ease
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-50px);
+                opacity: 0
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1
+            }
+        }
+
+        .close {
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #fff;
+            transition: .3s;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, .1)
+        }
+
+        .close:hover {
+            background: rgba(255, 204, 0, .3);
+            color: #ffcc00;
+            transform: rotate(90deg)
+        }
+
+        .modal-content h2 {
+            font-size: 28px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(255, 255, 255, .3);
+            padding-right: 50px
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 8px;
+            margin: 12px 0 16px
+        }
+
+        .tab-btn {
+            flex: 1;
+            background: rgba(255, 255, 255, .12);
+            color: #fff;
+            border: 0;
+            border-radius: 10px 10px 0 0;
+            padding: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: .2s
+        }
+
+        .tab-btn:hover {
+            background: rgba(255, 255, 255, .2)
+        }
+
+        .tab-btn.active {
+            background: rgba(255, 255, 255, .28)
+        }
+
+        .tab-content {
+            display: none
+        }
+
+        .tab-content.active {
+            display: block
+        }
+
+        pre {
+            background: rgba(0, 0, 0, .35);
+            padding: 12px;
+            border-radius: 10px;
+            overflow: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+            color: #fff;
+            font-size: 13.5px;
+            line-height: 1.55
+        }
+
+        #infoFloatingBtn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #000075, #0000ff);
+            color: #fff;
+            border: 4px solid #fff;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, .4);
+            z-index: 1500;
+            transition: .3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px
+        }
+
+        #infoFloatingBtn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 30px rgba(0, 0, 255, .6)
+        }
+
+        #infoFloatingBtn span:first-child {
+            font-size: 36px
+        }
+
+        .video-full {
+            width: 100%;
+            border-radius: 15px;
+            background: #000
+        }
+
+        .video-full video {
+            width: 100%;
+            height: auto;
+            border-radius: 15px;
+            max-height: 70vh
+        }
+
+        @media (max-width:1024px) {
+
+            .flex-container-40-60,
+            .flex-container-30-70 {
+                flex-direction: column
+            }
+
+            .flex-image-30,
+            .flex-text-70 {
+                flex: 0 0 100%
+            }
+        }
+
+        @media (max-width:768px) {
+            .modal-content {
+                width: 96%;
+                padding: 20px 15px
+            }
+
+            #infoFloatingBtn {
+                width: 90px;
+                height: 90px;
+                font-size: 14px;
+                bottom: 20px;
+                right: 20px
+            }
+
+            #infoFloatingBtn span:first-child {
+                font-size: 28px
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="logo">
+            <a href="/"><img src="/static/image/logo.png" width="80px" height="80px" alt=""></a>
+
+            <span>Elektr Motor Tajribasi</span>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <div class="main-container">
+        <!-- LEFT PANEL -->
+        <div class="left-panel">
+            <div class="control-group">
+                <h3>Boshqaruv</h3>
+                <button class="btn btn-success" onclick="startMotor()" id="startBtn">
+                    Motorni Ishga Tushirish
+                </button>
+                <button class="btn btn-danger" onclick="stopMotor()" id="stopBtn">
+                    Motorni To'xtatish
+                </button>
+                <button class="btn btn-primary" onclick="togglePower()">
+                    Quvvat Almashtirish
+                </button>
+                <button class="btn btn-info" onclick="showMagneticField()">
+                    Magnit Maydonini Ko'rsatish
+                </button>
+            </div>
+            <aside class="left-panel">
+                <h3>Ma'lumotlar</h3>
+                <button class="btn btn-primary" id="schemaBtn">💡 Sxema qayerda ishlatiladi</button>
+
+                <button class="btn btn-primary" id="componentsBtn">🔌 Qurilmalar</button>
+            </aside>
+
+            <div class="control-group">
+                <h3>Motor Holati</h3>
+                <div class="status-row">
+                    <span>Quvvat:</span>
+                    <div class="status-led" id="powerLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Batareya:</span>
+                    <div class="status-led" id="batteryLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Magnit Maydoni:</span>
+                    <div class="status-led" id="magneticLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Aylanish:</span>
+                    <div class="status-led" id="rotationLed"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+            <div class="title-header">Elektr Motor Tajribasi</div>
+
+            <div class="motor-container">
+                <div class="motor-base">
+                    <!-- Battery -->
+                    <div class="battery" id="battery"></div>
+                    <div class="battery_2">
+                        <img src="/static/image/litium - Copy.png" alt="Battery">
+                    </div>
+
+                    <!-- Connection Wires -->
+                    <div class="connection-wire wire-positive"></div>
+                    <div class="connection-wire wire-negative"></div>
+                    <div class="connection-wire wire-horizontal-pos"></div>
+                    <div class="connection-wire wire-horizontal-neg"></div>
+
+                    <!-- Support Structure -->
+                    <div class="support-wire left"></div>
+                    <div class="support-wire right"></div>
+
+                    <!-- Wire Coil -->
+                    <div class="wire-coil" id="wireCoil">
+                        <div class="coil-winding"></div>
+                    </div>
+
+                    <!-- Magnetic Field Lines -->
+                    <div class="magnetic-field" id="magneticField">
+                        <div class="field-line"></div>
+                        <div class="field-line"></div>
+                        <div class="field-line"></div>
+                        <div class="field-line"></div>
+                        <div class="field-line"></div>
+                        <div class="field-line"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-panel" id="infoPanel">
+                <h3>Elektr Motor Haqida</h3>
+                <p>Bu oddiy elektr motor namunasi bo'lib, magnit maydon va elektr toki orasidagi ta'sirni ko'rsatadi.
+                </p>
+                <p>Motor ishga tushganda, sim halqadan elektr toki o'tadi va magnit maydoni hosil bo'ladi. Bu maydon
+                    batareya atrofidagi magnit maydon bilan ta'sirlashib, sim halqani aylanishga majbur qiladi.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- STATUS DISPLAY -->
+    <div class="status-display">
+        <div class="status-row">
+            <strong>Motor Holati:</strong>
+        </div>
+        <div class="status-row">
+            <span>Quvvat:</span>
+            <div class="status-led" id="powerStatus"></div>
+        </div>
+        <div class="status-row">
+            <span>Aylanish:</span>
+            <div class="status-led" id="rotationStatus"></div>
+        </div>
+        <div class="status-row">
+            <span>Magnit Maydoni:</span>
+            <div class="status-led" id="magneticStatus"></div>
+        </div>
+    </div>
+    <!-- ✅ LEFT PANEL: 3 ta tugma -->
+
+
+    <!-- ✅ 1) Sxema qayerda ishlatiladi (DC Motor / L298N) -->
+    <div class="modal" id="schemaModal">
+        <div class="modal-content">
+            <span class="close" title="Yopish">&times;</span>
+            <h2>💡 Sxema qayerda ishlatiladi </h2>
+
+            <div class="flex-container-40-60">
+                <div class="flex-video-40">
+                    <!-- 1-video (xohlasangiz almashtiring) -->
+                    <iframe src="https://www.youtube.com/embed/BRWl9AYuDk4?si=USfcMlcUq4_N2lNA" title="DC Motor Control with L298N"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen></iframe>
+                </div>
+                <div class="flex-text-60">
+                    <strong>20 ta Inovatsiyalar siz uchun</strong>
+                   <p>Motor va Dc motorlar orqali takrorlashingiz mumkin bo'lgan loyihalar</p>
+                </div>
+            </div>
+
+            <div class="flex-container-40-60">
+                <div class="flex-video-40">
+                    <!-- 2-video (ixtiyoriy) -->
+                    <iframe src="https://www.youtube.com/embed/agqonDqmkoM?si=QvDmul5DV4vkpTFK" title="PWM Speed Control"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen></iframe>
+                </div>
+                <div class="flex-text-60">
+                    <strong>🔄 Ishlash prinsipi</strong>
+                    <p>Mis sim spiral (coil) bilan batareyani ulash orqali tok oqadi.
+
+Tok oqishi bilan coil elektromagnitga aylanadi.
+Magnit maydon ichida coil harakatlana boshlaydi (Lorentz kuchi ta’siri).
+Coilning ikki uchini mos ravishda qo‘yish va magnitni to‘g‘ri joylashtirish orqali doimiy aylanish hosil qilinadi.</p>
+                </div>
+            </div>
+              <div class="flex-container-40-60">
+                <div class="flex-video-40">
+                    <!-- 2-video (ixtiyoriy) -->
+                    <iframe src="https://www.youtube.com/embed/q9VpXz01msM?si=6Z_uxtUubiqf7sm1" title="PWM Speed Control"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen></iframe>
+                </div>
+                <div class="flex-text-60">
+                    <strong>Qo‘shimcha tajriba g‘oyalari</strong>
+               <p>Magnet pozitsiyasini o‘zgartirish → aylanish tezligini o‘lchash
+Batareya kuchini o‘zgartirish → aylanish tezligi va kuchi bilan bog‘liqlik
+Coilning burilish sonini o‘zgartirish → magnit maydon kuchini tekshirish
+Mini fan yoki LED bilan integratsiya → vizual va amaliy effektlar</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- ✅ 3) Qurilmalar -->
+    <div class="modal" id="componentsModal">
+        <div class="modal-content">
+            <span class="close" title="Yopish">&times;</span>
+            <h2>🔌 Ishlatilgan Qurilmalar</h2>
+
+
+            <div class="flex-container-30-70">
+                <div class="flex-image-30"><img src="/static/image/battery - Copy.png" alt="Breadboard"></div>
+                <div class="flex-text-70">
+                    <strong>Battereya va simlar va magnit</strong>
+                    <p>Quvvat manbai sifatida</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ✅ 4) Qo'shimcha info (ixtiyoriy) + suzuvchi tugma -->
+    <div class="modal" id="infoModal">
+        <div class="modal-content">
+            <span class="close" title="Yopish">&times;</span>
+            <h2>📚 Qo'shimcha Ma'lumot</h2>
+            <div class="video-full">
+                <video controls>
+                    <source src="/media/2.mp4" type="video/mp4">
+                    Brauzeringiz video formatni qo'llab-quvvatlamaydi.
+                </video>
+            </div>
+        </div>
+    </div>
+
+    <button id="infoFloatingBtn"><span>📚</span><span>Ma'lumot</span></button>
+
+    <script>
+        let motorRunning = false;
+        let powerOn = false;
+        let magneticFieldVisible = false;
+
+        const elements = {
+            wireCoil: document.getElementById('wireCoil'),
+            magneticField: document.getElementById('magneticField'),
+            powerLed: document.getElementById('powerLed'),
+            batteryLed: document.getElementById('batteryLed'),
+            magneticLed: document.getElementById('magneticLed'),
+            rotationLed: document.getElementById('rotationLed'),
+            powerStatus: document.getElementById('powerStatus'),
+            rotationStatus: document.getElementById('rotationStatus'),
+            magneticStatus: document.getElementById('magneticStatus'),
+            infoPanel: document.getElementById('infoPanel')
+        };
+
+        function updateStatus() {
+            elements.powerLed.classList.toggle('on', powerOn);
+            elements.batteryLed.classList.toggle('on', powerOn);
+            elements.magneticLed.classList.toggle('on', magneticFieldVisible);
+            elements.rotationLed.classList.toggle('on', motorRunning);
+            elements.powerStatus.classList.toggle('on', powerOn);
+            elements.rotationStatus.classList.toggle('on', motorRunning);
+            elements.magneticStatus.classList.toggle('on', magneticFieldVisible);
+        }
+
+        function openModal(id) { const m = document.getElementById(id); if (m) m.style.display = 'block'; }
+        function closeModal(el) { const m = el.closest('.modal'); if (m) m.style.display = 'none'; }
+
+        document.addEventListener('click', (e) => { if (e.target.matches('.modal .close')) closeModal(e.target); });
+        window.addEventListener('click', (e) => { document.querySelectorAll('.modal').forEach(m => { if (e.target === m) m.style.display = 'none'; }); });
+
+        // buttons
+        document.getElementById('schemaBtn')?.addEventListener('click', () => openModal('schemaModal'));
+        document.getElementById('codeBtn')?.addEventListener('click', () => openModal('codeModal'));
+        document.getElementById('componentsBtn')?.addEventListener('click', () => openModal('componentsModal'));
+        document.getElementById('infoFloatingBtn')?.addEventListener('click', () => openModal('infoModal'));
+
+        // tabs
+        (function () {
+            const codeModal = document.getElementById('codeModal');
+            if (!codeModal) return;
+            codeModal.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const t = btn.dataset.tab;
+                    codeModal.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    codeModal.querySelectorAll('.tab-content').forEach(p => p.classList.toggle('active', p.id === t));
+                });
+            });
+        })();
+        function startMotor() {
+            if (!powerOn) {
+                alert('Avval quvvatni yoqing!');
+                return;
+            }
+            motorRunning = true;
+            elements.wireCoil.classList.add('spinning');
+            magneticFieldVisible = true;
+            elements.magneticField.classList.add('active');
+            updateStatus();
+        }
+
+        function stopMotor() {
+            motorRunning = false;
+            elements.wireCoil.classList.remove('spinning');
+            updateStatus();
+        }
+
+        function togglePower() {
+            powerOn = !powerOn;
+            if (!powerOn) {
+                stopMotor();
+                magneticFieldVisible = false;
+                elements.magneticField.classList.remove('active');
+            }
+            updateStatus();
+        }
+
+        function showMagneticField() {
+            if (!powerOn) {
+                alert('Avval quvvatni yoqing!');
+                return;
+            }
+            magneticFieldVisible = !magneticFieldVisible;
+            elements.magneticField.classList.toggle('active', magneticFieldVisible);
+            updateStatus();
+        }
+
+        function showPrinciple() {
+            elements.infoPanel.innerHTML = `
+                <h3>Ishlash Printsipi</h3>
+                <p><strong>Elektromagnit Induktsiya:</strong> Elektr toki sim halqadan o'tganda, atrofida magnit maydon hosil bo'ladi.</p>
+                <p><strong>Kuch Ta'siri:</strong> Bu magnit maydon boshqa magnit maydon (magnitlar) bilan ta'sirlashib, kuch hosil qiladi.</p>
+                <p><strong>Aylanish Harakati:</strong> Hosil bo'lgan kuch sim halqani aylanishga majbur qiladi.</p>
+                <p><strong>Doimiy Harakat:</strong> Kommutator yordamida toki yo'nalishi almashib, doimiy aylanish ta'minlanadi.</p>
+            `;
+        }
+
+        function showComponents() {
+            elements.infoPanel.innerHTML = `
+                <h3>Komponentlar</h3>
+                <p><strong>Batareya:</strong> Elektr energiya manbai (3V)</p>
+                <p><strong>Sim Halqa:</strong> Mis simdan yasalgan o'ram, elektr tokini o'tkazadi</p>
+                <p><strong>Magnitlar:</strong> Doimiy magnit maydon hosil qiladi</p>
+                <p><strong>Ulanish Simlari:</strong> Elektr zanjirinisaqlaydi</p>
+                <p><strong>Tayanch:</strong> Sim halqani aylanish uchun mahkamlaydi</p>
+            `;
+        }
+
+        function showApplications() {
+            elements.infoPanel.innerHTML = `
+                <h3>Qo'llanilishi</h3>
+                <p><strong>Uy Jihozlari:</strong> Ventilyator, chang yutgich, kir yuvish mashinasi</p>
+                <p><strong>Transport:</strong> Elektr avtomashinalar, metro, tramvay</p>
+                <p><strong>Sanoat:</strong> Konveyer, nasoslar, kompressorlar</p>
+                <p><strong>Elektronika:</strong> CD/DVD pleyer, printer, kompyuter kulerlari</p>
+                <p><strong>Robotika:</strong> Robot qo'llari, harakatlantiruvchi tizimlar</p>
+            `;
+        }
+
+        updateStatus();
+    </script>
+</body>
+
+</html>

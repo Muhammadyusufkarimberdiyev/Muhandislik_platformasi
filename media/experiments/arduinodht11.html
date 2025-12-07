@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DHT11 LCD Arduino Tajribasi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #e6f3ff;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: auto;
+        }
+
+        /* HEADER */
+        .header {
+            display: flex;
+            align-items: center;
+            background:#000075;
+            color: white;
+            padding: 10px 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            width: 100%;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .logo-icon img {
+            border-radius: 50%;
+            border: 2px solid white;
+            width: 40px;
+            height: 40px;
+        }
+
+        /* MAIN LAYOUT */
+        .main-container {
+            display: flex;
+            margin-top: 20px;
+            gap: 20px;
+        }
+
+        /* LEFT PANEL */
+        .left-panel {
+            width: 250px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            height: fit-content;
+            position: relative;
+            z-index: 1;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 15px;
+        }
+
+        .control-group h3 {
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 8px;
+            font-size: 14px;
+            border-radius: 5px;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn-success { 
+            background: #28a745; 
+            color: white; 
+        }
+        .btn-danger { 
+            background: #dc3545; 
+            color: white; 
+        }
+        .btn-primary { 
+            background: #000075; 
+            color: white; 
+        }
+        .btn-info { 
+            background:#000075 ; 
+            color: white; 
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .title-header {
+            background: #000075;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0 auto 30px;
+            text-align: center;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        /* CIRCUIT BOARD */
+        .circuit-board {
+          
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px auto;
+            max-width: 800px;
+            position: relative;
+          
+        }
+
+        /* ARDUINO UNO */
+        .arduino-uno {
+           
+          
+            border-radius: 8px;
+            position: absolute;
+            left: 50px;
+            top: 50px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            
+        }
+
+        .arduino-label {
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .arduino-model {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        /* PINS */
+        .pin {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: #333;
+            border-radius: 2px;
+        }
+
+        /* Digital pins */
+        .pin-d2 { top: 160px; left: 50px; }
+        .pin-d12 { top: 160px; left: 38px; }
+        .pin-d11 { top: 160px; left: 26px; }
+        .pin-d10 { top: 160px; left: 14px; }
+        .pin-d9 { top: 160px; left: 2px; }
+
+        /* Power pins */
+        .pin-5v { top: 200px; left: 2px; }
+        .pin-gnd { top: 200px; left: 14px; }
+
+        /* Analog pins */
+        .pin-a4 { top: 240px; left: 200px; }
+        .pin-a5 { top: 240px; left: 188px; }
+
+        /* DHT11 SENSOR */
+        .dht11-sensor {
+         
+            width: 80px;
+            height: 60px;
+            border-radius: 8px;
+            position: absolute;
+            right: 150px;
+            top: 76px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .dht11-sensor:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(74, 144, 226, 0.6);
+        }
+
+        .dht11-label {
+            font-size: 14px;
+        }
+
+        .dht11-sublabel {
+            font-size: 10px;
+            opacity: 0.9;
+        }
+
+        /* LCD DISPLAY */
+        .lcd-display {
+            background: green;
+            width: 280px;
+            height: 120px;
+            border-radius: 8px;
+            position: absolute;
+            right: 50px;
+            top: 200px;
+            
+            box-shadow: 3px 3px 15px rgba(0,0,0,0.4);
+        }
+
+        .lcd-screen {
+            background: #0f3460;
+            width: 260px;
+            height: 80px;
+            margin: 15px auto;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .lcd-line {
+            margin: 8px 0;
+            height: 20px;
+            line-height: 20px;
+            transition: all 0.5s ease;
+            position: relative;
+            z-index: 2;
+        }
+
+        .lcd-cursor {
+            position: absolute;
+            bottom: 10px;
+            right: 15px;
+            color: #00ff00;
+            font-size: 18px;
+            animation: blink 1s infinite;
+            z-index: 3;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        .lcd-line.updating {
+            animation: textUpdate 0.5s ease;
+        }
+
+        @keyframes textUpdate {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+
+        /* WIRES */
+        .wire {
+            position: absolute;
+            z-index: 5;
+        }
+
+        /* DHT11 to Arduino wires */
+        .wire-red {
+            width: 3px;
+            height: 230px;
+            background: red;
+            left: 245px;
+            top: 95px;
+        }
+
+        .wire-black {
+            width: 3px;
+            height: 25px;
+            background: black;
+            left: 206px;
+            top: 105px;
+        }
+
+        .wire-yellow {
+            width: 3px;
+            height: 20px;
+            background: yellow;
+            left: 323px;
+            top: 115px;
+        }
+
+        .wire-red-h1 {
+            width: 310px;
+            height: 3px;
+            background: red;
+            left: 245px;
+            top: 95px;
+        }
+
+        .wire-black-h1 {
+            width: 350px;
+            height: 3px;
+            background: black;
+            left: 206px;
+            top: 105px;
+        }
+
+        .wire-yellow-h1 {
+            width: 230px;
+            height: 3px;
+            background: yellow;
+            left: 325px;
+            top: 115px;
+        }
+
+        /* LCD to Arduino wires */
+        .wire-green {
+            width: 3px;
+            height: 105px;
+            background: black;
+            left: 262px;
+            top: 220px;
+        }
+
+        .wire-blue {
+            width: 3px;
+            height: 95px;
+            background: red;
+       left: 252px;
+            top: 230px;
+        }
+
+        .wire-purple {
+            width: 3px;
+            height: 85px;
+            background: purple;
+             left: 342px;
+            top: 240px;
+        }
+
+        .wire-orange {
+            width: 3px;
+            height: 70px;
+            background: orange;
+            left: 352px;
+            top: 250px;
+        }
+
+        .wire-green-h2 {
+            width: 208px;
+            height: 3px;
+            background: black;
+              left: 262px;
+            top: 220px;
+        }
+
+        .wire-blue-h2 {
+            width: 218px;
+            height: 3px;
+            background: red;
+            left: 252px;
+            top: 230px;
+        }
+
+        .wire-purple-h2 {
+            width: 128px;
+            height: 3px;
+            background: purple;
+          left: 342px;
+            top: 240px;
+        }
+
+        .wire-orange-h2 {
+            width: 118px;
+            height: 3px;
+            background: orange;
+        left: 352px;
+            top: 250px;
+        }
+
+        /* STATUS INDICATORS */
+        .status-led {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #dc3545;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+        }
+
+        .status-led.on {
+            background: #28a745;
+            box-shadow: 0 0 10px rgba(40, 167, 69, 0.8);
+        }
+
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 8px 0;
+            font-size: 13px;
+        }
+
+        /* DATA DISPLAY */
+        .data-display {
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 30px;
+            max-width: 400px;
+        }
+
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            font-size: 16px;
+        }
+
+        .data-value {
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .left-panel {
+                width: 100%;
+                margin-bottom: 20px;
+            }
+            
+            .circuit-board {
+                padding: 20px;
+            }
+            
+            .arduino-uno {
+                position: relative;
+                left: 20px;
+                top: 20px;
+                margin-bottom: 150px;
+            }
+            
+            .dht11-sensor {
+                position: relative;
+                right: auto;
+                top: auto;
+                margin: 20px;
+            }
+            
+            .lcd-display {
+                position: relative;
+                right: auto;
+                top: auto;
+                margin: 20px;
+            }
+        }
+
+        /* MODAL STYLES */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            backdrop-filter: blur(3px);
+        }
+
+        .modal-content {
+            background: #000075;
+            color: white;
+            margin: 5% auto;
+            padding: 20px;
+            width: 80%;
+            max-width: 700px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+            animation: slideDown 0.4s ease;
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+            transition: color 0.3s;
+        }
+
+        .close:hover {
+            color: #ffcc00;
+        }
+
+        .modal-content h2 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            border-bottom: 2px solid rgba(255,255,255,0.2);
+            padding-bottom: 8px;
+        }
+
+        .tab-buttons {
+            display: flex;
+            margin-bottom: 10px;
+        }
+
+        .tab-buttons button {
+            flex: 1;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            border-radius: 5px 5px 0 0;
+            transition: background 0.3s;
+        }
+
+        .tab-buttons button.active {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        pre {
+            background: rgba(0,0,0,0.4);
+            padding: 12px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 0.9rem;
+        }
+
+        .card {
+            background: rgba(255,255,255,0.08);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            transition: background 0.3s;
+        }
+
+        .card:hover {
+            background: rgba(255,255,255,0.15);
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* REAL-TIME ANIMATION */
+        .reading-animation {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .connection-active {
+            animation: connectionGlow 1.5s ease-in-out infinite;
+        }
+
+        @keyframes connectionGlow {
+            0%, 100% { box-shadow: 0 0 5px rgba(0,255,0,0.3); }
+            50% { box-shadow: 0 0 15px rgba(0,255,0,0.8); }
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="logo">
+            <img src="/static/image/logo.png" width="80px" height="80px" alt="">
+            <span>DHT11 LCD Arduino Tajribasi</span>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <div class="main-container">
+        <!-- LEFT PANEL -->
+        <div class="left-panel">
+            <div class="control-group">
+                <h3>Boshqaruv</h3>
+                <button class="btn btn-success" onclick="startReading()" id="startBtn">
+                    🔄 O'qishni boshlash
+                </button>
+                <button class="btn btn-danger" onclick="stopReading()" id="stopBtn">
+                    ⏹️ To'xtatish
+                </button>
+                <button class="btn btn-primary" onclick="togglePower()">
+                    ⚡ Quvvat
+                </button>
+                <button class="btn btn-info" onclick="testConnection()">
+                    🔧 Ulanishni tekshirish
+                </button>
+            </div>
+
+            <div class="control-group">
+                <h3>Ma'lumotlar</h3>
+                <button class="btn btn-primary" onclick="openModal('schemaModal')">
+                    📋 Sxema haqida
+                </button>
+                <button class="btn btn-primary" onclick="openModal('codeModal')">
+                    💻 Kod
+                </button>
+                <button class="btn btn-primary" onclick="openModal('componentsModal')">
+                    🔌 Qurilmalar
+                </button>
+            </div>
+
+            <div class="control-group">
+                <h3>Qurilma holati</h3>
+                <div class="status-row">
+                    <span>Quvvat:</span>
+                    <div class="status-led" id="powerLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>DHT11:</span>
+                    <div class="status-led" id="dhtLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>LCD:</span>
+                    <div class="status-led" id="lcdLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Arduino:</span>
+                    <div class="status-led" id="arduinoLed"></div>
+                </div>
+            </div>
+
+            <!-- Real-time Data Display -->
+            <div class="data-display">
+                <h3 style="margin-bottom: 15px; text-align: center;">Joriy ma'lumotlar</h3>
+                <div class="data-row">
+                    <span>Harorat:</span>
+                    <span class="data-value" id="tempValue">--°C</span>
+                </div>
+                <div class="data-row">
+                    <span>Namlik:</span>
+                    <span class="data-value" id="humidityValue">--%</span>
+                </div>
+                <div class="data-row">
+                    <span>Holat:</span>
+                    <span class="data-value" id="statusValue">O'chirilgan</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+            <div class="title-header">DHT11 va LCD 16x2 bilan harorat va namlik o'lchash</div>
+            
+            <div class="circuit-board">
+                <!-- Arduino UNO -->
+          
+                    <img src="/static/image/arduino1 - Copy.png" class="arduino-uno" id="arduino" width="350px" height="350px" alt="">
+      
+        
+
+                <!-- DHT11 Sensor -->
+                <div class="dht11-sensor" id="dht11" onclick="simulateReading()">
+                    <img src="/static/image/DHT11.jpg-removebg-preview - Copy.png" width="150px" height="150px" alt="">
+                </div>
+
+                <!-- LCD Display -->
+                <div class="lcd-display" id="lcd">
+                    <div class="lcd-screen">
+                        <div class="lcd-line" id="lcdLine1">Temp: --°C</div>
+                        <div class="lcd-line" id="lcdLine2">Humidity: --%</div>
+                    </div>
+                </div>
+
+                <!-- Connection Wires -->
+                <div class="wire wire-red" id="wireRed"></div>
+                <div class="wire wire-black" id="wireBlack"></div>
+                <div class="wire wire-yellow" id="wireYellow"></div>
+                <div class="wire wire-red-h1" id="wireRedH1"></div>
+                <div class="wire wire-black-h1" id="wireBlackH1"></div>
+                <div class="wire wire-yellow-h1" id="wireYellowH1"></div>
+                <div class="wire wire-green" id="wireGreen"></div>
+                <div class="wire wire-blue" id="wireBlue"></div>
+                <div class="wire wire-purple" id="wirePurple"></div>
+                <div class="wire wire-orange" id="wireOrange"></div>
+                   <div class="wire wire-green-h2" id="wireGreen"></div>
+                <div class="wire wire-blue-h2" id="wireBlue"></div>
+                <div class="wire wire-purple-h2" id="wirePurple"></div>
+                <div class="wire wire-orange-h2" id="wireOrange"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALS -->
+    <div class="modal" id="schemaModal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Sxema haqida ma'lumot</h2>
+            <div class="card">
+                <h3>DHT11 + LCD Loyihasi</h3>
+                <p>Bu loyiha DHT11 sensor yordamida harorat va namlikni o'lchab, LCD displeyda ko'rsatadi. Arduino UNO asosida ishlaydi va real vaqtda ma'lumotlarni yangilaydi.</p>
+            </div>
+            <div class="card">
+                <h3>Ishlatish sohalari:</h3>
+                <p>• Uy sharoitida harorat nazorati<br>
+                • Sera va bog'lar uchun mikroiqlim nazorati<br>
+                • Laboratoriya va ombor sharoitlari monitoringi<br>
+                • IoT loyihalarda ma'lumot yig'ish</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="codeModal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Kod</h2>
+            
+            <div class="tab-buttons">
+                <button class="tab-btn active" data-tab="arduino">Arduino IDE</button>
+                <button class="tab-btn" data-tab="libraries">Kutubxonalar</button>
+            </div>
+
+            <div class="tab-content active" id="arduino">
+                <pre>
+#include &lt;DHT.h&gt;
+#include &lt;LiquidCrystal.h&gt;
+
+#define DHTPIN 2
+#define DHTTYPE DHT11
+
+DHT dht(DHTPIN, DHTTYPE);
+LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
+
+void setup() {
+  Serial.begin(9600);
+  dht.begin();
+  lcd.begin(16, 2);
+  lcd.print("DHT11 Sensor");
+  delay(2000);
+  lcd.clear();
+}
+
+void loop() {
+  float humidity = dht.readHumidity();
+  float temperature = dht.readTemperature();
+
+  if (isnan(humidity) || isnan(temperature)) {
+    Serial.println("DHT11 o'qishda xatolik!");
+    lcd.setCursor(0, 0);
+    lcd.print("Sensor xatolik!");
+    return;
+  }
+
+  // LCD ga chiqarish
+  lcd.setCursor(0, 0);
+  lcd.print("Temp: ");
+  lcd.print(temperature);
+  lcd.print("C");
+  
+  lcd.setCursor(0, 1);
+  lcd.print("Humidity: ");
+  lcd.print(humidity);
+  lcd.print("%");
+
+  // Serial monitor
+  Serial.print("Harorat: ");
+  Serial.print(temperature);
+  Serial.print("°C, Namlik: ");
+  Serial.print(humidity);
+  Serial.println("%");
+
+  delay(2000);
+}
+                </pre>
+            </div>
+
+            <div class="tab-content" id="libraries">
+                <pre>
+// Kerakli kutubxonalar:
+
+1. DHT sensor library by Adafruit
+   - Arduino IDE: Tools → Manage Libraries → "DHT sensor library"
+   - yoki: Sketch → Include Library → Add .ZIP Library
+
+2. LiquidCrystal library (standart)
+   - Arduino IDE bilan birga keladi
+   - #include &lt;LiquidCrystal.h&gt;
+
+3. O'rnatish:
+   - DHT.h va LiquidCrystal.h ni qo'shing
+   - Board: Arduino UNO tanlang
+   - Port: to'g'ri COM portni tanlang
+                </pre>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="componentsModal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Ishlatilgan qurilmalar</h2>
+
+            <div class="card">
+                <h3>🌡️ DHT11 Sensor</h3>
+                <p><strong>Vazifasi:</strong> Harorat va namlikni o'lchash<br>
+                <strong>Xususiyatlari:</strong> 0-50°C, 20-90% namlik, ±2°C aniqlik<br>
+                <strong>Pinlar:</strong> VCC, GND, DATA</p>
+            </div>
+
+            <div class="card">
+                <h3>📺 LCD 16x2 Display</h3>
+                <p><strong>Vazifasi:</strong> Ma'lumotlarni ko'rsatish<br>
+                <strong>Xususiyatlari:</strong> 16 ustun, 2 qator, HD44780 kontrollerli<br>
+                <strong>Pinlar:</strong> VSS, VDD, V0, RS, Enable, D4-D7</p>
+            </div>
+
+            <div class="card">
+                <h3>🔌 Arduino UNO R3</h3>
+                <p><strong>Vazifasi:</strong> Asosiy boshqaruvchi mikrokontoller<br>
+                <strong>Xususiyatlari:</strong> ATmega328P, 14 digital pin, 6 analog pin<br>
+                <strong>Quvvat:</strong> 5V, USB yoki DC jack</p>
+            </div>
+
+            <div class="card">
+                <h3>🔗 Ulanish simlar</h3>
+                <p><strong>Kerak:</strong> Erkak-ayol jumper wire<br>
+                <strong>Miqdor:</strong> 10-12 dona turli rangli<br>
+                <strong>Uzunlik:</strong> 10-20 sm optimal</p>
+            </div>
+        </div>
+    </div>
+
+   <script>
+    // System variables
+    let powerOn = false;
+    let readingActive = false;
+    let currentTemp = 0;
+    let currentHumidity = 0;
+    let readingInterval;
+
+    // DOM elements
+    const elements = {
+        powerLed: document.getElementById('powerLed'),
+        dhtLed: document.getElementById('dhtLed'),
+        lcdLed: document.getElementById('lcdLed'),
+        arduinoLed: document.getElementById('arduinoLed'),
+        tempValue: document.getElementById('tempValue'),
+        humidityValue: document.getElementById('humidityValue'),
+        statusValue: document.getElementById('statusValue'),
+        lcdLine1: document.getElementById('lcdLine1'),
+        lcdLine2: document.getElementById('lcdLine2'),
+        dht11: document.getElementById('dht11'),
+        lcd: document.getElementById('lcd'),
+        arduino: document.getElementById('arduino')
+    };
+
+    // LED update
+    function updateLED(led, state) {
+        if (state) {
+            led.classList.add("on");
+        } else {
+            led.classList.remove("on");
+        }
+    }
+
+    // Toggle power
+    function togglePower() {
+        powerOn = !powerOn;
+        updateLED(elements.powerLed, powerOn);
+        updateLED(elements.arduinoLed, powerOn);
+        elements.statusValue.textContent = powerOn ? "Quvvat yoqilgan" : "O‘chirilgan";
+        if (!powerOn) stopReading();
+    }
+
+    // Start reading
+    function startReading() {
+        if (!powerOn) {
+            alert("⚡ Avval quvvatni yoqing!");
+            return;
+        }
+        if (readingActive) return;
+
+        readingActive = true;
+        updateLED(elements.dhtLed, true);
+        updateLED(elements.lcdLed, true);
+        elements.statusValue.textContent = "O‘qish boshlandi";
+
+        readingInterval = setInterval(simulateReading, 2000);
+    }
+
+    // Stop reading
+    function stopReading() {
+        readingActive = false;
+        clearInterval(readingInterval);
+        updateLED(elements.dhtLed, false);
+        updateLED(elements.lcdLed, false);
+        elements.statusValue.textContent = powerOn ? "Kutish holati" : "O‘chirilgan";
+    }
+
+    // Simulate sensor reading
+    function simulateReading() {
+        if (!readingActive) return;
+
+        currentTemp = (20 + Math.random() * 10).toFixed(1);
+        currentHumidity = (40 + Math.random() * 30).toFixed(1);
+
+        elements.tempValue.textContent = `${currentTemp}°C`;
+        elements.humidityValue.textContent = `${currentHumidity}%`;
+
+        elements.lcdLine1.textContent = `Temp: ${currentTemp}°C`;
+        elements.lcdLine2.textContent = `Humidity: ${currentHumidity}%`;
+        
+        elements.lcdLine1.classList.add("updating");
+        elements.lcdLine2.classList.add("updating");
+        setTimeout(() => {
+            elements.lcdLine1.classList.remove("updating");
+            elements.lcdLine2.classList.remove("updating");
+        }, 600);
+    }
+
+    // Test connection
+    function testConnection() {
+        if (!powerOn) {
+            alert("⚡ Avval quvvatni yoqing!");
+            return;
+        }
+        elements.statusValue.textContent = "🔗 Ulanish muvaffaqiyatli!";
+        elements.arduino.classList.add("connection-active");
+        setTimeout(() => elements.arduino.classList.remove("connection-active"), 3000);
+    }
+
+    // Modals
+    function openModal(id) {
+        document.getElementById(id).style.display = "block";
+    }
+    document.querySelectorAll(".close").forEach(btn => {
+        btn.onclick = () => btn.parentElement.parentElement.style.display = "none";
+    });
+    window.onclick = (e) => {
+        if (e.target.classList.contains("modal")) {
+            e.target.style.display = "none";
+        }
+    };
+
+    // Tabs in modal
+    document.querySelectorAll(".tab-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+            document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+            btn.classList.add("active");
+            document.getElementById(btn.dataset.tab).classList.add("active");
+        });
+    });
+</script>

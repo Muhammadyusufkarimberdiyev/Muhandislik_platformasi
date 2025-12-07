@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DHT11 LCD Arduino Tajribasi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #e6f3ff;
+            min-height: 100vh;
+            padding: 1.5vw;
+            overflow-x: hidden;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            background: #000075;
+            color: white;
+            padding: 0.8vw 2vw;
+            box-shadow: 0 0.3vw 1vw rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.8vw;
+            font-size: clamp(14px, 1.5vw, 18px);
+            font-weight: bold;
+        }
+
+        .logo img {
+            border-radius: 50%;
+            border: 0.15vw solid white;
+            width: clamp(35px, 4vw, 50px);
+            height: clamp(35px, 4vw, 50px);
+        }
+
+        .main-container {
+            display: flex;
+            margin-top: 2vh;
+            gap: 2vw;
+        }
+
+        .left-panel {
+            width: clamp(200px, 18vw, 250px);
+            background: white;
+            padding: 1.2vw;
+            border-radius: 0.6vw;
+            box-shadow: 0 0.3vw 0.6vw rgba(0,0,0,0.1);
+            height: fit-content;
+        }
+
+        .control-group {
+            margin-bottom: 1.5vw;
+            border-bottom: 0.1vw solid #ddd;
+            padding-bottom: 1.2vw;
+        }
+
+        .control-group h3 {
+            margin-bottom: 0.8vw;
+            color: #333;
+            font-size: clamp(13px, 1.3vw, 16px);
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 0.8vw;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 0.6vw;
+            font-size: clamp(11px, 1.1vw, 14px);
+            border-radius: 0.4vw;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .btn:hover {
+            transform: translateY(-0.15vw);
+            box-shadow: 0 0.3vw 0.6vw rgba(0,0,0,0.1);
+        }
+
+        .btn-success { background: #28a745; color: white; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-primary { background: #000075; color: white; }
+        .btn-info { background: #000075; color: white; }
+
+        .main-content {
+            flex: 1;
+            padding: 1.5vw;
+            background: white;
+            border-radius: 0.6vw;
+            box-shadow: 0 0.3vw 0.9vw rgba(0,0,0,0.1);
+        }
+
+        .title-header {
+            background: #000075;
+            color: white;
+            padding: 1vw 2vw;
+            border-radius: 1.5vw;
+            font-size: clamp(14px, 1.5vw, 18px);
+            font-weight: bold;
+            margin-bottom: 2vw;
+            text-align: center;
+            box-shadow: 0 0.3vw 1.2vw rgba(0,0,0,0.2);
+        }
+
+        .circuit-board {
+            position: relative;
+            width: 100%;
+            height: 0;
+            padding-bottom: 55%;
+            margin-top: 2vw;
+        }
+
+        .circuit-wrapper {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .arduino-uno {
+            position: absolute;
+            left: 6.5%;
+            top: 4.5%;
+            width: 37%;
+        }
+
+        .arduino-uno img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .dht11-sensor {
+            position: absolute;
+            right: 28%;
+            top: 5.5%;
+            width: 12%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 20;
+        }
+
+        .dht11-sensor img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .dht11-sensor:hover {
+            transform: scale(1.05);
+            filter: drop-shadow(0 0 1vw rgba(74, 144, 226, 0.6));
+        }
+
+        .lcd-display {
+            background: green;
+            width: 28%;
+            aspect-ratio: 2.3/1;
+            border-radius: 0.6vw;
+            position: absolute;
+            right: 22%;
+            top: 35%;
+            box-shadow: 0.3vw 0.3vw 1.2vw rgba(0,0,0,0.4);
+            z-index: 15;
+        }
+
+        .lcd-screen {
+            background: #0f3460;
+            width: 92%;
+            height: 66%;
+            margin: 4% auto;
+            border-radius: 0.3vw;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            font-size: clamp(10px, 1.1vw, 14px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .lcd-line {
+            margin: 0.6vw 0;
+            transition: all 0.5s ease;
+        }
+
+        .lcd-line.updating {
+            animation: textUpdate 0.5s ease;
+        }
+
+        @keyframes textUpdate {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .wire {
+            position: absolute;
+            border-radius: 0.12vw;
+            z-index: 10;
+        }
+
+        /* DHT11 simlar */
+        .wire-red {
+            width: 0.3%;
+            height: 43%;
+            background: red;
+            left: 28%;
+            top: 14.5%;
+        }
+
+        .wire-black {
+            width: 0.3%;
+            height: 3.5%;
+            background: black;
+            left: 23%;
+            top: 16.3%;
+        }
+
+        .wire-yellow {
+            width: 0.3%;
+            height: 2%;
+            background: yellow;
+            left: 36.5%;
+            top: 18%;
+        }
+
+        .wire-red-h1 {
+            width: 33%;
+            height: 0.3%;
+            background: red;
+            left: 28%;
+            top: 14.5%;
+        }
+
+        .wire-black-h1 {
+            width: 38%;
+            height: 0.3%;
+            background: black;
+            left: 23%;
+            top: 16.3%;
+        }
+
+        .wire-yellow-h1 {
+            width: 24.5%;
+            height: 0.3%;
+            background: yellow;
+            left: 36.5%;
+            top: 18%;
+        }
+
+        /* LCD simlar */
+        .wire-green {
+            width: 0.3%;
+            height: 20%;
+            background: black;
+            left: 29%;
+            top: 37%;
+        }
+
+        .wire-blue {
+            width: 0.3%;
+            height: 18%;
+            background: red;
+            left: 28%;
+            top: 39%;
+        }
+
+        .wire-purple {
+            width: 0.3%;
+            height: 16%;
+            background: purple;
+            left: 37.5%;
+            top: 41%;
+        }
+
+        .wire-orange {
+            width: 0.3%;
+            height: 13%;
+            background: orange;
+            left: 38.5%;
+            top: 44%;
+        }
+
+        .wire-green-h2 {
+            width: 23%;
+            height: 0.3%;
+            background: black;
+            left: 29%;
+            top: 37%;
+        }
+
+        .wire-blue-h2 {
+            width: 24%;
+            height: 0.3%;
+            background: red;
+            left: 28%;
+            top: 39%;
+        }
+
+        .wire-purple-h2 {
+            width: 14%;
+            height: 0.3%;
+            background: purple;
+            left: 37.5%;
+            top: 41%;
+        }
+
+        .wire-orange-h2 {
+            width: 13%;
+            height: 0.3%;
+            background: orange;
+            left: 38.5%;
+            top: 44%;
+        }
+
+        .status-led {
+            width: clamp(10px, 1vw, 13px);
+            height: clamp(10px, 1vw, 13px);
+            border-radius: 50%;
+            background: #dc3545;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 0 0.4vw rgba(0,0,0,0.5);
+        }
+
+        .status-led.on {
+            background: #28a745;
+            box-shadow: 0 0 0.8vw rgba(40, 167, 69, 0.8);
+        }
+
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 0.6vw 0;
+            font-size: clamp(11px, 1.1vw, 13px);
+        }
+
+        .data-display {
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 1.5vw;
+            border-radius: 0.8vw;
+            margin-top: 2vw;
+        }
+
+        .data-display h3 {
+            font-size: clamp(13px, 1.3vw, 16px);
+            margin-bottom: 1vw;
+            text-align: center;
+        }
+
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 0.8vw 0;
+            font-size: clamp(12px, 1.2vw, 14px);
+        }
+
+        .data-value {
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            backdrop-filter: blur(0.3vw);
+        }
+
+        .modal-content {
+            background: #000075;
+            color: white;
+            margin: 5% auto;
+            padding: 2vw;
+            width: 70%;
+            max-width: 700px;
+            border-radius: 1.2vw;
+            box-shadow: 0 0.8vw 2vw rgba(0,0,0,0.4);
+            animation: slideDown 0.4s ease;
+            position: relative;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .close {
+            position: absolute;
+            right: 1.5vw;
+            top: 1vw;
+            font-size: clamp(20px, 2vw, 24px);
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+            transition: color 0.3s;
+        }
+
+        .close:hover { color: #ffcc00; }
+
+        .modal-content h2 {
+            font-size: clamp(18px, 1.8vw, 22px);
+            margin-bottom: 1.2vw;
+            border-bottom: 0.15vw solid rgba(255,255,255,0.2);
+            padding-bottom: 0.6vw;
+        }
+
+        .tab-buttons {
+            display: flex;
+            margin-bottom: 0.8vw;
+        }
+
+        .tab-buttons button {
+            flex: 1;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            padding: 0.8vw;
+            border: none;
+            cursor: pointer;
+            font-size: clamp(12px, 1.2vw, 14px);
+            border-radius: 0.4vw 0.4vw 0 0;
+            transition: background 0.3s;
+        }
+
+        .tab-buttons button.active {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        pre {
+            background: rgba(0,0,0,0.4);
+            padding: 1vw;
+            border-radius: 0.6vw;
+            overflow-x: auto;
+            font-size: clamp(10px, 0.9vw, 12px);
+            white-space: pre-wrap;
+        }
+
+        .card {
+            background: rgba(255,255,255,0.08);
+            padding: 1.2vw;
+            border-radius: 0.8vw;
+            margin-bottom: 1.2vw;
+        }
+
+        .card h3 {
+            font-size: clamp(14px, 1.4vw, 17px);
+            margin-bottom: 0.6vw;
+        }
+
+        .card p {
+            font-size: clamp(12px, 1.2vw, 14px);
+            line-height: 1.6;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .connection-active {
+            animation: connectionGlow 1.5s ease-in-out infinite;
+        }
+
+        @keyframes connectionGlow {
+            0%, 100% { filter: drop-shadow(0 0 0.5vw rgba(0,255,0,0.3)); }
+            50% { filter: drop-shadow(0 0 1.2vw rgba(0,255,0,0.8)); }
+        }
+
+        @media (max-width: 1200px) {
+            .circuit-board { padding-bottom: 60%; }
+        }
+
+        @media (max-width: 1024px) {
+            .main-container { flex-direction: column; }
+            .left-panel { width: 100%; }
+            .circuit-board { padding-bottom: 70%; }
+            .modal-content { width: 80%; }
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 3vw; }
+            .circuit-board { padding-bottom: 85%; }
+            .modal-content { width: 90%; margin: 10% auto; }
+        }
+
+        @media (max-width: 480px) {
+            .circuit-board { padding-bottom: 110%; }
+            
+        .arduino-uno {
+            position: absolute;
+            left: 6.5%;
+            top: 12.5%;
+            width: 37%;
+        }
+            .dht11-sensor {
+            position: absolute;
+            right: 27%;
+            top: 7.4%;
+            width: 15%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 20;
+        }
+              .dht11-sensor img {
+            width: 100%;
+            height: 70px;
+            display: block;
+        }
+        
+        .lcd-display {
+            background: green;
+            width: 28%;
+            aspect-ratio: 2.3/1;
+            border-radius: 0.6vw;
+            position: absolute;
+            right: 22%;
+            top: 28%;
+            box-shadow: 0.3vw 0.3vw 1.2vw rgba(0,0,0,0.4);
+            z-index: 15;
+        }
+         .wire {
+            position: absolute;
+            border-radius: 0.12vw;
+            z-index: 10;
+        }
+
+        /* DHT11 simlar */
+        .wire-red {
+            width: 0.3%;
+            height: 23.5%;
+            background: red;
+            left: 28%;
+            top: 15%;
+        }
+
+        .wire-black {
+            width: 0.3%;
+            height: 3%;
+            background: black;
+            left: 23%;
+            top: 17%;
+        }
+
+        .wire-yellow {
+            width: 0.3%;
+            height: 2%;
+            background: yellow;
+            left: 36%;
+            top: 18%;
+        }
+
+        .wire-red-h1 {
+            width: 33%;
+            height: 0.3%;
+            background: red;
+            left: 28%;
+            top: 15%;
+        }
+
+        .wire-black-h1 {
+            width: 38%;
+            height: 0.3%;
+            background: black;
+            left: 23%;  
+            top: 17%;
+        }
+
+        .wire-yellow-h1 {
+            width: 25%;
+            height: 0.3%;
+            background: yellow;
+            left: 36%;
+            top: 18%;
+        }
+
+        /* LCD simlar */
+        .wire-green {
+            width: 0.3%;
+            height: 7%;
+            background: black;
+            left: 29%;
+            top: 32%;
+        }
+
+        .wire-blue {
+            width: 0.3%;
+            height: 8%;
+            background: red;
+            left: 28%;
+            top: 30%;
+        }
+
+        .wire-purple {
+            width: 0.3%;
+            height: 4.5%;
+            background: purple;
+            left: 37.5%;
+            top: 34%;
+        }
+
+        .wire-orange {
+            width: 0.3%;
+            height: 3.5%;
+            background: orange;
+            left: 38.5%;
+            top: 35%;
+        }
+
+        .wire-green-h2 {
+            width: 23%;
+            height: 0.3%;
+            background: black;
+            left: 29%;
+            top: 32%;
+        }
+
+        .wire-blue-h2 {
+            width: 24%;
+            height: 0.3%;
+            background: red;
+            left: 28%;
+            top: 33%;
+        }
+
+        .wire-purple-h2 {
+            width: 14%;
+            height: 0.3%;
+            background: purple;
+            left: 37.5%;
+            top: 34%;
+        }
+
+        .wire-orange-h2 {
+            width: 13%;
+            height: 0.3%;
+            background: orange;
+            left: 38.5%;
+            top: 35%;
+        }
+
+        }
+         .left-panel{width:280px;max-width:95%;background:#fff;border-radius:14px;padding:16px;box-shadow:0 6px 16px rgba(0,0,0,.08)}
+  .left-panel h3{margin:0 0 12px;font-size:16px;color:#333}
+  .btn{display:block;width:100%;padding:10px 12px;margin:8px 0;border:0;border-radius:10px;cursor:pointer;transition:.25s;text-align:left;font-weight:600}
+  .btn-primary{background:#000075;color:#fff}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 14px rgba(0,0,0,.1)}
+
+  .wrap{display:flex;gap:20px;align-items:flex-start}
+  .content{flex:1;background:#fff;border-radius:14px;padding:18px;box-shadow:0 6px 18px rgba(0,0,0,.06)}
+  .hero{border-radius:14px;background:linear-gradient(135deg,#000075,#2030b0);color:#fff;padding:18px 20px;margin-bottom:16px}
+  .hero h1{margin:0 0 6px;font-size:22px}
+  .hero p{margin:0;opacity:.9}
+
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .card{background:#f8faff;border:1px solid #e8eefc;border-radius:14px;padding:14px}
+  .card h3{margin:0 0 10px;font-size:16px}
+  .lcd{background:#0f3460;color:#00ff00;border-radius:10px;padding:12px;font-family:"Courier New",monospace;line-height:1.6}
+
+  .preview{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap}
+  .preview .img{flex:0 0 320px;max-width:100%;background:#f3f4f6;border-radius:12px;overflow:hidden;border:1px solid #e5e7eb}
+  .preview .img img{width:100%;height:auto;display:block}
+  .preview .desc{flex:1;min-width:260px}
+
+  .modal{display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.8);backdrop-filter:blur(5px);overflow-y:auto}
+  .modal-content{background:#000075;color:#fff;margin:5vh auto;padding:26px;width:90%;max-width:1000px;border-radius:20px;box-shadow:0 15px 40px rgba(0,0,0,.5);position:relative;animation:slideDown .4s ease}
+  @keyframes slideDown{from{transform:translateY(-50px);opacity:0}to{transform:translateY(0);opacity:1}}
+  .close{position:absolute;right:20px;top:15px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:bold;cursor:pointer;color:#fff;transition:.3s;border-radius:50%;background:rgba(255,255,255,.1)}
+  .close:hover{background:rgba(255,204,0,.3);color:#ffcc00;transform:rotate(90deg)}
+  .modal-content h2{font-size:26px;margin-bottom:18px;padding-bottom:12px;border-bottom:2px solid rgba(255,255,255,.25);padding-right:50px}
+
+  .tab-buttons{display:flex;gap:8px;margin:12px 0 16px}
+  .tab-btn{flex:1;background:rgba(255,255,255,.12);color:#fff;border:0;border-radius:10px 10px 0 0;padding:10px;cursor:pointer;font-weight:600;transition:.2s}
+  .tab-btn:hover{background:rgba(255,255,255,.2)}
+  .tab-btn.active{background:rgba(255,255,255,.28)}
+  .tab-content{display:none}
+  .tab-content.active{display:block}
+
+  pre{background:rgba(0,0,0,.35);padding:12px;border-radius:10px;overflow:auto;white-space:pre-wrap;word-break:break-word;color:#fff;font-size:13.5px;line-height:1.55}
+  code{font-family:"Courier New",monospace}
+
+  #infoFloatingBtn{position:fixed;bottom:30px;right:30px;width:120px;height:120px;border-radius:50%;background:linear-gradient(135deg,#000075,#0000ff);color:#fff;border:4px solid #fff;cursor:pointer;font-size:16px;font-weight:bold;box-shadow:0 8px 20px rgba(0,0,0,.4);z-index:1500;transition:.3s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px}
+  #infoFloatingBtn:hover{transform:scale(1.1);box-shadow:0 12px 30px rgba(0,0,255,.6)}
+  #infoFloatingBtn span:first-child{font-size:36px}
+
+  .video-full{width:100%;border-radius:15px;background:#000}
+  .video-full video{width:100%;height:auto;border-radius:15px;max-height:70vh}
+
+  .kv{display:flex;gap:10px;align-items:center;color:#334;opacity:.9;font-size:14px}
+  .led{width:12px;height:12px;border-radius:50%;background:#dc3545;box-shadow:inset 0 0 4px rgba(0,0,0,.4)}
+  .led.on{background:#28a745;box-shadow:0 0 10px rgba(40,167,69,.7)}
+
+  @media (max-width:1024px){.grid{grid-template-columns:1fr}.wrap{flex-direction:column}.left-panel{width:100%}}
+  @media (max-width:768px){.modal-content{width:96%;padding:20px 15px}#infoFloatingBtn{width:90px;height:90px;font-size:14px;bottom:20px;right:20px}#infoFloatingBtn span:first-child{font-size:28px}}
+   
+   .left-panel{width:280px;max-width:95%;background:#fff;border-radius:14px;padding:16px;box-shadow:0 6px 16px rgba(0,0,0,.08)}
+  .left-panel h3{margin:0 0 12px;font-size:16px;color:#333}
+  .btn{display:block;width:100%;padding:10px 12px;margin:8px 0;border:0;border-radius:10px;cursor:pointer;transition:.25s;text-align:left;font-weight:600}
+  .btn-primary{background:#000075;color:#fff}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 14px rgba(0,0,0,.1)}
+  .flex-container-40-60{display:flex;gap:20px;align-items:flex-start;background:rgba(255,255,255,.1);padding:20px;border-radius:15px;margin-bottom:20px}
+  .flex-text-60{flex:1}
+  .flex-text-60 p{font-size:16px;line-height:1.8}
+  .flex-container-30-70{display:flex;gap:20px;align-items:flex-start;background:rgba(255,255,255,.1);padding:20px;border-radius:15px;margin-bottom:20px}
+  .flex-image-30{flex:0 0 30%}
+  .flex-image-30 img{width:100%;border-radius:10px}
+  .flex-text-70{flex:0 0 70%}
+  .flex-text-70 strong{color:#ffcc00;font-size:18px;display:block;margin-bottom:10px}
+  .modal{display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.8);backdrop-filter:blur(5px);overflow-y:auto}
+  .modal-content{background:#000075;color:#fff;margin:5vh auto;padding:30px;width:90%;max-width:1000px;border-radius:20px;box-shadow:0 15px 40px rgba(0,0,0,.5);position:relative;animation:slideDown .4s ease}
+  @keyframes slideDown{from{transform:translateY(-50px);opacity:0}to{transform:translateY(0);opacity:1}}
+  .close{position:absolute;right:20px;top:15px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:bold;cursor:pointer;color:#fff;transition:.3s;border-radius:50%;background:rgba(255,255,255,.1)}
+  .close:hover{background:rgba(255,204,0,.3);color:#ffcc00;transform:rotate(90deg)}
+  .modal-content h2{font-size:28px;margin-bottom:25px;padding-bottom:15px;border-bottom:2px solid rgba(255,255,255,.3);padding-right:50px}
+  .tab-buttons{display:flex;gap:8px;margin:12px 0 16px}
+  .tab-btn{flex:1;background:rgba(255,255,255,.12);color:#fff;border:0;border-radius:10px 10px 0 0;padding:10px;cursor:pointer;font-weight:600;transition:.2s}
+  .tab-btn:hover{background:rgba(255,255,255,.2)}
+  .tab-btn.active{background:rgba(255,255,255,.28)}
+  .tab-content{display:none}
+  .tab-content.active{display:block}
+  pre{background:rgba(0,0,0,.35);padding:12px;border-radius:10px;overflow:auto;white-space:pre-wrap;word-break:break-word;color:#fff;font-size:13.5px;line-height:1.55}
+  #infoFloatingBtn{position:fixed;bottom:30px;right:30px;width:120px;height:120px;border-radius:50%;background:linear-gradient(135deg,#000075,#0000ff);color:#fff;border:4px solid #fff;cursor:pointer;font-size:16px;font-weight:bold;box-shadow:0 8px 20px rgba(0,0,0,.4);z-index:1500;transition:.3s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px}
+  #infoFloatingBtn:hover{transform:scale(1.1);box-shadow:0 12px 30px rgba(0,0,255,.6)}
+  #infoFloatingBtn span:first-child{font-size:36px}
+  .video-full{width:100%;border-radius:15px;background:#000}
+  .video-full video{width:100%;height:auto;border-radius:15px;max-height:70vh}
+  @media (max-width:1024px){.flex-container-40-60,.flex-container-30-70{flex-direction:column}.flex-image-30,.flex-text-70{flex:0 0 100%}}
+  @media (max-width:768px){.modal-content{width:96%;padding:20px 15px}#infoFloatingBtn{width:90px;height:90px;font-size:14px;bottom:20px;right:20px}#infoFloatingBtn span:first-child{font-size:28px}}
+   </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+                 <a href="/"><img src="/static/image/logo.png" width="80px" height="80px" alt=""></a>
+          
+            <span>DHT11 LCD Arduino Tajribasi</span>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <div class="left-panel">
+            <div class="control-group">
+                <h3>Boshqaruv</h3>
+                <button class="btn btn-success" onclick="startReading()">O'qishni boshlash</button>
+                <button class="btn btn-danger" onclick="stopReading()">To'xtatish</button>
+                <button class="btn btn-primary" onclick="togglePower()">Quvvat</button>
+                <button class="btn btn-info" onclick="testConnection()">Ulanishni tekshirish</button>
+            </div>
+
+    <aside class="left-panel">
+  <h3>Ma'lumotlar</h3>
+  <button class="btn btn-primary" id="schemaBtn">💡 Sxema qayerda ishlatiladi</button>
+  <button class="btn btn-primary" id="codeBtn">💻 Kod</button>
+  <button class="btn btn-primary" id="componentsBtn">🔌 Qurilmalar</button>
+</aside>
+
+            <div class="control-group">
+                <h3>Qurilma holati</h3>
+                <div class="status-row">
+                    <span>Quvvat:</span>
+                    <div class="status-led" id="powerLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>DHT11:</span>
+                    <div class="status-led" id="dhtLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>LCD:</span>
+                    <div class="status-led" id="lcdLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Arduino:</span>
+                    <div class="status-led" id="arduinoLed"></div>
+                </div>
+            </div>
+
+            <div class="data-display">
+                <h3>Joriy ma'lumotlar</h3>
+                <div class="data-row">
+                    <span>Harorat:</span>
+                    <span class="data-value" id="tempValue">--°C</span>
+                </div>
+                <div class="data-row">
+                    <span>Namlik:</span>
+                    <span class="data-value" id="humidityValue">--%</span>
+                </div>
+                <div class="data-row">
+                    <span>Holat:</span>
+                    <span class="data-value" id="statusValue">O'chirilgan</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="title-header">DHT11 va LCD 16x2 bilan harorat va namlik o'lchash</div>
+            
+            <div class="circuit-board">
+                <div class="circuit-wrapper">
+                    <div class="arduino-uno">
+                        <img src="/static/image/arduino1 - Copy.png" alt="Arduino UNO">
+                    </div>
+
+                    <div class="dht11-sensor" id="dht11" onclick="simulateReading()">
+                        <img src="/static/image/DHT11.jpg-removebg-preview - Copy.png" alt="DHT11">
+                    </div>
+
+                    <div class="lcd-display">
+                        <div class="lcd-screen">
+                            <div class="lcd-line" id="lcdLine1">Temp: --°C</div>
+                            <div class="lcd-line" id="lcdLine2">Humidity: --%</div>
+                        </div>
+                    </div>
+
+                    <div class="wire wire-red"></div>
+                    <div class="wire wire-black"></div>
+                    <div class="wire wire-yellow"></div>
+                    <div class="wire wire-red-h1"></div>
+                    <div class="wire wire-black-h1"></div>
+                    <div class="wire wire-yellow-h1"></div>
+                    <div class="wire wire-green"></div>
+                    <div class="wire wire-blue"></div>
+                    <div class="wire wire-purple"></div>
+                    <div class="wire wire-orange"></div>
+                    <div class="wire wire-green-h2"></div>
+                    <div class="wire wire-blue-h2"></div>
+                    <div class="wire wire-purple-h2"></div>
+                    <div class="wire wire-orange-h2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+<!-- 1) Sxema qayerda ishlatiladi -->
+<div class="modal" id="schemaModal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>💡 Sxema qayerda ishlatiladi (RGB LED)</h2>
+    <div class="flex-container-40-60">
+         <div class="flex-video-40">
+                <iframe 
+                    src="https://www.youtube.com/embed/iZcMQ2dn27s?si=Nh-e3EKt6KcEAAye" 
+                    title="YouTube video player" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+      <div class="flex-text-60">
+        <strong>🔄 Ulanish sxemasi</strong>
+<p>DHT11 sensor pinlari (4 pinli variant):
+
+VCC → 5V
+
+Data → Arduino raqamli pin (masalan, D2)
+
+NC → ishlatilmaydi
+
+GND → GND
+
+Izoh: Data pin bilan VCC orasida 10k Ω pull-up rezistor ulanadi.</p>
+      </div>
+    </div>
+    <div class="flex-container-40-60">
+         <div class="flex-video-40">
+                <iframe 
+                    src="https://www.youtube.com/embed/Esl6FLbZq7o?si=W5jSb0WebHOMSA76" 
+                    title="YouTube video player" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+      <div class="flex-text-60">
+        <strong>Qo‘shimcha imkoniyatlar</strong>
+<p>LCD / OLED ekran bilan: real vaqt harorat va namlikni ko‘rsatish
+
+Buzzer: Harorat yoki namlik chegaradan chiqsa signal berish
+
+Relay + fan / nasos: Masalan, namlik past bo‘lsa sug‘orish tizimi ishlaydi
+
+IoT integratsiyasi: WiFi yoki Bluetooth orqali masofadan monitoring (Blynk, ESP8266/ESP32)</p>
+      </div>
+    </div>
+    <div class="flex-container-40-60">
+         <div class="flex-video-40">
+                <iframe 
+                    src="https://www.youtube.com/embed/8tfj0ZfADcE?si=cjWax7Z-3GZF31vk" 
+                    title="YouTube video player" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+      <div class="flex-text-60">
+        <strong>Afzalliklari</strong>
+   <p>
+    
+Oson va arzon loyiha
+
+Harorat va namlikni real vaqt kuzatish
+
+O‘simlik sug‘orish, uy sharoitida monitoring, laboratoriya tajribalari uchun ideal
+
+Arduino bilan sensorlarni o‘rganish va kodlashni osonlashtiradi
+   </p>
+   
+    </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Kod (Arduino) -->
+<div class="modal" id="codeModal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>💻 Kod</h2>
+
+    <div class="tab-buttons">
+      <button class="tab-btn active" data-tab="arduino">Arduino Kodi</button>
+      <button class="tab-btn" data-tab="libraries">Mblock kodi</button>
+    </div>
+
+    <div class="tab-content active" id="arduino">
+      <pre><code>// DHT11 + LCD 16x2 (4-bit)
+// DHT11 DATA → D7, VCC → 5V, GND → GND
+// LCD: RS→12, E→11, D4→5, D5→4, D6→3, D7→2
+
+#include &lt;DHT.h&gt;
+#include &lt;LiquidCrystal.h&gt;
+
+#define DHTPIN 7
+#define DHTTYPE DHT11
+
+DHT dht(DHTPIN, DHTTYPE);
+LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
+
+void setup(){
+  dht.begin();
+  lcd.begin(16, 2);
+  lcd.clear();
+  lcd.setCursor(0,0); lcd.print("DHT11 + LCD");
+  lcd.setCursor(0,1); lcd.print("Initializing...");
+  delay(1200);
+}
+
+void loop(){
+  float h = dht.readHumidity();
+  float t = dht.readTemperature(); // Selsiy
+
+  if (isnan(h) || isnan(t)){
+    lcd.clear();
+    lcd.setCursor(0,0); lcd.print("Sensor xatosi!");
+    lcd.setCursor(0,1); lcd.print("Qayta urining...");
+    delay(1200);
+    return;
+  }
+
+  lcd.clear();
+  lcd.setCursor(0,0); lcd.print("Temp: "); lcd.print(t,1); lcd.print((char)223); lcd.print("C");
+  lcd.setCursor(0,1); lcd.print("Humidity: "); lcd.print(h,1); lcd.print("%");
+
+  delay(1500); // 1.5 s (DHT11 uchun yetarli)
+}</code></pre>
+    </div>
+
+    <div class="tab-content" id="libraries">
+            <pre><img src="/static/image/mblock.webp" alt="mBlock – RGB LED" style="width:80%;height:auto"></pre>
+  
+    </div>
+
+    
+  </div>
+</div>
+
+<div class="modal" id="componentsModal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>🔌 Ishlatilgan Qurilmalar</h2>
+
+    <div class="flex-container-30-70">
+      <div class="flex-image-30"><img src="/static/image/arduino1 - Copy.png" alt="Arduino UNO"></div>
+      <div class="flex-text-70">
+        <strong>Arduino UNO</strong>
+        <p>PWM chiqishlar orqali R/G/B kanallarni boshqarish.</p>
+      </div>
+    </div>
+
+    <div class="flex-container-30-70">
+      <div class="flex-image-30"><img src="/static/image/DHT11.jpg-removebg-preview - Copy.png" alt="RGB LED"></div>
+      <div class="flex-text-70">
+        <strong>DHT11 sensor</strong>
+     <p>Ushbu sensor haroratni aniqlab bera oladi</p>
+    </div>
+    </div>
+
+   
+
+    <div class="flex-container-30-70">
+      <div class="flex-image-30"><img src="/static/image/1000uF25VElectrolyticCapacitor10x16mm.Leadspace-3.webp" alt="Breadboard"></div>
+      <div class="flex-text-70">
+        <strong>LCD Display</strong>
+        <p>Ko'rinishni to'liq ko'rsatib beruvchi display</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Qo‘shimcha video/ma'lumot -->
+<div class="modal" id="infoModal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>📚 Qo'shimcha Ma'lumot</h2>
+    <div class="video-full">
+      <video controls>
+        <source src="/media/2.mp4" type="video/mp4">
+        Brauzeringiz video formatni qo'llab-quvvatlamaydi.
+      </video>
+    </div>
+  </div>
+</div>
+
+<button id="infoFloatingBtn"><span>📚</span><span>Ma'lumot</span></button>
+    <script>
+        
+        let powerOn = false;
+        let readingActive = false;
+        let readingInterval;
+
+        const elements = {
+            powerLed: document.getElementById('powerLed'),
+            dhtLed: document.getElementById('dhtLed'),
+            lcdLed: document.getElementById('lcdLed'),
+            arduinoLed: document.getElementById('arduinoLed'),
+            tempValue: document.getElementById('tempValue'),
+            humidityValue: document.getElementById('humidityValue'),
+            statusValue: document.getElementById('statusValue'),
+            lcdLine1: document.getElementById('lcdLine1'),
+            lcdLine2: document.getElementById('lcdLine2'),
+            dht11: document.getElementById('dht11')
+        };
+
+        function updateLED(led, state) {
+            led.classList.toggle('on', state);
+        }
+
+        function togglePower() {
+            powerOn = !powerOn;
+            updateLED(elements.powerLed, powerOn);
+            updateLED(elements.arduinoLed, powerOn);
+            elements.statusValue.textContent = powerOn ? "Quvvat yoqilgan" : "O'chirilgan";
+            if (!powerOn) stopReading();
+        }
+
+        function startReading() {
+            if (!powerOn) {
+                alert("Avval quvvatni yoqing!");
+                return;
+            }
+            readingActive = true;
+            updateLED(elements.dhtLed, true);
+            updateLED(elements.lcdLed, true);
+            elements.statusValue.textContent = "O'qish boshlandi";
+            readingInterval = setInterval(simulateReading, 2000);
+        }
+  function openModal(id){ const m=document.getElementById(id); if(m) m.style.display='block'; }
+  function closeModal(el){ const m=el.closest('.modal'); if(m) m.style.display='none'; }
+
+  document.addEventListener('click',(e)=>{ if(e.target.matches('.modal .close')) closeModal(e.target); });
+  window.addEventListener('click',(e)=>{ document.querySelectorAll('.modal').forEach(m=>{ if(e.target===m) m.style.display='none'; }); });
+
+  document.getElementById('schemaBtn')?.addEventListener('click', ()=>openModal('schemaModal'));
+  document.getElementById('codeBtn')?.addEventListener('click',   ()=>openModal('codeModal'));
+  document.getElementById('componentsBtn')?.addEventListener('click', ()=>openModal('componentsModal'));
+  document.getElementById('infoFloatingBtn')?.addEventListener('click', ()=>openModal('infoModal'));
+
+  // Interaktiv (demo) oqish simulyatsiyasi
+  const leds = {
+    power: document.getElementById('powerLed'),
+    dht: document.getElementById('dhtLed'),
+    lcd: document.getElementById('lcdLed'),
+    arduino: document.getElementById('arduinoLed'),
+  };
+  const statusText = document.getElementById('statusText');
+  const L1 = document.getElementById('lcdLine1');
+  const L2 = document.getElementById('lcdLine2');
+
+
+
+  function setLED(el,on){ el.classList.toggle('on',!!on); }
+
+  function togglePower(){
+    powerOn=!powerOn;
+    setLED(leds.power,powerOn);
+    setLED(leds.arduino,powerOn);
+    statusText.textContent = "Holat: "+(powerOn?"Quvvat yoqilgan":"O‘chirilgan");
+    if(!powerOn) stopReading();
+  }
+
+  function startReading(){
+    if(!powerOn){ alert("Avval quvvatni yoqing!"); return; }
+    if(reading) return;
+    reading=true;
+    setLED(leds.dht,true); setLED(leds.lcd,true);
+    statusText.textContent="Holat: O‘qish boshlandi";
+    timer=setInterval(simulate,1500);
+  }
+
+  function stopReading(){
+    reading=false; clearInterval(timer);
+    setLED(leds.dht,false); setLED(leds.lcd,false);
+    statusText.textContent="Holat: "+(powerOn?"Kutish holati":"O‘chirilgan");
+  }
+
+  function simulate(){
+    if(!reading) return;
+    const t=(20+Math.random()*10).toFixed(1);
+    const h=(40+Math.random()*30).toFixed(1);
+    L1.textContent = `Temp: ${t}°C`;
+    L2.textContent = `Humidity: ${h}%`;
+  }
+
+  function testConnection(){
+    if(!powerOn){ alert("Avval quvvatni yoqing!"); return; }
+    statusText.textContent="Holat: Ulanish muvaffaqiyatli!";
+  }
+
+  document.getElementById('powerBtn')?.addEventListener('click',togglePower);
+  document.getElementById('startBtn')?.addEventListener('click',startReading);
+  document.getElementById('stopBtn')?.addEventListener('click',stopReading);
+  document.getElementById('testBtn')?.addEventListener('click',testConnection);
+
+  // Tablar
+  (function(){
+    const codeModal=document.getElementById('codeModal');
+    if(!codeModal) return;
+    codeModal.querySelectorAll('.tab-btn').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        const t=btn.dataset.tab;
+        codeModal.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        codeModal.querySelectorAll('.tab-content').forEach(p=>p.classList.toggle('active', p.id===t));
+      });
+    });
+  })();
+        function stopReading() {
+            readingActive = false;
+            clearInterval(readingInterval);
+            updateLED(elements.dhtLed, false);
+            updateLED(elements.lcdLed, false);
+            elements.statusValue.textContent = powerOn ? "Kutish holati" : "O'chirilgan";
+        }
+
+        function simulateReading() {
+            if (!readingActive) return;
+            const temp = (20 + Math.random() * 10).toFixed(1);
+            const humidity = (40 + Math.random() * 30).toFixed(1);
+            elements.tempValue.textContent = `${temp}°C`;
+            elements.humidityValue.textContent = `${humidity}%`;
+            elements.lcdLine1.textContent = `Temp: ${temp}°C`;
+            elements.lcdLine2.textContent = `Humidity: ${humidity}%`;
+            elements.lcdLine1.classList.add("updating");
+            elements.lcdLine2.classList.add("updating");
+            setTimeout(() => {
+                elements.lcdLine1.classList.remove("updating");
+                elements.lcdLine2.classList.remove("updating");
+            }, 600);
+        }
+
+        function testConnection() {
+            if (!powerOn) {
+                alert("Avval quvvatni yoqing!");
+                return;
+            }
+            elements.statusValue.textContent = "Ulanish muvaffaqiyatli!";
+            elements.dht11.classList.add("connection-active");
+            setTimeout(() => elements.dht11.classList.remove("connection-active"), 3000);
+        }
+
+        function openModal(id) {
+            document.getElementById(id).style.display = "block";
+        }
+
+        document.querySelectorAll(".close").forEach(btn => {
+            btn.onclick = () => btn.parentElement.parentElement.style.display = "none";
+        });
+
+        window.onclick = (e) => {
+            if (e.target.classList.contains("modal")) e.target.style.display = "none";
+        };
+
+        document.querySelectorAll(".tab-btn").forEach(btn => {
+            btn.addEventListener("click", () => {
+                document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+                document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+                btn.classList.add("active");
+                document.getElementById(btn.dataset.tab).classList.add("active");
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,46 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background: #fdf7e5;
+}
+
+h1 {
+    background: #aa00ff;
+    color: white;
+    padding: 10px;
+    margin-bottom: 20px;
+}
+
+.circuit {
+    position: relative;
+    width: 800px;
+    height: 500px;
+    margin: auto;
+    border: 2px dashed #555;
+    background-color: #fffbe6;
+}
+
+.component {
+    position: absolute;
+    width: 100px;
+}
+
+.arduino { top: 50px; left: 100px; }
+.sensor { top: 60px; left: 350px; }
+.buzzer { top: 220px; left: 350px; }
+.car { bottom: 50px; left: 300px; width: 150px; }
+.wall { bottom: 50px; right: 50px; width: 100px; }
+
+#wires {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 800px;
+    height: 500px;
+    z-index: 0;
+}
+
+.status {
+    margin-top: 20px;
+    font-size: 18px;
+}

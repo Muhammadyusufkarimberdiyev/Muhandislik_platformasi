@@ -1,0 +1,1306 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tutun Detektori Sxemasi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: white;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: auto;
+        }
+
+        /* HEADER */
+        .header {
+            display: flex;
+            align-items: center;
+            background: #000075;
+            color: white;
+            padding: 10px 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            width: 100%;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .logo-icon img {
+            border-radius: 50%;
+            border: 2px solid white;
+            width: 40px;
+            height: 40px;
+        }
+
+        /* MAIN LAYOUT */
+        .main-container {
+            display: flex;
+            margin-top: 20px;
+            gap: 20px;
+        }
+
+        /* LEFT PANEL */
+        .left-panel {
+            width: 250px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            height: fit-content;
+            position: relative;
+            z-index: 1;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 15px;
+        }
+
+        .control-group h3 {
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 8px;
+            font-size: 14px;
+            border-radius: 5px;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn-success { 
+            background: #28a745; 
+            color: white; 
+        }
+        .btn-danger { 
+            background: #dc3545; 
+            color: white; 
+        }
+        .btn-primary { 
+            background: #000075; 
+            color: white; 
+        }
+        .btn-info { 
+            background: #000075; 
+            color: white; 
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .title-header {
+            background: linear-gradient(45deg, #ff6b35, #f7931e);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0 auto 30px;
+            text-align: center;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        /* CIRCUIT BOARD */
+        .circuit-container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            position: relative;
+            min-height: 600px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .circuit-title {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: #00ff00;
+            padding: 8px 20px;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 16px;
+            z-index: 10;
+        }
+
+        /* MQ2 SENSOR */
+        .mq2-sensor {
+            position: absolute;
+            top: 200px;
+            left: 300px;
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(145deg, #2c5530, #4a7c59);
+            border-radius: 50%;
+            border: 4px solid #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 5px 5px 15px rgba(0,0,0,0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .mq2-sensor:hover {
+            transform: scale(1.05);
+        }
+
+        .sensor-label {
+            background: #333;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: bold;
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+        }
+
+        /* BUZZER */
+        .buzzer {
+            position: absolute;
+            top: 150px;
+            right: 600px;
+            width: 50px;
+            height: 30px;
+            background: linear-gradient(145deg, #1a1a1a, #333);
+            border-radius: 15px;
+            border: 2px solid #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 3px 3px 10px rgba(0,0,0,0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .buzzer.active {
+            background: linear-gradient(145deg, #ff4500, #ff6347);
+            animation: buzzerVibrate 0.1s infinite alternate;
+        }
+
+        @keyframes buzzerVibrate {
+            0% { transform: translateX(-1px); }
+            100% { transform: translateX(1px); }
+        }
+
+        .buzzer-label {
+            
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: bold;
+            position: absolute;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        /* LED */
+        .led {
+            position: absolute;
+            top: 120px;
+            right: 450px;
+            width: 30px;
+            height: 50px;
+            background: linear-gradient(180deg, #ff0000, #cc0000);
+            border-radius: 15px 15px 5px 5px;
+            border: 2px solid #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 3px 3px 10px rgba(0,0,0,0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            opacity: 0.3;
+        }
+
+        .led.active {
+            opacity: 1;
+            box-shadow: 0 0 20px #ff0000, 3px 3px 10px rgba(0,0,0,0.3);
+            animation: ledBlink 0.5s infinite alternate;
+        }
+
+        @keyframes ledBlink {
+            0% { 
+                box-shadow: 0 0 15px #ff0000;
+                transform: scale(1);
+            }
+            100% { 
+                box-shadow: 0 0 25px #ff0000;
+                transform: scale(1.05);
+            }
+        }
+
+        .led-label {
+            background: #333;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: bold;
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        /* BATTERY */
+        .battery {
+            position: absolute;
+            top: 300px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 40px;
+      
+            border-radius: 8px;
+            border: 2px solid #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 3px 3px 10px rgba(0,0,0,0.3);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .battery::after {
+            content: '';
+            position: absolute;
+            right: -8px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 6px;
+            height: 20px;
+            background: #333;
+            border-radius: 2px;
+        }
+
+        .battery-label {
+            background: #333;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: bold;
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .battery-voltage {
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        /* CHARGING PHONE */
+        .phone {
+            position: absolute;
+            top: 300px;
+            right: 50px;
+            width: 60px;
+            height: 100px;
+            background: linear-gradient(145deg, #2c3e50, #34495e);
+            border-radius: 8px;
+            border: 2px solid #1a252f;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 3px 3px 10px rgba(0,0,0,0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .phone-screen {
+            width: 45px;
+            height: 70px;
+            background: #000;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #00ff00;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .charging-cable {
+            position: absolute;
+            bottom: -5px;
+            width: 20px;
+            height: 8px;
+            background: #333;
+            border-radius: 4px;
+        }
+
+        .charging-indicator {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .phone.charging .charging-indicator {
+            opacity: 1;
+            animation: chargingPulse 1s infinite alternate;
+        }
+
+        @keyframes chargingPulse {
+            0% { color: #00ff00; }
+            100% { color: #32ff32; }
+        }
+
+        /* WIRES */
+        .wire {
+            position: absolute;
+            background: #333;
+            z-index: 1;
+        }
+
+        .wire-red { background: #ff0000;
+        width: 260px;
+        height: 3px; top: 258px; left: 460px; }
+         .wire-red1 { background: #ff0000;
+        width: 3px;
+        height: 90px; top: 258px; right: 450px; }
+          .wire-red2 { background: #ff0000;
+        width: 3px;
+        height: 90px; top: 170px; right: 455px; }
+          .wire-red3 { background: #ff0000;
+        width: 3px;
+        height: 60px; top: 200px; left: 572px; }
+         .wire-red4 { background: #ff0000;
+        width: 13px;   height: 3px; bottom: 250px; right: 450px; }
+        .wire-black { background: #000000;   width: 262px;   height: 3px; bottom: 353px; left: 440px; }
+         .wire-black1 { background: #000000; width: 3px;   height: 50px; bottom: 355px; left: 529px;}
+          .wire-black2 { background: #000000;width: 3px;   height: 78px; bottom: 353px; left: 700px; }
+           .wire-black3 { background: #000000;width: 85px;   height: 3px; bottom: 382px; left: 445px; }
+               .wire-black4 { background: #000000;   width: 3px;   height: 100px; bottom: 253px; left: 450px; }
+                 .wire-black5 { background: black;
+        width: 13px;   height: 3px; bottom: 250px; left: 450px; }
+        .wire-blue { background: #0066ff; }
+
+        
+
+        /* SMOKE ANIMATION - YAXSHILANGAN */
+        .smoke-container {
+            position: absolute;
+            top: 200px;
+            left: 265px;
+            width: 80px;
+            height: 80px;
+            pointer-events: none;
+            z-index: 5;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .smoke-container.active {
+            opacity: 1;
+        }
+
+        /* SMOKE GIF/VIDEO */
+        .smoke-gif {
+            position: absolute;
+            top: -20px;
+            left: -10px;
+            width: 100px;
+            height: 150px;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="150" viewBox="0 0 100 150"><defs><filter id="blur"><feGaussianBlur stdDeviation="2"/></filter></defs><g filter="url(%23blur)"><circle cx="50" cy="130" r="8" fill="%23888" opacity="0.8"><animate attributeName="cy" values="130;80;30;-10" dur="3s" repeatCount="indefinite"/><animate attributeName="r" values="8;12;18;25" dur="3s" repeatCount="indefinite"/><animate attributeName="opacity" values="0.8;0.6;0.3;0" dur="3s" repeatCount="indefinite"/></circle><circle cx="45" cy="135" r="6" fill="%23999" opacity="0.7"><animate attributeName="cy" values="135;85;35;-5" dur="3.2s" repeatCount="indefinite" begin="0.3s"/><animate attributeName="r" values="6;10;16;22" dur="3.2s" repeatCount="indefinite" begin="0.3s"/><animate attributeName="opacity" values="0.7;0.5;0.2;0" dur="3.2s" repeatCount="indefinite" begin="0.3s"/></circle><circle cx="55" cy="132" r="7" fill="%23777" opacity="0.6"><animate attributeName="cy" values="132;82;32;-8" dur="3.5s" repeatCount="indefinite" begin="0.6s"/><animate attributeName="r" values="7;11;17;24" dur="3.5s" repeatCount="indefinite" begin="0.6s"/><animate attributeName="opacity" values="0.6;0.4;0.2;0" dur="3.5s" repeatCount="indefinite" begin="0.6s"/></circle></g></svg>');
+            background-repeat: no-repeat;
+            background-size: contain;
+            opacity: 0;
+            display: none;
+        }
+
+        .smoke-container.active .smoke-gif {
+            display: block;
+            opacity: 1;
+            animation: smokeGifAnimation 0.5s ease-in;
+        }
+
+        @keyframes smokeGifAnimation {
+            0% { opacity: 0; transform: scale(0.5); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .smoke {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0;
+        }
+
+        .smoke-container.active .smoke {
+            animation: smokeRise 2.5s infinite linear;
+        }
+
+        /* KATTA VA KO'P TUTUN ZARRALARI */
+        .smoke:nth-child(1) { 
+            width: 12px; height: 12px;
+            left: 35px; bottom: 0;
+            animation-delay: 0s; 
+            background: radial-gradient(circle,black, rgba(180, 180, 180, 0.4));
+        }
+        .smoke:nth-child(2) { 
+            width: 15px; height: 15px;
+            left: 40px; bottom: 0;
+            animation-delay: 0.2s; 
+            background: radial-gradient(circle, rgba(130, 130, 130, 0.8), rgba(170, 170, 170, 0.3));
+        }
+        .smoke:nth-child(3) { 
+            width: 18px; height: 18px;
+            left: 30px; bottom: 0;
+            animation-delay: 0.4s; 
+            background: radial-gradient(circle, black, rgba(190, 190, 190, 0.3));
+        }
+        .smoke:nth-child(4) { 
+            width: 14px; height: 14px;
+            left: 45px; bottom: 0;
+            animation-delay: 0.6s; 
+            background: radial-gradient(circle, rgba(125, 125, 125, 0.8), rgba(165, 165, 165, 0.4));
+        }
+        .smoke:nth-child(5) { 
+            width: 20px; height: 20px;
+            left: 32px; bottom: 0;
+            animation-delay: 0.8s; 
+            background: radial-gradient(circle, black, rgba(175, 175, 175, 0.3));
+        }
+        .smoke:nth-child(6) { 
+            width: 16px; height: 16px;
+            left: 38px; bottom: 0;
+            animation-delay: 1.0s; 
+            background: radial-gradient(circle, rgba(145, 145, 145, 0.6), rgba(185, 185, 185, 0.3));
+        }
+        .smoke:nth-child(7) { 
+            width: 22px; height: 22px;
+            left: 28px; bottom: 0;
+            animation-delay: 1.2s; 
+            background: radial-gradient(circle, black, rgba(160, 160, 160, 0.4));
+        }
+        .smoke:nth-child(8) { 
+            width: 17px; height: 17px;
+            left: 42px; bottom: 0;
+            animation-delay: 1.4s; 
+            background: radial-gradient(circle, rgba(155, 155, 155, 0.7), rgba(195, 195, 195, 0.3));
+        }
+        .smoke:nth-child(9) { 
+            width: 19px; height: 19px;
+            left: 36px; bottom: 0;
+            animation-delay: 1.6s; 
+            background: radial-gradient(circle, black, rgba(150, 150, 150, 0.4));
+        }
+        .smoke:nth-child(10) { 
+            width: 24px; height: 24px;
+            left: 31px; bottom: 0;
+            animation-delay: 1.8s; 
+            background: radial-gradient(circle, black, rgba(180, 180, 180, 0.3));
+        }
+        .smoke:nth-child(11) { 
+            width: 13px; height: 13px;
+            left: 44px; bottom: 0;
+            animation-delay: 2.0s; 
+            background: radial-gradient(circle, rgba(160, 160, 160, 0.8), rgba(200, 200, 200, 0.3));
+        }
+        .smoke:nth-child(12) { 
+            width: 21px; height: 21px;
+            left: 26px; bottom: 0;
+            animation-delay: 2.2s; 
+            background: radial-gradient(circle, rgba(115, 115, 115, 0.9), rgba(155, 155, 155, 0.4));
+        }
+
+        @keyframes smokeRise {
+            0% {
+                opacity: 0;
+                transform: translateY(0) translateX(0) scale(0.3);
+            }
+            10% {
+                opacity: 0.9;
+                transform: translateY(-15px) translateX(2px) scale(0.6);
+            }
+            30% {
+                opacity: 0.8;
+                transform: translateY(-40px) translateX(-5px) scale(1.0);
+            }
+            50% {
+                opacity: 0.6;
+                transform: translateY(-70px) translateX(8px) scale(1.4);
+            }
+            70% {
+                opacity: 0.4;
+                transform: translateY(-100px) translateX(-3px) scale(1.8);
+            }
+            85% {
+                opacity: 0.2;
+                transform: translateY(-130px) translateX(6px) scale(2.2);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-160px) translateX(-4px) scale(2.5);
+            }
+        }
+
+        /* QO'SHIMCHA SMOKE EFFECTS */
+        .smoke-container::before {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 30px;
+            width: 40px;
+            height: 20px;
+            background: radial-gradient(ellipse, rgba(100, 100, 100, 0.3), transparent);
+            border-radius: 50%;
+            animation: smokeBase 2s ease-in-out infinite;
+        }
+
+        @keyframes smokeBase {
+            0%, 100% { 
+                opacity: 0.3;
+                transform: scale(1);
+            }
+            50% { 
+                opacity: 0.6;
+                transform: scale(1.2);
+            }
+        }
+
+        .smoke-container.active::after {
+            content: '';
+            position: absolute;
+            top: -50px;
+            left: 20px;
+            width: 60px;
+            height: 100px;
+            background: linear-gradient(to top, 
+                rgba(120, 120, 120, 0.1), 
+                rgba(150, 150, 150, 0.05), 
+                transparent);
+            border-radius: 30px;
+            animation: smokeCloud 3s ease-out infinite;
+        }
+
+        @keyframes smokeCloud {
+            0% { 
+                opacity: 0;
+                transform: translateY(50px) scale(0.5);
+            }
+            50% { 
+                opacity: 0.3;
+                transform: translateY(-20px) scale(1);
+            }
+            100% { 
+                opacity: 0;
+                transform: translateY(-80px) scale(1.5);
+            }
+        }
+
+        /* STATUS DISPLAY */
+        .status-display {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            min-width: 220px;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            z-index: 100;
+        }
+
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 8px 0;
+            font-size: 13px;
+        }
+
+        .status-led {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #dc3545;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+        }
+
+        .status-led.on {
+            background: #28a745;
+            box-shadow: 0 0 10px rgba(40, 167, 69, 0.8);
+        }
+
+        .status-led.alert {
+            background: #ff6b35;
+            box-shadow: 0 0 10px rgba(255, 107, 53, 0.8);
+            animation: alertBlink 0.5s infinite alternate;
+        }
+
+        @keyframes alertBlink {
+            0% { opacity: 1; }
+            100% { opacity: 0.3; }
+        }
+
+        /* CONTROL BUTTONS */
+        .control-panel {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        .control-button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            min-width: 120px;
+        }
+
+        .btn-power {
+            background: linear-gradient(45deg, #4169e1, #8a2be2);
+            color: white;
+        }
+
+        .btn-smoke {
+            background: linear-gradient(45deg, #ff6b35, #ff8c42);
+            color: white;
+        }
+
+        .btn-reset {
+            background: #000075;
+            color: white;
+        }
+
+        .control-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .left-panel {
+                width: 100%;
+            }
+            
+            .status-display {
+                position: relative;
+                margin: 20px auto;
+                width: fit-content;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .circuit-container {
+                padding: 20px;
+                min-height: 500px;
+            }
+            
+            .control-panel {
+                position: relative;
+                margin-top: 30px;
+                transform: none;
+                left: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="logo">
+      <a href="/"><img src="/static/image/logo.png" width="80px" height="80px" alt=""></a>
+            <span>Tutun Detektori Sxemasi</span>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <div class="main-container">
+        <!-- LEFT PANEL -->
+        <div class="left-panel">
+            <div class="control-group">
+                <h3>Boshqaruv</h3>
+                <button class="btn btn-success" onclick="togglePower()" id="powerBtn">
+                    ⚡ Quvvat yoqish
+                </button>
+                <button class="btn btn-danger" onclick="triggerSmoke()" id="smokeBtn">
+                    💨 Tutun simulyatsiyasi
+                </button>
+                <button class="btn btn-primary" onclick="testSystem()">
+                    🔍 Tizimni sinash
+                </button>
+                <button class="btn btn-info" onclick="resetSystem()">
+                    🔄 Qayta o'rnatish
+                </button>
+            </div>
+
+            <div class="control-group">
+                <h3>Qurilma holati</h3>
+                <div class="status-row">
+                    <span>Quvvat:</span>
+                    <div class="status-led" id="powerLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>MQ2 Sensor:</span>
+                    <div class="status-led" id="sensorLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>LED:</span>
+                    <div class="status-led" id="ledLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Buzzer:</span>
+                    <div class="status-led" id="buzzerLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Telefon zaryadka:</span>
+                    <div class="status-led" id="chargeLed"></div>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <h3>Sozlamalar</h3>
+                <button class="btn btn-primary" onclick="adjustSensitivity()">
+                    ⚙️ Sezgirlik sozlash
+                </button>
+                <button class="btn btn-primary" onclick="showInfo()">
+                    ℹ️ Ma'lumot
+                </button>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+            <div class="title-header">🔥 Tutun Detektori Sxemasi</div>
+            
+            <div class="circuit-container">
+      
+                
+                <!-- MQ2 SENSOR -->
+                <div class="mq2-sensor" id="mq2Sensor" onclick="toggleSensor()">
+                    <div class="sensor-label">MQ2 Sensor</div>
+                    <img src="/static/image/mq2.2-removebg-preview.png" width="300px" height="300px" alt="">
+                </div>
+
+                <!-- SMOKE ANIMATION - TUZATILGAN -->
+                <div class="smoke-container" id="smokeContainer">
+                    <div class="smoke"></div>
+                    <div class="smoke"></div>
+                    <div class="smoke"></div>
+                    <div class="smoke"></div>
+                    <div class="smoke"></div>
+                    <div class="smoke"></div>
+                    <div class="smoke"></div>
+                    <div class="smoke"></div>
+                    <div class="smoke"></div>
+                    <div class="smoke"></div>
+                      <div class="smoke"></div>
+                    <div class="smoke"></div>
+                    <div class="smoke"></div>
+                </div>
+
+                <!-- BUZZER -->
+                <div class="buzzer" id="buzzer" onclick="toggleBuzzer()">
+                    <div class="buzzer-label">Buzzer</div>
+                   <img src="/static/image/buzzer3.png" width="150px" height="150px" alt="">
+                </div>
+
+                <!-- LED -->
+                <div class="led" id="led" onclick="toggleLed()">
+                    <div class="led-label">LED</div>
+                </div>
+
+                <!-- BATTERY -->
+                <div class="battery" id="battery">
+                    <div class="battery-label">3.7V Battery</div>
+                    <img src="/static/image/litium - Copy.png" width="250px" height="100px" alt="">
+                </div>
+
+                <!-- PHONE -->
+           
+
+                <!-- WIRES -->
+                <div class="wire wire-red "></div>
+                <div class="wire wire-black "></div>
+                <div class="wire wire-red1 "></div>
+                <div class="wire wire-black1 "></div>
+                <div class="wire wire-red2 "></div>
+                 <div class="wire wire-red3 "></div>
+                  <div class="wire wire-red4 "></div>
+                    <div class="wire wire-black2 "></div>
+                      <div class="wire wire-black3 "></div>
+                      <div class="wire wire-black4 "></div>
+                      <div class="wire wire-black5 "></div>
+            </div>
+
+            <!-- STATUS DISPLAY -->
+            <div class="status-display">
+                <h4 style="margin-bottom: 10px;">📊 Tizim holati</h4>
+                <div class="status-row">
+                    <span>Tutun darajasi:</span>
+                    <span id="smokeLevel">0 ppm</span>
+                </div>
+                <div class="status-row">
+                    <span>Batareya:</span>
+                    <span id="batteryLevel">3.7V</span>
+                </div>
+                <div class="status-row">
+                    <span>Telefon zaryadka:</span>
+                    <span id="chargeLevel">97%</span>
+                </div>
+                <div class="status-row">
+                    <span>Tizim holati:</span>
+                    <span id="systemStatus">Normal</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONTROL PANEL -->
+    <div class="control-panel">
+        <button class="control-button btn-power" onclick="togglePower()">
+            ⚡ Quvvat
+        </button>
+        <button class="control-button btn-smoke" onclick="triggerSmoke()">
+            💨 Tutun
+        </button>
+        <button class="control-button btn-reset" onclick="resetSystem()">
+            🔄 Reset
+        </button>
+    </div>
+
+    <script>
+        // System State Variables
+        let systemPower = false;
+        let smokeDetected = false;
+        let buzzerActive = false;
+        let ledActive = false;
+        let phoneCharging = false;
+        let smokeLevel = 0;
+        let smokeAnimationInterval = null;
+
+        // DOM Elements
+        const elements = {
+            powerLed: document.getElementById('powerLed'),
+            sensorLed: document.getElementById('sensorLed'),
+            ledLed: document.getElementById('ledLed'),
+            buzzerLed: document.getElementById('buzzerLed'),
+            chargeLed: document.getElementById('chargeLed'),
+            mq2Sensor: document.getElementById('mq2Sensor'),
+            buzzer: document.getElementById('buzzer'),
+            led: document.getElementById('led'),
+            phone: document.getElementById('phone'),
+            smokeContainer: document.getElementById('smokeContainer'),
+            smokeLevel: document.getElementById('smokeLevel'),
+            batteryLevel: document.getElementById('batteryLevel'),
+            chargeLevel: document.getElementById('chargeLevel'),
+            systemStatus: document.getElementById('systemStatus'),
+            powerBtn: document.getElementById('powerBtn'),
+            smokeBtn: document.getElementById('smokeBtn')
+        };
+
+        // Update Status LEDs
+        function updateStatus() {
+            elements.powerLed.classList.toggle('on', systemPower);
+            elements.sensorLed.classList.toggle('alert', smokeDetected);
+            elements.ledLed.classList.toggle('alert', ledActive);
+            elements.buzzerLed.classList.toggle('alert', buzzerActive);
+            elements.chargeLed.classList.toggle('on', phoneCharging);
+
+            // Update text displays
+            elements.smokeLevel.textContent = smokeLevel + ' ppm';
+            elements.systemStatus.textContent = smokeDetected ? 'OGOHLANTIRISH!' : 'Normal';
+            
+            // Update charging percentage
+            if (phoneCharging) {
+                let charge = Math.min(100, parseInt(elements.chargeLevel.textContent) + 1);
+                elements.chargeLevel.textContent = charge + '%';
+                elements.phone.querySelector('.charging-indicator').textContent = `🔋 ${charge}%`;
+            }
+        }
+
+        // Power Control
+        function togglePower() {
+            systemPower = !systemPower;
+            
+            if (systemPower) {
+                elements.powerBtn.textContent = '⚡ Quvvatni o\'chirish';
+                elements.powerBtn.classList.remove('btn-success');
+                elements.powerBtn.classList.add('btn-danger');
+                phoneCharging = true;
+                elements.phone.classList.add('charging');
+            } else {
+                elements.powerBtn.textContent = '⚡ Quvvat yoqish';
+                elements.powerBtn.classList.remove('btn-danger');
+                elements.powerBtn.classList.add('btn-success');
+                resetAllSystems();
+            }
+            
+            updateStatus();
+        }
+
+        // Smoke Detection - TUZATILGAN
+        function triggerSmoke() {
+            if (!systemPower) {
+                alert('Avval quvvatni yoqing!');
+                return;
+            }
+            
+            smokeDetected = !smokeDetected;
+            
+            if (smokeDetected) {
+                // Tutun animatsiyasini yoqish
+                elements.smokeContainer.classList.add('active');
+                elements.smokeBtn.textContent = '💨 Tutunni to\'xtatish';
+                elements.smokeBtn.classList.remove('btn-danger');
+                elements.smokeBtn.classList.add('btn-success');
+                
+                smokeLevel = Math.floor(Math.random() * 500) + 300; // 300-800 ppm
+                
+                // Ogohlantirish tizimini yoqish
+                activateAlarm();
+                
+                // Tutun zarralarini yaratish
+                createSmokeParticles();
+                
+            } else {
+                // Tutun animatsiyasini o'chirish
+                elements.smokeContainer.classList.remove('active');
+                elements.smokeBtn.textContent = '💨 Tutun simulyatsiyasi';
+                elements.smokeBtn.classList.remove('btn-success');
+                elements.smokeBtn.classList.add('btn-danger');
+                
+                smokeLevel = 0;
+                
+                // Ogohlantirish tizimini o'chirish
+                deactivateAlarm();
+            }
+            
+            updateStatus();
+        }
+
+        // Create dynamic smoke particles - TUZATILGAN
+        function createSmokeParticles() {
+            const smokeContainer = elements.smokeContainer;
+            
+            // Mavjud zarralarni tozalash
+            smokeContainer.innerHTML = '';
+            
+            // Yangi zarralar yaratish
+            for (let i = 0; i < 8; i++) {
+                const smoke = document.createElement('div');
+                smoke.className = 'smoke';
+                smoke.style.left = (15 + Math.random() * 20) + 'px';
+                smoke.style.animationDelay = (Math.random() * 2) + 's';
+                smoke.style.animationDuration = (2 + Math.random() * 2) + 's';
+                smokeContainer.appendChild(smoke);
+            }
+        }
+
+        // Activate Alarm Systems
+        function activateAlarm() {
+            ledActive = true;
+            buzzerActive = true;
+            
+            elements.led.classList.add('active');
+            elements.buzzer.classList.add('active');
+            elements.mq2Sensor.style.background = 'linear-gradient(145deg, #ff4757, #ff6b82)';
+            
+            // Buzzer ovozini yoqish
+            playBuzzerSound();
+        }
+
+        // Deactivate Alarm Systems
+        function deactivateAlarm() {
+            ledActive = false;
+            buzzerActive = false;
+            
+            elements.led.classList.remove('active');
+            elements.buzzer.classList.remove('active');
+            elements.mq2Sensor.style.background = 'linear-gradient(145deg, #2c5530, #4a7c59)';
+            
+            // Buzzer ovozini o'chirish
+            stopBuzzerSound();
+        }
+
+        // Buzzer Sound Control - YAXSHILANGAN
+        let audioContext = null;
+        let buzzerInterval = null;
+
+        function playBuzzerSound() {
+            if (!buzzerActive) return;
+            
+            try {
+                if (!audioContext) {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                
+                // Beep ovozini yaratish
+                function createBeep() {
+                    if (!buzzerActive) return;
+                    
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+                    oscillator.frequency.setValueAtTime(1000, audioContext.currentTime + 0.1);
+                    
+                    gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+                    gainNode.gain.linearRampToValueAtTime(0.1, audioContext.currentTime + 0.01);
+                    gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.2);
+                    
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.2);
+                }
+                
+                // Dastlabki beep
+                createBeep();
+                
+                // Takroriy beeplar
+                buzzerInterval = setInterval(createBeep, 600);
+                
+            } catch (error) {
+                console.log('Audio yaratishda xatolik:', error);
+            }
+        }
+
+        function stopBuzzerSound() {
+            buzzerActive = false;
+            if (buzzerInterval) {
+                clearInterval(buzzerInterval);
+                buzzerInterval = null;
+            }
+        }
+
+        // Individual Component Controls
+        function toggleSensor() {
+            if (!systemPower) return;
+            triggerSmoke();
+        }
+
+        function toggleLed() {
+            if (!systemPower) return;
+            ledActive = !ledActive;
+            elements.led.classList.toggle('active', ledActive);
+            updateStatus();
+        }
+
+        function toggleBuzzer() {
+            if (!systemPower) return;
+            buzzerActive = !buzzerActive;
+            elements.buzzer.classList.toggle('active', buzzerActive);
+            
+            if (buzzerActive) {
+                playBuzzerSound();
+            } else {
+                stopBuzzerSound();
+            }
+            updateStatus();
+        }
+
+        function toggleCharging() {
+            if (!systemPower) return;
+            phoneCharging = !phoneCharging;
+            elements.phone.classList.toggle('charging', phoneCharging);
+            updateStatus();
+        }
+
+        // System Controls
+        function testSystem() {
+            if (!systemPower) {
+                alert('Avval quvvatni yoqing!');
+                return;
+            }
+            
+            alert('Tizim sinovi boshlandi...\n\n1. LED sinovi\n2. Buzzer sinovi\n3. Tutun sensor sinovi');
+            
+            // Test sequence
+            setTimeout(() => {
+                // LED testi
+                ledActive = true;
+                elements.led.classList.add('active');
+                updateStatus();
+                
+                setTimeout(() => {
+                    // Buzzer testi
+                    buzzerActive = true;
+                    elements.buzzer.classList.add('active');
+                    playBuzzerSound();
+                    updateStatus();
+                    
+                    setTimeout(() => {
+                        // Tutun sensor testi
+                        triggerSmoke();
+                        
+                        setTimeout(() => {
+                            // Test tugashi
+                            triggerSmoke(); // Tutunni o'chirish
+                            ledActive = false;
+                            buzzerActive = false;
+                            elements.led.classList.remove('active');
+                            elements.buzzer.classList.remove('active');
+                            stopBuzzerSound();
+                            updateStatus();
+                            
+                            alert('Tizim sinovi muvaffaqiyatli yakunlandi!\n\n✅ Barcha komponentlar ishlayapti');
+                        }, 3000);
+                    }, 2000);
+                }, 2000);
+            }, 1000);
+        }
+
+        function resetSystem() {
+            resetAllSystems();
+            systemPower = false;
+            elements.powerBtn.textContent = '⚡ Quvvat yoqish';
+            elements.powerBtn.classList.remove('btn-danger');
+            elements.powerBtn.classList.add('btn-success');
+            elements.smokeBtn.textContent = '💨 Tutun simulyatsiyasi';
+            elements.smokeBtn.classList.remove('btn-success');
+            elements.smokeBtn.classList.add('btn-danger');
+            updateStatus();
+            alert('Tizim qayta o\'rnatildi!');
+        }
+
+        function resetAllSystems() {
+            smokeDetected = false;
+            ledActive = false;
+            buzzerActive = false;
+            phoneCharging = false;
+            smokeLevel = 0;
+            
+            elements.smokeContainer.classList.remove('active');
+            elements.led.classList.remove('active');
+            elements.buzzer.classList.remove('active');
+            elements.phone.classList.remove('charging');
+            elements.mq2Sensor.style.background = 'linear-gradient(145deg, #2c5530, #4a7c59)';
+            
+            stopBuzzerSound();
+        }
+
+        function adjustSensitivity() {
+            if (!systemPower) {
+                alert('Avval quvvatni yoqing!');
+                return;
+            }
+            
+            const sensitivity = prompt('Sensor sezgirligini kiriting (1-10):', '5');
+            if (sensitivity && sensitivity >= 1 && sensitivity <= 10) {
+                alert(`Sensor sezgirligi ${sensitivity}/10 ga sozlandi!\n\nYuqori sezgirlik = Tezroq aniqlash\nPast sezgirlik = Noto'g'ri signallar kamroq`);
+            } else if (sensitivity !== null) {
+                alert('Iltimos, 1 dan 10 gacha bo\'lgan raqam kiriting!');
+            }
+        }
+
+        function showInfo() {
+            alert(`🔥 TUTUN DETEKTORI SXEMASI\n\n` +
+                  `🔋 KOMPONENTLAR:\n` +
+                  `• MQ2 Gaz sensori - tutun va gazlarni aniqlaydi\n` +
+                  `• LED - vizual ogohlantirish\n` +
+                  `• Buzzer - ovozli ogohlantirish\n` +
+                  `• 3.7V Li-ion batareya - quvvat manbai\n` +
+                  `• Telefon zaryadka porti\n\n` +
+                  `⚡ ISHLASH PRINSIPI:\n` +
+                  `1. MQ2 sensor tutun yoki gazni aniqlaydi\n` +
+                  `2. Signal mikrokontrollerga uzatiladi\n` +
+                  `3. LED va buzzer ishga tushadi\n` +
+                  `4. Telefon zaryadlash davom etadi\n\n` +
+                  `🚨 XAVFSIZLIK:\n` +
+                  `• Batareya darajasini kuzatib boring\n` +
+                  `• Sensorni vaqti-vaqti bilan sinang\n` +
+                  `• Noto'g'ri signallardan saqlaning`);
+        }
+
+        // Initialize system
+        function init() {
+            updateStatus();
+            console.log('Tutun detektori tizimi ishga tushdi!');
+            
+            // Batareya darajasi animatsiyasi
+            setInterval(() => {
+                if (systemPower) {
+                    updateStatus();
+                }
+            }, 2000);
+            
+            // Audio context ishga tushirish uchun user interaction kutish
+            document.addEventListener('click', function initAudio() {
+                if (!audioContext) {
+                    try {
+                        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                        if (audioContext.state === 'suspended') {
+                            audioContext.resume();
+                        }
+                        console.log('Audio context tayyor!');
+                    } catch (error) {
+                        console.log('Audio context yaratib bo\'lmadi:', error);
+                    }
+                }
+                document.removeEventListener('click', initAudio);
+            });
+        }
+
+        // Auto-start
+        init();
+    </script>
+</body>
+</html>

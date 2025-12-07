@@ -1,0 +1,566 @@
+
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Milliy Muhandislik Platformasi</title>
+  <link rel="stylesheet" href="/static/style.css"/>
+  <link rel="stylesheet" href="/static/ai_style.css"/>
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+ <header>
+        <nav>
+            <a href="/"><img src="/static/image/logo.png" alt="Logo" /></a>
+           <div class="search-box">
+                <i class="fa fa-search"></i>
+                <input type="text" placeholder="Qidiruv...">
+            </div>
+
+            <div class="menu-toggle" id="menuToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+
+            <ul id="navMenu">
+                <a href="/"><li>Asosiy sahifa</li></a>
+                <a href="#we"><li>Biz haqimizda</li></a>
+                <a href="#techno"><li>Texnologiya</li></a>
+                <a href="#partners"><li>Hamkorlarimiz</li></a>
+            </ul>
+        </nav>
+    </header>
+  
+  <section>
+    <div class="con">
+        <div class="header">
+            <h1 class="title">Suniy Intellekt</h1>
+            <button class="ai-btn" onclick="openAITools()">
+                <i class="fas fa-brain"></i> Suniy Intellekt Vositalari
+            </button>
+        </div>
+
+        <!-- AI Categories Section -->
+        <div class="ai-categories">
+            <h2 class="section-subtitle">Suniy Intellekt Turlari</h2>
+            <div class="category-grid">
+                <div class="category-card1" onclick="selectCategory('text')">
+                    <div class="category-icon">
+                        <i class="fas fa-edit"></i>
+                    </div>
+                    <div class="category-title">Matn Suniy Intellektlar</div>
+                    <div class="category-desc">ChatGPT, Claude, Gemini</div>
+                </div>
+
+                <div class="category-card1" onclick="selectCategory('image')">
+                    <div class="category-icon">
+                        <i class="fas fa-image"></i>
+                    </div>
+                    <div class="category-title">Rasm Suniy Intellektlar</div>
+                    <div class="category-desc">DALL-E, Midjourney, Stable Diffusion</div>
+                </div>
+
+                <div class="category-card1" onclick="selectCategory('video')">
+                    <div class="category-icon">
+                        <i class="fas fa-video"></i>
+                    </div>
+                    <div class="category-title">Video Suniy Intellektlar</div>
+                    <div class="category-desc">Sora, Runway, Luma AI</div>
+                </div>
+
+                <div class="category-card1" onclick="selectCategory('code')">
+                    <div class="category-icon">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <div class="category-title">Kod Suniy Intellektlar</div>
+                    <div class="category-desc">GitHub Copilot, CodeWhisperer</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Tools Grid -->
+        <div class="tools-section">
+            <h2 class="section-subtitle">Suniy Intellekt Vositalari</h2>
+            <div class="tools-grid" id="toolsGrid">
+                <!-- First row -->
+                <a href="https://chatgpt.com/"><div class="tool-card" onclick="selectTool(1)">
+                    <div class="tool-image">
+                        <i class="fas fa-comments ai-icon-1"></i>
+                    </div>
+                    <div class="card-title">ChatGPT</div>
+                    <div class="card-stats">
+                        <div class="stat-item">
+                            <i class="fas fa-star"></i>
+                            <span>Matn</span>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-users"></i>
+                            <span>100M+ foydalanuvchi</span>
+                        </div>
+                    </div>
+                    <div class="tool-description">Eng mashhur chat bot, savol-javob, yozish, tarjima</div>
+                </div></a>
+
+                <a href="https://www.midjourney.com/"><div class="tool-card" onclick="selectTool(2)">
+                    <div class="tool-image">
+                        <i class="fas fa-palette ai-icon-2"></i>
+                    </div>
+                    <div class="card-title">Midjourney</div>
+                    <div class="card-stats">
+                        <div class="stat-item">
+                            <i class="fas fa-star"></i>
+                            <span>Rasm</span>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-magic"></i>
+                            <span>Kreativ</span>
+                        </div>
+                    </div>
+                    <div class="tool-description">Matndan professional rasm yaratish</div>
+                </div>
+
+                <a href="https://sora.chatgpt.com/"><div class="tool-card" onclick="selectTool(3)">
+                    <div class="tool-image">
+                        <i class="fas fa-film ai-icon-3"></i>
+                    </div>
+                    <div class="card-title">Sora AI</div>
+                    <div class="card-stats">
+                        <div class="stat-item">
+                            <i class="fas fa-star"></i>
+                            <span>Video</span>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-clock"></i>
+                            <span>60s video</span>
+                        </div>
+                    </div>
+                    <div class="tool-description">Matndan professional video yaratish</div>
+                </div></a>
+
+                <!-- Second row -->
+                <a href="https://github.com/features/copilot"><div class="tool-card" onclick="selectTool(4)">
+                    <div class="tool-image">
+                        <i class="fas fa-code ai-icon-4"></i>
+                    </div>
+                    <div class="card-title">GitHub Copilot</div>
+                    <div class="card-stats">
+                        <div class="stat-item">
+                            <i class="fas fa-star"></i>
+                            <span>Kod</span>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-laptop-code"></i>
+                            <span>Dasturlash</span>
+                        </div>
+                    </div>
+                    <div class="tool-description">Kod yozishda yordam beruvchi AI yordamchi</div>
+                </div></a>
+
+                <a href="https://claude.ai/"><div class="tool-card" onclick="selectTool(5)">
+                    <div class="tool-image">
+                        <i class="fas fa-brain ai-icon-5"></i>
+                    </div>
+                    <div class="card-title">Claude AI</div>
+                    <div class="card-stats">
+                        <div class="stat-item">
+                            <i class="fas fa-star"></i>
+                            <span>Kod</span>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Dasturlash</span>
+                        </div>
+                    </div>
+                    <div class="tool-description">Kod yozishda yordam beruvchi AI yordamchi</div>
+                </div></a>
+
+                <a href="https://start.elevenlabs.io/"><div class="tool-card" onclick="selectTool(6)">
+                    <div class="tool-image">
+                        <i class="fas fa-microphone ai-icon-6"></i>
+                    </div>
+                    <div class="card-title">ElevenLabs</div>
+                    <div class="card-stats">
+                        <div class="stat-item">
+                            <i class="fas fa-star"></i>
+                            <span>Audio</span>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-volume-up"></i>
+                            <span>Voice AI</span>
+                        </div>
+                    </div>
+                    <div class="tool-description">Matnni tabiiy ovozga aylantirish</div>
+                </div></a>
+            </div>
+        </div>
+
+        <!-- Prompts Section -->
+        <div class="prompts-section">
+            <h2 class="section-subtitle">Prompt Namunalari</h2>
+            <div class="prompts-grid">
+                <div class="prompt-card" onclick="copyPrompt(1)">
+                    <div class="prompt-icon">
+                        <i class="fas fa-copy"></i>
+                    </div>
+                    <div class="prompt-title">Maqola Yozish</div>
+                    <div class="prompt-text">"[Mavzu] haqida 500 so'zli informativ maqola yoz. Kirish, asosiy qism va xulosa bo'lsin."</div>
+                </div>
+
+                <div class="prompt-card" onclick="copyPrompt(2)">
+                    <div class="prompt-icon">
+                        <i class="fas fa-copy"></i>
+                    </div>
+                    <div class="prompt-title">Kod Yozish</div>
+                    <div class="prompt-text">"Python da [funksiya nomi] funksiyasini yoz. Izoh va misollar ham qo'sh."</div>
+                </div>
+
+                <div class="prompt-card" onclick="copyPrompt(3)">
+                    <div class="prompt-icon">
+                        <i class="fas fa-copy"></i>
+                    </div>
+                    <div class="prompt-title">Tarjima</div>
+                    <div class="prompt-text">"Bu matnni o'zbek tiliga tarjima qil: [matn]. Tabiiy va tushunarly bo'lsin."</div>
+                </div>
+
+                <div class="prompt-card" onclick="copyPrompt(4)">
+                    <div class="prompt-icon">
+                        <i class="fas fa-copy"></i>
+                    </div>
+                    <div class="prompt-title">Rasm Yaratish</div>
+                    <div class="prompt-text">"Professional, yuqori sifatli [tavsif] rasmi. 4K, yorqin ranglar, zamonaviy uslub.<br>[Asosiy obyekt] + [uslub] + [ranglar] + [detallar] + [kamera/kompozitsiya] + [muayyan his/atmosfera] + [texnik sifat]
+"</div>
+                </div>
+
+                <div class="prompt-card" onclick="copyPrompt(4)">
+                    <div class="prompt-icon">
+                        <i class="fas fa-copy"></i>
+                    </div>
+                    <div class="prompt-title">Universal Prompt </div>
+                    <div class="prompt-text">"Sen [son] yillik tajribaga ega mutaxasis [soha]san sen menga ushbu vazifani bajarishing kerak[Vazifa aytiladi]"</div>
+                </div>
+                  <div class="prompt-card" onclick="copyPrompt(4)">
+                    <div class="prompt-icon">
+                        <i class="fas fa-copy"></i>
+                    </div>
+                    <div class="prompt-title">Universal Prompt </div>
+                    <div class="prompt-text">"SEN: Mutaxassis rolini o'yna va quyidagiga mukammal, aniq va chizmali javob ber: [Vazifa/so'rov]. Kontekst: [kontekst]. Cheklovlar: [format, til, uzunlik, kod yoki misol]. Agar ma'lumot yetishmasa, 2 ta taxmin bilan to‘liq javob ber va taxminlarni alohida yoz."</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Videos Section -->
+        <div class="videos-section">
+            <h2 class="section-subtitle">Suniy Intellekt Videolar</h2>
+            <div class="video-grid">
+                <div class="video-card" onclick="playVideo(1)">
+                    <div class="video-thumbnail">
+                       <iframe width="100%" height="100%" src="https://www.youtube.com/embed/PzVl2T9Lv-Y?si=CL3_W4e7l1RbL9UF" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                        <div class="video-overlay">Narakeet Suniy Intellekt</div>
+                    </div>
+                    <div class="video-info">
+                        <div class="video-title">Narakeet Suniy Intellekti bilan ishlash</div>
+                        <div class="video-duration">1 daqiqa</div>
+                    </div>
+                </div>
+
+                <div class="video-card" onclick="playVideo(2)">
+                    <div class="video-thumbnail">
+                   
+                        <iframe width="100%" height="100%" src="https://www.youtube.com/embed/7VQGUsmB8Ps?si=fA8rycIXksubtEn3" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                        <div class="video-overlay">Suniy Intellekt Video Yaratish</div>
+                    </div>
+                    <div class="video-info">
+                        <div class="video-title">Vozo va Narakeet Suniy Intellekt</div>
+                        <div class="video-duration">2 daqiqa 22 soniya</div>
+                    </div>
+                </div>
+
+                <div class="video-card" onclick="playVideo(3)">
+                    <div class="video-thumbnail">
+                        
+                        <iframe width="100%" height="100%" src="https://www.youtube.com/embed/clSaInuldSM?si=upg3W9akKiT2wiKu" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                     
+                        <div class="video-overlay">Suniy Intellektda Kod Yozish</div>
+                    </div>
+                    <div class="video-info">
+                        <div class="video-title">Claude Suniy Intellekt</div>
+                        <div class="video-duration">7 Daqiqa 54 Soniya</div>
+                    </div>
+                </div>
+                 <div class="video-card" onclick="playVideo(1)">
+                    <div class="video-thumbnail">
+                       <iframe width="100%" height="100%" src="https://www.youtube.com/embed/EStiajkXvXs?si=Z7Swspe5aT85-sqH" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                        <div class="video-overlay">Suniy Intellektda Rasm Yaratish</div>
+                    </div>
+                    <div class="video-info">
+                        <div class="video-title">Leonardo Suniy Intellekt </div>
+                        <div class="video-duration">4 daqiqa</div>
+                    </div>
+                </div>
+
+                <div class="video-card" onclick="playVideo(2)">
+                    <div class="video-thumbnail">
+                   
+                        <iframe width="100%" height="100%" src="https://www.youtube.com/embed/jmjw9MJxeoY?si=WU1guR7D6DP6faoQ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                        <div class="video-overlay">Suniy Intellekt Video Yaratish</div>
+                    </div>
+                    <div class="video-info">
+                        <div class="video-title">Veed Suniy Intellekt</div>
+                        <div class="video-duration">2 daqiqa 22 soniya</div>
+                    </div>
+                </div>
+
+                <div class="video-card" onclick="playVideo(3)">
+                    <div class="video-thumbnail">
+                        
+                        <iframe width="100%" height="100%" src="https://www.youtube.com/embed/Orq3RPaj1ew?si=B24bUztvU2xCkzyw" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                     
+                        <div class="video-overlay">Kod Yozmasdan Suniy Intellekt Yaratish</div>
+                    </div>
+                    <div class="video-info">
+                        <div class="video-title">Teachable Machine</div>
+                        <div class="video-duration">7 Daqiqa 54 Soniya</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="pagination">
+            <div class="page-dot active" onclick="changePage(1)"></div>
+            <div class="page-dot" onclick="changePage(2)"></div>
+            <div class="page-dot" onclick="changePage(3)"></div>
+            <div class="page-dot" onclick="changePage(4)"></div>
+            <div class="page-dot" onclick="changePage(5)"></div>
+        </div>
+    </div>
+  </section>
+
+<footer>
+      <div class="footer">
+        <div class="left">
+          <img src="/static/image/muallif.jpg" alt="Muallif logotipi">
+          <p>
+<span style="display: block; text-align: center; font-size: 20px; font-weight: bold;">
+    Muallif : Muhammad Al-Xorazmiy Nomidagi Ixtisoslashtirilgan Maktab Andijon Filiali
+</span>
+
+              <br>Ushbu platforma O'zbekiston Respublikasi Prezidentining <br> 2024-yil 1-apreldagi PF-55-son
+            Farmoniga asosan tashkil etilgan 2025-yilgi Ixtirochilikka qadam tanlovini 1-o'rin <br> sohibi hamda
+            amaliyotgan tadbiq etish uchun Oliy ta'lim <br> va innovatsiyalar vazirligi huzuridagi
+            Ilm-fanni moliyalashtirish va innovatsiyalarni qo'llab-quvvatlash jamg'armasi tomonidan
+            56 mln so'm miqdorida moliyalashtirilgan.
+          </p>
+        </div>
+        <div class="center">
+          <h2>Aloqa uchun</h2>
+          <p>Manzil: Andijon shahar, Qalandarxona mahalla fuqarolar yig'ini,<br> Buxoro ko'chasi, 4 uy</p>
+          <p>Tel: +998 94 212 14 48</p>
+          <p>Gmail: ixm337@piima.uz</p>
+          <ul class="social-icons">
+            <li><a href="https://www.facebook.com/share/1C2cE7VJQR/?mibextid=wwXIfr" target="_blank"><i class="fab fa-facebook-f"></i></a></li>
+            <li><a href="https://www.youtube.com/@Milliy_muhandislik_platformasi" target="_blank"><i class="fab fa-youtube"></i></a></li>
+            <li><a href="https://www.instagram.com/itschool_andijan?igsh=MWdkMzQ4Zmt5MzhxaA==" target="_blank"><i class="fab fa-instagram"></i></a></li>
+            <li><a href="https://t.me/milliy_muhandislik" target="_blank"><i class="fab fa-telegram"></i></a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="bottom">
+        <p>Yaratilgan 2025 MMP | Dizayn va Dasturlash muallifi</p>
+      </div>
+    </footer>
+
+  <script>
+    let currentPage = 1;
+    let selectedTools = new Set();
+
+    function openAITools() {
+        const btn = document.querySelector('.ai-btn');
+        btn.style.background = '#10b981';
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Ochilmoqda...';
+        
+        setTimeout(() => {
+            alert('AI Vositalari bo\'limi ochilmoqda!\n\nBu bo\'limda siz:\n• Turli AI vositalar bilan tanishasiz\n• Promptlar yozishni o\'rganasiz\n• AI bilan ishlash usullarini bilasiz');
+            btn.innerHTML = '<i class="fas fa-brain"></i> AI Vositalari';
+            btn.style.background = '#000075';
+        }, 2000);
+    }
+
+    function selectCategory(type) {
+        const categories = document.querySelectorAll('.category-card');
+        categories.forEach(cat => cat.classList.remove('active'));
+        
+        event.target.closest('.category-card').classList.add('active');
+        
+        // Filter tools based on category
+        filterTools(type);
+    }
+
+    function filterTools(type) {
+        const tools = document.querySelectorAll('.tool-card');
+        tools.forEach(tool => {
+            tool.style.opacity = '0.5';
+            setTimeout(() => {
+                tool.style.opacity = '1';
+            }, 300);
+        });
+    }
+
+    function selectTool(id) {
+        const card = document.querySelectorAll('.tool-card')[id - 1];
+        
+        if (selectedTools.has(id)) {
+            selectedTools.delete(id);
+            card.style.borderColor = 'transparent';
+            card.style.background = 'white';
+        } else {
+            selectedTools.add(id);
+            card.style.borderColor = '#10b981';
+            card.style.background = 'rgba(16, 185, 129, 0.1)';
+        }
+
+        // Add loading effect
+        card.classList.add('loading');
+        setTimeout(() => {
+            card.classList.remove('loading');
+        }, 1000);
+    }
+
+    function copyPrompt(id) {
+        const prompts = [
+            "[Mavzu] haqida 500 so'zli informativ maqola yoz. Kirish, asosiy qism va xulosa bo'lsin.",
+            "Python da [funksiya nomi] funksiyasini yoz. Izoh va misollar ham qo'sh.",
+            "Bu matnni o'zbek tiliga tarjima qil: [matn]. Tabiiy va tushunarly bo'lsin.",
+            "Professional, yuqori sifatli [tavsif] rasmi. 4K, yorqin ranglar, zamonaviy uslub."
+        ];
+        
+        navigator.clipboard.writeText(prompts[id - 1]).then(() => {
+            const card = document.querySelectorAll('.prompt-card')[id - 1];
+            const icon = card.querySelector('i');
+            icon.className = 'fas fa-check';
+            icon.style.color = '#10b981';
+            
+            setTimeout(() => {
+                icon.className = 'fas fa-copy';
+                icon.style.color = '';
+            }, 2000);
+        });
+    }
+
+    function playVideo(id) {
+        const videoCard = document.querySelectorAll('.video-card')[id - 1];
+        const playIcon = videoCard.querySelector('.video-icon i');
+        
+        playIcon.style.transform = 'scale(0.8)';
+        setTimeout(() => {
+            playIcon.style.transform = 'scale(1.2)';
+        }, 100);
+
+        setTimeout(() => {
+            alert(`Video ${id} o'ynatilmoqda...`);
+            playIcon.style.transform = 'scale(1)';
+        }, 500);
+    }
+
+  
+const itemsPerPage = 3; // har bir sahifada nechta element bo‘lsin
+
+function changePage(pageNum) {
+    if (pageNum === currentPage) return;
+    currentPage = pageNum;
+
+    // Pagination dotsni yangilash
+    document.querySelectorAll('.page-dot').forEach((dot, index) => {
+        dot.classList.toggle('active', index + 1 === pageNum);
+    });
+
+    // Tools grid elementlarini olish
+    const tools = document.querySelectorAll('.tool-card');
+    tools.forEach((tool, index) => {
+        const start = (pageNum - 1) * itemsPerPage;
+        const end = pageNum * itemsPerPage;
+        if (index >= start && index < end) {
+            tool.style.display = 'block';
+        } else {
+            tool.style.display = 'none';
+        }
+    });
+
+    // Prompt grid elementlari
+    const prompts = document.querySelectorAll('.prompt-card');
+    prompts.forEach((prompt, index) => {
+        const start = (pageNum - 1) * itemsPerPage;
+        const end = pageNum * itemsPerPage;
+        if (index >= start && index < end) {
+            prompt.style.display = 'block';
+        } else {
+            prompt.style.display = 'none';
+        }
+    });
+
+    // Video grid elementlari
+    const videos = document.querySelectorAll('.video-card');
+    videos.forEach((video, index) => {
+        const start = (pageNum - 1) * itemsPerPage;
+        const end = pageNum * itemsPerPage;
+        if (index >= start && index < end) {
+            video.style.display = 'block';
+        } else {
+            video.style.display = 'none';
+        }
+    });
+}
+
+// Sahifa yuklanganda faqat 1-sahifani ko‘rsatish
+document.addEventListener("DOMContentLoaded", () => {
+    changePage(1);
+});
+
+    // Add interactive animations
+    document.querySelectorAll('.tool-card, .prompt-card, .video-card').forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-8px) scale(1.02)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            if (!this.classList.contains('loading')) {
+                this.style.transform = 'translateY(0) scale(1)';
+            }
+        });
+    });
+
+    // Category cards animation
+    document.querySelectorAll('.category-card').forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-5px) scale(1.05)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0) scale(1)';
+        });
+    });
+      // BURGER MENU FUNCTIONALITY
+        // =========================
+        const menuToggle = document.getElementById('menuToggle');
+        const navMenu = document.getElementById('navMenu');
+
+        menuToggle.addEventListener('click', function() {
+            navMenu.classList.toggle('active');
+            this.classList.toggle('active');
+        });
+
+        // Menyu tashqarisiga bosilganda yopish
+        document.addEventListener('click', function(e) {
+            if (!menuToggle.contains(e.target) && !navMenu.contains(e.target)) {
+                navMenu.classList.remove('active');
+                menuToggle.classList.remove('active');
+            }
+        });
+  </script>
+</body>
+<script src="./index.js"></script>
+
+</html>

@@ -1,0 +1,1738 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avtomatik Suv Ochuvchi Qurilma</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #e6f3ff;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: auto;
+        }
+
+        /* HEADER */
+        .header {
+            display: flex;
+            align-items: center;
+            background:#000075;
+            color: white;
+            padding: 10px 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            width: 100%;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .logo-icon img {
+            border-radius: 50%;
+            border: 2px solid white;
+            width: 40px;
+            height: 40px;
+        }
+
+        /* MAIN LAYOUT */
+        .main-container {
+            display: flex;
+            margin-top: 20px;
+            gap: 20px;
+        }
+
+        /* LEFT PANEL */
+        .left-panel {
+            width: 250px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            height: fit-content;
+            position: relative;
+            z-index: 1;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 15px;
+        }
+
+        .control-group h3 {
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 8px;
+            font-size: 14px;
+            border-radius: 5px;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn-success { 
+            background: #28a745; 
+            color: white; 
+        }
+        .btn-danger { 
+            background: #dc3545; 
+            color: white; 
+        }
+        .btn-primary { 
+            background: #000075; 
+            color: white; 
+        }
+        .btn-info { 
+            background:#000075 ; 
+            color: white; 
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .title-header {
+            background: #000075;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0 auto 30px;
+            text-align: center;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .circuit-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 30px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        /* POWER SUPPLY SECTION */
+        .power-supply-section {
+            width: 150px;
+        }
+
+        .dual-smps {
+            background: linear-gradient(145deg, #e8e8e8, #f5f5f5);
+            border: 3px solid #333;
+            border-radius: 8px;
+            width: 140px;
+            height: 200px;
+            position: relative;
+            box-shadow: 5px 5px 15px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px;
+        }
+
+        .smps-label {
+            background: #333;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .voltage-display {
+            background: #000;
+            color: #00ff00;
+            padding: 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            margin-bottom: 15px;
+            text-align: center;
+            min-width: 80px;
+        }
+
+        .output-terminals {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: auto;
+        }
+
+        .terminal-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .terminal {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 2px solid #333;
+        }
+
+        .terminal.red { background: #ff0000; }
+        .terminal.black { background: #000000; }
+        .terminal.green { background: #00ff00; }
+
+        .terminal-label {
+            font-size: 11px;
+            font-weight: bold;
+            color: #333;
+            min-width: 30px;
+        }
+
+        /* CONTROL CIRCUIT SECTION */
+        .control-circuit-section {
+            flex: 1;
+            min-width: 400px;
+            border: 4px solid #000075;
+            box-shadow: 0 0 25px blue;
+              border-radius: 20px;
+        }
+
+        .circuit-board {
+            background: #ffffff;
+         
+          
+            width: 100%;
+            height: 600px;
+            position: relative;
+          
+            margin: 0 auto;
+            max-width: 480px;
+            display: flex;
+        }
+
+        .control-header {
+            background: blue;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 15px;
+            font-size: 14px;
+            font-weight: bold;
+            position: absolute;
+            top: -12px;
+            right: 30px;
+            box-shadow: 0 3px 10px rgba(255, 20, 147, 0.3);
+        }
+
+        .voltage-regulator {
+            background: linear-gradient(45deg, #ff4757, #ff6b82);
+            color: white;
+            width: 45px;
+            height: 30px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: bold;
+            position: absolute;
+            top: 40px;
+            right: 80px;
+            box-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .microcontroller {
+    
+            color: white;
+            width: 120px;
+            height: 70px;
+            border-radius: 8px;
+            position: absolute;
+            top: 80px;
+            left: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+         
+        }
+
+        .mc-main-label {
+            font-size: 14px;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .mc-model {
+            font-size: 10px;
+            color: #ccc;
+            margin-top: 2px;
+        }
+
+        .resistor {
+            width: 40px;
+            height: 10px;
+    
+            border-radius: 5px;
+            position: absolute;
+        }
+
+        .resistor.r10k {
+            top: 200px;
+            left: 200px;
+            transform: rotate(0deg);
+        }
+
+        .resistor.r1k {
+            top: 250px;
+            left: 200px;
+            transform: rotate(0deg);
+        }
+
+        .potentiometer {
+            width: 35px;
+            height: 35px;
+     
+            border: 3px solid #333;
+            border-radius: 50%;
+            position: absolute;
+            top: 220px;
+            right: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 9px;
+            font-weight: bold;
+            cursor: pointer;
+      
+        }
+
+        .transistor {
+            width: 25px;
+            height: 30px;
+           
+            position: absolute;
+            top: 320px;
+            left: 120px;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 8px;
+           
+        }
+
+        .relay-5v {
+     
+            color: white;
+            width: 80px;
+            height: 50px;
+            border-radius: 8px;
+            position: absolute;
+            bottom: 120px;
+            right: 50px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            
+        }
+
+        .relay-5v.active {
+            background: linear-gradient(145deg, #28a745, #20c997);
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(40, 167, 69, 0.6);
+        }
+
+        .sensor-tcrt5000 {
+            
+            color: white;
+            width: 70px;
+            height: 40px;
+            border-radius: 6px;
+            position: absolute;
+            bottom: 60px;
+            left: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 9px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        
+        }
+
+        .sensor-tcrt5000.active {
+            background: #ff6b35;
+            box-shadow: 0 0 20px rgba(255, 107, 53, 0.8);
+        }
+
+        .circuit-wire {
+            position: absolute;
+            height: 3px;
+            border-radius: 2px;
+        }
+
+        .wire-red { background: #ff0000; }
+        .wire-black { background: #000000; }
+        .wire-blue { background: #0066ff; }
+        .wire-pink { background: #ff1493; }
+        .wire-green { background: #00ff00; }
+
+        /* TAP SYSTEM SECTION */
+        .tap-system-section {
+            width: 250px;
+        }
+
+        .user-hand-area {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .hand-demonstration {
+            font-size: 60px;
+            opacity: 0;
+            transition: all 0.4s ease;
+            cursor: pointer;
+            position: relative;
+            z-index: 10;
+            top: 320px;
+            left: 280px;
+        }
+
+        .hand-demonstration.visible {
+            opacity: 1;
+            animation: handWave 1.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes handWave {
+            0% { transform: translateY(0) rotate(-5deg); }
+            100% { transform: translateY(-15px) rotate(5deg); }
+        }
+
+        .tap-faucet {
+            background: linear-gradient(145deg, #c0c0c0, #e0e0e0);
+            width: 100px;
+            height: 70px;
+            border-radius: 12px;
+            position: relative;
+            margin: 20px auto;
+            box-shadow: 4px 4px 12px rgba(0,0,0,0.3);
+            margin-right: 80px;
+        }
+
+        .faucet-spout {
+            background: linear-gradient(145deg, #a8a8a8, #c0c0c0);
+            width: 25px;
+            height: 20px;
+            border-radius: 0 0 12px 12px;
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 2px 2px 6px rgba(0,0,0,0.3);
+        }
+
+     
+.water-stream {
+    width: 8px;
+    height: 10px;
+    background: linear-gradient(to top, /* Changed from 'to bottom' to 'to top' */
+        rgba(135, 206, 250, 0.95) 0%,
+        rgba(30, 144, 255, 0.9) 40%,
+        rgba(0, 100, 200, 0.85) 80%,
+        rgba(0, 80, 160, 0.8) 100%);
+    position: absolute;
+    bottom: 250px; /* Changed from top: 200px to bottom: 50px */
+    left: 120px;
+    transform: translateX(-50%);
+    border-radius: 4px;
+    opacity: 0;
+    transition: all 0.5s ease;
+    box-shadow: 0 0 8px rgba(135, 206, 250, 0.6);
+}
+
+.water-stream.flowing {
+    height: 200px;
+    opacity: 1;
+    animation: waterStreamUpward 0.6s ease-in-out infinite alternate; /* New animation name */
+}
+
+/* New upward water stream animation */
+@keyframes waterStreamUpward {
+    0% { 
+        transform: translateX(-50%) scaleY(1) scaleX(1);
+        filter: blur(0px);
+        height: 200px;
+    }
+    100% { 
+        transform: translateX(-50%) scaleY(1.1) scaleX(1.3);
+        filter: blur(0.5px);
+        height: 210px;
+    }
+}
+
+/* Enhanced water collection with splash effects */
+.water-collection {
+    width: 100px;
+    height: 20px;
+    background: rgba(135, 206, 250, 0);
+    border-radius: 50%;
+    position: absolute;
+    top: 150px;
+    left: 26%;
+    transform: translateX(-50%);
+    transition: all 0.4s ease;
+
+}
+
+.water-collection.active {
+    background: rgba(135, 206, 250, 0.8);
+    animation: waterSplashRipples 1.2s ease-in-out infinite;
+}
+
+/* New splash animation with ripple effects */
+@keyframes waterSplashRipples {
+    0% { 
+        transform: translateX(-50%) scale(0.8);
+        opacity: 0.8;
+        box-shadow: 
+            0 0 0 0px rgba(135, 206, 250, 0.4),
+            0 0 0 0px rgba(30, 144, 255, 0.2);
+    }
+    25% {
+        transform: translateX(-50%) scale(1.0);
+        opacity: 0.9;
+        box-shadow: 
+            0 0 0 5px rgba(135, 206, 250, 0.3),
+            0 0 0 0px rgba(30, 144, 255, 0.2);
+    }
+    50% { 
+        transform: translateX(-50%) scale(1.2);
+        opacity: 0.6;
+        box-shadow: 
+            0 0 0 10px rgba(135, 206, 250, 0.2),
+            0 0 0 5px rgba(30, 144, 255, 0.1);
+    }
+    75% {
+        transform: translateX(-50%) scale(1.1);
+        opacity: 0.7;
+        box-shadow: 
+            0 0 0 15px rgba(135, 206, 250, 0.1),
+            0 0 0 8px rgba(30, 144, 255, 0.05);
+    }
+    100% { 
+        transform: translateX(-50%) scale(0.8);
+        opacity: 0.8;
+        box-shadow: 
+            0 0 0 20px rgba(135, 206, 250, 0),
+            0 0 0 10px rgba(30, 144, 255, 0);
+    }
+}
+
+/* Additional splash particles effect */
+.water-collection.active::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: radial-gradient(circle, 
+        transparent 40%, 
+        rgba(135, 206, 250, 0.3) 60%, 
+        rgba(30, 144, 255, 0.2) 80%, 
+        transparent 100%);
+    animation: splashParticles 1.0s ease-out infinite;
+}
+
+@keyframes splashParticles {
+    0% {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.5);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(2.0);
+        opacity: 0;
+    }
+}
+
+/* Water droplet effects around the splash */
+.water-collection.active::after {
+    content: '';
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: rgba(135, 206, 250, 0.9);
+    border-radius: 50%;
+    top: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    animation: waterDroplets 1.2s ease-out infinite;
+    box-shadow: 
+        -20px 2px 0 rgba(135, 206, 250, 0.7),
+        20px 2px 0 rgba(135, 206, 250, 0.7),
+        -10px -3px 0 rgba(30, 144, 255, 0.6),
+        10px -3px 0 rgba(30, 144, 255, 0.6);
+}
+
+@keyframes waterDroplets {
+    0% {
+        transform: translateX(-50%) translateY(0) scale(0);
+        opacity: 0;
+    }
+    30% {
+        transform: translateX(-50%) translateY(-15px) scale(1);
+        opacity: 1;
+    }
+    70% {
+        transform: translateX(-50%) translateY(-10px) scale(0.8);
+        opacity: 0.8;
+    }
+    100% {
+        transform: translateX(-50%) translateY(10px) scale(0);
+        opacity: 0;
+    }
+}
+
+        .solenoid-valve-12v {
+         
+            color: white;
+            width: 50px;
+            height: 70px;
+            border-radius: 8px;
+            margin:40px 100px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 9px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+          
+        }
+
+        .solenoid-valve-12v.active {
+            background: #28a745;
+            box-shadow: 0 0 15px rgba(40, 167, 69, 0.6);
+        }
+
+        .water-pipe-system {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .pipe-section {
+            width: 100px;
+            height: 20px;
+            background: linear-gradient(145deg, #a8a8a8, #c8c8c8);
+            border-radius: 10px;
+            position: relative;
+            box-shadow: 2px 2px 6px rgba(0,0,0,0.3);
+        }
+
+        .pipe-section::before {
+            content: '';
+            position: absolute;
+            width: 80%;
+            height: 4px;
+            background: rgba(135, 206, 250, 0);
+            top: 50%;
+            left: 10%;
+            transform: translateY(-50%);
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .pipe-section.water-flow::before {
+            background: rgba(135, 206, 250, 0.9);
+            animation: pipeFlow 1s linear infinite;
+        }
+
+        @keyframes pipeFlow {
+            0% { 
+                background: linear-gradient(90deg, 
+                    rgba(135, 206, 250, 0.9) 0%, 
+                    rgba(30, 144, 255, 0.7) 50%, 
+                    rgba(135, 206, 250, 0.9) 100%);
+                background-size: 200% 100%;
+                background-position: 0% 0%;
+            }
+            100% { 
+                background-position: 200% 0%;
+            }
+        }
+
+        .sink-basin {
+            width: 140px;
+            height: 70px;
+            /* background: linear-gradient(145deg, #f0f0f0, #e0e0e0); */
+            border-radius: 70px 70px 20px 20px;
+            position: relative;
+            margin-top: 50px;
+            margin-left: 55px;
+            /* box-shadow: inset 4px 4px 12px rgba(0,0,0,0.2); */
+
+        }
+
+
+        /* STATUS DISPLAY */
+        .status-display {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            min-width: 220px;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            z-index: 100;
+        }
+
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 8px 0;
+            font-size: 13px;
+        }
+
+        .status-led {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #dc3545;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+        }
+
+        .status-led.on {
+            background: #28a745;
+            box-shadow: 0 0 10px rgba(40, 167, 69, 0.8);
+        }
+
+        /* CONTROL PANEL */
+        .control-panel {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        .control-button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            min-width: 120px;
+        }
+
+        .btn-power {
+            background: linear-gradient(45deg, #4169e1, #8a2be2);
+            color: white;
+        }
+
+        .btn-test {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+        }
+
+        .btn-reset {
+            background: #000075;
+            color: white;
+        }
+
+        .control-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .control-button:active {
+            transform: translateY(-1px);
+        }
+
+        /* MODAL STYLES */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 10% auto;
+            padding: 20px;
+            width: 70%;
+            max-width: 700px;
+            border-radius: 10px;
+            position: relative;
+            box-shadow: 0 5px 30px rgba(0,0,0,0.3);
+        }
+
+        .close {
+            position: absolute;
+            right: 15px;
+            top: 10px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #aaa;
+        }
+
+        .close:hover {
+            color: #333;
+        }
+
+        .modal h2 {
+            margin-bottom: 15px;
+            color: #0078d7;
+        }
+
+        .modal p, .modal pre {
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        /* RESPONSIVE DESIGN */
+        @media (max-width: 1024px) {
+            .circuit-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .status-display {
+                position: relative;
+                margin: 20px auto;
+                width: fit-content;
+            }
+            
+            .control-panel {
+                position: relative;
+                margin-top: 30px;
+                transform: none;
+                left: auto;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .left-panel {
+                width: 100%;
+            }
+            
+            .circuit-board {
+                height: 500px;
+            }
+            
+            .control-button {
+                padding: 10px 15px;
+                font-size: 12px;
+                min-width: 100px;
+            }
+            
+            .modal-content {
+                width: 90%;
+                margin: 20% auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .control-panel {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .control-button {
+                width: 100%;
+                max-width: 250px;
+            }
+            
+            .circuit-board {
+                height: 400px;
+            }
+        }
+        /* MODAL umumiy style */
+/* MODAL umumiy style */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(0,0,0,0.6);
+    backdrop-filter: blur(3px);
+}
+
+/* MODAL ichki qismi */
+.modal-content {
+    background: #000075;
+    color: white;
+    margin: 5% auto;
+    padding: 20px;
+    width: 50%;
+    max-width: 700px;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+    animation: slideDown 0.4s ease;
+    position: relative;
+}
+
+/* Close tugmasi */
+.close {
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    color: white;
+    transition: color 0.3s;
+}
+.close:hover {
+    color: #ffcc00;
+}
+
+/* Sarlavha */
+.modal-content h2 {
+    font-size: 1.5em;
+    margin-bottom: 15px;
+    border-bottom: 2px solid rgba(255,255,255,0.2);
+    padding-bottom: 8px;
+}
+
+/* CARD dizayni */
+.card {
+    background: rgba(255,255,255,0.08);
+    padding: 10px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    overflow: hidden;
+    transition: background 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+.card:hover {
+    background: rgba(255,255,255,0.15);
+}
+
+/* CARD ichidagi rasm */
+.card img {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    border-radius: 8px;
+    background: white;
+    padding: 5px;
+}
+.right{
+    width: 250px;
+    position: absolute;
+    top: 420px;
+    left: 230px;
+
+}
+
+/* CARD matn qismi */
+.card .text {
+    flex: 1;
+}
+.card h3 {
+    margin: 0;
+    
+    font-size: 1.1rem;
+}
+.card p {
+    margin: 5px 0 0;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+/* Tab tugmalar */
+.tab-buttons {
+    display: flex;
+    margin-bottom: 10px;
+}
+.tab-buttons button {
+    flex: 1;
+    background: rgba(255,255,255,0.1);
+    color: white;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    border-radius: 5px 5px 0 0;
+    transition: background 0.3s;
+}
+.tab-buttons button.active {
+    background: rgba(255,255,255,0.3);
+}
+.tab-buttons button:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+/* Kod bo‘lagi */
+.tab-content {
+    display: none;
+}
+.tab-content.active {
+    display: block;
+}
+pre {
+    background: rgba(0,0,0,0.4);
+    padding: 12px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-size: 0.9rem;
+}
+ .wire {
+            position: absolute;
+            z-index: 10;
+        }
+
+ .wire-red {
+          width: 130px;
+            height: 2px;
+            background: red;
+            right: -20px;
+            bottom: 246.5px;
+        }
+         .wire-black{
+        width: 130px;
+            height: 2px;
+            background: black;
+            right: -10px;
+            bottom: 259.5px;
+        }
+    .wire-green{
+         width: 130px;
+            height: 2px;
+            background: green   ;
+            right: -15px;
+            bottom: 253px;
+    }
+
+     .wire-red1 {
+          width: 2px;
+            height: 70px;
+            background: red;
+            right: -20px;
+            bottom: 246.5px;
+        }
+         .wire-black1{
+        width: 2px;
+            height: 85px;
+            background: black;
+            right: -10px;
+            bottom: 259.5px;
+        }
+    .wire-green1{
+         width: 2px;
+            height: 135px;
+            background: green   ;
+            right: -15px;
+            bottom: 253px;
+    }
+     .wire-red2 {
+     width: 30px;
+            height: 2px;
+            background: red   ;
+            right: -20px;
+            bottom: 315px;
+        }
+         .wire-black2{
+     width: 22px;
+            height: 2px;
+            background: black   ;
+            right: -10px;
+            bottom: 344px;
+        }
+    .wire-green2{
+         width: 22px;
+            height: 2px;
+            background: green   ;
+            right: -15px;
+            bottom: 328px;
+    }
+     .wire-green3{
+         width: 212px;
+            height: 2px;
+            background: green;
+            right: -15px;
+            bottom: 387px;
+    }
+    .wire-green4{
+         width: 2px;
+            height: 75px;
+            background: green;
+            right: 195px;
+            bottom: 314px;
+    }
+    .wire-green5{
+         width: 25px;
+            height: 2px;
+            background: green;
+            right: 170px;
+            bottom: 314px;
+    }
+     .wire-red4{
+         width: 175px;
+            height: 2px;
+            background: red;
+            right: 170px;
+            bottom: 330px;
+    }
+     .wire-red5{
+         width: 2px;
+            height: 8px;
+            background: red;
+            left: 135px;
+            bottom: 330px;
+    }
+     .wire-black4{
+         width: 135px;
+            height: 2px;
+            background: black;
+            left: 135px;
+            bottom: 350px;
+    }
+     .wire-black5{
+         width: 55px;
+            height: 2px;
+            background: black;
+            right: 170px;
+            bottom: 310px;
+    }
+     .wire-black6{
+         width: 2px;
+            height: 25px;
+            background: black;
+            left: 270px;
+            bottom: 350px;
+    }
+    .img{
+        position: absolute;
+        z-index: 10;
+        top: 152px;
+        right: 195px;
+    }
+     .wire-black7{
+         width: 2px;
+            height: 65px;
+            background: black;
+            right: 223px;
+            bottom: 310px;
+    }
+    
+/* Animatsiya */
+@keyframes slideDown {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="logo">
+            <a href="/"><img src="/static/image/logo.png" width="80px" height="80px" alt=""></a>
+            <span>Avtomatik Suv Ochuvchi Qurilma</span>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <div class="main-container">
+        <!-- LEFT PANEL -->
+        <div class="left-panel">
+            <div class="control-group">
+                <h3>Boshqaruv</h3>
+                <button class="btn btn-success" onclick="startSimulation()" id="startBtn">
+                    Start
+                </button>
+                <button class="btn btn-danger" onclick="stopSimulation()" id="stopBtn">
+                     Stop
+                </button>
+                <button class="btn btn-primary" onclick="togglePower()">
+                     Quvvat
+                </button>
+                <button class="btn btn-info" onclick="runTest()">
+                     Test
+                </button>
+            </div>
+
+            <div class="control-group">
+                <h3>Ma'lumotlar</h3>
+                <button class="btn btn-primary" id="schemaBtn">
+                    💻 Sxema qayerda ishlatiladi
+                </button>
+                <button class="btn btn-primary" id="codeBtn">
+                    💻  Kod
+                </button>
+                <button class="btn btn-primary" id="componentsBtn">
+                    🔌 Qurilmalar
+                </button>
+            </div>
+
+            <div class="control-group">
+                <h3>Qurilma holati</h3>
+                <div class="status-row">
+                    <span>Quvvat:</span>
+                    <div class="status-led" id="powerLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Sensor:</span>
+                    <div class="status-led" id="sensorLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>O'rni:</span>
+                    <div class="status-led" id="relayLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Ventil:</span>
+                    <div class="status-led" id="solenoidLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Suv oqimi:</span>
+                    <div class="status-led" id="waterLed"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+            <div class="title-header">Avtomatik Suv Ochuvchi Qurilma</div>
+            
+            <div class="circuit-container">
+                <!-- LEFT - Power Supply -->
+             
+
+                <!-- CENTER - Control Circuit -->
+                <div class="control-circuit-section">
+                    <div class="circuit-board">
+                        <div class="control-header">Controlling Circuit</div>
+
+                          <div class="tap-system-section">
+                    <div class="user-hand-area">
+                        <div class="hand-demonstration" id="handDemo">✋</div>
+                    </div>
+                    
+                    <!-- <div class="tap-faucet">
+                        <div class="faucet-spout"></div>
+                    </div> -->
+                         <!-- <div class="sink-basin">
+                       
+                       </div> -->
+                    <div class="water-collection" id="waterLevel"></div>
+                    <div class="water-stream" id="waterStream"></div>
+                    
+                    <div class="solenoid-valve-12v" id="solenoid" style="position: absolute; top: 180px;">
+                        <img src="/static/image/Untitled-design-4-4.webp"  width="50px" height="50px" alt="">
+                    </div>
+               
+                       <img src="/static/image/tpp - Copy.png" class='img'  width="50px" height="120px" alt="">
+                       <div class="wire wire-red"></div>
+                       <div class="wire wire-black"></div>
+                       <div class="wire wire-green"></div>
+                       <div class="wire wire-red1"></div>
+                       <div class="wire wire-black1"></div>
+                       <div class="wire wire-green1"></div>
+                        <div class="wire wire-red2"></div>
+                       <div class="wire wire-black2"></div>
+                       <div class="wire wire-green2"></div>
+                       <div class="wire wire-red3"></div>
+                       <div class="wire wire-black3"></div>
+                       <div class="wire wire-green3"></div>
+                        <div class="wire wire-green4"></div>
+                        <div class="wire wire-green5"></div>
+                              <div class="wire wire-red4"></div>
+                       <div class="wire wire-black4"></div>
+                       <div class="wire wire-black5"></div>
+                        <div class="wire wire-red5"></div>
+                         <div class="wire wire-black6"></div>
+                       <div class="wire wire-black7"></div>
+                    <div class="right">
+                         <div class="relay-5v" id="relay" onclick="manualRelay()">
+                            <img src="/static/image/delay (1).png" width="250px" height="250px" alt="">
+                        </div>
+                   
+                        <div class="sensor-tcrt5000" id="sensor" 
+                             onmouseenter="detectHand()" 
+                             onmouseleave="removeHand()">
+                             <img src="/static/image/tsrt.png" width="150px" height="150px" alt="">
+                        </div>
+                     
+                    </div>
+                   
+                    
+
+                </div>
+                        
+                        
+                    </div>
+                </div>
+
+                <!-- RIGHT - Tap System -->
+              
+            </div>
+        </div>
+    </div>
+
+    <!-- CONTROL PANEL -->
+    <div class="control-panel">
+        <button class="control-button btn-power" onclick="togglePower()">
+            ⚡ Quvvat Yoqish/O'chirish
+        </button>
+        <button class="control-button btn-test" onclick="runTest()">
+            🔍 Tizimni sinash
+        </button>
+        <button class="control-button btn-reset" onclick="resetAll()">
+            🔄 Qayta o'rnatish
+        </button>
+    </div>
+
+   <div class="modal" id="schemaModal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Sxema qayerda ishlatiladi</h2>
+
+        <div class="card">
+            <video controls>
+                <source src="videos/kitchen.mp4" type="video/mp4">
+            </video>
+            <p>Oshxona va qo'l yuvish joylarida gigiyena uchun ishlatiladi.</p>
+        </div>
+
+        <div class="card">
+               <video controls>
+                <source src="videos/kitchen.mp4" type="video/mp4">
+            </video>
+            <p>Avtomatlashtirilgan sug‘orish tizimlarida suv oqimini boshqarish uchun.</p>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal" id="codeModal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Kod</h2>
+
+        <!-- Tab tugmalar -->
+        <div class="tab-buttons">
+            <button class="tab-btn active" data-tab="mblock">mBlock Kodi</button>
+            <button class="tab-btn" data-tab="arduino">Arduino Kodi</button>
+        </div>
+
+        <!-- mBlock kodi -->
+        <div class="tab-content active" id="mblock">
+            <pre>
+// mBlock blok kodi bu yerda bo‘ladi (grafik kod tavsifi)
+say "Qo'l aniqlansa relay yoqiladi"
+            </pre>
+        </div>
+
+        <!-- Arduino kodi -->
+        <div class="tab-content" id="arduino">
+            <pre>
+// TCRT5000 Sensor va Relay boshqaruvi
+const int sensorPin = 2;
+const int relayPin = 3;
+
+void setup() {
+  pinMode(sensorPin, INPUT);
+  pinMode(relayPin, OUTPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  int sensorValue = digitalRead(sensorPin);
+  
+  if (sensorValue == LOW) {
+    digitalWrite(relayPin, HIGH);
+    Serial.println("Qo'l aniqlangan - Suv oqimi yoqildi");
+  } else {
+    digitalWrite(relayPin, LOW);
+    Serial.println("Qo'l yo'q - Suv oqimi o'chirildi");
+  }
+  
+  delay(100);
+}
+            </pre>
+        </div>
+    </div>
+</div>
+<div class="modal" id="componentsModal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Ishlatilgan qurilmalar</h2>
+
+        <div class="card">
+            <img src="images/tcrt5000.png" alt="TCRT5000 Sensor">
+            <div class="text">
+                <h3>TCRT5000 Infraqizil Sensor</h3>
+                <p>Qo‘l mavjudligini aniqlash uchun infraqizil texnologiya asosida ishlaydi.</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <img src="images/lm393p.png" alt="LM393P Komparator">
+            <div class="text">
+                <h3>LM393P Komparator</h3>
+                <p>Sensor signalini qayta ishlash va solishtirish uchun ishlatiladi.</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <img src="images/relay.png" alt="5V Relay">
+            <div class="text">
+                <h3>5V Relay</h3>
+                <p>Solenoid valve’ni elektr signal orqali boshqaradi.</p>
+            </div>
+        </div>
+
+        <!-- qolgan qurilmalar ham shu tarzda -->
+    </div>
+</div>
+
+    
+    <script>
+ // Modal ochish / yopish
+function openModal(id) {
+    document.getElementById(id).style.display = "block";
+}
+function closeModal(id) {
+    document.getElementById(id).style.display = "none";
+}
+
+document.querySelectorAll(".modal .close").forEach(btn => {
+    btn.addEventListener("click", function() {
+        this.closest(".modal").style.display = "none";
+    });
+});
+
+window.addEventListener("click", function(e) {
+    document.querySelectorAll(".modal").forEach(modal => {
+        if (e.target === modal) {
+            modal.style.display = "none";
+        }
+    });
+});
+
+// Tab boshqaruvi
+document.querySelectorAll(".tab-btn").forEach(button => {
+    button.addEventListener("click", function() {
+        const tab = this.dataset.tab;
+
+        // Tugmalarni yangilash
+        document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+        this.classList.add("active");
+
+        // Kontentni yangilash
+        document.querySelectorAll(".tab-content").forEach(content => {
+            content.classList.remove("active");
+            if (content.id === tab) {
+                content.classList.add("active");
+            }
+        });
+    });
+});
+
+
+        // System State Variables
+        let powerOn = false;
+        let sensorDetecting = false;
+        let relayActivated = false;
+        let solenoidOpen = false;
+        let waterFlowing = false;
+
+        // DOM Elements
+        const elements = {
+            powerLed: document.getElementById('powerLed'),
+            sensorLed: document.getElementById('sensorLed'),
+            relayLed: document.getElementById('relayLed'),
+            solenoidLed: document.getElementById('solenoidLed'),
+            waterLed: document.getElementById('waterLed'),
+            handDemo: document.getElementById('handDemo'),
+            sensor: document.getElementById('sensor'),
+            relay: document.getElementById('relay'),
+            solenoid: document.getElementById('solenoid'),
+            waterStream: document.getElementById('waterStream'),
+            waterLevel: document.getElementById('waterLevel'),
+        };
+
+        // Update Status LEDs
+        function updateStatus() {
+            elements.powerLed.classList.toggle('on', powerOn);
+            elements.sensorLed.classList.toggle('on', sensorDetecting);
+            elements.relayLed.classList.toggle('on', relayActivated);
+            elements.solenoidLed.classList.toggle('on', solenoidOpen);
+            elements.waterLed.classList.toggle('on', waterFlowing);
+        }
+
+        // Power Control
+        function togglePower() {
+            powerOn = !powerOn;
+            
+            if (!powerOn) {
+                // Turn off everything when power is off
+                stopAllSystems();
+            }
+            
+            updateStatus();
+        }
+
+        // Hand Detection (Mouse Events)
+        function detectHand() {
+            if (!powerOn) return;
+            
+            sensorDetecting = true;
+            elements.sensor.classList.add('active');
+            elements.handDemo.classList.add('visible');
+            
+            // Activate relay after short delay
+            setTimeout(() => {
+                if (sensorDetecting) {
+                    activateRelay();
+                }
+            }, 300);
+            
+            updateStatus();
+        }
+
+        function removeHand() {
+            sensorDetecting = false;
+            elements.sensor.classList.remove('active');
+            elements.handDemo.classList.remove('visible');
+            
+            // Deactivate systems after delay
+            setTimeout(() => {
+                if (!sensorDetecting) {
+                    deactivateRelay();
+                }
+            }, 500);
+            
+            updateStatus();
+        }
+
+        // Relay Control
+        function activateRelay() {
+            if (!powerOn) return;
+            
+            relayActivated = true;
+            elements.relay.classList.add('active');
+            
+            // Open solenoid valve
+            setTimeout(() => {
+                if (relayActivated) {
+                    openSolenoid();
+                }
+            }, 200);
+            
+            updateStatus();
+        }
+
+        function deactivateRelay() {
+            relayActivated = false;
+            elements.relay.classList.remove('active');
+            
+            closeSolenoid();
+            updateStatus();
+        }
+
+        function manualRelay() {
+            if (!powerOn) return;
+            
+            if (relayActivated) {
+                deactivateRelay();
+            } else {
+                activateRelay();
+            }
+        }
+
+        // Solenoid Valve Control
+        function openSolenoid() {
+            solenoidOpen = true;
+            elements.solenoid.classList.add('active');
+            
+            startWaterFlow();
+            updateStatus();
+        }
+
+        function closeSolenoid() {
+            solenoidOpen = false;
+            elements.solenoid.classList.remove('active');
+            
+            stopWaterFlow();
+            updateStatus();
+        }
+
+        // Water Flow Control
+        function startWaterFlow() {
+            waterFlowing = true;
+            
+            // Water stream animation
+            elements.waterStream.classList.add('flowing');
+            
+            // Water in sink
+            elements.waterLevel.classList.add('active');
+            
+ 
+            
+            updateStatus();
+        }
+
+        function stopWaterFlow() {
+            waterFlowing = false;
+            
+            elements.waterStream.classList.remove('flowing');
+            elements.waterLevel.classList.remove('active');
+            elements.pipe1.classList.remove('water-flow');
+            elements.pipe2.classList.remove('water-flow');
+            
+            updateStatus();
+        }
+
+        // System Controls
+        function runTest() {
+            if (!powerOn) {
+                alert('Avval quvvatni yoqing!');
+                return;
+            }
+            
+            // Simulate hand detection for 3 seconds
+            detectHand();
+            setTimeout(() => {
+                removeHand();
+            }, 3000);
+        }
+
+        function resetAll() {
+            stopAllSystems();
+            powerOn = false;
+            updateStatus();
+        }
+
+        function stopAllSystems() {
+            sensorDetecting = false;
+            relayActivated = false;
+            solenoidOpen = false;
+            waterFlowing = false;
+            
+            // Remove all active classes
+            elements.sensor.classList.remove('active');
+            elements.relay.classList.remove('active');
+            elements.solenoid.classList.remove('active');
+            elements.handDemo.classList.remove('visible');
+            
+            stopWaterFlow();
+        }
+
+        function adjustSensitivity() {
+            if (powerOn) {
+                alert('Sensor sezgirligi sozlandi! (10kΩ potentiometer)');
+            } else {
+                alert('Avval quvvatni yoqing!');
+            }
+        }
+        
+        // Modal ochish va yopish funksiyasi
+        function openModal(id) {
+            document.getElementById(id).style.display = "block";
+        }
+        
+        // Tugmalar eventlari
+        document.getElementById("schemaBtn").addEventListener("click", function() {
+            openModal("schemaModal");
+        });
+        document.getElementById("codeBtn").addEventListener("click", function() {
+            openModal("codeModal");
+        });
+        document.getElementById("componentsBtn").addEventListener("click", function() {
+            openModal("componentsModal");
+        });
+
+        // Barcha modal yopish tugmalari
+        document.querySelectorAll(".modal .close").forEach(btn => {
+            btn.addEventListener("click", function() {
+                this.closest(".modal").style.display = "none";
+            });
+        });
+
+        // Modal tashqarisiga bosganda yopish
+        window.addEventListener("click", function(e) {
+            document.querySelectorAll(".modal").forEach(modal => {
+                if (e.target === modal) {
+                    modal.style.display = "none";
+                }
+            });
+        });
+
+        // Namuna funksiyalar
+        function startSimulation() {
+            alert("Simulyatsiya boshlandi!");
+        }
+        function stopSimulation() {
+            alert("Simulyatsiya to'xtadi!");
+        }
+    </script>
+</body>
+</html>

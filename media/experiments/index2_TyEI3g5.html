@@ -1,0 +1,1627 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>360° Servo Motor & Robot Arm Control</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #e6f3ff;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: auto;
+        }
+
+        /* HEADER */
+        .header {
+            display: flex;
+            align-items: center;
+            background: #000075;
+            color: white;
+            padding: 10px 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            width: 100%;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .logo-icon img {
+            border-radius: 50%;
+            border: 2px solid white;
+            width: 40px;
+            height: 40px;
+        }
+
+        /* MAIN LAYOUT */
+        .main-container {
+            display: flex;
+            margin-top: 20px;
+            gap: 20px;
+        }
+
+        /* LEFT PANEL */
+        .left-panel {
+            width: 250px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            height: fit-content;
+            position: relative;
+            z-index: 1;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 15px;
+        }
+
+        .control-group h3 {
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 8px;
+            font-size: 14px;
+            border-radius: 5px;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn-success { 
+            background: #28a745; 
+            color: white; 
+        }
+        .btn-danger { 
+            background: #dc3545; 
+            color: white; 
+        }
+        .btn-primary { 
+            background: #000075; 
+            color: white; 
+        }
+        .btn-info { 
+            background: #000075; 
+            color: white; 
+        }
+
+        /* STATUS LEDS */
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 8px 0;
+            font-size: 13px;
+        }
+
+        .status-led {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #dc3545;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+        }
+
+        .status-led.on {
+            background: #28a745;
+            box-shadow: 0 0 10px rgba(40, 167, 69, 0.8);
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            flex: 1;
+            position: relative;
+        }
+
+        .container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+        }
+
+        .circuit-board {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            aspect-ratio: 6 / 7;
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            border: 2px solid #000075;
+        }
+
+        /* Component containers - ALL IN PERCENTAGE */
+        .servo-container {
+            position: absolute;
+            top: 14%;
+            left: 25%;
+            width: 20%;
+            height: 11%;
+        }
+
+        .servo-motor {
+            width: 100%;
+            height: 100%;
+            border-radius: 8px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9vw;
+        }
+
+        .servo-motor > img {
+            width: 150px;
+            height: 150px;
+            object-fit: contain;
+        }
+
+        .servo-horn {
+            position: absolute;
+            left: 1%;
+            top: -8%;
+        }
+
+        .servo-horn img {
+            width: 70px;
+            height: 100px;
+            object-fit: contain;
+        }
+
+        .ne555-container {
+            position: absolute;
+            top: 36%;
+            left: 33%;
+            width: 13%;
+            height: 9%;
+        }
+
+        .ne555-chip {
+            width: 100%;
+            height: 100%;
+            background: #333;
+            border-radius: 8px;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75vw;
+            font-weight: bold;
+            position: relative;
+        }
+
+        .ne555-chip img {
+            width: 150px;
+            height: 120px;
+            object-fit: contain;
+        }
+
+        .potentiometer-container {
+            position: absolute;
+            bottom: 21%;
+            left: 17%;
+            width: 10%;
+            height: 11%;
+        }
+
+        .potentiometer {
+            width: 83%;
+            height: 63%;
+            background: #8D6E63;
+            border-radius: 50%;
+            border: 3px solid #5D4037;
+            position: relative;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .pot-knob {
+            width: 60%;
+            height: 60%;
+            background: #FFA726;
+            border-radius: 50%;
+            position: relative;
+            transition: transform 0.1s ease;
+        }
+
+        .pot-indicator {
+            position: absolute;
+            top: 2px;
+            left: 50%;
+            width: 2px;
+            height: 12px;
+            background: #333;
+            transform-origin: 50% 100%;
+        }
+
+        .resistor-container {
+            position: absolute;
+            top: 45%;
+            left: 33%;
+        }
+
+        .resistor-container img {
+            width: 60px;
+            height: 40px;
+            object-fit: contain;
+        }
+
+        .battery-container {
+            position: absolute;
+            bottom: 7%;
+            left: 8%;
+            width: 17%;
+            height: 6%;
+        }
+
+        .battery {
+            width: 80%;
+            height: 75%;
+            border-radius: 5px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.6vw;
+            font-weight: bold;
+        }
+
+        .battery img {
+            width: 100px;
+            height: 80px;
+            object-fit: contain;
+        }
+
+        .center {
+            margin-top: 55.5%;
+            margin-left: 43%;
+        }
+
+        .center img {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+        }
+
+        /* Wires - ALL IN PERCENTAGE */
+        .wire {
+            position: absolute;
+            z-index: 10;
+        }
+
+        .wire-red {
+            width: 5%;
+            height: 0.4%;
+            background: red;
+            left: 20%;
+            top: 19%;
+        }
+        
+        .wire-red1 {
+            width: 15%;
+            height: 0.4%;
+            background: orange;
+            left: 10%;
+            top: 20%;
+        }
+        
+        .wire-red2 {
+            width: 0.5%;
+            height: 22%;
+            background: orange;
+            left: 10%;
+            top: 20%;
+        }
+        
+        .wire-red3 {
+            width: 25%;
+            height: 0.4%;
+            background: orange;
+            left: 10%;
+            top: 41%;
+        }
+        
+        .wire-red4 {
+            width: 0.5%;
+            height: 7%;
+            background: red;
+            left: 20%;
+            top: 19%;
+        }
+        
+        .wire-red5 {
+            width: 27%;
+            height: 0.4%;
+            background: red;
+            left: 20%;
+            top: 26%;
+        }
+
+        .wire-red6 {
+            width: 26%;
+            height: 0.4%;
+            background: red;
+            left: 12%;
+            bottom: 24%;
+            transform: rotate(-47deg);
+        }
+        
+        .wire-black3 {
+            width: 0.5%;
+            height: 10%;
+            background: red;
+            left: 46%;
+            top: 26%;
+        }
+        
+        .wire-black4 {
+            width: 32%;
+            height: 0.4%;
+            background: red;
+            left: 46%;
+            top: 35%;
+        }
+        
+        .wire-black5 {
+            width: 0.5%;
+            height: 50%;
+            background: red;
+            right: 22%;
+            top: 35%;
+        }
+        
+        .wire-black6 {
+            width: 45%;
+            height: 0.4%;
+            background: red;
+            right: 22%;
+            bottom: 15%;
+        }
+        
+        .wire-black7 {
+            width: 0.5%;
+            height: 41%;
+            background: red;
+            left: 33%;
+            bottom: 15%;
+        }
+
+        .wire-black {
+            width: 13%;
+            height: 0.4%;
+            background: #1f2937;
+            left: 13%;
+            top: 19%;
+        }
+        
+        .wire-black1 {
+            width: 0.5%;
+            height: 66%;
+            background: #1f2937;
+            left: 13%;
+            top: 19%;
+        }
+        
+        .wire-black8 {
+            width: 0.5%;
+            height: 3%;
+            background: #1f2937;
+            left: 25%;
+            top: 35%;
+        }
+        
+        .wire-black2 {
+            width: 20%;
+            height: 0.4%;
+            background: #1f2937;
+            left: 14%;
+            top: 35%;
+        }
+        
+        .wire-pink {
+            width: 20%;
+            height: 0.4%;
+            background: pink;
+            left: 24%;
+            bottom: 27%;
+        }
+        
+        .wire-pink1 {
+            width: 0.5%;
+            height: 15%;
+            background: pink;
+            left: 43%;
+            bottom: 27%;
+        }
+        
+        .wire-pink2 {
+            width: 28%;
+            height: 0.4%;
+            background: pink;
+            left: 43%;
+            bottom: 41%;
+        }
+        
+        .wire-pink3 {
+            width: 0.5%;
+            height: 20%;
+            background: pink;
+            right: 29%;
+            bottom: 41%;
+        }
+        
+        .wire-pink4 {
+            width: 24%;
+            height: 0.4%;
+            background: pink;
+            left: 47%;
+            bottom: 61%;
+        }
+        
+        .wire-purple1 {
+            width: 18%;
+            height: 0.4%;
+            background: blue;
+            left: 48%;
+            bottom: 53%;
+        }
+        
+        .wire-purple2 {
+            width: 0.5%;
+            height: 6%;
+            background: blue;
+            left: 48%;
+            bottom: 53%;
+        }
+        
+        .wire-purple3 {
+            width: 7%;
+            height: 0.4%;
+            background: blue;
+            left: 42%;
+            bottom: 58%;
+        }
+        
+        .wire-purple4 {
+            width: 17%;
+            height: 0.4%;
+            background: blue;
+            left: 27%;
+            bottom: 59%;
+            transform: rotate(7deg);
+        }
+
+        /* Control Panel */
+        .servo-control-panel {
+            position: absolute;
+            right: 3%;
+            top: 14%;
+            background: rgba(255,255,255,0.9);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            width: 200px;
+        }
+
+        .control-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: #ddd;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #2196F3;
+            cursor: pointer;
+        }
+
+        .value-display {
+            text-align: center;
+            padding: 10px;
+            background: #f0f0f0;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .pwm-indicator {
+            width: 100%;
+            height: 30px;
+            background: #f0f0f0;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            position: relative;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .pwm-signal {
+            height: 100%;
+            background: #4CAF50;
+            transition: width 0.2s ease;
+        }
+
+        .circuit-status-led {
+            position: absolute;
+            bottom: 3%;
+            right: 3%;
+            width: 2.5%;
+            height: 2%;
+            border-radius: 50%;
+            background: #4CAF50;
+            box-shadow: 0 0 10px #4CAF50;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* CONTROL PANEL BOTTOM */
+        .control-panel {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        .control-button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            min-width: 120px;
+        }
+
+        .btn-power {
+            background: linear-gradient(45deg, #4169e1, #8a2be2);
+            color: white;
+        }
+
+        .btn-test {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+        }
+
+        .btn-reset {
+            background: #000075;
+            color: white;
+        }
+
+        .control-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        /* MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            backdrop-filter: blur(3px);
+        }
+
+        .modal-content {
+            background: #000075;
+            color: white;
+            margin: 5% auto;
+            padding: 20px;
+            width: 50%;
+            max-width: 700px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+            animation: slideDown 0.4s ease;
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+            transition: color 0.3s;
+        }
+
+        .close:hover {
+            color: #ffcc00;
+        }
+
+        .modal-content h2 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            border-bottom: 2px solid rgba(255,255,255,0.2);
+            padding-bottom: 8px;
+        }
+
+        .card {
+            background: rgba(255,255,255,0.08);
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            transition: background 0.3s;
+        }
+
+        .card:hover {
+            background: rgba(255,255,255,0.15);
+        }
+
+        .tab-buttons {
+            display: flex;
+            margin-bottom: 10px;
+        }
+
+        .tab-buttons button {
+            flex: 1;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            border-radius: 5px 5px 0 0;
+            transition: background 0.3s;
+        }
+
+        .tab-buttons button.active {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        pre {
+            background: rgba(0,0,0,0.4);
+            padding: 12px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 0.9rem;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .left-panel {
+                width: 100%;
+            }
+
+            .servo-motor > img {
+                width: 120px;
+                height: 120px;
+            }
+
+            .servo-horn img {
+                width: 56px;
+                height: 80px;
+            }
+
+            .ne555-chip img {
+                width: 120px;
+                height: 96px;
+            }
+
+            .resistor-container img {
+                width: 40px;
+                height: 32px;
+            }
+
+            .battery img {
+                width: 80px;
+                height: 64px;
+            }
+
+            .center img {
+                width: 64px;
+                height: 64px;
+            }
+
+            .servo-control-panel {
+                position: relative;
+                margin: 20px auto;
+                width: 100%;
+                max-width: 400px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .circuit-board {
+                aspect-ratio: 6 / 8;
+            }
+
+            .servo-motor > img {
+                width: 90px;
+                height: 90px;
+            }
+
+            .servo-horn img {
+                width: 42px;
+                height: 60px;
+            }
+
+            .ne555-chip img {
+                width: 90px;
+                height: 72px;
+            }
+
+            .resistor-container img {
+                width: 30px;
+                height: 24px;
+            }
+
+            .battery img {
+                width: 60px;
+                height: 48px;
+            }
+
+            .center img {
+                width: 48px;
+                height: 48px;
+            }
+
+            .control-button {
+                padding: 10px 15px;
+                font-size: 12px;
+                min-width: 100px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .circuit-board {
+                aspect-ratio: 6 / 9;
+            }
+
+            .servo-motor > img {
+                width: 60px;
+                height: 60px;
+            }
+
+            .servo-horn img {
+                width: 28px;
+                height: 40px;
+            }
+
+            .ne555-chip img {
+                width: 60px;
+                height: 48px;
+            }
+
+            .resistor-container img {
+                width: 20px;
+                height: 16px;
+            }
+
+            .battery img {
+                width: 40px;
+                height: 32px;
+            }
+
+            .center img {
+                width: 32px;
+                height: 32px;
+            }
+
+            .control-panel {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .control-button {
+                width: 100%;
+                max-width: 250px;
+            }
+        }
+        .left-panel{width:280px;max-width:95%;background:#fff;border-radius:14px;padding:16px;box-shadow:0 6px 16px rgba(0,0,0,.08)}
+  .left-panel h3{margin:0 0 12px;font-size:16px;color:#333}
+  .btn{display:block;width:100%;padding:10px 12px;margin:8px 0;border:0;border-radius:10px;cursor:pointer;transition:.25s;text-align:left;font-weight:600}
+  .btn-primary{background:#000075;color:#fff}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 14px rgba(0,0,0,.1)}
+  .flex-container-40-60{display:flex;gap:20px;align-items:flex-start;background:rgba(255,255,255,.1);padding:20px;border-radius:15px;margin-bottom:20px}
+  .flex-text-60{flex:1}
+  .flex-text-60 p{font-size:16px;line-height:1.8}
+  .flex-container-30-70{display:flex;gap:20px;align-items:flex-start;background:rgba(255,255,255,.1);padding:20px;border-radius:15px;margin-bottom:20px}
+  .flex-image-30{flex:0 0 30%}
+  .flex-image-30 img{width:100%;border-radius:10px}
+  .flex-text-70{flex:0 0 70%}
+  .flex-text-70 strong{color:#ffcc00;font-size:18px;display:block;margin-bottom:10px}
+  .modal{display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.8);backdrop-filter:blur(5px);overflow-y:auto}
+  .modal-content{background:#000075;color:#fff;margin:5vh auto;padding:30px;width:90%;max-width:1000px;border-radius:20px;box-shadow:0 15px 40px rgba(0,0,0,.5);position:relative;animation:slideDown .4s ease}
+  @keyframes slideDown{from{transform:translateY(-50px);opacity:0}to{transform:translateY(0);opacity:1}}
+  .close{position:absolute;right:20px;top:15px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:bold;cursor:pointer;color:#fff;transition:.3s;border-radius:50%;background:rgba(255,255,255,.1)}
+  .close:hover{background:rgba(255,204,0,.3);color:#ffcc00;transform:rotate(90deg)}
+  .modal-content h2{font-size:28px;margin-bottom:25px;padding-bottom:15px;border-bottom:2px solid rgba(255,255,255,.3);padding-right:50px}
+  .tab-buttons{display:flex;gap:8px;margin:12px 0 16px}
+  .tab-btn{flex:1;background:rgba(255,255,255,.12);color:#fff;border:0;border-radius:10px 10px 0 0;padding:10px;cursor:pointer;font-weight:600;transition:.2s}
+  .tab-btn:hover{background:rgba(255,255,255,.2)}
+  .tab-btn.active{background:rgba(255,255,255,.28)}
+  .tab-content{display:none}
+  .tab-content.active{display:block}
+  pre{background:rgba(0,0,0,.35);padding:12px;border-radius:10px;overflow:auto;white-space:pre-wrap;word-break:break-word;color:#fff;font-size:13.5px;line-height:1.55}
+  #infoFloatingBtn{position:fixed;bottom:30px;right:30px;width:120px;height:120px;border-radius:50%;background:linear-gradient(135deg,#000075,#0000ff);color:#fff;border:4px solid #fff;cursor:pointer;font-size:16px;font-weight:bold;box-shadow:0 8px 20px rgba(0,0,0,.4);z-index:1500;transition:.3s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px}
+  #infoFloatingBtn:hover{transform:scale(1.1);box-shadow:0 12px 30px rgba(0,0,255,.6)}
+  #infoFloatingBtn span:first-child{font-size:36px}
+  .video-full{width:100%;border-radius:15px;background:#000}
+  .video-full video{width:100%;height:auto;border-radius:15px;max-height:70vh}
+  @media (max-width:1024px){.flex-container-40-60,.flex-container-30-70{flex-direction:column}.flex-image-30,.flex-text-70{flex:0 0 100%}}
+  @media (max-width:768px){.modal-content{width:96%;padding:20px 15px}#infoFloatingBtn{width:90px;height:90px;font-size:14px;bottom:20px;right:20px}#infoFloatingBtn span:first-child{font-size:28px}}
+   
+              .card {
+    display: flex;
+    gap: 15px;
+    background: #000075;
+    color: white;
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    align-items: center;
+}
+
+.card img {
+    width: 150px;
+    border-radius: 10px;
+}
+
+.card .text h3 {
+    margin-bottom: 8px;
+    color: white;
+}
+   </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="logo">
+            <img src="/static/image/logo.png" width="80px" height="80px" alt="">
+            <span>360° Servo Motor & Robot Arm Control</span>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <div class="main-container">
+        <!-- LEFT PANEL -->
+        <div class="left-panel">
+            <div class="control-group">
+                <h3>Boshqaruv</h3>
+                <button class="btn btn-success" onclick="startSimulation()" id="startBtn">
+                    Start
+                </button>
+                <button class="btn btn-danger" onclick="stopSimulation()" id="stopBtn">
+                    Stop
+                </button>
+                <button class="btn btn-primary" onclick="togglePower()">
+                    Quvvat
+                </button>
+                <button class="btn btn-info" onclick="runTest()">
+                    Test
+                </button>
+            </div>
+            
+            <div class="control-group">
+                <h3>Ma'lumotlar</h3>
+       <button class="btn btn-primary" id="schemaBtn"      data-modal="#schemaModal">💡 Sxema qayerda ishlatiladi</button>
+<button class="btn btn-primary" id="codeBtn"        data-modal="#codeModal">💻 Kod</button>
+<button class="btn btn-primary" id="componentsBtn"  data-modal="#componentsModal">🔌 Qurilmalar</button>
+            </div>
+            
+            <div class="control-group">
+                <h3>Qurilma holati</h3>
+                <div class="status-row">
+                    <span>Quvvat:</span>
+                    <div class="status-led" id="powerLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Motor:</span>
+                    <div class="status-led" id="motorLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Signal:</span>
+                    <div class="status-led" id="signalLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Holat:</span>
+                    <div class="status-led" id="statusLed"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+            <div class="container">
+                <div class="circuit-board">
+                    <!-- Servo Motor -->
+                    <div class="servo-container">
+                        <div class="servo-motor">
+                            <img src="/static/image/servo.m - Copy.png" alt="">
+                            <div class="servo-arm" id="servoArm"></div>
+                            <div class="servo-horn" id="servoHorn">
+                                <img src="/static/image/hep.png" alt="">
+                            </div>
+                            <div class="robot-arm" id="robotArm"></div>
+                            <div class="robot-hand" id="robotHand">
+                                <div class="robot-finger finger-1"></div>
+                                <div class="robot-finger finger-2"></div>
+                                <div class="robot-finger finger-3"></div>
+                                <div class="robot-finger finger-4"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <img src="/static/image/104.png" width="50px" height="50px" style="position: absolute; top: 35%; left: 20%;" alt="">
+                    
+                    <!-- Wires -->
+                    <div class="wire wire-red"></div>
+                    <div class="wire wire-black"></div>
+                    <div class="wire wire-red1"></div>
+                    <div class="wire wire-black1"></div>
+                    <div class="wire wire-red2"></div>
+                    <div class="wire wire-black2"></div>
+                    <div class="wire wire-red3"></div>
+                    <div class="wire wire-black3"></div>
+                    <div class="wire wire-red4"></div>
+                    <div class="wire wire-black4"></div>
+                    <div class="wire wire-red5"></div>
+                    <div class="wire wire-black5"></div>
+                    <div class="wire wire-black6"></div>
+                    <div class="wire wire-black7"></div>
+                    <div class="wire wire-black8"></div>
+                    <div class="wire wire-pink"></div>
+                    <div class="wire wire-purple"></div>
+                    <div class="wire wire-pink1"></div>
+                    <div class="wire wire-purple1"></div>
+                    <div class="wire wire-pink2"></div>
+                    <div class="wire wire-purple2"></div>
+                    <div class="wire wire-pink3"></div>
+                    <div class="wire wire-purple3"></div>
+                    <div class="wire wire-pink4"></div>
+                    <div class="wire wire-purple4"></div>
+                    <div class="wire wire-red6"></div>
+
+                    <!-- NE555 Timer -->
+                    <div class="ne555-container">
+                        <div class="ne555-chip">
+                            <img src="/static/image/ne555p.png" alt="">
+                        </div>
+                    </div>
+
+                    <!-- Potentiometer -->
+                    <div class="potentiometer-container">
+                        <div class="potentiometer" id="potentiometer">
+                            <div class="pot-knob" id="potKnob">
+                                <div class="pot-indicator"></div>
+                            </div>
+                        </div>
+                        <div style="text-align: center; margin-top: 5px; font-size: 10px; font-weight: bold;">47k pot</div>
+                    </div>
+                    
+                    <div class="center">
+                        <img src="/static/image/resistor1.png" alt="">
+                        <img src="/static/image/1n.png" alt="">
+                    </div>
+                    
+                    <!-- Resistors -->
+                    <div class="resistor-container">
+                        <img src="/static/image/resistor.png" style="margin-right: 50vw; margin-top: 17vh;" alt="">
+                    </div>
+
+                    <!-- Battery -->
+                    <div class="battery-container">
+                        <div class="battery">
+                            <img src="/static/image/battery - touch.png" alt="">
+                        </div>
+                    </div>
+
+                    <div class="circuit-status-led" id="circuitStatusLed"></div>
+                </div>
+            </div>
+            
+            <!-- Control Panel -->
+            <div class="servo-control-panel">
+                <div class="control-group">
+                    <label class="control-label">Servo Angle (0-360°)</label>
+                    <input type="range" class="slider" id="angleSlider" min="0" max="360" value="180">
+                    <div class="value-display" id="angleDisplay">180°</div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label">PWM Signal</label>
+                    <div class="pwm-indicator">
+                        <div class="pwm-signal" id="pwmSignal"></div>
+                    </div>
+                    <div class="value-display" id="pwmDisplay">1.5ms / 20ms</div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label">Frequency</label>
+                    <input type="range" class="slider" id="freqSlider" min="40" max="60" value="50">
+                    <div class="value-display" id="freqDisplay">50 Hz</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONTROL PANEL -->
+    <div class="control-panel">
+        <button class="control-button btn-power" onclick="togglePower()">
+            Quvvat Yoqish/O'chirish
+        </button>
+        <button class="control-button btn-test" onclick="runTest()">
+            Tizimni sinash
+        </button>
+        <button class="control-button btn-reset" onclick="resetAll()">
+            Qayta o'rnatish
+        </button>
+    </div>
+
+    <!-- MODALS -->
+        <!-- qolgan qurilmalar ham shu tarzda -->
+  <div class="modal" id="schemaModal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>💡 Sxema qayerda ishlatiladi (RGB LED)</h2>
+    <div class="flex-container-40-60">
+         <div class="flex-video-40">
+                <iframe 
+                    src="https://www.youtube.com/embed/E85Vzb5B_-k?si=9DcIP4v6-L48esX6" 
+                    title="YouTube video player" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+      <div class="flex-text-60">
+        <strong>Ulanish sxemasi</strong>
+<p>Servo motor:
+
+Qizil kabel → 5V
+
+Qora / jigarrang → GND
+
+Sariq / Oq signal kabel → Arduino raqamli pin (masalan, D9)
+
+Potentiometr / Joystick → Arduino analog pin (masalan, A0)</p>
+      </div>
+    </div>
+    <div class="flex-container-40-60">
+         <div class="flex-video-40">
+                <iframe 
+                    src="https://www.youtube.com/embed/g9Q0wBy_qkE?si=kD3C_l9UXX412bcG" 
+                    title="YouTube video player" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+      <div class="flex-text-60">
+        <strong>🧩 Robot Arm Control</strong>
+  <p>Arm segmentlari: Har bir segmentga 360° servo motor o‘rnatiladi
+
+Joystick / Potentiometr: Har bir servo uchun alohida boshqaruv
+
+Arduino kod: Har bir analog pinni o‘qib, mos servo motor harakatini boshqarish
+
+Misol: 3 segmentli robot qo‘l
+
+Servo1 → Baza aylanishi
+
+Servo2 → Bilak harakati
+
+Servo3 → Qo‘l uchidagi manipulyator</p>
+      </div>
+    </div>
+    <div class="flex-container-40-60">
+         <div class="flex-video-40">
+                <iframe 
+                    src="https://www.youtube.com/embed/fH_dG9AcFAY?si=u_A5CdmfJQUuNFSV" 
+                    title="YouTube video player" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+      <div class="flex-text-60">
+        <strong>Qo‘shimcha imkoniyatlar</strong>
+  <p>Push-button bilan oldinga / orqaga harakat
+
+Bluetooth yoki WiFi modul orqali masofadan boshqarish
+
+Gripper qo‘shish → ob’ektni ushlash va qo‘yish
+
+Autonomous mode → oldindan yozilgan harakatlarni bajarish</p>
+   
+    </div>
+    </div>
+  </div>
+</div>
+<!-- Ishlatilgan qurilmalar (modal) -->
+<!-- Ishlatilgan qurilmalar (modal) -->
+<div class="modal" id="componentsModal">
+  <div class="modal-content">
+    <span class="close" title="Yopish">&times;</span>
+    <h2>🔌 Ishlatilgan Qurilmalar</h2>
+
+    <div class="card">
+      <img src="/static/image/ne555p.png" alt="Rezistor">
+      <div class="text">
+        <h3>NE555P sensor</h3>
+        <p>Vazifasi: Signal generator (PWM yoki kvadrat impulslar) sifatida ishlaydi.
+
+Izoh: Servo motorni harakatlantirish uchun zarur bo‘lgan impulslarni hosil qiladi.
+</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <img src="/static/image/battery - touch.png" alt="LM393P Komparator">
+      <div class="text">
+        <h3>Batareya</h3>
+        <p>Batareya — bu elektr energiyasini saqlab, qurilmaga tok manbai sifatida ta’minlovchi elementdir.
+</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <img src="/static/image/servo.m - Copy.png" alt="5V Relay modul">
+      <div class="text">
+        <h3>Servo motor</h3>
+        <p>Vazifasi: Elektr signalga qarab ma’lum burchakka buriladi.
+
+Izoh: 555 timer chiqishidagi impuls kengligiga qarab servo 0° dan 180° gacha harakatlanadi.</p>
+      </div>
+    </div>
+   <div class="card">
+      <img src="/static/image/10k.png" alt="5V Relay modul">
+      <div class="text">
+        <h3>47k Potensiometr</h3>
+        <p>
+            Vazifasi: 555 timer chastotasini yoki impuls kengligini o‘zgartiradi.
+
+Izoh: Servo motorning aylanish burchagini qo‘lda sozlash imkonini beradi.
+        </p>
+      </div>
+    </div>
+    <div class="card">
+      <img src="/static/image/led-removebg-preview.png" alt="5V Relay modul">
+      <div class="text">
+        <h3>Led Diod</h3>
+        <p>
+         Vazifasi: Tokning faqat bitta yo‘nalishda o‘tishini ta’minlaydi.
+
+Izoh: 555 timer ichida impuls shaklini barqarorlashtirish uchun ishlatiladi.
+        </p>
+      </div>
+    </div>
+ <div class="card">
+      <img src="/static/image/1n-removebg-preview.png" alt="5V Relay modul">
+      <div class="text">
+        <h3>Kondensator</h3>
+        <p>
+         Vazifasi: Tokning faqat bitta yo‘nalishda o‘tishini ta’minlaydi.
+
+Izoh: 555 timer ichida impuls shaklini barqarorlashtirish uchun ishlatiladi.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+<div class="modal" id="infoModal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>📚 Qo'shimcha Ma'lumot</h2>
+    <div class="video-full">
+      <video controls>
+        <source src="/media/2.mp4" type="video/mp4">
+        Brauzeringiz video formatni qo'llab-quvvatlamaydi.
+      </video>
+    </div>
+  </div>
+</div>
+
+<button id="infoFloatingBtn"><span>📚</span><span>Ma'lumot</span></button>
+
+
+   
+   
+   
+    <script>
+        // Modal ochish / yopish
+        function openModal(id) {
+            document.getElementById(id).style.display = "block";
+        }
+        
+        function closeModal(id) {
+            document.getElementById(id).style.display = "none";
+        }
+
+        document.getElementById("schemaBtn").addEventListener("click", function() {
+            openModal("schemaModal");
+        });
+        
+        document.getElementById("codeBtn").addEventListener("click", function() {
+            openModal("codeModal");
+        });
+        
+        document.getElementById("componentsBtn").addEventListener("click", function() {
+            openModal("componentsModal");
+        });
+
+        document.querySelectorAll(".modal .close").forEach(btn => {
+            btn.addEventListener("click", function() {
+                this.closest(".modal").style.display = "none";
+            });
+        });
+
+  function openModal(id){ const m=document.getElementById(id); if(m) m.style.display='block'; }
+  function closeModal(el){ const m=el.closest('.modal'); if(m) m.style.display='none'; }
+
+  document.addEventListener('click', (e)=>{ if(e.target.matches('.modal .close')) closeModal(e.target); });
+  window.addEventListener('click', (e)=>{ document.querySelectorAll('.modal').forEach(m=>{ if(e.target===m) m.style.display='none'; }); });
+
+  // buttons
+  document.getElementById('schemaBtn')?.addEventListener('click', ()=>openModal('schemaModal'));
+  document.getElementById('codeBtn')?.addEventListener('click',   ()=>openModal('codeModal'));
+  document.getElementById('componentsBtn')?.addEventListener('click', ()=>openModal('componentsModal'));
+  document.getElementById('infoFloatingBtn')?.addEventListener('click', ()=>openModal('infoModal'));
+
+  // tabs
+  (function(){
+    const codeModal=document.getElementById('codeModal');
+    if(!codeModal) return;
+    codeModal.querySelectorAll('.tab-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const t=btn.dataset.tab;
+        codeModal.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        codeModal.querySelectorAll('.tab-content').forEach(p=>p.classList.toggle('active', p.id===t));
+      });
+    });
+  })();
+        window.addEventListener("click", function(e) {
+            document.querySelectorAll(".modal").forEach(modal => {
+                if (e.target === modal) {
+                    modal.style.display = "none";
+                }
+            });
+        });
+
+        // Tab boshqaruvi
+        document.querySelectorAll(".tab-btn").forEach(button => {
+            button.addEventListener("click", function() {
+                const tab = this.dataset.tab;
+                document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+                this.classList.add("active");
+                document.querySelectorAll(".tab-content").forEach(content => {
+                    content.classList.remove("active");
+                    if (content.id === tab) {
+                        content.classList.add("active");
+                    }
+                });
+            });
+        });
+
+        // System State Variables
+        let powerOn = false;
+        let motorActive = false;
+        let signalDetected = false;
+        let systemStatus = false;
+
+        // DOM Elements
+        const elements = {
+            powerLed: document.getElementById('powerLed'),
+            motorLed: document.getElementById('motorLed'),
+            signalLed: document.getElementById('signalLed'),
+            statusLed: document.getElementById('statusLed'),
+            angleSlider: document.getElementById('angleSlider'),
+            freqSlider: document.getElementById('freqSlider'),
+            angleDisplay: document.getElementById('angleDisplay'),
+            pwmDisplay: document.getElementById('pwmDisplay'),
+            freqDisplay: document.getElementById('freqDisplay'),
+            pwmSignal: document.getElementById('pwmSignal'),
+            servoArm: document.getElementById('servoArm'),
+            servoHorn: document.getElementById('servoHorn'),
+            robotArm: document.getElementById('robotArm'),
+            robotHand: document.getElementById('robotHand'),
+            potentiometer: document.getElementById('potentiometer'),
+            potKnob: document.getElementById('potKnob'),
+            circuitStatusLed: document.getElementById('circuitStatusLed')
+        };
+
+        function updateStatus() {
+            elements.powerLed.classList.toggle('on', powerOn);
+            elements.motorLed.classList.toggle('on', motorActive);
+            elements.signalLed.classList.toggle('on', signalDetected);
+            elements.statusLed.classList.toggle('on', systemStatus);
+        }
+
+        function togglePower() {
+            powerOn = !powerOn;
+            if (!powerOn) {
+                stopAllSystems();
+            }
+            updateStatus();
+        }
+
+        function angleToPulseWidth(angle) {
+            return 0.5 + (angle / 360) * 2.0;
+        }
+
+        function angleToRotation(angle) {
+            return angle;
+        }
+
+        function updateServo() {
+            if (!powerOn) return;
+            
+            const angle = parseInt(elements.angleSlider.value);
+            const frequency = parseInt(elements.freqSlider.value);
+            
+            elements.angleDisplay.textContent = angle + '°';
+            elements.freqDisplay.textContent = frequency + ' Hz';
+            
+            const pulseWidth = angleToPulseWidth(angle);
+            const period = 1000 / frequency;
+            const dutyCycle = (pulseWidth / period) * 100;
+            
+            elements.pwmDisplay.textContent = pulseWidth.toFixed(2) + 'ms / ' + period.toFixed(1) + 'ms';
+            elements.pwmSignal.style.width = Math.min(dutyCycle, 100) + '%';
+            
+            const rotation = angleToRotation(angle);
+            if (elements.servoArm) elements.servoArm.style.transform = `translateX(-50%) rotate(${rotation}deg)`;
+            if (elements.servoHorn) elements.servoHorn.style.transform = `rotate(${rotation}deg)`;
+            if (elements.robotArm) elements.robotArm.style.transform = `translateX(-50%) rotate(${rotation}deg)`;
+            if (elements.robotHand) elements.robotHand.style.transform = `translateX(-50%) rotate(${rotation}deg)`;
+            
+            const potRotation = (angle / 360) * 270;
+            elements.potKnob.style.transform = `rotate(${potRotation}deg)`;
+            
+            if (angle < 120) {
+                elements.circuitStatusLed.style.background = '#FF5722';
+                elements.circuitStatusLed.style.boxShadow = '0 0 10px #FF5722';
+            } else if (angle > 240) {
+                elements.circuitStatusLed.style.background = '#2196F3';
+                elements.circuitStatusLed.style.boxShadow = '0 0 10px #2196F3';
+            } else {
+                elements.circuitStatusLed.style.background = '#4CAF50';
+                elements.circuitStatusLed.style.boxShadow = '0 0 10px #4CAF50';
+            }
+            
+            motorActive = true;
+            signalDetected = true;
+            systemStatus = true;
+            updateStatus();
+        }
+document.addEventListener('DOMContentLoaded', () => {
+  // ---- Universal open() by [data-modal] or known button IDs ----
+  function openModalById(id) {
+    const m = document.getElementById(id);
+    if (m) m.style.display = 'block';
+    else console.warn('[openModalById] topilmadi:', id);
+  }
+  function closeModal(modalEl) { modalEl.style.display = 'none'; }
+
+  // 1) Tugmalar → Modal
+  //   a) Data-atribut bilan (yaxshi amaliyot)
+  document.querySelectorAll('[data-modal]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const sel = btn.getAttribute('data-modal');
+      const m = document.querySelector(sel);
+      if (m) m.style.display = 'block';
+    });
+  });
+
+  //   b) An’anaviy ID’lar bo‘lsa (orqaga moslik)
+  const map = [
+    ['schemaBtn',     'schemaModal'],
+    ['componentsBtn', 'componentsModal'],
+    ['codeBtn',       'codeModal'],
+    ['infoFloatingBtn','infoModal']
+  ];
+  map.forEach(([btnId, modalId]) => {
+    const b = document.getElementById(btnId);
+    if (b) b.addEventListener('click', () => openModalById(modalId));
+  });
+
+  // 2) Modal ichidagi ✖ yopish
+  document.querySelectorAll('.modal').forEach(modal => {
+    const closeBtn = modal.querySelector('.close');
+    if (closeBtn) closeBtn.addEventListener('click', () => closeModal(modal));
+  });
+
+  // 3) Modal foniga bosilganda yopish
+  window.addEventListener('click', (e) => {
+    document.querySelectorAll('.modal').forEach(modal => {
+      if (e.target === modal) closeModal(modal);
+    });
+  });
+
+  // 4) Kod modalidagi tablar
+  const codeModal = document.getElementById('codeModal');
+  if (codeModal) {
+    codeModal.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = btn.dataset.tab;
+        codeModal.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        codeModal.querySelectorAll('.tab-content').forEach(p => {
+          p.classList.toggle('active', p.id === target);
+        });
+      });
+    });
+  }
+});
+        let isDragging = false;
+
+        elements.potentiometer.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            updatePotFromMouse(e);
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                updatePotFromMouse(e);
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+
+        function updatePotFromMouse(e) {
+            const rect = elements.potentiometer.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            
+            const angle = Math.atan2(e.clientY - centerY, e.clientX - centerX);
+            let degrees = (angle * 180 / Math.PI + 90 + 360) % 360;
+            
+            const servoAngle = Math.round(degrees);
+            elements.angleSlider.value = Math.max(0, Math.min(360, servoAngle));
+            updateServo();
+        }
+
+        function startSimulation() {
+            if (!powerOn) {
+                alert('Avval quvvatni yoqing!');
+                return;
+            }
+            updateServo();
+        }
+
+        function stopSimulation() {
+            stopAllSystems();
+        }
+
+        function runTest() {
+            if (!powerOn) {
+                alert('Avval quvvatni yoqing!');
+                return;
+            }
+            
+            let angle = 0;
+            const interval = setInterval(() => {
+                elements.angleSlider.value = angle;
+                updateServo();
+                
+                angle += 10;
+                if (angle > 360) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        elements.angleSlider.value = 180;
+                        updateServo();
+                    }, 500);
+                }
+            }, 100);
+        }
+
+        function resetAll() {
+            stopAllSystems();
+            elements.angleSlider.value = 180;
+            elements.freqSlider.value = 50;
+            updateServo();
+        }
+
+        function stopAllSystems() {
+            motorActive = false;
+            signalDetected = false;
+            systemStatus = false;
+            updateStatus();
+        }
+
+        elements.angleSlider.addEventListener('input', updateServo);
+        elements.freqSlider.addEventListener('input', updateServo);
+        updateServo();
+
+        setInterval(() => {
+            const currentPulseWidth = angleToPulseWidth(parseInt(elements.angleSlider.value));
+            const frequency = parseInt(elements.freqSlider.value);
+            const period = 1000 / frequency;
+            
+            elements.pwmSignal.style.transition = 'none';
+            elements.pwmSignal.style.width = '100%';
+            
+            setTimeout(() => {
+                elements.pwmSignal.style.transition = 'width 0.05s ease';
+                elements.pwmSignal.style.width = '0%';
+            }, currentPulseWidth);
+        }, 20);
+    </script>
+</body>
+</html>

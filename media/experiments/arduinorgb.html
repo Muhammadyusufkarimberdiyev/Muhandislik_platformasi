@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RGB LED Arduino Simulyatori</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #e6f3ff;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: auto;
+        }
+
+        /* HEADER */
+        .header {
+            display: flex;
+            align-items: center;
+            background:#000075;
+            color: white;
+            padding: 10px 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            width: 100%;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 50%;
+            border: 2px solid white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000075;
+            font-weight: bold;
+        }
+
+        /* MAIN LAYOUT */
+        .main-container {
+            display: flex;
+            margin-top: 20px;
+            gap: 20px;
+        }
+
+        /* LEFT PANEL */
+        .left-panel {
+            width: 250px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            height: fit-content;
+            position: relative;
+            z-index: 1;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 15px;
+        }
+
+        .control-group h3 {
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 8px;
+            font-size: 14px;
+            border-radius: 5px;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn-success { 
+            background: #28a745; 
+            color: white; 
+        }
+        .btn-danger { 
+            background: #dc3545; 
+            color: white; 
+        }
+        .btn-primary { 
+            background: #000075; 
+            color: white; 
+        }
+        .btn-info { 
+            background:#000075 ; 
+            color: white; 
+        }
+
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 8px 0;
+            font-size: 13px;
+        }
+
+        .status-led {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #dc3545;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+        }
+
+        .status-led.on {
+            background: #28a745;
+            box-shadow: 0 0 10px rgba(40, 167, 69, 0.8);
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .title-header {
+            background: #000075;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0 auto 30px;
+            text-align: center;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        /* CIRCUIT BOARD */
+        .circuit-board {
+            position: relative;
+            width: 800px;
+            height: 600px;
+            margin: 0 auto;
+            background: #f0f0f0;
+            border: 2px solid #333;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        /* ARDUINO */
+        .arduino {
+            position: absolute;
+            left: 10px;
+            top: 50px;
+            
+            border-radius: 8px;
+    
+        }
+
+        .arduino-header {
+            background: #004444;
+            color: white;
+            text-align: center;
+            padding: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 6px 6px 0 0;
+        }
+
+        .arduino-pins {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            padding: 10px;
+            font-size: 10px;
+            color: white;
+        }
+
+        .pin-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .pin {
+            width: 15px;
+            height: 15px;
+            background: #333;
+            border-radius: 50%;
+            border: 2px solid #666;
+        }
+
+        .pin.active {
+            background: #00ff00;
+            box-shadow: 0 0 8px #00ff00;
+        }
+
+        .pin-label {
+            font-weight: bold;
+            min-width: 30px;
+        }
+
+        /* BREADBOARD */
+        .breadboard {
+            position: absolute;
+            right: 70px;
+            top: 70px;
+            width: 400px;
+            height: 250px;
+              border-radius: 8px;
+            display: grid;
+            grid-template-columns: repeat(20, 1fr);
+            grid-template-rows: repeat(12, 1fr);
+            gap: 2px;
+            padding: 10px;
+        }
+
+        .breadboard-hole {
+            width: 8px;
+            height: 8px;
+        
+            border-radius: 50%;
+            margin: auto;
+        }
+
+        .breadboard-hole.connected {
+            background: #ff6600;
+            box-shadow: 0 0 5px #ff6600;
+        }
+
+        /* RGB LED */
+        .rgb-led {
+            position: absolute;
+            right: 155px;
+            top: 170px;
+            width: 40px;
+            height: 40px;
+   
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+           
+        }
+
+        .led-inner {
+           
+            
+            transition: all 0.3s ease;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        /* LED ranglar */
+        .rgb-led.red .led-inner {
+            background: radial-gradient(circle, #ff0000 0%, #cc0000 70%, #990000 100%);
+            box-shadow: 0 0 20px #ff0000, inset 0 0 10px rgba(255,255,255,0.2);
+        }
+
+        .rgb-led.green .led-inner {
+            background: radial-gradient(circle, #00ff00 0%, #00cc00 70%, #009900 100%);
+            box-shadow: 0 0 20px #00ff00, inset 0 0 10px rgba(255,255,255,0.2);
+        }
+
+        .rgb-led.blue .led-inner {
+            background: radial-gradient(circle, #0000ff 0%, #0000cc 70%, #000099 100%);
+            box-shadow: 0 0 20px #0000ff, inset 0 0 10px rgba(255,255,255,0.2);
+        }
+
+        .rgb-led.yellow .led-inner {
+            background: radial-gradient(circle, #ffff00 0%, #cccc00 70%, #999900 100%);
+            box-shadow: 0 0 20px #ffff00, inset 0 0 10px rgba(255,255,255,0.2);
+        }
+
+        .rgb-led.purple .led-inner {
+            background: radial-gradient(circle, #ff00ff 0%, #cc00cc 70%, #990099 100%);
+            box-shadow: 0 0 20px #ff00ff, inset 0 0 10px rgba(255,255,255,0.2);
+        }
+
+        .rgb-led.cyan .led-inner {
+            background: radial-gradient(circle, #00ffff 0%, #00cccc 70%, #009999 100%);
+            box-shadow: 0 0 20px #00ffff, inset 0 0 10px rgba(255,255,255,0.2);
+        }
+
+        .rgb-led.white .led-inner {
+            background: radial-gradient(circle, #ffffff 0%, #cccccc 70%, #999999 100%);
+            box-shadow: 0 0 20px #ffffff, inset 0 0 10px rgba(255,255,255,0.2);
+        }
+
+        .rgb-led.off .led-inner {
+       
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        /* RESISTOR */
+        .resistor {
+            position: absolute;
+            width: 40px;
+            height: 12px;
+           border-radius: 6px;
+            
+        }
+
+        .resistor.r220 {
+            right: 152px;
+            top: 235px;
+            transform: rotate(90deg);
+        }
+
+        .resistor.r220-2 {
+            right: 131px;
+            top: 235px;
+            transform: rotate(90deg);
+        }
+
+        .resistor.r220-3 {
+            right: 121px;
+            top: 235px;
+            transform: rotate(90deg);
+        }
+
+        /* SIMLAR (WIRES) */
+        .wire {
+            position: absolute;
+            border-radius: 2px;
+            z-index: 10;
+        }
+
+        
+
+        .wire-gnd {
+            background: #000000;
+            width: 80px;
+            height: 3px;
+            left: 280px;
+            top: 205px;
+        }
+
+        /* Vertikal simlar */
+        .wire-v1 {
+            /* background: #ff0000; */
+            width: 3px;
+            height: 23px;
+            right: 190px;
+            top: 275px;
+        }
+
+        .wire-v2 {
+            background: #00ff00;
+           width: 4px;
+            height: 10px;
+            right: 168px;
+            top: 275px;
+        }
+
+        .wire-v3 {
+            background: #0000ff;
+           width: 3px;
+            height: 20px;
+            right: 158px;
+            top: 275px;
+        }
+
+        /* Arduino dan chiquvchi simlar */
+      
+        .wire-arduino-red-h {
+            background: #ff0000;
+            width: 325px;
+            height: 3px;
+            left: 280px;
+            top: 267px;
+        }
+
+   
+
+        .wire-arduino-green-h {
+            background: #00ff00;
+            width: 345px;
+            height: 3px;
+            left: 280px;
+            top: 283px;
+        }
+
+        
+        .wire-arduino-blue-h {
+            background: #0000ff;
+            width: 360px;
+            height: 3px;
+            left: 280px;
+            top: 293px;
+        }
+
+        .wire-arduino-gnd {
+             background: #000000;
+            width: 3px;
+            height:35px;
+            left: 358px;
+            top: 205px;
+        }
+
+        .wire-arduino-gnd-h {
+            background: #000000;
+            width: 259px;
+            height: 3px;
+             left: 358px;
+            top: 238px;
+        }
+
+        /* LED PINS */
+        .led-pin {
+            position: absolute;
+            width: 2px;
+            height: 10px;
+            background: black;
+        }
+
+        .led-pin-1 { right: 161px; top: 203px; transform: rotate(-25deg); }
+        .led-pin-2 { right: 169px; top: 205px; }
+        .led-pin-3 { right: 180px; top: 205px; }
+        .led-pin-4 { right: 187px; top: 203px; transform: rotate(25deg); }
+
+        /* CONTROL PANEL */
+        .control-panel {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        .control-button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            min-width: 120px;
+        }
+
+        .btn-power {
+            background: linear-gradient(45deg, #4169e1, #8a2be2);
+            color: white;
+        }
+
+        .btn-test {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+        }
+
+        .btn-reset {
+            background: #000075;
+            color: white;
+        }
+.led-inner {
+    right: 150px;
+            top: 180px;
+            width: 25px;
+            height: 30px;
+            border-radius: 55px 55px 0 0;
+            background: whitesmoke;
+
+    transition: all 0.3s ease;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+}
+
+        .control-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        /* TIME DISPLAY */
+        .time-display {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .left-panel {
+                width: 100%;
+            }
+            
+            .circuit-board {
+                width: 100%;
+                height: 500px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="logo">
+                     <img src="/static/image/logo.png" width="80px" height="80px" alt="">
+            <span>RGB LED Arduino Simulyatori</span>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <div class="main-container">
+        <!-- LEFT PANEL -->
+        <div class="left-panel">
+            <div class="control-group">
+                <h3>Boshqaruv</h3>
+                <button class="btn btn-success" onclick="startSimulation()" id="startBtn">
+                    Start
+                </button>
+                <button class="btn btn-danger" onclick="stopSimulation()" id="stopBtn">
+                    Stop
+                </button>
+                <button class="btn btn-primary" onclick="togglePower()">
+                    Quvvat
+                </button>
+                <button class="btn btn-info" onclick="runTest()">
+                    Test
+                </button>
+            </div>
+
+            <div class="control-group">
+                <h3>Qurilma holati</h3>
+                <div class="status-row">
+                    <span>Quvvat:</span>
+                    <div class="status-led" id="powerLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Pin 9 (Qizil):</span>
+                    <div class="status-led" id="redLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Pin 10 (Yashil):</span>
+                    <div class="status-led" id="greenLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>Pin 11 (Ko'k):</span>
+                    <div class="status-led" id="blueLed"></div>
+                </div>
+                <div class="status-row">
+                    <span>RGB LED:</span>
+                    <div class="status-led" id="rgbStatusLed"></div>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <h3>Rangli rejim</h3>
+                <button class="btn btn-primary" onclick="manualColor('red')">Qizil</button>
+                <button class="btn btn-primary" onclick="manualColor('green')">Yashil</button>
+                <button class="btn btn-primary" onclick="manualColor('blue')">Ko'k</button>
+                <button class="btn btn-primary" onclick="manualColor('yellow')">Sariq</button>
+                <button class="btn btn-primary" onclick="manualColor('purple')">Binafsha</button>
+                <button class="btn btn-primary" onclick="manualColor('cyan')">Moviy</button>
+                <button class="btn btn-primary" onclick="manualColor('white')">Oq</button>
+                <button class="btn btn-danger" onclick="manualColor('off')">O'chirish</button>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+            <div class="title-header">RGB LED va Arduino Tajribasi</div>
+            
+            <div class="circuit-board">
+                <div class="time-display" id="timeDisplay">Vaqt: 0s</div>
+                
+                <!-- ARDUINO -->
+                <div class="arduino">
+                    <img src="/static/image/arduino1.png" width="350px" height="350px" alt="">
+                </div>
+
+                <!-- BREADBOARD -->
+                <div class="breadboard" id="breadboard">
+                    <img src="/static/image/breadboard-removebg-preview.png" width="400px" height="350px" alt="">
+                </div>
+
+                <!-- RGB LED -->
+                <div class="rgb-led off" id="rgbLed">
+                    <div class="led-inner"></div>
+                </div>
+                <div class="led-pin led-pin-1"></div>
+                <div class="led-pin led-pin-2"></div>
+                <div class="led-pin led-pin-3"></div>
+                <div class="led-pin led-pin-4"></div>
+                <!-- RESISTORLAR -->
+                <div class="resistor r220">
+                    <img src="/static/image/resistor.png" width="48px" height="50px" alt="">
+                </div>
+                <div class="resistor r220-2"><img src="/static/image/resistor.png" width="48px" height="50px" alt=""></div>
+                <div class="resistor r220-3"><img src="/static/image/resistor.png" width="48px" height="50px" alt=""></div>
+
+            
+                <!-- SIMLAR -->
+                <!-- Arduino dan chiquvchi gorizontal simlar -->
+                <div class="wire wire-arduino-red-h"></div>
+                <div class="wire wire-arduino-green-h"></div>
+                <div class="wire wire-arduino-blue-h"></div>
+                <div class="wire wire-arduino-gnd-h"></div>
+
+                <!-- Arduino pinlaridan vertikal simlar -->
+                <div class="wire wire-arduino-red"></div>
+                <div class="wire wire-arduino-green"></div>
+                <div class="wire wire-arduino-blue"></div>
+                <div class="wire wire-arduino-gnd"></div>
+
+                <!-- Resistorlar orqali LED ga -->
+                <div class="wire wire-red"></div>
+                <div class="wire wire-green"></div>
+                <div class="wire wire-blue"></div>
+                <div class="wire wire-gnd"></div>
+
+                <!-- Resistorlar ostidagi vertikal simlar -->
+                <div class="wire wire-v1"></div>
+                <div class="wire wire-v2"></div>
+                <div class="wire wire-v3"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONTROL PANEL -->
+    <div class="control-panel">
+        <button class="control-button btn-power" onclick="togglePower()">
+            Quvvat Yoqish/O'chirish
+        </button>
+        <button class="control-button btn-test" onclick="runTest()">
+            Tizimni sinash
+        </button>
+        <button class="control-button btn-reset" onclick="resetAll()">
+            Qayta o'rnatish
+        </button>
+    </div>
+
+    <script>
+        // Tizim holat o'zgaruvchilari
+        let powerOn = false;
+        let simulationRunning = false;
+        let currentColor = 'off';
+        let colorIndex = 0;
+        let intervalId = null;
+        let timeElapsed = 0;
+        let timeIntervalId = null;
+
+        // Ranglar ketma-ketligi
+        const colors = ['red', 'green', 'blue', 'yellow', 'purple', 'cyan', 'white', 'off'];
+        const colorNames = ['Qizil', 'Yashil', 'Ko\'k', 'Sariq', 'Binafsha', 'Moviy', 'Oq', 'O\'chiq'];
+
+        // DOM elementlar
+        const elements = {
+            powerLed: document.getElementById('powerLed'),
+            redLed: document.getElementById('redLed'),
+            greenLed: document.getElementById('greenLed'),
+            blueLed: document.getElementById('blueLed'),
+            rgbStatusLed: document.getElementById('rgbStatusLed'),
+            rgbLed: document.getElementById('rgbLed'),
+            timeDisplay: document.getElementById('timeDisplay'),
+          
+        };
+
+        // Breadboard yaratish
+        function createBreadboard() {
+            const breadboard = document.getElementById('breadboard');
+            for (let i = 0; i < 240; i++) { // 20x12 = 240 teshik
+                const hole = document.createElement('div');
+                hole.className = 'breadboard-hole';
+                breadboard.appendChild(hole);
+            }
+        }
+
+        // LED holatini yangilash
+        function updateLED(color) {
+            const led = elements.rgbLed;
+            
+            // Barcha ranglarni olib tashlash
+            colors.forEach(c => led.classList.remove(c));
+            
+            // Yangi rangni qo'shish
+            led.classList.add(color);
+            currentColor = color;
+            
+            // Arduino pinlarini yangilash
+            updateArduinoPins(color);
+            
+            // Status LED ni yangilash
+            updateStatusLEDs(color);
+        }
+
+        // Arduino pinlarini yangilash
+        function updateArduinoPins(color) {
+            // Barcha pinlarni o'chirish
+            elements.pin9.classList.remove('active');
+            elements.pin10.classList.remove('active');
+            elements.pin11.classList.remove('active');
+            elements.pinGnd.classList.add('active'); // GND har doim faol
+
+            // Rang bo'yicha pinlarni yoqish
+            switch(color) {
+                case 'red':
+                    elements.pin9.classList.add('active');
+                    break;
+                case 'green':
+                    elements.pin10.classList.add('active');
+                    break;
+                case 'blue':
+                    elements.pin11.classList.add('active');
+                    break;
+                case 'yellow':
+                    elements.pin9.classList.add('active');
+                    elements.pin10.classList.add('active');
+                    break;
+                case 'purple':
+                    elements.pin9.classList.add('active');
+                    elements.pin11.classList.add('active');
+                    break;
+                case 'cyan':
+                    elements.pin10.classList.add('active');
+                    elements.pin11.classList.add('active');
+                    break;
+                case 'white':
+                    elements.pin9.classList.add('active');
+                    elements.pin10.classList.add('active');
+                    elements.pin11.classList.add('active');
+                    break;
+            }
+        }
+
+        // Status LED larni yangilash
+        function updateStatusLEDs(color) {
+            elements.redLed.classList.toggle('on', color.includes('red') || color === 'yellow' || color === 'purple' || color === 'white');
+            elements.greenLed.classList.toggle('on', color === 'green' || color === 'yellow' || color === 'cyan' || color === 'white');
+            elements.blueLed.classList.toggle('on', color === 'blue' || color === 'purple' || color === 'cyan' || color === 'white');
+            elements.rgbStatusLed.classList.toggle('on', color !== 'off');
+            elements.powerLed.classList.toggle('on', powerOn);
+        }
+
+        // Vaqt hisoblagichi
+        function updateTimer() {
+            elements.timeDisplay.textContent = `Vaqt: ${timeElapsed}s`;
+            timeElapsed++;
+        }
+
+        // Quvvatni yoqish/o'chirish
+        function togglePower() {
+            powerOn = !powerOn;
+            
+            if (!powerOn) {
+                stopSimulation();
+                updateLED('off');
+            }
+            
+            updateStatusLEDs(currentColor);
+        }
+
+        // Simulyatsiyani boshlash
+        function startSimulation() {
+            if (!powerOn) {
+                alert('Avval quvvatni yoqing!');
+                return;
+            }
+            
+            if (simulationRunning) {
+                alert('Simulyatsiya allaqachon ishlamoqda!');
+                return;
+            }
+            
+            simulationRunning = true;
+            timeElapsed = 0;
+            colorIndex = 0;
+            
+            // Vaqt hisoblagichini boshlash
+            timeIntervalId = setInterval(updateTimer, 1000);
+            
+            // Rang o'zgartirish intervalini boshlash (har 5 soniyada)
+            intervalId = setInterval(() => {
+                if (simulationRunning && powerOn) {
+                    updateLED(colors[colorIndex]);
+                    console.log(`Rang o'zgartirildi: ${colorNames[colorIndex]}`);
+                    colorIndex = (colorIndex + 1) % colors.length;
+                }
+            }, 5000);
+            
+            // Birinchi rangni darhol o'rnatish
+            updateLED(colors[colorIndex]);
+            colorIndex = (colorIndex + 1) % colors.length;
+            
+            alert('Simulyatsiya boshlandi! LED har 5 soniyada rang o\'zgartiradi.');
+        }
+
+        // Simulyatsiyani to'xtatish
+        function stopSimulation() {
+            simulationRunning = false;
+            
+            if (intervalId) {
+                clearInterval(intervalId);
+                intervalId = null;
+            }
+            
+            if (timeIntervalId) {
+                clearInterval(timeIntervalId);
+                timeIntervalId = null;
+            }
+            
+            updateLED('off');
+            alert('Simulyatsiya to\'xtatildi!');
+        }
+
+        // Test rejimi
+        function runTest() {
+            if (!powerOn) {
+                alert('Avval quvvatni yoqing!');
+                return;
+            }
+            
+            alert('Test boshlandi! Barcha ranglar ketma-ket ko\'rsatiladi.');
+            
+            let testIndex = 0;
+            const testInterval = setInterval(() => {
+                if (testIndex < colors.length - 1) { // 'off'ni chiqarib tashlash
+                    updateLED(colors[testIndex]);
+                    console.log(`Test: ${colorNames[testIndex]}`);
+                    testIndex++;
+                } else {
+                    clearInterval(testInterval);
+                    updateLED('off');
+                    alert('Test tugadi!');
+                }
+            }, 1000);
+        }
+
+        // Qo'lda rang o'rnatish
+        function manualColor(color) {
+            if (!powerOn) {
+                alert('Avval quvvatni yoqing!');
+                return;
+            }
+            
+            // Agar simulyatsiya ishlab tursa, uni to'xtatish
+            if (simulationRunning) {
+                stopSimulation();
+            }
+            
+            updateLED(color);
+            console.log(`Qo'lda rang o'rnatildi: ${color}`);
+        }
+
+        // Barcha tizimni qayta o'rnatish
+        function resetAll() {
+            stopSimulation();
+            powerOn = false;
+            timeElapsed = 0;
+            updateLED('off');
+            elements.timeDisplay.textContent = 'Vaqt: 0s';
+            alert('Tizim qayta o\'rnatildi!');
+        }
+
+        // Sahifa yuklanganda
+        window.addEventListener('load', function() {
+            createBreadboard();
+            updateLED('off');
+            
+            // Arduino kodi ko'rsatish
+            console.log(`
+/*
+  RGB LED Arduino Kodi
+  Her 5 soniyada rang o'zgartirish
+*/
+
+int redPin = 9;
+int greenPin = 10; 
+int bluePin = 11;
+
+void setup() {
+  pinMode(redPin, OUTPUT);
+  pinMode(greenPin, OUTPUT);
+  pinMode(bluePin, OUTPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  // Qizil
+  setColor(255, 0, 0);
+  Serial.println("Qizil");
+  delay(5000);
+  
+  // Yashil  
+  setColor(0, 255, 0);
+  Serial.println("Yashil");
+  delay(5000);
+  
+  // Ko'k
+  setColor(0, 0, 255);
+  Serial.println("Ko'k");
+  delay(5000);
+  
+  // Sariq
+  setColor(255, 255, 0);
+  Serial.println("Sariq");
+  delay(5000);
+  
+  // Binafsha
+  setColor(255, 0, 255);
+  Serial.println("Binafsha");
+  delay(5000);
+  
+  // Moviy
+  setColor(0, 255, 255);
+  Serial.println("Moviy");
+  delay(5000);
+  
+  // Oq
+  setColor(255, 255, 255);
+  Serial.println("Oq");
+  delay(5000);
+  
+  // O'chirish
+  setColor(0, 0, 0);
+  Serial.println("O'chiq");
+  delay(5000);
+}
+
+void setColor(int red, int green, int blue) {
+  analogWrite(redPin, red);
+  analogWrite(greenPin, green);
+  analogWrite(bluePin, blue);
+}
+            `);
+            
+            alert('RGB LED Arduino Simulyatori tayyor! Quvvatni yoqib, "Start" tugmasini bosing.');
+        });
+    </script>
+</body>
+</html>
