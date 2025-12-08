@@ -1072,13 +1072,21 @@ a{
 
 .container1 {
     display: grid;
-    grid-template-columns: repeat(3, 320px);
+    grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
     gap: 20px;
     justify-content: center;
-    align-items: center;
-    
+    padding: 20px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
+@media (max-width: 768px) {
+    .container1 {
+        grid-template-columns: 1fr;
+        gap: 15px;
+        padding: 15px;
+    }
+}
 .card {
     display: flex;
     flex-direction: column;
