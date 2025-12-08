@@ -289,229 +289,65 @@
             }
         }
 
-        /* Tablet va kichik ekranlar uchun */
+        /* Responsive */
         @media (max-width: 900px) {
             .auth-container {
                 max-width: 750px;
             }
-
             .auth-left {
                 padding: 50px 30px;
             }
-
             .auth-right {
                 padding: 50px 30px;
             }
-
             .logo-section h1 {
                 font-size: 24px;
             }
-
             .logo-section img {
                 width: 130px;
                 height: 160px;
             }
         }
 
-        /* Mobil ekranlar uchun */
         @media (max-width: 768px) {
             body {
                 padding: 10px;
             }
-
             .auth-container {
                 flex-direction: column;
                 max-width: 500px;
                 min-height: auto;
                 border-radius: 20px;
             }
-            
             .auth-left {
                 padding: 40px 25px;
                 min-height: auto;
             }
-
             .auth-left::before,
             .auth-left::after {
                 width: 150px;
                 height: 150px;
             }
-            
             .logo-section img {
                 width: 100px;
                 height: 120px;
             }
-
             .logo-section i {
                 font-size: 60px;
             }
-            
             .logo-section h1 {
                 font-size: 20px;
                 margin-bottom: 8px;
             }
-
             .logo-section p {
                 font-size: 13px;
             }
-
             .auth-right {
                 padding: 40px 25px;
             }
-
-            .form-wrapper {
-                max-width: 100%;
-            }
-
             h2 {
                 font-size: 24px;
                 margin-bottom: 25px;
-            }
-
-            .input-group {
-                margin-bottom: 18px;
-            }
-
-            .input-group input {
-                padding: 12px 15px 12px 42px;
-                font-size: 14px;
-            }
-
-            .input-group i {
-                font-size: 15px;
-                left: 13px;
-            }
-
-            .btn {
-                padding: 13px;
-                font-size: 15px;
-            }
-
-            .switch-text {
-                font-size: 13px;
-                margin-top: 18px;
-            }
-
-            .error-message,
-            .success-message {
-                padding: 10px 12px;
-                font-size: 13px;
-            }
-        }
-
-        /* Juda kichik mobil ekranlar */
-        @media (max-width: 400px) {
-            body {
-                padding: 5px;
-            }
-
-            .auth-container {
-                border-radius: 15px;
-            }
-
-            .auth-left {
-                padding: 30px 20px;
-            }
-
-            .logo-section img {
-                width: 80px;
-                height: 100px;
-                margin-bottom: 15px;
-            }
-
-            .logo-section h1 {
-                font-size: 18px;
-            }
-
-            .logo-section p {
-                font-size: 12px;
-            }
-
-            .auth-right {
-                padding: 30px 20px;
-            }
-
-            h2 {
-                font-size: 22px;
-                margin-bottom: 20px;
-            }
-
-            .input-group {
-                margin-bottom: 15px;
-            }
-
-            .input-group input {
-                padding: 11px 12px 11px 38px;
-                font-size: 13px;
-                border-radius: 8px;
-            }
-
-            .input-group i {
-                font-size: 14px;
-                left: 12px;
-            }
-
-            .btn {
-                padding: 12px;
-                font-size: 14px;
-                border-radius: 8px;
-            }
-
-            .switch-text {
-                font-size: 12px;
-            }
-        }
-
-        /* Landscape mobil rejim */
-        @media (max-width: 768px) and (orientation: landscape) {
-            .auth-container {
-                flex-direction: row;
-                max-width: 90vw;
-            }
-
-            .auth-left {
-                flex: 0.8;
-                padding: 30px 20px;
-            }
-
-            .logo-section img {
-                width: 70px;
-                height: 90px;
-            }
-
-            .logo-section h1 {
-                font-size: 16px;
-            }
-
-            .logo-section p {
-                font-size: 11px;
-            }
-
-            .auth-right {
-                flex: 1.2;
-                padding: 30px 25px;
-            }
-
-            h2 {
-                font-size: 20px;
-                margin-bottom: 15px;
-            }
-
-            .input-group {
-                margin-bottom: 12px;
-            }
-
-            .input-group input {
-                padding: 10px 12px 10px 38px;
-            }
-
-            .btn {
-                padding: 11px;
-                margin-top: 5px;
-            }
-
-            .switch-text {
-                margin-top: 12px;
             }
         }
     </style>
@@ -533,7 +369,15 @@
                 <div class="form-container active" id="loginForm">
                     <h2>Kirish</h2>
                     
-                    <div id="loginMessages"></div>
+                    {% if messages %}
+                        {% for message in messages %}
+                            {% if not request.session.signup_active %}
+                            <div class="{% if message.tags == 'error' %}error-message{% else %}success-message{% endif %} show">
+                                {{ message }}
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
 
                     <form method="POST" action="/login/">
                         {% csrf_token %}
@@ -563,7 +407,15 @@
                 <div class="form-container" id="signupForm">
                     <h2>Ro'yxatdan o'tish</h2>
 
-                    <div id="signupMessages"></div>
+                    {% if messages %}
+                        {% for message in messages %}
+                            {% if request.session.signup_active %}
+                            <div class="{% if message.tags == 'error' %}error-message{% else %}success-message{% endif %} show">
+                                {{ message }}
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
 
                     <form method="POST" action="/login/">
                         {% csrf_token %}
@@ -613,5 +465,13 @@
             document.getElementById('loginForm').classList.add('active');
         }
     </script>
+    
+    {% if request.session.signup_active %}
+    <script>
+        window.addEventListener('DOMContentLoaded', function() {
+            switchToSignup();
+        });
+    </script>
+    {% endif %}
 </body>
 </html>

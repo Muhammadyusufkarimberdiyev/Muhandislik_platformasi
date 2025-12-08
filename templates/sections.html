@@ -32,7 +32,10 @@
                 <a href="/"><li>Asosiy sahifa</li></a>
                 <a href="#we"><li>Biz haqimizda</li></a>
                 <a href="#techno"><li>Texnologiya</li></a>
-                <a href="#partners"><li>Hamkorlarimiz</li></a>
+                <a href="{% url 'main:logout' %}">
+                   <li>Chiqish</li>
+                </a>
+
             </ul>
         </nav>
     </header>

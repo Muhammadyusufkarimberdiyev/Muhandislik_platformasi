@@ -37,81 +37,132 @@ def get_client_ip(request):
     else:
         ip = request.META.get('REMOTE_ADDR')
     return ip
+# views.py - Faqat LoginSignupView klassini almashtiring
 
+from django.middleware.csrf import get_token
+from django.contrib import messages as django_messages
 
-# Login/Signup View
 class LoginSignupView(View):
     def get(self, request):
         if request.user.is_authenticated:
             return redirect('main:sections')
+        
+        # Session'ni tozalash
+        if 'signup_active' in request.session:
+            del request.session['signup_active']
+            
         return render(request, 'login-signup.html')
     
     def post(self, request):
         action = request.POST.get('action')
         
         if action == 'login':
-            username = request.POST.get('username')
-            password = request.POST.get('password')
+            username = request.POST.get('username', '').strip()
+            password = request.POST.get('password', '')
+            
+            if not username or not password:
+                django_messages.error(request, "Barcha maydonlarni to'ldiring!")
+                return redirect('main:login')
             
             user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
                 
                 # Profil yangilash
-                profile = user.profile
-                profile.last_login_time = timezone.now()
-                profile.login_count += 1
-                profile.save()
+                try:
+                    profile = user.profile
+                    profile.last_login_time = timezone.now()
+                    profile.login_count += 1
+                    profile.save()
+                except:
+                    pass
                 
                 # Login tarixini saqlash
-                LoginHistory.objects.create(
-                    user=user,
-                    ip_address=get_client_ip(request),
-                    user_agent=request.META.get('HTTP_USER_AGENT', '')
-                )
+                try:
+                    LoginHistory.objects.create(
+                        user=user,
+                        ip_address=get_client_ip(request),
+                        user_agent=request.META.get('HTTP_USER_AGENT', '')
+                    )
+                except:
+                    pass
                 
-                messages.success(request, f"Xush kelibsiz, {user.username}!")
+                django_messages.success(request, f"Xush kelibsiz, {user.username}!")
                 return redirect('main:sections')
             else:
-                messages.error(request, "Login yoki parol noto'g'ri!")
-                return render(request, 'login-signup.html', {'error': 'invalid'})
+                django_messages.error(request, "Login yoki parol noto'g'ri!")
+                return redirect('main:login')
         
         elif action == 'signup':
-            username = request.POST.get('username')
-            email = request.POST.get('email')
-            password = request.POST.get('password')
-            confirm_password = request.POST.get('confirm_password')
+            username = request.POST.get('username', '').strip()
+            email = request.POST.get('email', '').strip()
+            password = request.POST.get('password', '')
+            confirm_password = request.POST.get('confirm_password', '')
+            
+            # Validatsiya
+            if not username or not email or not password or not confirm_password:
+                django_messages.error(request, "Barcha maydonlarni to'ldiring!")
+                request.session['signup_active'] = True
+                return redirect('main:login')
+            
+            if len(username) < 3:
+                django_messages.error(request, "Foydalanuvchi nomi kamida 3 ta belgidan iborat bo'lishi kerak!")
+                request.session['signup_active'] = True
+                return redirect('main:login')
+            
+            if len(password) < 6:
+                django_messages.error(request, "Parol kamida 6 ta belgidan iborat bo'lishi kerak!")
+                request.session['signup_active'] = True
+                return redirect('main:login')
             
             if password != confirm_password:
-                messages.error(request, "Parollar mos kelmadi!")
-                return render(request, 'login-signup.html', {'error': 'password_mismatch'})
+                django_messages.error(request, "Parollar mos kelmadi!")
+                request.session['signup_active'] = True
+                return redirect('main:login')
             
+            # Username tekshiruvi
             if User.objects.filter(username=username).exists():
-                messages.error(request, "Bu foydalanuvchi nomi band!")
-                return render(request, 'login-signup.html', {'error': 'username_exists'})
+                django_messages.error(request, "Bu foydalanuvchi nomi allaqachon band!")
+                request.session['signup_active'] = True
+                return redirect('main:login')
             
+            # Email tekshiruvi
             if User.objects.filter(email=email).exists():
-                messages.error(request, "Bu email allaqachon ro'yxatdan o'tgan!")
-                return render(request, 'login-signup.html', {'error': 'email_exists'})
+                django_messages.error(request, "Bu email allaqachon ro'yxatdan o'tgan!")
+                request.session['signup_active'] = True
+                return redirect('main:login')
             
-            # Yangi foydalanuvchi yaratish
-            user = User.objects.create_user(username=username, email=email, password=password)
+            try:
+                # Yangi foydalanuvchi yaratish
+                user = User.objects.create_user(
+                    username=username, 
+                    email=email, 
+                    password=password
+                )
+                
+                # Avtomatik login
+                login(request, user)
+                
+                # Login tarixini saqlash
+                try:
+                    LoginHistory.objects.create(
+                        user=user,
+                        ip_address=get_client_ip(request),
+                        user_agent=request.META.get('HTTP_USER_AGENT', '')
+                    )
+                except:
+                    pass
+                
+                django_messages.success(request, "Ro'yxatdan muvaffaqiyatli o'tdingiz!")
+                return redirect('main:sections')
             
-            # Avtomatik login
-            login(request, user)
-            
-            # Login tarixini saqlash
-            LoginHistory.objects.create(
-                user=user,
-                ip_address=get_client_ip(request),
-                user_agent=request.META.get('HTTP_USER_AGENT', '')
-            )
-            
-            messages.success(request, "Ro'yxatdan muvaffaqiyatli o'tdingiz!")
-            return redirect('main:sections')
+            except Exception as e:
+                django_messages.error(request, "Xatolik yuz berdi. Qaytadan urinib ko'ring.")
+                request.session['signup_active'] = True
+                return redirect('main:login')
         
         return render(request, 'login-signup.html')
-
+   
 
 # Logout View
 @login_required(login_url='main:login')
