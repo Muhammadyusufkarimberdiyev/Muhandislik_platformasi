@@ -102,21 +102,17 @@ class ClassCategory(models.Model):
         return self.name
 
 
+
+    
+
 class ClassVideo(models.Model):
     name = models.CharField(max_length=55)
     category = models.ForeignKey(ClassCategory, on_delete=models.CASCADE, related_name="videos")
-    link = models.URLField(max_length=1000, blank=True, null=True)
-    video_file = models.FileField(upload_to='class_videos/', blank=True, null=True)  # VIDEO FAYL
+    link = models.URLField(max_length=1000)
     date = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
         return self.name
-    
-    def get_video_url(self):
-        """Video URL yoki fayl yo'lini qaytaradi"""
-        if self.video_file:
-            return self.video_file.url
-        return self.link or ""
     
 from django.db import models
 

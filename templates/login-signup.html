@@ -115,43 +115,35 @@
         .auth-right {
             flex: 1;
             padding: 60px 40px;
-            position: relative;
-            overflow: hidden;
             display: flex;
             align-items: center;
+            justify-content: center;
+        }
+
+        .form-wrapper {
+            width: 100%;
+            max-width: 400px;
         }
 
         .form-container {
-            position: absolute;
-            width: calc(100% - 80px);
-            top: 50%;
-            transform: translateY(-50%);
-            transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            width: 100%;
+            display: none;
         }
 
-        .login-form {
-            opacity: 1;
-            transform: translate(-50%, -50%);
-            left: 50%;
+        .form-container.active {
+            display: block;
+            animation: fadeIn 0.4s ease-in-out;
         }
 
-        .signup-form {
-            opacity: 0;
-            transform: translate(50%, -50%);
-            left: 50%;
-            pointer-events: none;
-        }
-
-        .auth-right.show-signup .login-form {
-            opacity: 0;
-            transform: translate(-150%, -50%);
-            pointer-events: none;
-        }
-
-        .auth-right.show-signup .signup-form {
-            opacity: 1;
-            transform: translate(-50%, -50%);
-            pointer-events: all;
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         h2 {
@@ -174,6 +166,7 @@
             color: #000075;
             font-size: 16px;
             transition: all 0.3s;
+            pointer-events: none;
         }
 
         .input-group input:focus + i {
@@ -366,36 +359,8 @@
                 padding: 40px 25px;
             }
 
-            .form-container {
-                width: calc(100% - 50px);
-                position: relative;
-                top: 0;
-                left: 0 !important;
-                transform: none !important;
-            }
-
-            .signup-form,
-            .login-form {
-                position: relative;
-                transform: none !important;
-                left: 0 !important;
-            }
-
-            .auth-right.show-signup .signup-form {
-                display: block;
-                opacity: 1;
-            }
-
-            .auth-right.show-signup .login-form {
-                display: none;
-            }
-
-            .login-form {
-                display: block;
-            }
-
-            .signup-form {
-                display: none;
+            .form-wrapper {
+                max-width: 100%;
             }
 
             h2 {
@@ -464,14 +429,6 @@
 
             .auth-right {
                 padding: 30px 20px;
-            }
-
-            .form-container {
-                width: calc(100% - 40px);
-                position: relative;
-                top: 0;
-                left: 0 !important;
-                transform: none !important;
             }
 
             h2 {
@@ -563,78 +520,83 @@
     <div class="auth-container">
         <div class="auth-left">
             <div class="logo-section">
-                <img src="/static/image/robot.png" alt="MMP Robot" />
+                <img src="/static/image/robot.png" alt="MMP Robot" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+                <i class="fas fa-robot" style="display: none;"></i>
                 <h1>Milliy Muhandislik Platformasi</h1>
                 <p>Kelajak muhandislarini tayyorlaymiz</p>
             </div>
         </div>
 
-        <div class="auth-right" id="authRight">
-            <!-- Login Form -->
-            <div class="form-container login-form">
-                <h2>Kirish</h2>
-                
-                <div id="loginMessages"></div>
-
-                <form method="POST" action="/login/">
-                    <input type="hidden" name="action" value="login">
+        <div class="auth-right">
+            <div class="form-wrapper">
+                <!-- Login Form -->
+                <div class="form-container active" id="loginForm">
+                    <h2>Kirish</h2>
                     
-                    <div class="input-group">
-                        <input type="text" name="username" placeholder="Foydalanuvchi nomi" required>
-                        <i class="fas fa-user"></i>
+                    <div id="loginMessages"></div>
+
+                    <form method="POST" action="/login/">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="login">
+                        
+                        <div class="input-group">
+                            <input type="text" name="username" placeholder="Foydalanuvchi nomi" required autocomplete="username">
+                            <i class="fas fa-user"></i>
+                        </div>
+
+                        <div class="input-group">
+                            <input type="password" name="password" placeholder="Parol" required autocomplete="current-password">
+                            <i class="fas fa-lock"></i>
+                        </div>
+
+                        <button type="submit" class="btn">
+                            <i class="fas fa-sign-in-alt"></i> Kirish
+                        </button>
+                    </form>
+
+                    <div class="switch-text">
+                        Akkountingiz yo'qmi? <a onclick="switchToSignup()">Ro'yxatdan o'tish</a>
                     </div>
-
-                    <div class="input-group">
-                        <input type="password" name="password" placeholder="Parol" required>
-                        <i class="fas fa-lock"></i>
-                    </div>
-
-                    <button type="submit" class="btn">
-                        <i class="fas fa-sign-in-alt"></i> Kirish
-                    </button>
-                </form>
-
-                <div class="switch-text">
-                    Akkountingiz yo'qmi? <a onclick="switchToSignup()">Ro'yxatdan o'tish</a>
                 </div>
-            </div>
 
-            <!-- Signup Form -->
-            <div class="form-container signup-form">
-                <h2>Ro'yxatdan o'tish</h2>
+                <!-- Signup Form -->
+                <div class="form-container" id="signupForm">
+                    <h2>Ro'yxatdan o'tish</h2>
 
-                <div id="signupMessages"></div>
+                    <div id="signupMessages"></div>
 
-                <form method="POST" action="/login/">
-                    <input type="hidden" name="action" value="signup">
+                    <form method="POST" action="/login/">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="signup">
 
-                    <div class="input-group">
-                        <input type="text" name="username" placeholder="Foydalanuvchi nomi" required minlength="3">
-                        <i class="fas fa-user"></i>
+                        <div class="input-group">
+                            <input type="text" name="username" placeholder="Foydalanuvchi nomi" required minlength="3" autocomplete="username">
+                            <i class="fas fa-user"></i>
+                        </div>
+
+                        <div class="input-group">
+                            <input type="email" name="email" placeholder="Email" required autocomplete="email">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+
+                        <div class="input-group">
+                            <input type="password" name="password" placeholder="Parol" required minlength="6" autocomplete="new-password">
+                            <i class="fas fa-lock"></i>
+                        </div>
+
+                        <div class="input-group">
+                            <input type="password" name="confirm_password" placeholder="Parolni tasdiqlang" required autocomplete="new-password">
+                            <i class="fas fa-lock"></i>
+                        </div>
+
+                        <button type="submit" class="btn">
+                            <i class="fas fa-user-plus"></i> Ro'yxatdan o'tish
+                        </button>
+                    </form>
+
+                    <div class="switch-text">
+                        Allaqachon akkountingiz bormi? <a onclick="switchToLogin()">Kirish</a>
                     </div>
-
-                    <div class="input-group">
-                        <input type="email" name="email" placeholder="Email" required>
-                        <i class="fas fa-envelope"></i>
-                    </div>
-
-                    <div class="input-group">
-                        <input type="password" name="password" placeholder="Parol" required minlength="6">
-                        <i class="fas fa-lock"></i>
-                    </div>
-
-                    <div class="input-group">
-                        <input type="password" name="confirm_password" placeholder="Parolni tasdiqlang" required>
-                        <i class="fas fa-lock"></i>
-                    </div>
-
-                    <button type="submit" class="btn">
-                        <i class="fas fa-user-plus"></i> Ro'yxatdan o'tish
-                    </button>
-                </form>
-
-                <div class="switch-text">
-                    Allaqachon akkountingiz bormi? <a onclick="switchToLogin()">Kirish</a>
                 </div>
             </div>
         </div>
@@ -642,15 +604,14 @@
 
     <script>
         function switchToSignup() {
-            document.getElementById('authRight').classList.add('show-signup');
+            document.getElementById('loginForm').classList.remove('active');
+            document.getElementById('signupForm').classList.add('active');
         }
 
         function switchToLogin() {
-            document.getElementById('authRight').classList.remove('show-signup');
+            document.getElementById('signupForm').classList.remove('active');
+            document.getElementById('loginForm').classList.add('active');
         }
-
-        // Django messages uchun (agar kerak bo'lsa)
-        // Bu yerda server-side messages ni ko'rsatish uchun kod qo'shishingiz mumkin
     </script>
 </body>
 </html>

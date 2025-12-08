@@ -6,28 +6,6 @@
   <title>Sinf darslari - Milliy Muhandislik Platformasi</title>
   <link rel="stylesheet" href="/static/style.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    .no-video-placeholder {
-      width: 100%;
-      height: 250px;
-      background: linear-gradient(135deg, #000075 0%, #0056b3 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-size: 60px;
-      border-radius: 15px;
-    }
-
-    .video-info-overlay {
-      padding: 1.5rem;
-      background: white;
-    }
-
-    video, iframe {
-      box-shadow: 0 10px 30px rgba(0,0,117,0.2);
-    }
-  </style>
 </head>
 
 <body>
@@ -58,7 +36,7 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        margin-bottom: 2rem;
+     
       }
       .back-btn {
         padding: 10px 20px;
@@ -71,56 +49,75 @@
       .back-btn:hover {
         opacity: 0.9;
       }
-      section {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 3rem 2rem;
+      .video-categories {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 2rem;
       }
+      .category-card a {
+        display: inline-block;
+        padding: 10px 20px;
+        border-radius: 999px;
+        border: 2px solid #000075;
+        text-decoration: none;
+        color: #000075;
+        background: white;
+        font-weight: 600;
+        transition: all 0.3s;
+      }
+      .category-card a.active,
+      .category-card a:hover {
+        background: #000075;
+        color: white;
+      }
+       section {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 3rem 2rem;
+    }
     </style>
 
+    <!-- Header qismi -->
     <div class="header-row">
-      <h1>Sinf darslari</h1>
-      <a class="back-btn" href="{% url 'main:class' %}">← Kategoriyalar</a>
+      <h1  >Sinf darslari</h1>
+      <a class="back-btn" href="{% url 'main:class' %}"><i class="fa-solid fa-arrow-left"></i>  Kategoriyalar</a>
     </div>
 
+    <!-- Kategoriya tugmalari -->
+    
+    <!-- Videolar grid (videos.html dizayni) -->
     <div class="video-grid">
       {% for v in videos %}
         <div class="video-card">
           <div class="video-thumbnail">
-            {% if v.video_file %}
-              <!-- Yuklangan video fayl - HTML5 default controls -->
-              <video 
-                controls 
-                preload="metadata"
-                controlsList="nodownload"
-                style="width: 100%; height: 200px;  background: #000; ">
-                <source src="{{ v.video_file.url }}" type="video/mp4">
-                Brauzeringiz video tegini qo'llab-quvvatlamaydi.
-              </video>
-            {% elif v.link %}
-              <!-- YouTube/embed link -->
+            {% if v.link %}
               <iframe 
                 src="{{ v.link }}" 
                 title="{{ v.name }}" 
                 frameborder="0"
-                style="width: 100%; height: 250px; border-radius: 15px;"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 referrerpolicy="strict-origin-when-cross-origin" 
                 allowfullscreen>
               </iframe>
             {% else %}
-              <div class="no-video-placeholder">
-                <i class="fas fa-graduation-cap"></i>
+              <div class="robot-image">
+                <i class="fas fa-graduation-cap" style="font-size:60px;color:#ccc;"></i>
               </div>
             {% endif %}
           </div>
 
-          <div class="video-info-overlay">
+          <div class="video-info">
             <div class="video-title">{{ v.name }}</div>
             <div class="video-meta">
               <span class="chip">{{ v.category.name }}</span>
-              <span class="chip">{{ v.date|date:"Y-m-d" }}</span>
+            
             </div>
+            {% if v.min %}
+              <div class="video-duration">
+                <i class="fas fa-clock"></i> {{ v.min }}
+              </div>
+            {% endif %}
           </div>
         </div>
       {% empty %}
@@ -128,11 +125,12 @@
       {% endfor %}
     </div>
 
+    <!-- PAGINATION -->
     {% if page and page.has_other_pages %}
       <div class="pagination">
         {% if page.has_previous %}
           <a class="page-prev"
-             href="?{% if active_ccat %}category={{ active_ccat }}&{% endif %}{% if cquery %}q={{ cquery }}&{% endif %}page={{ page.previous_page_number }}">⬅</a>
+             href="?{% if active_ccat %}category={{ active_ccat }}&{% endif %}{% if cquery %}q={{ cquery }}&{% endif %}page={{ page.previous_page_number }}">â¬…</a>
         {% endif %}
 
         {% for num in paginator.page_range %}
@@ -143,11 +141,13 @@
 
         {% if page.has_next %}
           <a class="page-next"
-             href="?{% if active_ccat %}category={{ active_ccat }}&{% endif %}{% if cquery %}q={{ cquery }}&{% endif %}page={{ page.next_page_number }}">➡</a>
+             href="?{% if active_ccat %}category={{ active_ccat }}&{% endif %}{% if cquery %}q={{ cquery }}&{% endif %}page={{ page.next_page_number }}">âž¡</a>
         {% endif %}
       </div>
     {% endif %}
   </section>
+
+
  <footer>
       <div class="footer">
         <div class="left">

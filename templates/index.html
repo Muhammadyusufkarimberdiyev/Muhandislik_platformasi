@@ -8,7 +8,6 @@
   
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-
 </head>
 <body>
     <header>
@@ -54,12 +53,11 @@
     
     </div>
   </div>
-
-
+  
     <section> 
 
-        <div class="container" id="we">
-        <div class="left">
+        <div class="container"  id="we">
+        <div class="left" >
               <h1>Biz haqimizda</h1>
           
             <p>Ushbu platforma muhandislik fanlarini qiziqarli va tushunarli tarzda o'rgatish maqsadida yaratilgan. U laboratoriya sharoiti mavjud bo'lmagan maktablarda xavfli tajribalarni virtual bajarish, elektronika, qurilma yasash, Lego EV3, 3D chizmalar bilan ishlash kabi darslarni interaktiv tarzda o'rgatishga xizmat qiladi.</p>
@@ -69,7 +67,7 @@
       </div>
       </div>
 
-  </div>
+
 
 
     
@@ -151,9 +149,7 @@
   </div>
 
 
-
-
-    <section class="team-section">
+ <section class="team-section">
         <div class="team-container">
             <h2 class="section-title">Bizning Jamoa</h2>
             <p class="section-subtitle">
@@ -163,38 +159,37 @@
             <div class="team-slider">
                 <div class="team-cards" id="teamCards">
                     <div class="team-card">
-                        <img src="/static/image/Nodirbek aka.jpg" alt="Nodirbek Ro'ziyev">
+                                   <img src="/static/image/Nodirbek aka.jpg" alt="Nodirbek Ro'ziyev">
                         <h3>Nodirbek Ro'ziyev</h3>
                         <p>Loyiha rahbari Fan Mutaxassisi</p>
-                        
                     </div>
                     <div class="team-card">
-                        <img src="/static/image/Islombek.jpg" alt="Islombek Karimberdiyev">
+                       <img src="/static/image/Islombek.jpg" alt="Islombek Karimberdiyev">
                         <h3>Islombek Karimberdiyev</h3>
                         <p>Video montajchi</p>
                     </div>
                     <div class="team-card">
-                        <img src="/static/Muhammadali.jpg" alt="Muhammad Ali">
+                     <img src="/static/Muhammadali.jpg" alt="Muhammad Ali">
                         <h3>Muhammad Ali Karimberdiyev</h3>
                         <p>Grafik va UI/UX Dizayner</p>
                     </div>
                     <div class="team-card">
-                        <img src="/static/image/Muhammad_yusuf-1jpg.jpg" alt="Muhammad Yusuf">
+                    <img src="/static/image/Muhammad_yusuf-1jpg.jpg" alt="Muhammad Yusuf">
                         <h3>Muhammad Yusuf Karimberdiyev</h3>
                         <p>Full Stack Dasturchi</p>
                     </div>
-                      <div class="team-card">
-                        <img src="/static/image/4.jpg" alt="Abduvaliyev Behruz">
+                    <div class="team-card">
+                          <img src="/static/image/4.jpg" alt="Abduvaliyev Behruz">
                         <h3>Abduvaliyev Behruz</h3>
                         <p>Ixtirochilikka Qadam Tanlovi G'olibi</p>
                     </div>
-                      <div class="team-card">
-                        <img src="/static/image/5.jpg" alt="Abdulazizov Odilbek">
+                    <div class="team-card">
+                 <img src="/static/image/5.jpg" alt="Abdulazizov Odilbek">
                         <h3>Abdulazizov Odilbek</h3>
                         <p>Ixtirochilikka Qadam Tanlovi G'olibi</p>
                     </div>
-                      <div class="team-card">
-                        <img src="/static/image/3.jpg" alt="G'anijonov Barkamol">
+                    <div class="team-card">
+                         <img src="/static/image/3.jpg" alt="G'anijonov Barkamol">
                         <h3>G'anijonov Barkamol</h3>
                         <p>Ixtirochilikka Qadam Tanlovi G'olibi</p>
                     </div>
@@ -202,16 +197,20 @@
             </div>
 
             <div class="arrows">
-                <button class="arrow left" onclick="moveSlide(-1)">
+                <button class="arrow left" id="prevBtn" onclick="moveSlide(-1)">
                     <i class="fas fa-chevron-left"></i>
                 </button>
-                <button class="arrow right" onclick="moveSlide(1)">
+                <button class="arrow right" id="nextBtn" onclick="moveSlide(1)">
                     <i class="fas fa-chevron-right"></i>
                 </button>
             </div>
+
+            <!-- Progress Dots -->
+            <div class="slider-dots" id="sliderDots"></div>
         </div>
     </section>
 
+  
 
 <section class="events-section">
   <h2 class="section-title">Yutuqlar</h2>
@@ -322,6 +321,216 @@
         }
     });
 }
+        (function() {
+            let currentIndex = 0;
+            let isDragging = false;
+            let startPos = 0;
+            let currentTranslate = 0;
+            let prevTranslate = 0;
+            let animationID = 0;
+
+            const cardsContainer = document.getElementById('teamCards');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+
+            // Ko'rinadigan kartalar soni
+            function getVisibleCards() {
+                const width = window.innerWidth;
+                if (width <= 768) return 1;
+                if (width <= 1200) return 2;
+                return 3;
+            }
+
+            // Card width + gap
+            function getSlideWidth() {
+                const width = window.innerWidth;
+                const cards = cardsContainer.children;
+                
+                if (cards.length === 0) return 0;
+                
+                if (width <= 768) {
+                    // Mobile: 100% width
+                    return cardsContainer.parentElement.offsetWidth;
+                } else {
+                    // Desktop/Tablet: card width + gap
+                    const card = cards[0];
+                    const cardWidth = card.offsetWidth;
+                    const computedStyle = window.getComputedStyle(cardsContainer);
+                    const gap = parseFloat(computedStyle.gap) || 0;
+                    return cardWidth + gap;
+                }
+            }
+
+            // Progress dots yaratish
+            function createDots() {
+                const dotsContainer = document.getElementById('sliderDots');
+                const totalCards = cardsContainer.children.length;
+                const visibleCards = getVisibleCards();
+                const totalSlides = Math.ceil(totalCards / visibleCards);
+                
+                dotsContainer.innerHTML = '';
+                
+                for (let i = 0; i < totalSlides; i++) {
+                    const dot = document.createElement('div');
+                    dot.className = 'dot';
+                    if (i === 0) dot.classList.add('active');
+                    dot.onclick = () => goToSlide(i);
+                    dotsContainer.appendChild(dot);
+                }
+            }
+
+            // Dots yangilash
+            function updateDots() {
+                const dots = document.querySelectorAll('.dot');
+                const visibleCards = getVisibleCards();
+                const currentSlide = Math.floor(currentIndex / visibleCards);
+                
+                dots.forEach((dot, index) => {
+                    dot.classList.toggle('active', index === currentSlide);
+                });
+            }
+
+            // Button holatini yangilash
+            function updateButtons() {
+                const totalCards = cardsContainer.children.length;
+                const visibleCards = getVisibleCards();
+                const maxIndex = totalCards - visibleCards;
+                
+                prevBtn.classList.toggle('disabled', currentIndex <= 0);
+                nextBtn.classList.toggle('disabled', currentIndex >= maxIndex);
+            }
+
+            // Slider harakati
+            function setSliderPosition() {
+                const slideWidth = getSlideWidth();
+                const offset = -(currentIndex * slideWidth);
+                cardsContainer.style.transform = `translateX(${offset}px)`;
+                updateButtons();
+                updateDots();
+            }
+
+            // Slide ko'chirish
+            window.moveSlide = function(direction) {
+                const totalCards = cardsContainer.children.length;
+                const visibleCards = getVisibleCards();
+                const maxIndex = totalCards - visibleCards;
+                
+                const newIndex = currentIndex + direction;
+                
+                if (newIndex < 0 || newIndex > maxIndex) {
+                    return;
+                }
+                
+                currentIndex = newIndex;
+                setSliderPosition();
+            };
+
+            // Ma'lum slide'ga o'tish
+            function goToSlide(slideIndex) {
+                const visibleCards = getVisibleCards();
+                currentIndex = slideIndex * visibleCards;
+                
+                const totalCards = cardsContainer.children.length;
+                const maxIndex = totalCards - visibleCards;
+                
+                if (currentIndex > maxIndex) {
+                    currentIndex = maxIndex;
+                }
+                
+                setSliderPosition();
+            }
+
+            // Touch/Mouse dragging
+            function touchStart(index) {
+                return function(event) {
+                    isDragging = true;
+                    startPos = getPositionX(event);
+                    animationID = requestAnimationFrame(animation);
+                    cardsContainer.style.cursor = 'grabbing';
+                };
+            }
+
+            function touchMove(event) {
+                if (isDragging) {
+                    const currentPosition = getPositionX(event);
+                    currentTranslate = prevTranslate + currentPosition - startPos;
+                }
+            }
+
+            function touchEnd() {
+                isDragging = false;
+                cancelAnimationFrame(animationID);
+                cardsContainer.style.cursor = 'grab';
+                
+                const movedBy = currentTranslate - prevTranslate;
+                
+                if (movedBy < -100 && currentIndex < cardsContainer.children.length - getVisibleCards()) {
+                    moveSlide(1);
+                }
+                
+                if (movedBy > 100 && currentIndex > 0) {
+                    moveSlide(-1);
+                }
+                
+                setSliderPosition();
+                currentTranslate = 0;
+                prevTranslate = 0;
+            }
+
+            function getPositionX(event) {
+                return event.type.includes('mouse') ? event.pageX : event.touches[0].clientX;
+            }
+
+            function animation() {
+                if (isDragging) requestAnimationFrame(animation);
+            }
+
+            // Event listeners
+            cardsContainer.addEventListener('mousedown', touchStart(0));
+            cardsContainer.addEventListener('mousemove', touchMove);
+            cardsContainer.addEventListener('mouseup', touchEnd);
+            cardsContainer.addEventListener('mouseleave', touchEnd);
+
+            cardsContainer.addEventListener('touchstart', touchStart(0), { passive: true });
+            cardsContainer.addEventListener('touchmove', touchMove, { passive: true });
+            cardsContainer.addEventListener('touchend', touchEnd);
+
+            // Keyboard navigation
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'ArrowLeft') moveSlide(-1);
+                if (e.key === 'ArrowRight') moveSlide(1);
+            });
+
+            // Resize handler
+            let resizeTimeout;
+            window.addEventListener('resize', function() {
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(function() {
+                    currentIndex = 0;
+                    createDots();
+                    setSliderPosition();
+                }, 250);
+            });
+
+            // Initialize
+            window.addEventListener('load', function() {
+                createDots();
+                setSliderPosition();
+                console.log('✅ Mukammal Team Slider tayyor!');
+            });
+
+            // Auto-play (ixtiyoriy)
+            setInterval(() => {
+                const totalCards = cardsContainer.children.length;
+                const visibleCards = getVisibleCards();
+                if (currentIndex >= totalCards - visibleCards) {
+                    currentIndex = 0;
+                } else {
+                    moveSlide(1);
+                }
+            }, 5000);
+
+        })();
 
 // Event listeners
 window.addEventListener('resize', handleResize);
@@ -414,52 +623,6 @@ document.querySelectorAll('.stat-card').forEach(card => {
                 navMenu.classList.remove('active');
                 menuToggle.classList.remove('active');
             }
-        });
-
-        // =========================
-        // TEAM SLIDER FUNCTIONALITY
-        // =========================
-        function moveSlide(direction) {
-  const cards = document.getElementById("teamCards");
-  const totalCards = cards.children.length;
-  const cardWidth = getCardWidth();
-  const visibleCards = getVisibleCards();
-  const container = document.querySelector(".team-slider");
-
-  currentIndex += direction;
-
-  // Maksimal indexni hisoblash (container eni bo‘yicha)
-  const containerWidth = container.offsetWidth;
-  const maxIndex = Math.max(0, Math.ceil((cardWidth * totalCards - containerWidth) / cardWidth));
-
-  if (currentIndex < 0) currentIndex = 0;
-  if (currentIndex > maxIndex) currentIndex = maxIndex;
-
-  cards.style.transform = `translateX(-${currentIndex * cardWidth}px)`;
-}
-
-
-       function getCardWidth() {
-  const firstCard = document.querySelector(".team-card");
-  if (!firstCard) return 0;
-  const style = window.getComputedStyle(firstCard);
-  const marginRight = parseInt(style.marginRight) || 0;
-  return firstCard.offsetWidth + marginRight;
-}
-
-
-        function getVisibleCards() {
-            const screenWidth = window.innerWidth;
-            if (screenWidth <= 768) return 1;
-            if (screenWidth <= 1024) return 2;
-            return 3;
-        }
-
-        // Ekran o'lchami o'zgarganda slider qayta sozlash
-        window.addEventListener('resize', function() {
-            currentIndex = 0;
-            const cards = document.getElementById("teamCards");
-            cards.style.transform = 'translateX(0px)';
         });
 
         // =========================
@@ -597,8 +760,7 @@ document.querySelectorAll('.stat-card').forEach(card => {
         }, 250);
 
         window.addEventListener('resize', optimizedResize);
-    
-
+   
 </script>
 
 </html> 

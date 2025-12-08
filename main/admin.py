@@ -9,29 +9,12 @@ admin.site.register(Book)
 admin.site.register(Video)
 admin.site.register(ExperimentCategory)
 admin.site.register(Experiment)
+admin.site.register(ClassCategory)
+admin.site.register(ClassVideo)
 
 
 
 
-
-# admin.py
-from django.contrib import admin
-from .models import ClassVideo, ClassCategory
-
-@admin.register(ClassVideo)
-class ClassVideoAdmin(admin.ModelAdmin):
-    list_display = ('name', 'category', 'date', 'has_video_file')
-    list_filter = ('category', 'date')
-    search_fields = ('name',)
-    
-    def has_video_file(self, obj):
-        return bool(obj.video_file)
-    has_video_file.boolean = True
-    has_video_file.short_description = 'Video fayl'
-
-@admin.register(ClassCategory)
-class ClassCategoryAdmin(admin.ModelAdmin):
-    list_display = ('name', 'date')
 
 
 from django.contrib import admin
