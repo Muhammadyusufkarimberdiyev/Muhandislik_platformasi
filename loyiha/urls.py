@@ -22,13 +22,20 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 from django.conf.urls import handler404, handler500
+from django.contrib.sitemaps.views import sitemap
+from .sitemaps import StaticViewSitemap
+
+sitemaps = {
+    'static': StaticViewSitemap,
+}
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 
     path('', include('main.urls', namespace="main")),
-
+    path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, 
+         name='django.contrib.sitemaps.views.sitemap'),
 ]
 handler404 = 'main.views.custom_404_view'  # 404 view
 if settings.DEBUG:
