@@ -3181,9 +3181,7 @@ footer .bottom{
   height: 150px;
 
 }
-.footer .social-icons{
-  margin-left: 220px;
-}
+
 }
 
 @media (max-width: 480px) {
@@ -3212,8 +3210,7 @@ footer .bottom{
   height: 150px;
 }
 .footer .social-icons{
-  justify-content: center;
-    padding-right:95px;
+ 
 }
 }
 .footer .left{
