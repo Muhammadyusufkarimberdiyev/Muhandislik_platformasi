@@ -287,7 +287,7 @@
 
         body {
             font-family: 'Times New Roman', Times, serif;
-            
+            align-items: center;
         }
 
         /* =========================
@@ -369,7 +369,108 @@
             transition: 0.3s;
         }
 
-       
+        /* =========================
+           TEAM SECTION TO'G'IRLASHI
+        ========================= */
+        .team-section {
+            padding: 60px 20px;
+            text-align: center;
+            background: #f8f9fa;
+        }
+
+        .section-title {
+            font-size: 32px;
+            font-weight: bold;
+            color: #000075;
+            margin-bottom: 10px;
+        }
+
+        .section-subtitle {
+            max-width: 700px;
+            margin: 0 auto 40px;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .team-container {
+            position: relative;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .team-slider {
+            overflow: hidden;
+            border-radius: 20px;
+        }
+
+        .team-cards {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+            gap: 20px;
+        }
+
+        .team-card {
+            background: #fff;
+            border: 2px solid #000075;
+            border-radius: 20px;
+            min-width: 280px;
+            padding: 25px 20px;
+            box-shadow: 0 8px 25px rgba(0,0,117,0.1);
+            text-align: center;
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+        }
+
+        .team-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .team-card img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 3px solid #000075;
+            object-fit: cover;
+            margin-bottom: 15px;
+        }
+
+        .team-card h3 {
+            margin: 15px 0 5px;
+            font-size: 18px;
+            color: #000075;
+        }
+
+        .team-card p {
+            color: #555;
+            font-size: 14px;
+        }
+
+        .arrows {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .arrow {
+            background: #000075;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+
+        .arrow:hover {
+            background: #000050;
+            transform: scale(1.1);
+        }
 
         /* =========================
            FOOTER TO'G'IRLASHI
@@ -568,7 +669,88 @@
                 text-align: center;
             }
 
-           
+            /* Team section mobile */
+            .team-section {
+                padding: 40px 15px;
+            }
+
+            .section-title {
+                font-size: 24px;
+                margin-bottom: 8px;
+            }
+
+            .section-subtitle {
+                font-size: 14px;
+                margin-bottom: 30px;
+                padding: 0 10px;
+            }
+
+            .team-slider {
+                width: 100%;
+                margin: 0;
+            }
+
+            .team-card {
+                min-width: 260px;
+                padding: 20px 15px;
+                margin: 0 10px;
+            }
+
+            .team-card img {
+                width: 120px;
+                height: 120px;
+            }
+
+            .team-card h3 {
+                font-size: 16px;
+                margin: 10px 0 5px;
+            }
+
+            .team-card p {
+                font-size: 13px;
+            }
+
+            .arrows {
+                margin-top: 20px;
+            }
+
+            .arrow {
+                width: 45px;
+                height: 45px;
+                font-size: 16px;
+            }
+
+            /* Statistics mobile */
+            .statistics-section {
+                padding: 50px 15px;
+            }
+
+            .statistics-title {
+                font-size: 2rem;
+                margin-bottom: 40px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .stat-card {
+                padding: 30px 15px;
+            }
+
+            .stat-icon {
+                font-size: 2.5rem;
+            }
+
+            .stat-number {
+                font-size: 2rem;
+            }
+
+            .stat-label {
+                font-size: 1rem;
+            }
+
             /* Footer mobile */
             .footer {
                 flex-direction: column;
@@ -711,7 +893,9 @@
                 font-size: 14px;
             }
 
-          
+            .team-section {
+                padding: 30px 10px;
+            }
 
             .section-title {
                 font-size: 20px;
@@ -721,7 +905,23 @@
                 font-size: 12px;
             }
 
-         
+            .team-card {
+                min-width: 220px;
+                padding: 15px;
+            }
+
+            .team-card img {
+                width: 100px;
+                height: 100px;
+            }
+
+            .team-card h3 {
+                font-size: 14px;
+            }
+
+            .team-card p {
+                font-size: 12px;
+            }
 
             .statistics-title {
                 font-size: 1.5rem;
@@ -893,43 +1093,22 @@ a{
     opacity: 0.8; /* hoverda ozgina effekt berish mumkin */
 }
 /* Asosiy konteyner fon rasmi bilan */
-/* Asosiy konteyner fon rasmi bilan */
 #we {
   width: 100%;
-  min-height: 600px;
-  background-image: url("./image/7.jpg");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  min-height: 600px; /* balandlik */
+  background-image: url("./image/2.1.jpg");
+  /* background-color: #000075; */
+  background-size: cover;      /* rasm butun maydonni qoplaydi */
+  background-position: center; /* rasm markazdan joylashadi */
+  background-repeat: no-repeat;/* rasm takrorlanmaydi */
   margin-top: 20px;
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: center; /* vertikal o‘rtada joylash */
   gap: 30px;
-  padding: 40px 80px;
+  padding: 40px 80px; /* ichki bo‘sh joy */
   box-sizing: border-box;
   color: white;
-  position: relative;
-  z-index: 0;
-}
-
-/* Shaffof ko'k qatlam */
-#we::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 117, 0.5); /* 75% shaffoflik */
-  z-index: -1;
-}
-
-/* Matn va iframe oldinga chiqishi uchun */
-#we .left,
-#we .right {
-  position: relative;
-  z-index: 1;
 }
 
 /* Chap qism (matn) */
@@ -941,7 +1120,6 @@ a{
 #we .left h1 {
   font-size: 40px;
   margin-bottom: 20px;
-  color: white;
 }
 
 #we .left p {
@@ -949,7 +1127,7 @@ a{
   line-height: 1.6;
 }
 
-/* O'ng qism (video) */
+/* O‘ng qism (video) */
 #we .right {
   flex: 1;
   display: flex;
@@ -964,45 +1142,16 @@ a{
 /* Telefon va kichik ekranlar uchun */
 @media (max-width: 768px) {
   #we {
-    flex-direction: column;
+    flex-direction: column; /* pastma-past joylashadi */
     text-align: center;
-    padding: 30px 15px;
-    min-height: auto;
   }
 
   #we .left,
   #we .right {
     max-width: 100%;
   }
-  
-  #we .left h1 {
-    font-size: 26px;
-  }
-  
-  #we .left p {
-    font-size: 15px;
-  }
-  
-  #we .right iframe {
-    height: 220px;
-    margin-top: 25px;
-  }
 }
 
-/* Planshet */
-@media (min-width: 769px) and (max-width: 1024px) {
-  #we {
-    padding: 35px 40px;
-  }
-  
-  #we .left h1 {
-    font-size: 32px;
-  }
-  
-  #we .left p {
-    font-size: 16px;
-  }
-}
 
 
 .events-section {
@@ -1072,42 +1221,14 @@ a{
 
 .container1 {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 320px));
+    grid-template-columns: repeat(3, 350px);
+    
     gap: 20px;
     justify-content: center;
     align-items: center;
-    padding: 20px;
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
+    
 }
 
-/* Tablet uchun (768px - 1024px) */
-@media (max-width: 1024px) {
-    .container1 {
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 15px;
-        padding: 15px;
-    }
-}
-
-/* Telefon uchun (max 768px) */
-@media (max-width: 768px) {
-    .container1 {
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 15px;
-        padding: 10px;
-    }
-}
-
-/* Kichik telefonlar uchun (max 480px) */
-@media (max-width: 480px) {
-    .container1 {
-        grid-template-columns: 1fr;
-        gap: 10px;
-        padding: 10px;
-    }
-}
 .card {
     display: flex;
     flex-direction: column;
@@ -1123,7 +1244,6 @@ a{
     transition: 0.3s ease;
     width: 300px;
     height: 200px;
-   
 }
 
 .card i {
@@ -1553,7 +1673,16 @@ a {
   .container2 .text p {
     font-size: 1em;
   }
-  
+  .container1 .ri{
+     display: grid;
+    grid-template-columns: repeat(1, 350px);
+
+    justify-content: center;
+    align-items: center;
+
+    margin-left: 0px;
+   
+}
 }
 
 /* Mobil - 768px va kichik */
@@ -1569,7 +1698,11 @@ a {
     margin-bottom: 20px;
     padding: 0 15px;
   }
+   .container1 .ri{
+
+    margin-left: 0px;
    
+}
   .container2 {
     flex-direction: column;
     align-items: center;
@@ -1882,7 +2015,7 @@ a {
         padding: 20px;
     }
 
-    .container, .container2 {
+    .container, .container1, .container2 {
         grid-template-columns: 1fr !important;
     }
 }
@@ -1924,7 +2057,7 @@ footer .bottom{
     border-top: 2px solid white;
     color: white;
     padding-bottom: 50px;
-    margin-top: 170px;
+    margin-top: 120px;
 }
 .all h1{
   color: white;
@@ -2778,7 +2911,10 @@ nav img {
   }
   
   /* Refined Cards Container */
-
+  .container1 {
+    gap: 20px;
+    padding: 0 15px;
+  }
   
   .card {
     width: 100%;
@@ -2836,7 +2972,7 @@ nav img {
   }
   
   footer .bottom {
-  
+    margin-top: 25px;
     padding-top: 15px;
     padding-bottom: 30px;
   }
@@ -2908,6 +3044,14 @@ nav img {
   background: #0056b3;
 }
 
+footer .bottom {
+  margin-top: 25px;
+  padding-top: 15px;
+  padding-bottom: 30px;
+  border-top: 1px solid #eee;
+  text-align: center;
+  width: 100%;
+}
 
 
 
@@ -2946,8 +3090,8 @@ footer .bottom{
     padding-top: 20px;
     border-top: 2px solid white;
     color: white;
-    padding-bottom: 20px;
-   margin-top: 200px;
+    padding-bottom: 50px;
+   
 }
 .all h1{
   color: white;
@@ -3068,7 +3212,8 @@ footer .bottom{
   height: 150px;
 }
 .footer .social-icons{
-  margin-left: 90px;
+  justify-content: center;
+    padding-right:95px;
 }
 }
 .footer .left{
@@ -3111,7 +3256,7 @@ footer .bottom{
   
   /* Grid layouts */
   .container1, .selection {
-    grid-template-columns: repeat(3, 350px);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   
   /* Card sizes */
@@ -3230,11 +3375,15 @@ footer .bottom{
     justify-content: center;
   }
 
-  .container2, .selection {
+  .container1, .container2, .selection {
     grid-template-columns: 1fr !important;
     margin: 0 auto !important;
   }
 
+  .container1 .ri {
+    margin-left: 0 !important;
+    grid-template-columns: 1fr !important;
+  }
 
   .container2 .text {
     margin-left: 0 !important;
@@ -3262,7 +3411,10 @@ footer .bottom{
     width: 100% !important;
   }
 
- 
+  .team-card {
+    margin: 10px auto !important;
+  }
+
   .selection div {
     width: 100% !important;
     margin-bottom: 20px !important;
@@ -3273,14 +3425,124 @@ footer .bottom{
 
 
 
+
+
+
+    #we {
+  width: 100%;
+  min-height: 600px;
+  background-image: url("/static/image/7.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 30px;
+  padding: 40px 80px;
+  box-sizing: border-box;
+  color: white;
+  position: relative;
+  z-index: 0;
+}
+
+/* Shaffof ko'k qatlam */
+#we::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 117, 0.5); /* 75% shaffoflik */
+  z-index: -1;
+}
+
+/* Matn va iframe oldinga chiqishi uchun */
+#we .left,
+#we .right {
+  position: relative;
+  z-index: 1;
+}
+
+/* Chap qism (matn) */
+#we .left {
+  flex: 1;
+  max-width: 50%;
+}
+
+#we .left h1 {
+  font-size: 40px;
+  margin-bottom: 20px;
+  color: white;
+}
+
+#we .left p {
+  font-size: 18px;
+  line-height: 1.6;
+}
+
+/* O'ng qism (video) */
+#we .right {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+#we .right iframe {
+  max-width: 100%;
+  border-radius: 10px;
+}
+
+/* Telefon va kichik ekranlar uchun */
+@media (max-width: 768px) {
+  #we {
+    flex-direction: column;
+    text-align: center;
+    padding: 30px 15px;
+    min-height: auto;
+  }
+
+  #we .left,
+  #we .right {
+    max-width: 100%;
+  }
+  
+  #we .left h1 {
+    font-size: 26px;
+  }
+  
+  #we .left p {
+    font-size: 15px;
+  }
+  
+  #we .right iframe {
+    height: 220px;
+    margin-top: 25px;
+  }
+}
+
+/* Planshet */
+@media (min-width: 769px) and (max-width: 1024px) {
+  #we {
+    padding: 35px 40px;
+  }
+  
+  #we .left h1 {
+    font-size: 32px;
+  }
+  
+  #we .left p {
+    font-size: 16px;
+  }
+}
 * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        body{
-         background: #f8f9fa;
-        }
+      
     /* =========================
            TEAM SECTION - MUKAMMAL
         ========================= */
@@ -3727,8 +3989,46 @@ footer .bottom{
                 font-size: 16px;
             }
         }
+        
+.container1 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 320px));
+    gap: 20px;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
 
+/* Tablet uchun (768px - 1024px) */
+@media (max-width: 1024px) {
+    .container1 {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 15px;
+        padding: 15px;
+    }
+}
 
+/* Telefon uchun (max 768px) */
+@media (max-width: 768px) {
+    .container1 {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 15px;
+        padding: 10px;
+    }
+}
+
+/* Kichik telefonlar uchun (max 480px) */
+@media (max-width: 480px) {
+    .container1 {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        padding: 10px;
+    }
+}
+   
 
 
 
