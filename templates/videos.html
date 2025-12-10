@@ -58,15 +58,14 @@
   <!-- "Barchasi" tugmasi -->
   
 
-  <!-- Dinamik kategoriyalar -->
-  {% for cat in VCategory %}
+{% for cat in VCategory %}
+  <a href="{% url 'main:videos' %}?category={{ cat.id }}"
+     {% if active_vcat == cat.id %}class="active"{% endif %}>
     <div class="category-card">
-      <a href="{% url 'main:videos' %}?category={{ cat.id }}"
-         {% if active_vcat == cat.id %}class="active"{% endif %}>
-         {{ cat.name }}
-      </a>
+       {{ cat.name }}
     </div>
-  {% endfor %}
+  </a>
+{% endfor %}
 </div>
  <div class="video-sections">
     <section>

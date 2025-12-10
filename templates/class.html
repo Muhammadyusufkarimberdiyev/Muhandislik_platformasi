@@ -96,20 +96,21 @@
       </ul>
     </nav>
   </header>
-
   <section>
     {% load static %}
 
     <h1 class="videos-title">Sinf darslari</h1>
     
     <div class="sinflar">
-      {% for cat in ClassCategory %}
-        <div class="head">
-          <a href="{% url 'main:classselect' %}?category={{ cat.id }}">{{ cat.name }}</a>
-        </div>
-      {% empty %}
-        <p class="no-categories">Kategoriyalar topilmadi.</p>
-      {% endfor %}
+    {% for cat in ClassCategory %}
+  <a style="color: white; font-size: 25px;" href="{% url 'main:classselect' %}?category={{ cat.id }}">
+    <div class="head">
+      {{ cat.name }}
+    </div>
+  </a>
+{% empty %}
+  <p class="no-categories">Kategoriyalar topilmadi.</p>
+{% endfor %}
     </div>
   </section>
 
